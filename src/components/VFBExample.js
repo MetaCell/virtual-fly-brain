@@ -18,6 +18,7 @@ const INSTANCES = [
   'VFB_00030632',
   'VFB_00030783',
 ];
+
 const COLORS = [
   { r: 0.36, g: 0.36, b: 0.36, a: 1 },
   { r: 0, g: 1, b: 0, a: 1 },

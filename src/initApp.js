@@ -1,5 +1,5 @@
 import { Application } from './Application';
-import { loadQuery } from './components/actions/loadQuery';
+import { loadQuery } from './reducers/actions/loadQuery';
 
 loadQuery('VFB_00101567'); //inital query load
 

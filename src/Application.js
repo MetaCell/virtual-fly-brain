@@ -1,15 +1,12 @@
-import { combineReducers, configureStore } from 'redux';
+import { combineReducers, applyMiddleware } from 'redux';
 import { LayoutReducer } from './reducers/LayoutReducer';
-
-const RootState = {
-  Layout: LayoutReducer
-}
+import thunk from 'redux-thunk'
 
 export function Application(){
 
   const rootReducer = combineReducers({
-    App: AppReducer
+    Layout: LayoutReducer
   });
 
-  return createStore(rootReducer, applyMiddleware(thunk)) ;
+  return configureStore(rootReducer, applyMiddleware(thunk)) ;
 }

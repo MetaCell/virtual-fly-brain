@@ -1,19 +1,42 @@
 import { queryById } from "../../network/query"
-import { requestStarted, requestSucceeded  } from "./base"
+
+export const loadQueryTypes = {
+  LOAD_QUERY_SUCCESS : 'LOAD_QUERY_SUCCESS',
+  LOAD_QUERY_STARTED : 'LOAD_QUERY_STARTED',
+  LOAD_QUERY_FAILURE : 'LOAD_QUERY_FAILURE'
+}
+
+const loadQuerySuccess = query => ({
+  type: loadQueryTypes.LOAD_QUERY_SUCCESS,
+  payload: {
+    ...query
+  }
+});
+
+const loadQueryStarted = () => ({
+  type: loadQueryTypes.LOAD_QUERY_STARTED
+});
+
+const loadQueryFailure = error => ({
+  type: loadQueryTypes.LOAD_QUERY_FAILURE,
+  payload: {
+    error
+  }
+});
 
 export const loadQuery = (queryId) => {
   return async (dispatch, getState) => {
-    dispatch(requestStarted())
+    dispatch(loadQueryStarted())
 
     let response
 
     try {
       response = await queryById(queryId);
     } catch (error) {
-      dispatch(requestFailed(error.message))
+      dispatch(loadQueryFailure(error.message))
       return
     }
 
-    dispatch(requestSucceeded(response.data))
+    dispatch(loadQuerySuccess(response.data))
   }
 }

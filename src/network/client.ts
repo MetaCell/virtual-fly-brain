@@ -16,12 +16,11 @@ export interface IHttpClient {
 
 export class HttpClient implements IHttpClient {
   public _url : string ;
-  public _endPoint: string ;
   constructor(url:string){
     this._url = url ;
   }
 
-  public encodeGetParams = p => Object.entries(p).map(kv => kv.map(encodeURIComponent).join('=')).join('&');
+  public encodeGetParams  = p => Object.entries(p).map(kv => kv.map( v => encodeURIComponent ).join('=')).join('&');
 
   public get<T>(parameters: IHttpClientRequestParameters<T>): Promise<T> {
     return new Promise<T>((resolve, reject) => {

@@ -1,4 +1,5 @@
 import { combineReducers, applyMiddleware } from 'redux';
+import { configureStore } from "@reduxjs/toolkit";
 import { LayoutReducer } from './reducers/LayoutReducer';
 import thunk from 'redux-thunk'
 

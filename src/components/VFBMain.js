@@ -53,26 +53,26 @@ export class VFBMain extends React.Component {
       menuHandler={this.menuHandler}/>
     
     <div>
-      <Canvas
+      {/* <Canvas
         id="CanvasContainer"
         name={"Canvas"}
         baseZoom="1.2"
         movieFilter={false}
         wireframeEnabled={true}
         minimiseAnimation={true}
-        />
+        /> */}
     </div>
 
     <div className="flexChildContainer">
-          <VFBStackViewer
-            id="NewStackViewer"
-            defHeight={_height}
-            defWidth={_width}
-            layout={this.refs.layout}
-            ref={ref => this.sliceViewerReference = ref}
-            canvasRef={this.canvasReference}
-            onLoad={this.StackViewerIdLoaded}
-            stackViewerHandler={this.stackViewerHandler} />
+      <VFBStackViewer
+        id="NewStackViewer"
+        defHeight={_height}
+        defWidth={_width}
+        layout={this.refs.layout}
+        ref={ref => this.sliceViewerReference = ref}
+        canvasRef={this.canvasReference}
+        onLoad={this.StackViewerIdLoaded}
+        stackViewerHandler={this.stackViewerHandler} />
     </div>
 
     <FlexLayout.Layout

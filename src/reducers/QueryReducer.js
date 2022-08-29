@@ -1,11 +1,11 @@
-import loadQueryTypes from "./actions/loadQuery";
+import { loadQueryTypes } from "./actions/loadQuery";
 
 const initialState = {
   isLoading: false,
-  json: unfefined //this will evolve into separate reducers
+  json: undefined //this will evolve into separate reducers
 };
 
-const reducer = (state = initialState, action) => {
+const QueryReducer = (state = initialState, action) => {
   switch (action.type) {
      case loadQueryTypes.LOAD_QUERY_STARTED:
         return Object.assign({}, state, {
@@ -20,4 +20,4 @@ const reducer = (state = initialState, action) => {
         return state;
   }
 }
-export default reducer;
+export default QueryReducer;

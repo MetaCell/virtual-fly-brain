@@ -37,6 +37,6 @@ export const loadQuery = (queryId) => {
       return
     }
 
-    dispatch(loadQuerySuccess(response.data))
+    dispatch(loadQuerySuccess(response.response))
   }
 }

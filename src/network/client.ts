@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig } from 'axios'
 
-const backendUrl = 'https://solr.virtualflybrain.org/solr/'; 
+const backendUrl = 'https://solr.virtualflybrain.org/solr'; 
 
 export interface IHttpClientRequestParameters<T> {
   endPoint: string
@@ -20,7 +20,7 @@ export class HttpClient implements IHttpClient {
     this._url = url ;
   }
 
-  public encodeGetParams  = p => Object.entries(p).map(kv => kv.map( v => encodeURIComponent ).join('=')).join('&');
+  public encodeGetParams  = p => Object.entries(p).map(kv => kv.map( v => encodeURIComponent(v as string) ).join('=')).join('&');
 
   public get<T>(parameters: IHttpClientRequestParameters<T>): Promise<T> {
     return new Promise<T>((resolve, reject) => {

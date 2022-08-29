@@ -9,12 +9,12 @@ const QueryReducer = (state = initialState, action) => {
   switch (action.type) {
      case loadQueryTypes.LOAD_QUERY_STARTED:
         return Object.assign({}, state, {
-           isLoading: action.payload.isLoading
+           isLoading: true
         })
      case loadQueryTypes.LOAD_QUERY_SUCCESS:
         return Object.assign({}, state, {
-           items: state.items.concat(action.items),
-           isLoading: action.isLoading
+           json: action.payload,
+           isLoading: false
         })
      default:
         return state;

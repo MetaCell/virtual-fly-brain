@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 import React, { Component } from 'react';
 import VFBToolBar from './VFBToolbar';
-import Canvas from "@metacell/geppetto-meta-ui/3d-canvas/Canvas";
+import VFBOBJModelLoader from './VFBOBJModelLoader';
 import VFBStackViewer from './VFBStackViewer';
 import * as FlexLayout from '@metacell/geppetto-meta-ui/flex-layout/src';
 import '@metacell/geppetto-meta-ui/flex-layout/style/dark.scss'
@@ -53,21 +53,12 @@ export class VFBMain extends React.Component {
       menuHandler={this.menuHandler}/>
     
     <div>
-      {/* <Canvas
-        id="CanvasContainer"
-        name={"Canvas"}
-        baseZoom="1.2"
-        movieFilter={false}
-        wireframeEnabled={true}
-        minimiseAnimation={true}
-        /> */}
+      <VFBOBJModelLoader />
     </div>
 
     <div className="flexChildContainer">
       <VFBStackViewer
         id="NewStackViewer"
-        defHeight={_height}
-        defWidth={_width}
         layout={this.refs.layout}
         ref={ref => this.sliceViewerReference = ref}
         canvasRef={this.canvasReference}
@@ -75,12 +66,12 @@ export class VFBMain extends React.Component {
         stackViewerHandler={this.stackViewerHandler} />
     </div>
 
-    <FlexLayout.Layout
+    {/* <FlexLayout.Layout
       ref="layout"
       model={this.model}
       factory={this.factory.bind(this)}
       onRenderTabSet={onRenderTabSet}
-      clickOnBordersAction={clickOnBordersAction}/>
+      clickOnBordersAction={clickOnBordersAction}/> */}
     
     {this.htmlToolbarRender}
   </div>)

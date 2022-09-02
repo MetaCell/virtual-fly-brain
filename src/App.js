@@ -5,6 +5,7 @@ import { VFBMain } from './components/VFBMain'
 function App() {
   return (
     <div className="App">
+      <VFBMain />
     </div>
   );
 }

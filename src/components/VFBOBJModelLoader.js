@@ -1,38 +1,32 @@
 import React, { Component } from 'react';
 import Canvas from "@metacell/geppetto-meta-ui/3d-canvas/Canvas";
 import CameraControls from "@metacell/geppetto-meta-ui/camera-controls/CameraControls";
-import SimpleInstance from "@metacell/geppetto-meta-core/model/SimpleInstance";
 import { withStyles } from '@material-ui/core';
-import neuron from './assets/SketchVolumeViewer_SAAVR_SAAVR_1_1_0000_draco.gltf';
-import contact from './assets/Sketch_Volume_Viewer_AIB_Rby_AIAR_AIB_Rby_AIAR_1_1_0000_green_0_24947b6670.gltf';
 import Button from "@material-ui/core/Button";
 import { applySelection, mapToCanvasData } from "@metacell/geppetto-meta-ui/3d-canvas/utils/SelectionUtils"
 import CaptureControls from "@metacell/geppetto-meta-ui/capture-controls/CaptureControls";
-import Resources from '@metacell/geppetto-meta-core/Resources';
-import ModelFactory from '@metacell/geppetto-meta-core/ModelFactory';
-import { augmentInstancesArray } from '@metacell/geppetto-meta-core/Instances';
 
 const instanceSpec = {
   "eClass": "SimpleInstance",
   "id": "ANeuron",
   "name": "VFB Obj Loader",
-  "type": { "eClass": "SimpleType" },
-  "visualValue": {
-    "eClass": Resources.OBJ,
-    'gltf': neuron
-  }
+  "type": { "eClass": "SimpleType" }
+  // , "visualValue": {
+  //   "eClass": Resources.OBJ,
+  //   'gltf': neuron
+  // }
 }
 
 function loadInstances (){
-  ModelFactory.cleanModel();
-  const instance1 = new SimpleInstance(instance1spec)
-  window.Instances = [instance1, instance2]
-  augmentInstancesArray(window.Instances);
+  // ModelFactory.cleanModel();
+  // const instance1 = new SimpleInstance(instance1spec)
+  // window.Instances = [instance1, instance2]
+  // augmentInstancesArray(window.Instances);
 }
 
 function getProxyInstances () {
-  return window.Instances.map(i => (
-    { instancePath: i.getId(), color: { r: 0, g:1, b: 0, a:1 } }))
+  // return window.Instances.map(i => (
+  //   { instancePath: i.getId(), color: { r: 0, g:1, b: 0, a:1 } }))
 }
 
 const styles = () => ({
@@ -44,13 +38,13 @@ const styles = () => ({
   },
 });
 
-class VFBOVJModelLoader extends Component {
+class VFBOBJModelLoader extends Component {
   constructor (props) {
     super(props);
     loadInstances()
     this.state = {
       data: getProxyInstances(),
-      showLoader: false,
+      showLoader: true,
       cameraOptions: {
         angle: 50,
         near: 0.01,
@@ -111,7 +105,7 @@ class VFBOVJModelLoader extends Component {
 
   render () {
     const { data, cameraOptions, showModel, showLoader } = this.state
-    const canvasData = mapToCanvasData(data)
+    const canvasData = undefined; //mapToCanvasData(data)
     const { classes } = this.props
 
     const captureOptions = {
@@ -134,7 +128,7 @@ class VFBOVJModelLoader extends Component {
       },
     }
 
-    return showLoader ? <Loader active={true} /> : showModel ? (
+    return showLoader ? <div>OBJ Model Loading...</div> : 
       <div ref={node => this.node = node} className={classes.container}>
         <>
           <Canvas
@@ -149,14 +143,7 @@ class VFBOVJModelLoader extends Component {
           />
         </>
       </div>
-    ) : <Button
-      variant="outlined"
-      color="primary"
-      onClick={this.handleToggle}
-    >
-      Show Example
-    </Button>
   }
 }
 
-export default withStyles(styles)(VFBOVJModelLoader);
+export default withStyles(styles)(VFBOBJModelLoader);

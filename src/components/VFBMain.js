@@ -53,17 +53,17 @@ export class VFBMain extends React.Component {
       menuHandler={this.menuHandler}/>
     
     <div>
-      <VFBOBJModelLoader />
+      {/* <VFBOBJModelLoader /> */}
     </div>
 
     <div className="flexChildContainer">
-      <VFBStackViewer
+      {/* <VFBStackViewer
         id="NewStackViewer"
         layout={this.refs.layout}
         ref={ref => this.sliceViewerReference = ref}
         canvasRef={this.canvasReference}
         onLoad={this.StackViewerIdLoaded}
-        stackViewerHandler={this.stackViewerHandler} />
+        stackViewerHandler={this.stackViewerHandler} /> */}
     </div>
 
     {/* <FlexLayout.Layout

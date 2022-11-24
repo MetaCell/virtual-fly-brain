@@ -1,10 +1,13 @@
 import React, { useState, useEffect }  from 'react';
 import { useSelector } from 'react-redux';
 import Canvas from "@metacell/geppetto-meta-ui/3d-canvas/Canvas";
+import SimpleInstance from "@metacell/geppetto-meta-core/model/SimpleInstance";
 import CameraControls from "@metacell/geppetto-meta-ui/camera-controls/CameraControls";
 import { withStyles } from '@material-ui/core';
 import { applySelection, mapToCanvasData } from "@metacell/geppetto-meta-ui/3d-canvas/utils/SelectionUtils"
 import CaptureControls from "@metacell/geppetto-meta-ui/capture-controls/CaptureControls";
+import { augmentInstancesArray } from '@metacell/geppetto-meta-core/Instances';
+import ModelFactory from '@metacell/geppetto-meta-core/ModelFactory';
 
 function getProxyInstances () {
   return window.Instances.map(i => (
@@ -38,10 +41,10 @@ const VFBOBJModelLoader = () => {
               'obj': obj
             }
           }
-          // ModelFactory.cleanModel();
-          // const instance = new SimpleInstance(model)
-          // window.Instances = [instance]
-          // augmentInstancesArray(window.Instances);
+          ModelFactory.cleanModel();
+          const instance = new SimpleInstance(model)
+          window.Instances = [instance]
+          augmentInstancesArray(window.Instances);
         })
       }
     }
@@ -65,7 +68,7 @@ const VFBOBJModelLoader = () => {
         wireframe: false,
       }
     }
-
+    const canvasRef = React.createRef();
     const canvasData = mapToCanvasData(data)
     const { classes } = this.props
     const [data, setData] = useState({});
@@ -97,14 +100,14 @@ const VFBOBJModelLoader = () => {
       <div ref={node => this.node = node} className={classes.container}>
         <>
           <Canvas
-            ref={this.canvasRef}
-            data={this.canvasData}
-            cameraOptions={this.state.cameraOptions}
-            captureOptions={this.captureOptions}
+            ref={canvasRef}
+            data={canvasData}
+            cameraOptions={state.cameraOptions}
+            captureOptions={captureOptions}
             backgroundColor={0x505050}
-            onSelection={this.onSelection}
-            onMount={this.onMount}
-            onHoverListeners={{ 'hoverId':this.hoverHandler }}
+            //onSelection={onSelection}
+            //onMount={onMount}
+            //onHoverListeners={{ 'hoverId':hoverHandler }}
           />
         </>
       </div>

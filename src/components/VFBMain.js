@@ -53,7 +53,7 @@ export class VFBMain extends React.Component {
       menuHandler={this.menuHandler}/>
     
     <div>
-      {/* <VFBOBJModelLoader /> */}
+      <VFBOBJModelLoader modelId={'VFB_00101567'} />
     </div>
 
     <div className="flexChildContainer">

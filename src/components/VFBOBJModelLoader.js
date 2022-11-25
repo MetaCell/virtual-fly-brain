@@ -23,94 +23,83 @@ const styles = () => ({
   },
 });
 
-const VFBOBJModelLoader = () => {
+const VFBOBJModelLoader = (props) => {
+
+  const dataSetsQuery = useSelector(state => state.Query.datasets_query);
+  const canvasRef = React.createRef();
+  const modelId = props.modelId
+  const [canvasData, setCanvasData] = useState(undefined);
+
+  function getProxyInstances () {
+    return window.Instances.map(i => (
+      { instancePath: i.getId(), }))
+  }
 
   useEffect(() => {
     if(dataSetsQuery) {
 
-      const loadInstance = async (dataSetsQuery) => {
-        return fetch(dataSetsQuery)
-        .then(obj => { 
-          const model = {
-            "eClass": "SimpleInstance",
-            "id": "ANeuron",
-            "name": "VFB Obj Loader",
-            "type": { "eClass": "SimpleType" }
-            , "visualValue": {
-              "eClass": "OBJ", //Resources.OBJ,
-              'obj': obj
+      const loadInstance = async (dataSetsQuery, modelId) => {
+        if (dataSetsQuery.length > 0)
+        {
+          const objUrl = dataSetsQuery.find( query => query.indexOf(modelId) > -1 ) + '/volume.obj';
+          return fetch(objUrl)
+          .then(obj => { 
+            const model = {
+              "eClass": "SimpleInstance",
+              "id": "ANeuron",
+              "name": "VFB Obj Loader",
+              "type": { "eClass": "SimpleType" }
+              , "visualValue": {
+                "eClass": "OBJ", //Resources.OBJ,
+                'obj': obj
+              }
             }
-          }
-          ModelFactory.cleanModel();
-          const instance = new SimpleInstance(model)
-          window.Instances = [instance]
-          augmentInstancesArray(window.Instances);
-        })
+            ModelFactory.cleanModel();
+            const instance = new SimpleInstance(model)
+            window.Instances = [instance]
+            augmentInstancesArray(window.Instances);
+
+            const data = getProxyInstances();
+            setCanvasData(data);
+          })
+        }
       }
+
+      loadInstance(dataSetsQuery, modelId).catch(console.error);
     }
 
-    //loadInstance().catch(console.error);
   }, [dataSetsQuery]); // listen only to currentChannelName changes
 
     const state = {
       cameraOptions: {
-        angle: 50,
-        near: 0.01,
-        far: 1000,
+        angle: 60,
+        near: 10,
+        far: 2000000,
         baseZoom: 1,
         cameraControls: {
           instance: CameraControls,
-          props: { wireframeButtonEnabled: false },
+          props: { wireframeButtonEnabled: false, },
         },
-        initialFlip: ['y', 'z'],
         reset: false,
         autorotate: false,
         wireframe: false,
-      }
-    }
-    const canvasRef = React.createRef();
-    const canvasData = mapToCanvasData(data)
-    const { classes } = this.props
-    const [data, setData] = useState({});
-    const [showLoader, setShowLoader] = useState(true);
-
-    const dataSetsQuery = useSelector(state => state.Query.datasets_query);
-
-    const captureOptions = {
-      captureControls: {
-        instance: CaptureControls,
-        props: {}
-      },
-      recorderOptions: {
-        mediaRecorderOptions: { mimeType: 'video/webm', },
-        blobOptions:{ type: 'video/webm' }
-      },
-      screenshotOptions:{
-        resolution:{
-          width: 3840,
-          height: 2160,
-        },
-        quality: 0.95,
-        pixelRatio: 1,
-        filter: () => true
+        initialPosition: { x: 230.357, y: 256.435, z: 934.238 },
+        initialRotation: { rx: -0.294, ry: -0.117, rz: -0.02, radius: 531.19 },
       },
     }
     
-    return showLoader ? <div>OBJ Model Loading...</div> : 
-      <div ref={node => this.node = node} className={classes.container}>
+    return canvasData ?  
+      <div ref={node => this.node = node} className={props.classes.container}>
         <>
           <Canvas
             ref={canvasRef}
             data={canvasData}
             cameraOptions={state.cameraOptions}
-            captureOptions={captureOptions}
             backgroundColor={0x505050}
-            //onSelection={onSelection}
-            //onMount={onMount}
-            //onHoverListeners={{ 'hoverId':hoverHandler }}
           />
         </>
       </div>
+      : <><div>OBJ Model Loading...</div></> ;
 }
 
 export default withStyles(styles)(VFBOBJModelLoader);

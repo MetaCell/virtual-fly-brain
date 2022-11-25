@@ -3,16 +3,12 @@ import { useSelector } from 'react-redux';
 import Canvas from "@metacell/geppetto-meta-ui/3d-canvas/Canvas";
 import SimpleInstance from "@metacell/geppetto-meta-core/model/SimpleInstance";
 import CameraControls from "@metacell/geppetto-meta-ui/camera-controls/CameraControls";
-import { withStyles } from '@material-ui/core';
+import CanvasTooltip from "@metacell/geppetto-meta-ui/3d-canvas/utils/CanvasToolTip"
+import { withStyles, makeStyles } from '@material-ui/core';
 import { applySelection, mapToCanvasData } from "@metacell/geppetto-meta-ui/3d-canvas/utils/SelectionUtils"
 import CaptureControls from "@metacell/geppetto-meta-ui/capture-controls/CaptureControls";
 import { augmentInstancesArray } from '@metacell/geppetto-meta-core/Instances';
 import ModelFactory from '@metacell/geppetto-meta-core/ModelFactory';
-
-function getProxyInstances () {
-  return window.Instances.map(i => (
-    { instancePath: i.getId(), color: { r: 0, g:1, b: 0, a:1 } }))
-}
 
 const styles = () => ({
   container: {
@@ -23,10 +19,19 @@ const styles = () => ({
   },
 });
 
+const canvasStyle = makeStyles(() => ({
+  canvasContainer: {
+      height: '100%',
+      width: '100%',
+  },
+}));
+
 const VFBOBJModelLoader = (props) => {
 
+  const style = canvasStyle();
   const dataSetsQuery = useSelector(state => state.Query.datasets_query);
   const canvasRef = React.createRef();
+  const tooltipRef = React.useRef(null);
   const modelId = props.modelId
   const [canvasData, setCanvasData] = useState(undefined);
 
@@ -60,7 +65,8 @@ const VFBOBJModelLoader = (props) => {
             augmentInstancesArray(window.Instances);
 
             const data = getProxyInstances();
-            setCanvasData(data);
+            const canvasData = mapToCanvasData(data)
+            setCanvasData(canvasData);
           })
         }
       }
@@ -68,36 +74,61 @@ const VFBOBJModelLoader = (props) => {
       loadInstance(dataSetsQuery, modelId).catch(console.error);
     }
 
-  }, [dataSetsQuery]); // listen only to currentChannelName changes
+    }, [dataSetsQuery]); // listen only to currentChannelName changes
 
-    const state = {
-      cameraOptions: {
-        angle: 60,
-        near: 10,
-        far: 2000000,
-        baseZoom: 1,
-        cameraControls: {
-          instance: CameraControls,
-          props: { wireframeButtonEnabled: false, },
+    const cameraOptions = {
+      angle: 60,
+      near: 10,
+      far: 2000000,
+      baseZoom: 1,
+      cameraControls: {
+        instance: CameraControls,
+        props: { wireframeButtonEnabled: false, },
+      },
+      reset: false,
+      autorotate: false,
+      wireframe: false
+    }
+
+    const captureOptions = {
+      captureControls: {
+        instance: CaptureControls,
+        props: {}
+      },
+      recorderOptions: {
+        mediaRecorderOptions: { mimeType: 'video/webm', },
+        blobOptions:{ type: 'video/webm' }
+      },
+      screenshotOptions:{
+        resolution:{
+          width: 3840,
+          height: 2160,
         },
-        reset: false,
-        autorotate: false,
-        wireframe: false,
-        initialPosition: { x: 230.357, y: 256.435, z: 934.238 },
-        initialRotation: { rx: -0.294, ry: -0.117, rz: -0.02, radius: 531.19 },
+        quality: 0.95,
+        pixelRatio: 1,
+        filter: () => true
       },
     }
-    
+
     return canvasData ?  
-      <div ref={node => this.node = node} className={props.classes.container}>
-        <>
-          <Canvas
-            ref={canvasRef}
-            data={canvasData}
-            cameraOptions={state.cameraOptions}
-            backgroundColor={0x505050}
-          />
-        </>
+      <div className={style.canvasContainer}>
+        <div id={'canvas-tooltips-container'}>
+            <div>
+                <CanvasTooltip
+                    ref={tooltipRef}
+                />
+                
+            </div>
+        </div>
+        <div className={style.canvasContainer}>
+            <Canvas
+              ref={canvasRef}
+              data={canvasData}
+              cameraOptions={cameraOptions}
+              captureOptions={captureOptions}
+              backgroundColor={0x505050}
+            />
+        </div>
       </div>
       : <><div>OBJ Model Loading...</div></> ;
 }

@@ -1,0 +1,5 @@
+domain: olphactory.metacell.us
+namespace: CHANGE ME
+backup:
+  active: false
+mainapp: pub-chem-index

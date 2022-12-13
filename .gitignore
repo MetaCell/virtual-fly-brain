@@ -1,7 +1,7 @@
 
-/node_modules
+applications/virtual-fly-brain/client/node_modules
 
 # production
-/build
-/dist
+applications/virtual-fly-brain/client/build
+applications/virtual-fly-brain/client/dist
 

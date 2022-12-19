@@ -71,7 +71,7 @@ steps:
         stage: publish
         type: push
         title: Cloudharness base
-        candidate: '${{REGISTRY}}/olphactory/cloudharness-base:${{DEPLOYMENT_TAG}}'
+        candidate: '${{REGISTRY}}/cloudharness-base:${{DEPLOYMENT_TAG}}'
         tags:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'
         - latest
@@ -80,34 +80,25 @@ steps:
         stage: publish
         type: push
         title: Cloudharness flask
-        candidate: '${{REGISTRY}}/olphactory/cloudharness-flask:${{DEPLOYMENT_TAG}}'
+        candidate: '${{REGISTRY}}/cloudharness-flask:${{DEPLOYMENT_TAG}}'
         tags:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'
         - latest
         registry: '${{REGISTRY_PUBLISH_URL}}'
-      publish_virtual-fy-brain-postgres:
+      publish_postgres:
         stage: publish
         type: push
         title: VirtualFlyBrain postgres
-        candidate: '${{REGISTRY}}/olphactory/virtual-fy-brain-postgres:${{DEPLOYMENT_TAG}}'
+        candidate: '${{REGISTRY}}/postgres:${{DEPLOYMENT_TAG}}'
         tags:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'
         - latest
         registry: '${{REGISTRY_PUBLISH_URL}}'
-      publish_pub-chem-index-ingestion:
-        stage: publish
-        type: push
-        title: Pub chem index ingestion
-        candidate: '${{REGISTRY}}/olphactory/pub-chem-index-ingestion:${{DEPLOYMENT_TAG}}'
-        tags:
-        - '${{DEPLOYMENT_PUBLISH_TAG}}'
-        - latest
-        registry: '${{REGISTRY_PUBLISH_URL}}'
-      publish_pub-chem-index:
+      publish_virtual-fly-brain:
         stage: publish
         type: push
         title: Pub chem index
-        candidate: '${{REGISTRY}}/olphactory/pub-chem-index:${{DEPLOYMENT_TAG}}'
+        candidate: '${{REGISTRY}}/virtual-fly-brain:${{DEPLOYMENT_TAG}}'
         tags:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'
         - latest

@@ -9,7 +9,7 @@ harness:
     type: postgres
     auto: true
     name: virtual-fy-brain-db
-    image_ref: virtual-fy-brain-postgres
+    image_ref: postgres
     size: 240Gi
     resources:
       requests:
@@ -26,6 +26,6 @@ harness:
     build:
       - cloudharness-base-debian
       - cloudharness-flask
-      - virtual-fy-brain-postgres
+      - postgres
     soft:
     - argo

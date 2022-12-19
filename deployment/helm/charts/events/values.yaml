@@ -1,0 +1,48 @@
+affinity: {}
+annotations: {}
+autoscaling: {enabled: false, maxReplicas: 100, minReplicas: 1, targetCPUUtilizationPercentage: 80}
+env: {}
+envs:
+  config: {}
+  secret: {}
+existingConfigMap: ''
+existingSecret: ''
+fullnameOverride: events-ui
+image: {pullPolicy: IfNotPresent, registry: docker.io, repository: provectuslabs/kafka-ui,
+  tag: ''}
+imagePullSecrets: []
+ingress:
+  annotations: {}
+  enabled: false
+  host: ''
+  ingressClassName: ''
+  path: /
+  precedingPaths: []
+  succeedingPaths: []
+  tls: {enabled: false, secretName: ''}
+initContainers: {}
+nameOverride: ''
+networkPolicy:
+  egressRules:
+    customRules: []
+  enabled: false
+  ingressRules:
+    customRules: []
+nodeSelector: {}
+podAnnotations: {}
+podLabels: {}
+podSecurityContext: {}
+probes: {useHttpsScheme: false}
+replicaCount: 1
+resources: {}
+securityContext: {}
+service: {port: 80, type: ClusterIP}
+serviceAccount:
+  annotations: {}
+  create: true
+  name: ''
+tolerations: []
+volumeMounts: {}
+volumes: {}
+yamlApplicationConfig: {}
+yamlApplicationConfigConfigMap: {keyName: config.yml, name: kafka-ui-configmap}

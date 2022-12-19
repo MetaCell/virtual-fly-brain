@@ -1,0 +1,27 @@
+openapi: 3.0.2
+info:
+  title: VirtualFlyBrainIndex
+  version: 1.0.0
+servers:
+- url: /
+tags:
+- name: test
+  /test:
+    description: Test API.
+    get:
+      description: Test API.
+      operationId: test
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/test'
+                type: array
+          description: Test API.
+      summary: Test API
+      tags:
+      - test
+      x-openapi-router-controller: virtual_fly_brain.controllers.test
+    summary: Test API

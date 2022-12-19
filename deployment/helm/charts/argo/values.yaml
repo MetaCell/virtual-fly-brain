@@ -1,0 +1,133 @@
+artifactRepository:
+  archiveLogs: false
+  s3:
+    accessKeySecret: {key: accesskey}
+    insecure: true
+    secretKeySecret: {key: secretkey}
+controller:
+  affinity: {}
+  clusterWorkflowTemplates: {enabled: true}
+  containerRuntimeExecutor: pns
+  extraArgs: []
+  extraContainers: []
+  extraEnv: []
+  image: {registry: quay.io, repository: argoproj/workflow-controller, tag: ''}
+  initialDelay: null
+  instanceID: {enabled: false}
+  links: []
+  livenessProbe:
+    failureThreshold: 3
+    httpGet: {path: /healthz, port: 6060}
+    initialDelaySeconds: 90
+    periodSeconds: 60
+    timeoutSeconds: 30
+  loadBalancerSourceRanges: []
+  logging: {globallevel: '0', level: info}
+  metricsConfig: {enabled: false, path: /metrics, port: 9090, portName: metrics, servicePort: 8080,
+    servicePortName: metrics}
+  name: workflow-controller
+  namespaceParallelism: null
+  nodeSelector: {kubernetes.io/os: linux}
+  parallelism: null
+  pdb: {enabled: false}
+  persistence: {}
+  podAnnotations: {}
+  podLabels: {}
+  podSecurityContext: {}
+  priorityClassName: ''
+  replicas: 1
+  resources: {}
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop: [ALL]
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+  serviceAccount:
+    annotations: {}
+    create: true
+    name: ''
+  serviceAnnotations: {}
+  serviceLabels: {}
+  serviceMonitor:
+    additionalLabels: {}
+    enabled: false
+  serviceType: ClusterIP
+  telemetryConfig: {enabled: false, path: /telemetry, port: 8081, servicePort: 8081,
+    servicePortName: telemetry}
+  tolerations: []
+  workflowDefaults: {}
+  workflowNamespaces: [default]
+  workflowRestrictions: {}
+createAggregateRoles: true
+executor:
+  env: {}
+  image: {registry: quay.io, repository: argoproj/argoexec, tag: ''}
+  resources: {}
+  securityContext: {}
+fullnameOverride: argo
+images:
+  pullPolicy: Always
+  pullSecrets: []
+kubeVersionOverride: ''
+nameOverride: null
+server:
+  affinity: {}
+  baseHref: /
+  clusterWorkflowTemplates: {enableEditing: true, enabled: true}
+  enabled: true
+  extraArgs: [--auth-mode=server]
+  extraContainers: []
+  extraEnv: []
+  image: {registry: quay.io, repository: argoproj/argocli, tag: ''}
+  ingress:
+    annotations: {}
+    enabled: false
+    extraPaths: []
+    hosts: []
+    https: false
+    ingressClassName: ''
+    labels: {}
+    pathType: Prefix
+    paths: [/]
+    tls: []
+  loadBalancerIP: ''
+  loadBalancerSourceRanges: []
+  name: server
+  nodeSelector: {kubernetes.io/os: linux}
+  pdb: {enabled: false}
+  podAnnotations: {}
+  podLabels: {}
+  podSecurityContext: {}
+  priorityClassName: ''
+  replicas: 1
+  resources: {}
+  secure: false
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop: [ALL]
+    readOnlyRootFilesystem: false
+    runAsNonRoot: true
+  serviceAccount:
+    annotations: {}
+    create: true
+    name: ''
+  serviceAnnotations: {}
+  serviceLabels: {}
+  servicePort: 2746
+  serviceType: ClusterIP
+  sso: null
+  tolerations: []
+  volumeMounts: []
+  volumes: []
+singleNamespace: true
+useDefaultArtifactRepo: false
+useStaticCredentials: true
+workflow:
+  namespace: null
+  rbac: {create: true}
+  serviceAccount:
+    annotations: {}
+    create: false
+    name: argo-workflow

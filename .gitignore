@@ -4,4 +4,5 @@ applications/virtual-fly-brain/client/node_modules
 # production
 applications/virtual-fly-brain/client/build
 applications/virtual-fly-brain/client/dist
+cloud-harness
 

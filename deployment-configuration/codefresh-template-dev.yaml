@@ -12,5 +12,5 @@ steps:
     working_directory: .
     commands:
     - bash cloud-harness/install.sh
-    - harness-deployment cloud-harness . -t ${{CF_BUILD_ID}} -d ${{DOMAIN}} -r ${{REGISTRY}} -i pub-chem-index
+    - harness-deployment cloud-harness . -t ${{CF_BUILD_ID}} -d ${{DOMAIN}} -r ${{REGISTRY}} -i virtual-fly-brain
       -rs ${{REGISTRY_SECRET}} -e dev -n ${{NAMESPACE}}

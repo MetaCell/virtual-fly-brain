@@ -1,0 +1,8 @@
+apiVersion: v1
+appVersion: 0.0.1
+description: CHANGE DESCRIPTION
+maintainers:
+- {email: filippo@metacell.us, name: Filippo Ledda}
+- {email: zoran@metacell.us, name: Zoran Sinnema}
+name: olphactory
+version: 0.0.1

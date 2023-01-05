@@ -27,7 +27,7 @@ def init_webapp_routes(app):
             return error
         return index()
 
-app = init_flask(title="Olphactory virtual-fy-brain index API", webapp=False, init_app_fn=init_webapp_routes)
+app = init_flask(title="virtual-fy-brain index API", webapp=False, init_app_fn=init_webapp_routes)
 
 def main():
     app.run(host='0.0.0.0', port=8080)

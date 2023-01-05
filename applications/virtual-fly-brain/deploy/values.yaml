@@ -26,6 +26,6 @@ harness:
     build:
       - cloudharness-base-debian
       - cloudharness-flask
-      - postgres
+      - cloudharness-postgres
     soft:
     - argo

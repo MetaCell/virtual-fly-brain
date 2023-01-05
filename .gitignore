@@ -5,4 +5,8 @@ applications/virtual-fly-brain/client/node_modules
 applications/virtual-fly-brain/client/build
 applications/virtual-fly-brain/client/dist
 cloud-harness
+deployment/helm
+skaffold.yaml
+.vscode
+.overrides
 

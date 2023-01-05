@@ -110,7 +110,7 @@ steps:
         - DOMAIN=${{DOMAIN}}
         - NOCACHE=${{CF_BUILD_ID}}
         - REGISTRY=${{REGISTRY}}/
-        image_name: postgres
+        image_name: cloudharness-postgres
         title: VirtualFlyBrain postgres
         working_directory: ./infrastructure/common-images/postgres
   build_application_images:

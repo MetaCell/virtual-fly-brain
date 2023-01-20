@@ -146,7 +146,7 @@ steps:
         - REGISTRY=${{REGISTRY}}/
         - CLOUDHARNESS_FLASK=${{REGISTRY}}/cloudharness-flask:${{CF_BUILD_ID}}
         image_name: virtual-fly-brain
-        title: Pub chem index
+        title: Virtual Fly Brain Dev
         working_directory: ./applications/virtual-fly-brain/backend
   deployment:
     stage: deploy

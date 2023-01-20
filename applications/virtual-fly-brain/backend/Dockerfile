@@ -10,7 +10,7 @@ ENV BUILDDIR=/dist
 RUN apk update
 RUN apk add postgresql-dev gcc python3-dev musl-dev npm
 
-COPY ./../client ${BUILDDIR}
+COPY ./client ${BUILDDIR}
 WORKDIR ${BUILDDIR}
 RUN npm install
 RUN npm run build

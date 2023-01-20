@@ -1,231 +1,35 @@
-version: '1.0'
+version: "1.0"
 stages:
-- prepare
-- build
-- deploy
-- publish
+  - "clone"
+  - "build"
+  - "deploy"
 steps:
-  main_clone:
-    title: Clone main repository
-    type: git-clone
-    stage: prepare
-    repo: '${{CF_REPO_OWNER}}/${{CF_REPO_NAME}}'
-    revision: '${{CF_BRANCH}}'
-    git: github
-  post_main_clone:
-    title: Post main clone
-    type: parallel
-    stage: prepare
-    steps:
-    - title: Cloning cloud-harness repository...
-      type: git-clone
-      stage: prepare
-      repo: https://github.com/MetaCell/cloud-harness.git
-      revision: '${{CLOUDHARNESS_BRANCH}}'
-      working_directory: .
-      git: github
-  prepare_deployment:
-    title: Prepare helm chart
-    image: python:3.9.10
-    stage: prepare
-    working_directory: .
+  clone:
+    stage: "clone"
+    title: "Cloning Apinatomy"
+    type: "git-clone"
+    repo: "metacell/virtual-fly-brain"
+    revision: "${{CF_BRANCH}}"
+  build:
+    stage: "build"
+    title: "Building Virtual Fly Brain"
+    type: "build"
+    image_name: "vfb"
+    tag: "${{CF_BUILD_ID}}"
+    dockerfile: Dockerfile
+    working_directory: ./virtual-fly-brain/applications/virtual-fly-brain/backend
+    buildkit: true    
+    registry: "${{CODEFRESH_REGISTRY}}"
+  deploy:
+    stage: "deploy"
+    title: "Deploying Apinatomy"
+    image: codefresh/kubectl
+    working_directory: ./virtual-fly-brain/deployment/k8s
     commands:
-    - bash cloud-harness/install.sh
-    - harness-deployment cloud-harness . -t ${{CF_BUILD_ID}} -d ${{DOMAIN}} -r ${{REGISTRY}}
-      -i virtual-fly-brain -rs ${{REGISTRY_SECRET}} -e dev -n ${{NAMESPACE}}
-  prepare_deployment_view:
-    commands:
-    - helm template ./deployment/helm --debug -n ${{NAMESPACE}}
-    environment:
-    - ACTION=auth
-    - KUBE_CONTEXT=${{NAMESPACE}}
-    image: codefresh/cfstep-helm:3.6.2
-    stage: prepare
-    title: View helm chart
-  build_base_images:
-    title: Build base images
-    type: parallel
-    stage: build
-    steps:
-      cloudharness-base-debian:
-        type: build
-        stage: build
-        tag: '${{CF_BUILD_ID}}'
-        dockerfile: infrastructure/base-images/cloudharness-base-debian/Dockerfile
-        registry: '${{CODEFRESH_REGISTRY}}'
-        buildkit: true
-        build_arguments:
-        - TAG=${{CF_BUILD_ID}}
-        - DOMAIN=${{DOMAIN}}
-        - NOCACHE=${{CF_BUILD_ID}}
-        - REGISTRY=${{REGISTRY}}/
-        image_name: cloudharness-base-debian
-        title: Cloudharness base debian
-        working_directory: ./cloud-harness
-      cloudharness-base:
-        type: build
-        stage: build
-        tag: '${{CF_BUILD_ID}}'
-        dockerfile: infrastructure/base-images/cloudharness-base/Dockerfile
-        registry: '${{CODEFRESH_REGISTRY}}'
-        buildkit: true
-        build_arguments:
-        - TAG=${{CF_BUILD_ID}}
-        - DOMAIN=${{DOMAIN}}
-        - NOCACHE=${{CF_BUILD_ID}}
-        - REGISTRY=${{REGISTRY}}/
-        image_name: cloudharness-base
-        title: Cloudharness base
-        working_directory: ./cloud-harness
-  build_static_images:
-    title: Build static images
-    type: parallel
-    stage: build
-    steps:
-      cloudharness-flask:
-        type: build
-        stage: build
-        tag: '${{CF_BUILD_ID}}'
-        dockerfile: Dockerfile
-        registry: '${{CODEFRESH_REGISTRY}}'
-        buildkit: true
-        build_arguments:
-        - TAG=${{CF_BUILD_ID}}
-        - DOMAIN=${{DOMAIN}}
-        - NOCACHE=${{CF_BUILD_ID}}
-        - REGISTRY=${{REGISTRY}}/
-        - CLOUDHARNESS_BASE=${{REGISTRY}}/cloudharness-base:${{CF_BUILD_ID}}
-        image_name: cloudharness-flask
-        title: Cloudharness flask
-        working_directory: ./cloud-harness/infrastructure/common-images/cloudharness-flask
-      postgres:
-        type: build
-        stage: build
-        tag: '${{CF_BUILD_ID}}'
-        dockerfile: Dockerfile
-        registry: '${{CODEFRESH_REGISTRY}}'
-        buildkit: true
-        build_arguments:
-        - TAG=${{CF_BUILD_ID}}
-        - DOMAIN=${{DOMAIN}}
-        - NOCACHE=${{CF_BUILD_ID}}
-        - REGISTRY=${{REGISTRY}}/
-        image_name: postgres
-        title: VirtualFlyBrain postgres
-        working_directory: ./infrastructure/common-images/vfb-postgres
-  build_application_images:
-    type: parallel
-    stage: build
-    steps:
-      accounts:
-        type: build
-        stage: build
-        tag: '${{CF_BUILD_ID}}'
-        dockerfile: Dockerfile
-        registry: '${{CODEFRESH_REGISTRY}}'
-        buildkit: true
-        build_arguments:
-        - TAG=${{CF_BUILD_ID}}
-        - DOMAIN=${{DOMAIN}}
-        - NOCACHE=${{CF_BUILD_ID}}
-        - REGISTRY=${{REGISTRY}}/
-        image_name: accounts
-        title: Accounts
-        working_directory: ./cloud-harness/applications/accounts
-      virtual-fly-brain:
-        type: build
-        stage: build
-        tag: '${{CF_BUILD_ID}}'
-        dockerfile: Dockerfile
-        registry: '${{CODEFRESH_REGISTRY}}'
-        buildkit: true
-        build_arguments:
-        - TAG=${{CF_BUILD_ID}}
-        - DOMAIN=${{DOMAIN}}
-        - NOCACHE=${{CF_BUILD_ID}}
-        - REGISTRY=${{REGISTRY}}/
-        - CLOUDHARNESS_FLASK=${{REGISTRY}}/cloudharness-flask:${{CF_BUILD_ID}}
-        image_name: virtual-fly-brain
-        title: Pub chem index
-        working_directory: ./applications/virtual-fly-brain/backend
-  deployment:
-    stage: deploy
-    type: helm
-    working_directory: ./${{CF_REPO_NAME}}
-    title: Installing chart
-    arguments:
-      helm_version: 3.6.2
-      chart_name: deployment/helm
-      release_name: '${{NAMESPACE}}'
-      kube_context: '${{CLUSTER_NAME}}'
-      namespace: '${{NAMESPACE}}'
-      chart_version: '${{CF_BUILD_ID}}'
-      cmd_ps: --wait --timeout 600s
-      custom_value_files:
-      - ./deployment/helm/values.yaml
-      custom_values: []
-  approval:
-    type: pending-approval
-    stage: publish
-    title: Approve build
-    description: Approve build release and tagging
-    timeout:
-      duration: 168
-      finalState: denied
-  publish:
-    type: parallel
-    stage: publish
-    steps:
-      publish_cloudharness-base-debian:
-        stage: publish
-        type: push
-        title: Cloudharness base debian
-        candidate: '${{REGISTRY}}/cloudharness-base-debian:${{CF_BUILD_ID}}'
-        tags:
-        - '${{DEPLOYMENT_PUBLISH_TAG}}'
-        registry: '${{REGISTRY_PUBLISH_URL}}'
-      publish_cloudharness-base:
-        stage: publish
-        type: push
-        title: Cloudharness base
-        candidate: '${{REGISTRY}}/cloudharness-base:${{CF_BUILD_ID}}'
-        tags:
-        - '${{DEPLOYMENT_PUBLISH_TAG}}'
-        registry: '${{REGISTRY_PUBLISH_URL}}'
-      publish_cloudharness-flask:
-        stage: publish
-        type: push
-        title: Cloudharness flask
-        candidate: '${{REGISTRY}}/cloudharness-flask:${{CF_BUILD_ID}}'
-        tags:
-        - '${{DEPLOYMENT_PUBLISH_TAG}}'
-        registry: '${{REGISTRY_PUBLISH_URL}}'
-      publish_accounts:
-        stage: publish
-        type: push
-        title: Accounts
-        candidate: '${{REGISTRY}}/accounts:${{CF_BUILD_ID}}'
-        tags:
-        - '${{DEPLOYMENT_PUBLISH_TAG}}'
-        registry: '${{REGISTRY_PUBLISH_URL}}'
-      publish_postgres:
-        stage: publish
-        type: push
-        title: VirtualFlyBrain postgres
-        candidate: '${{REGISTRY}}/postgres:${{CF_BUILD_ID}}'
-        tags:
-        - '${{DEPLOYMENT_PUBLISH_TAG}}'
-        registry: '${{REGISTRY_PUBLISH_URL}}'
-      publish_virtual-fly-brain:
-        stage: publish
-        type: push
-        title: Pub chem index
-        candidate: '${{REGISTRY}}/virtual-fly-brain:${{CF_BUILD_ID}}'
-        tags:
-        - '${{DEPLOYMENT_PUBLISH_TAG}}'
-        registry: '${{REGISTRY_PUBLISH_URL}}'
-    when:
-      condition:
-        all:
-          whenVarExists: includes("${{DEPLOYMENT_PUBLISH_TAG}}", "{{DEPLOYMENT_PUBLISH_TAG}}")
-            == false
+      - export CLUSTER_NAME="${{CLUSTER_NAME}}"
+      - export NAMESPACE="${{NAMESPACE}}"
+      - export CF_BUILD_ID
+      - export REGISTRY="${{REGISTRY}}/"
+      - export DOMAIN="${{DOMAIN}}"
+      - chmod +x ./deploy.sh
+      - ./deploy.sh

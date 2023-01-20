@@ -97,7 +97,7 @@ steps:
       publish_virtual-fly-brain:
         stage: publish
         type: push
-        title: Pub chem index
+        title: Virtual Fly Brain
         candidate: '${{REGISTRY}}/virtual-fly-brain:${{DEPLOYMENT_TAG}}'
         tags:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'

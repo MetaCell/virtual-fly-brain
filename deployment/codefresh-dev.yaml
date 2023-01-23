@@ -58,8 +58,8 @@ steps:
         - TAG=${{CF_BUILD_ID}}
         - DOMAIN=${{DOMAIN}}
         - NOCACHE=${{CF_BUILD_ID}}
-        - REGISTRY=${{REGISTRY}}/
-        image_name: cloudharness-base-debian
+        - REGISTRY=${{REGISTRY}}/virtual-fly-brain
+        image_name: virtual-fly-brain/cloudharness-base-debian
         title: Cloudharness base debian
         working_directory: ./cloud-harness
       cloudharness-base:
@@ -73,8 +73,8 @@ steps:
         - TAG=${{CF_BUILD_ID}}
         - DOMAIN=${{DOMAIN}}
         - NOCACHE=${{CF_BUILD_ID}}
-        - REGISTRY=${{REGISTRY}}/
-        image_name: cloudharness-base
+        - REGISTRY=${{REGISTRY}}/virtual-fly-brain
+        image_name: virtual-fly-brain/cloudharness-base
         title: Cloudharness base
         working_directory: ./cloud-harness
   build_static_images:
@@ -93,12 +93,12 @@ steps:
         - TAG=${{CF_BUILD_ID}}
         - DOMAIN=${{DOMAIN}}
         - NOCACHE=${{CF_BUILD_ID}}
-        - REGISTRY=${{REGISTRY}}/
+        - REGISTRY=${{REGISTRY}}/virtual-fly-brain
         - CLOUDHARNESS_BASE=${{REGISTRY}}/cloudharness-base:${{CF_BUILD_ID}}
-        image_name: cloudharness-flask
+        image_name: virtual-fly-brain/cloudharness-flask
         title: Cloudharness flask
         working_directory: ./cloud-harness/infrastructure/common-images/cloudharness-flask
-      postgres:
+      vfb-postgres:
         type: build
         stage: build
         tag: '${{CF_BUILD_ID}}'
@@ -109,8 +109,8 @@ steps:
         - TAG=${{CF_BUILD_ID}}
         - DOMAIN=${{DOMAIN}}
         - NOCACHE=${{CF_BUILD_ID}}
-        - REGISTRY=${{REGISTRY}}/
-        image_name: postgres
+        - REGISTRY=${{REGISTRY}}/virtual-fly-brain
+        image_name: virtual-fly-brain/vfb-postgres
         title: VirtualFlyBrain postgres
         working_directory: ./infrastructure/common-images/vfb-postgres
   build_application_images:
@@ -128,8 +128,8 @@ steps:
         - TAG=${{CF_BUILD_ID}}
         - DOMAIN=${{DOMAIN}}
         - NOCACHE=${{CF_BUILD_ID}}
-        - REGISTRY=${{REGISTRY}}/
-        image_name: accounts
+        - REGISTRY=${{REGISTRY}}/virtual-fly-brain
+        image_name: virtual-fly-brain/accounts
         title: Accounts
         working_directory: ./cloud-harness/applications/accounts
       virtual-fly-brain:
@@ -143,9 +143,9 @@ steps:
         - TAG=${{CF_BUILD_ID}}
         - DOMAIN=${{DOMAIN}}
         - NOCACHE=${{CF_BUILD_ID}}
-        - REGISTRY=${{REGISTRY}}/
+        - REGISTRY=${{REGISTRY}}/virtual-fly-brain
         - CLOUDHARNESS_FLASK=${{REGISTRY}}/cloudharness-flask:${{CF_BUILD_ID}}
-        image_name: virtual-fly-brain
+        image_name: virtual-fly-brain/virtual-fly-brain
         title: Virtual Fly Brain Dev
         working_directory: ./applications/virtual-fly-brain/backend
   deployment:
@@ -178,7 +178,7 @@ steps:
         stage: publish
         type: push
         title: Cloudharness base debian
-        candidate: '${{REGISTRY}}/cloudharness-base-debian:${{CF_BUILD_ID}}'
+        candidate: '${{REGISTRY}}/virtual-fly-brain/cloudharness-base-debian:${{CF_BUILD_ID}}'
         tags:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'
         registry: '${{REGISTRY_PUBLISH_URL}}'
@@ -186,7 +186,7 @@ steps:
         stage: publish
         type: push
         title: Cloudharness base
-        candidate: '${{REGISTRY}}/cloudharness-base:${{CF_BUILD_ID}}'
+        candidate: '${{REGISTRY}}/virtual-fly-brain/cloudharness-base:${{CF_BUILD_ID}}'
         tags:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'
         registry: '${{REGISTRY_PUBLISH_URL}}'
@@ -194,7 +194,7 @@ steps:
         stage: publish
         type: push
         title: Cloudharness flask
-        candidate: '${{REGISTRY}}/cloudharness-flask:${{CF_BUILD_ID}}'
+        candidate: '${{REGISTRY}}/virtual-fly-brain/cloudharness-flask:${{CF_BUILD_ID}}'
         tags:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'
         registry: '${{REGISTRY_PUBLISH_URL}}'
@@ -202,15 +202,15 @@ steps:
         stage: publish
         type: push
         title: Accounts
-        candidate: '${{REGISTRY}}/accounts:${{CF_BUILD_ID}}'
+        candidate: '${{REGISTRY}}/virtual-fly-brain/accounts:${{CF_BUILD_ID}}'
         tags:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'
         registry: '${{REGISTRY_PUBLISH_URL}}'
-      publish_postgres:
+      publish_vfb-postgres:
         stage: publish
         type: push
         title: VirtualFlyBrain postgres
-        candidate: '${{REGISTRY}}/postgres:${{CF_BUILD_ID}}'
+        candidate: '${{REGISTRY}}/virtual-fly-brain/vfb-postgres:${{CF_BUILD_ID}}'
         tags:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'
         registry: '${{REGISTRY_PUBLISH_URL}}'
@@ -218,7 +218,7 @@ steps:
         stage: publish
         type: push
         title: Virtual Fly Brain
-        candidate: '${{REGISTRY}}/virtual-fly-brain:${{CF_BUILD_ID}}'
+        candidate: '${{REGISTRY}}/virtual-fly-brain/virtual-fly-brain:${{CF_BUILD_ID}}'
         tags:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'
         registry: '${{REGISTRY_PUBLISH_URL}}'

@@ -1,4 +1,4 @@
-domain: vfb.dev.metacell.us
+domain: virtual-fly-brain.metacell.us
 namespace: vfb
 backup:
   active: false

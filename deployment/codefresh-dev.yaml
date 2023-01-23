@@ -94,7 +94,7 @@ steps:
         - DOMAIN=${{DOMAIN}}
         - NOCACHE=${{CF_BUILD_ID}}
         - REGISTRY=${{REGISTRY}}/virtual-fly-brain
-        - CLOUDHARNESS_BASE=${{REGISTRY}}/cloudharness-base:${{CF_BUILD_ID}}
+        - CLOUDHARNESS_BASE=${{REGISTRY}}/virtual-fly-brain/cloudharness-base:${{CF_BUILD_ID}}
         image_name: virtual-fly-brain/cloudharness-flask
         title: Cloudharness flask
         working_directory: ./cloud-harness/infrastructure/common-images/cloudharness-flask
@@ -144,7 +144,7 @@ steps:
         - DOMAIN=${{DOMAIN}}
         - NOCACHE=${{CF_BUILD_ID}}
         - REGISTRY=${{REGISTRY}}/virtual-fly-brain
-        - CLOUDHARNESS_FLASK=${{REGISTRY}}/cloudharness-flask:${{CF_BUILD_ID}}
+        - CLOUDHARNESS_FLASK=${{REGISTRY}}/virtual-fly-brain/cloudharness-flask:${{CF_BUILD_ID}}
         image_name: virtual-fly-brain/virtual-fly-brain
         title: Virtual Fly Brain Dev
         working_directory: ./applications/virtual-fly-brain/backend

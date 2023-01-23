@@ -1,4 +1,4 @@
-domain:vfb.dev.metacell.us
+domain: vfb.dev.metacell.us
 namespace: vfb
 backup:
   active: false

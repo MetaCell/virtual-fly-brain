@@ -2,10 +2,12 @@
 .travis.yml
 README.md
 git_push.sh
+tox.ini
 virtual_fly_brain/__init__.py
 virtual_fly_brain/__main__.py
 virtual_fly_brain/controllers/__init__.py
-virtual_fly_brain/controllers/default_controller.py
+virtual_fly_brain/controllers/security_controller_.py
+virtual_fly_brain/controllers/test_controller.py
 virtual_fly_brain/encoder.py
 virtual_fly_brain/models/__init__.py
 virtual_fly_brain/models/base_model_.py
@@ -13,4 +15,3 @@ virtual_fly_brain/openapi/openapi.yaml
 virtual_fly_brain/test/__init__.py
 virtual_fly_brain/typing_utils.py
 virtual_fly_brain/util.py
-tox.ini

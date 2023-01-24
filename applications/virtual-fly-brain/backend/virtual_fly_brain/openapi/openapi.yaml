@@ -6,6 +6,7 @@ servers:
 - url: /
 tags:
 - name: test
+paths:
   /test:
     description: Test API.
     get:
@@ -21,5 +22,7 @@ tags:
       summary: Test API
       tags:
       - test
-      x-openapi-router-controller: virtual_fly_brain.controllers.default_controller
+      x-openapi-router-controller: virtual_fly_brain.controllers.test_controller
     summary: Test API
+components:
+  schemas: {}

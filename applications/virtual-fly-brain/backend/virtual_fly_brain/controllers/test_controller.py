@@ -12,4 +12,4 @@ def test_api():  # noqa: E501
 
     :rtype: str
     """
-    return 'do some magic!'
+    return 'Test API'

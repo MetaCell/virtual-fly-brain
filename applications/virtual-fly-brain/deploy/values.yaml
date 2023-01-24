@@ -8,8 +8,7 @@ harness:
   database:
     type: postgres
     auto: true
-    name: virtual-fy-brain-db
-    image_ref: postgres
+    name: virtual-fly-brain-db
     size: 240Gi
     resources:
       requests:

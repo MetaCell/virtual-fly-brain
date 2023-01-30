@@ -85,15 +85,6 @@ steps:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'
         - latest
         registry: '${{REGISTRY_PUBLISH_URL}}'
-      publish_postgres:
-        stage: publish
-        type: push
-        title: VirtualFlyBrain postgres
-        candidate: '${{REGISTRY}}/virtual-fly-brain/vfb-postgres:${{DEPLOYMENT_TAG}}'
-        tags:
-        - '${{DEPLOYMENT_PUBLISH_TAG}}'
-        - latest
-        registry: '${{REGISTRY_PUBLISH_URL}}'
       publish_virtual-fly-brain:
         stage: publish
         type: push

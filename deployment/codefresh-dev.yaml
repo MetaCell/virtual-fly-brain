@@ -98,21 +98,6 @@ steps:
         image_name: virtual-fly-brain/cloudharness-flask
         title: Cloudharness flask
         working_directory: ./cloud-harness/infrastructure/common-images/cloudharness-flask
-      vfb-postgres:
-        type: build
-        stage: build
-        tag: '${{CF_BUILD_ID}}'
-        dockerfile: Dockerfile
-        registry: '${{CODEFRESH_REGISTRY}}'
-        buildkit: true
-        build_arguments:
-        - TAG=${{CF_BUILD_ID}}
-        - DOMAIN=${{DOMAIN}}
-        - NOCACHE=${{CF_BUILD_ID}}
-        - REGISTRY=${{REGISTRY}}/virtual-fly-brain
-        image_name: virtual-fly-brain/vfb-postgres
-        title: VirtualFlyBrain postgres
-        working_directory: ./infrastructure/common-images/vfb-postgres
   build_application_images:
     type: parallel
     stage: build
@@ -203,14 +188,6 @@ steps:
         type: push
         title: Accounts
         candidate: '${{REGISTRY}}/virtual-fly-brain/accounts:${{CF_BUILD_ID}}'
-        tags:
-        - '${{DEPLOYMENT_PUBLISH_TAG}}'
-        registry: '${{REGISTRY_PUBLISH_URL}}'
-      publish_vfb-postgres:
-        stage: publish
-        type: push
-        title: VirtualFlyBrain postgres
-        candidate: '${{REGISTRY}}/virtual-fly-brain/vfb-postgres:${{CF_BUILD_ID}}'
         tags:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'
         registry: '${{REGISTRY_PUBLISH_URL}}'

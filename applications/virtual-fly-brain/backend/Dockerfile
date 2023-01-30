@@ -8,7 +8,7 @@ ENV PORT=8080
 ENV BUILDDIR=/dist
 
 RUN apk update
-RUN apk add postgresql-dev gcc python3-dev musl-dev npm
+RUN apk add gcc python3-dev musl-dev npm
 
 COPY ./client ${BUILDDIR}
 WORKDIR ${BUILDDIR}

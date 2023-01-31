@@ -1,8 +1,8 @@
 /* eslint-disable no-undef */
 import React, { Component } from 'react';
-import VFBToolBar from './VFBToolbar';
-import VFBOBJModelLoader from './VFBOBJModelLoader';
-import VFBStackViewer from './VFBStackViewer';
+import VFBToolBar from './Toolbar';
+//import VFBOBJModelLoader from './VFBOBJModelLoader';
+//import VFBStackViewer from './VFBStackViewer';
 import * as FlexLayout from '@metacell/geppetto-meta-ui/flex-layout/src';
 import '@metacell/geppetto-meta-ui/flex-layout/style/dark.scss'
 var modelJson = require('./layoutModel').modelJson;
@@ -53,7 +53,7 @@ export class VFBMain extends React.Component {
       menuHandler={this.menuHandler}/>
     
     <div>
-      <VFBOBJModelLoader modelId={'VFB_00101567'} />
+      {/* <VFBOBJModelLoader modelId={'VFB_00101567'} /> */}
     </div>
 
     <div className="flexChildContainer">

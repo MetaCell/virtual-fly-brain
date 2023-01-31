@@ -5,12 +5,10 @@ import App from './App';
 import {Application} from './Application';
 import reportWebVitals from './reportWebVitals';
 import {Provider} from 'react-redux'
-import { loadQuery } from './reducers/actions/loadQuery';
+import { termInfoById } from './reducers/actions/loadQuery';
 
 const store = Application();
-
 const root = ReactDOM.createRoot(document.getElementById('root'));
-store.dispatch(loadQuery('VFB_00101567'));
 
 root.render(
   <Provider store={store}>

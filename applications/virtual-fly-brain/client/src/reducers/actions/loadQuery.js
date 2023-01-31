@@ -1,4 +1,4 @@
-import { queryById } from "../../network/query"
+import { get_term_info } from "../../network/query"
 
 export const loadQueryTypes = {
   LOAD_QUERY_SUCCESS : 'LOAD_QUERY_SUCCESS',
@@ -24,14 +24,14 @@ const loadQueryFailure = error => ({
   }
 });
 
-export const loadQuery = (queryId) => {
+export const termInfoById = (queryId) => {
   return async (dispatch, getState) => {
     dispatch(loadQueryStarted())
 
     let response
 
     try {
-      response = await queryById(queryId);
+      response = await get_term_info(queryId);
     } catch (error) {
       dispatch(loadQueryFailure(error.message))
       return

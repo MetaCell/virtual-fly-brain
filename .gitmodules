@@ -1,0 +1,3 @@
+[submodule "applications/virtual-fly-brain/backend/virtual_fly_brain/libs/VFB_queries"]
+	path = applications/virtual-fly-brain/backend/virtual_fly_brain/libs/VFB_queries
+	url = https://github.com/VirtualFlyBrain/VFB_queries.git

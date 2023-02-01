@@ -1,14 +1,15 @@
 #from cloudharness.utils.server import init_flask
-from libs.VFB_queries.src import get_term_info
+from libs.VFB_queries.src.vfb_queries import get_term_info
 import flask
+from flask import request
 import os
 
 def init_webapp_routes(app):
     www_path = os.path.dirname(os.path.abspath(__file__)) + "/www"
 
     @app.route('/get_term_info', methods=['GET'])
-    def get_term_info():
-      return get_term_info()
+    def term_info():
+      return get_term_info(request.args.get('id'))
       
     @app.route('/test', methods=['GET'])
     def test():

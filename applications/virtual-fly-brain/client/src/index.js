@@ -1,17 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import reportWebVitals from './reportWebVitals';
 import './index.css';
 import App from './App';
-import {Application} from './Application';
-import reportWebVitals from './reportWebVitals';
 import {Provider} from 'react-redux'
-import { termInfoById } from './reducers/actions/loadQuery';
-
-const store = Application();
+import store from './store';
+const appContext = React.createContext();
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
-  <Provider store={store}>
+  <Provider store={store} context={appContext}>
     <App/>
   </Provider>,
 );

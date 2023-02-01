@@ -1,3 +1,5 @@
+conda activate vfb-ch
+
 minikube start --driver=docker
 minikube addons enable ingress
 

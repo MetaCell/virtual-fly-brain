@@ -1,15 +1,14 @@
-import logo from './logo.svg';
 import './App.css';
 import { VFBMain } from './components/Main'
-import React, {useSearchParams} from 'react';
-import { termInfoById } from './reducers/actions/loadQuery';
+import React from 'react';
+import { termInfoById } from './reducers/actions/termInfo';
+import { queryString } from './utils/queryString';
 
 function App() {
 
-  const [searchParams, setSearchParams] = useSearchParams();
-  const id = searchParams.get("id")
-
-  if (id) termInfoById(id);
+  const id = queryString("id")
+  if (id) 
+    termInfoById(id);
 
   return (
     <div className="App">
@@ -18,4 +17,4 @@ function App() {
   );
 }
 
-export default App;
+export default Object.freeze(App);

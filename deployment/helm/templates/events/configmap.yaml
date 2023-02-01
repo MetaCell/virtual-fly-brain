@@ -1,6 +1,0 @@
-apiVersion: v1
-data: {config.yml: "kafka:\n  clusters:\n    - name: \"cluster-{{ .Values.namespace
-    }}\"\n      bootstrapServers: \"{{ .Values.apps.events.kafka.name }}:9092\"\nauth:\n
-    \ type: disabled\nmanagement:\n  health:\n    ldap:\n      enabled: false"}
-kind: ConfigMap
-metadata: {name: kafka-ui-configmap}

@@ -1,11 +1,6 @@
 import store from '../../store';
 import { get_term_info } from "../../network/query"
-
-export const getTermInfoTypes = {
-  GET_TERM_INFO_SUCCESS : 'GET_TERM_INFO_SUCCESS',
-  GET_TERM_INFO_STARTED : 'GET_TERM_INFO_STARTED',
-  GET_TERM_INFO_FAILURE : 'GET_TERM_INFO_FAILURE'
-}
+import { getTermInfoTypes } from './types/getTermInfoTypes';
 
 const getTermInfoSuccess = query => ({
   type: getTermInfoTypes.GET_TERM_INFO_SUCCESS,
@@ -38,5 +33,5 @@ export const termInfoById = async (queryId) => {
     return
   }
 
-  store.dispatch(getTermInfoSuccess(response.response))
+  store.dispatch(getTermInfoSuccess(response.meta))
 }

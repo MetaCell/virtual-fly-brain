@@ -24,16 +24,57 @@ const TermInfo = () => {
 
     return(
       termInfoData ?
-      <div>
+      <div className="flexlayout__border_bottom">
+        <br/>
+        <br/>
+        <br/>
         <div>
           <div>
-            <span >Name</span>
+            <span><b>Name</b></span>
               <div>
-                <div tabindex="-1">
+                <div tabIndex="-1">
                   <div>
-                    <b>{ termInfoData.Name }</b>
-                    <span class="label types">
-                      { termInfoData.Tags.map( tag => <span class="label">{tag}</span>) }
+                     { termInfoData.meta.Name }<br/>
+                    <span className="label types">
+                      { termInfoData.meta.Tags.map( tag => <span className="label">{tag}<br/></span>) }
+                    </span>
+                  </div>
+                </div>
+              </div>
+          </div>
+        </div>
+        <div>
+          <span><b>Description</b></span>
+            <div>
+              <div tabIndex="-1">
+                <div>
+                    { termInfoData.meta.Description }<br/>
+                </div>
+              </div>
+            </div>
+        </div>
+        <div>
+          <div>
+            <span><b>Queries</b></span>
+              <div>
+                <div tabIndex="-1">
+                  <div>
+                    <span className="label types">
+                      { termInfoData.Queries.map( query => <span className="label">{JSON.stringify(query)}<br/></span>) }
+                    </span>
+                  </div>
+                </div>
+              </div>
+          </div>
+        </div>
+        <div>
+          <div>
+            <span><b>Examples</b></span>
+              <div>
+                <div tabIndex="-1">
+                  <div>
+                    <span className="label types">
+                      { Object.keys(termInfoData.Examples).map( example => <span className="label">{JSON.stringify(termInfoData.Examples[example])}<br/></span>) }
                     </span>
                   </div>
                 </div>

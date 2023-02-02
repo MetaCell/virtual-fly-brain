@@ -33,5 +33,5 @@ export const termInfoById = async (queryId) => {
     return
   }
 
-  store.dispatch(getTermInfoSuccess(response.meta))
+  store.dispatch(getTermInfoSuccess(response))
 }

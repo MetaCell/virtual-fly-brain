@@ -1,8 +1,6 @@
 /* eslint-disable no-undef */
 import React, { Component } from 'react';
 import VFBToolBar from './Toolbar';
-//import VFBOBJModelLoader from './VFBOBJModelLoader';
-//import VFBStackViewer from './VFBStackViewer';
 import * as FlexLayout from '@metacell/geppetto-meta-ui/flex-layout/src';
 import '@metacell/geppetto-meta-ui/flex-layout/style/dark.scss'
 import TermInfo from './TermInfo';
@@ -27,9 +25,12 @@ const Main = () => {
       <div className="unselectable" style={{ height: '100%', width: '100%' }}>
         
         <div>
+          <VFBToolBar />
         </div>
         
-        <div><TermInfo></TermInfo></div>
+        <div>
+          <TermInfo />
+        </div>
         
       </div>
     )

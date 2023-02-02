@@ -3,7 +3,7 @@ import { getTermInfoTypes } from './actions/types/getTermInfoTypes';
 const initialState = {
   termInfoData: undefined,
   isLoading: false,
-  errorLoading: false
+  error: false
 };
 
 const TermInfoReducer = (state = initialState, response) => {
@@ -15,14 +15,12 @@ const TermInfoReducer = (state = initialState, response) => {
      case getTermInfoTypes.GET_TERM_INFO_SUCCESS:
         return Object.assign({}, state, {
           termInfoData: response.payload,
-          isLoading: false,
-          errorLoading: false
+          isLoading: false
         })
       case getTermInfoTypes.GET_TERM_INFO_FAILURE:
         return Object.assign({}, state, {
           termInfoData: response.payload.error,
-          isLoading: false,
-          errorLoading: true
+          error: true
         })
      default:
         return state;

@@ -1,20 +1,28 @@
 import './App.css';
-import { VFBMain } from './components/Main'
+import Main from './components/Main'
 import React from 'react';
 import { termInfoById } from './reducers/actions/termInfo';
 import { queryString } from './utils/queryString';
+import {useSelector, useDispatch} from 'react-redux'
 
-function App() {
+const App = () => { 
 
-  const id = queryString("id")
-  if (id) 
-    termInfoById(id);
+  const isLoading = useSelector(state => state.termInfo.isLoading)
+  const termInfoData = useSelector(state => state.termInfo.termInfoData)
+
+  if(!isLoading && !termInfoData)
+  {
+    const id = queryString("id")
+
+    if (id) 
+      termInfoById(id);
+  }
 
   return (
     <div className="App">
-      <VFBMain />
+      <Main />
     </div>
   );
 }
 
-export default Object.freeze(App);
+export default App;

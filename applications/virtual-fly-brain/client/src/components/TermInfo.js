@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import {useSelector, useDispatch} from 'react-redux'
 import * as FlexLayout from '@metacell/geppetto-meta-ui/flex-layout/src';
 import '@metacell/geppetto-meta-ui/flex-layout/style/dark.scss'
-
+import ExamplesSlider from './ExamplesSlider';
 require('../css/base.less');
 require('../css/VFBMain.less');
 
@@ -59,9 +59,7 @@ const TermInfo = () => {
               <div>
                 <div tabIndex="-1">
                   <div>
-                    <span className="label types">
-                      { termInfoData.Queries.map( query => <span className="label">{JSON.stringify(query)}<br/></span>) }
-                    </span>
+
                   </div>
                 </div>
               </div>
@@ -73,9 +71,7 @@ const TermInfo = () => {
               <div>
                 <div tabIndex="-1">
                   <div>
-                    <span className="label types">
-                      { Object.keys(termInfoData.Examples).map( example => <span className="label">{JSON.stringify(termInfoData.Examples[example])}<br/></span>) }
-                    </span>
+                    <ExamplesSlider examples={termInfoData.Examples} ></ExamplesSlider>
                   </div>
                 </div>
               </div>

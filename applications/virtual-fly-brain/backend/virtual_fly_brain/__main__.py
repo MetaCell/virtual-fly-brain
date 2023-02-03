@@ -13,6 +13,7 @@ def init_webapp_routes(app):
     def term_info():
       id = request.args.get('id')
       term_info_data = get_term_info(id)
+      #instances = get_instances(id)
       return term_info_data
 
     @app.route('/get_instances', methods=['GET'])

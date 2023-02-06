@@ -4,6 +4,8 @@ import {useSelector, useDispatch} from 'react-redux'
 import * as FlexLayout from '@metacell/geppetto-meta-ui/flex-layout/src';
 import '@metacell/geppetto-meta-ui/flex-layout/style/dark.scss'
 import ExamplesSlider from './ExamplesSlider';
+import Queries from './Queries';
+
 require('../css/base.less');
 require('../css/VFBMain.less');
 
@@ -59,7 +61,7 @@ const TermInfo = () => {
               <div>
                 <div tabIndex="-1">
                   <div>
-
+                    <Queries queries={termInfoData.Queries} ></Queries>
                   </div>
                 </div>
               </div>

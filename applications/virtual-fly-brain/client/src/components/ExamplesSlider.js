@@ -11,10 +11,9 @@ const spanStyle = {
 }
 
 const divStyle = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  backgroundSize: 'cover',
+  backgroundPosition: 'center center',
+  backgroundRepeat: 'no-repeat',
+  backgroundSize: 'contain',
   height: '400px'
 }
 
@@ -25,8 +24,8 @@ const ExamplesSlider = (props) => {
     caption: props.examples[k][0].label
   }));
   return (
-    <div className="slide-container">
-      <Slide>
+    <div className="slide-container" >
+      <Slide >
        {slideImages.map((slideImage, index)=> (
           <div key={index}>
             <div style={{ ...divStyle, 'backgroundImage': `url(${slideImage.url})` }}>

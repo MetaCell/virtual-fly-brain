@@ -1,0 +1,37 @@
+apps: {}
+backup:
+  active: false
+  dir: /backups
+  keep_days: '7'
+  keep_months: '6'
+  keep_weeks: '4'
+  resources:
+    limits: {cpu: 50m, memory: 64Mi}
+    requests: {cpu: 25m, memory: 32Mi}
+  schedule: '*/5 * * * *'
+  suffix: .gz
+  volumesize: 2Gi
+domain: vfb.local
+env:
+- {name: CH_VERSION, value: 0.0.1}
+- {name: CH_CHART_VERSION, value: 0.0.1}
+- {name: CH_DOMAIN, value: vfb.local}
+- {name: CH_IMAGE_REGISTRY, value: ''}
+- {name: CH_IMAGE_TAG, value: latest}
+ingress:
+  enabled: true
+  letsencrypt: {email: filippo@metacell.us}
+  name: cloudharness-ingress
+  ssl_redirect: false
+local: false
+mainapp: virtual-fly-brain
+name: virtual-fly-brain
+namespace: vfb
+privenv:
+- {name: CH_SECRET, value: In God we trust; all others must bring data. ― W. Edwards
+    Deming}
+registry: {name: '', secret: ''}
+secured_gatekeepers: false
+tag: latest
+task-images: {}
+tls: false

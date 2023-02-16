@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig } from 'axios'
 
-const backendUrl = 'https://solr.virtualflybrain.org/solr'; 
+const backendUrl = 'http://127.0.0.1:8080/'; 
 
 export interface IHttpClientRequestParameters<T> {
   endPoint: string
@@ -25,14 +25,14 @@ export class HttpClient implements IHttpClient {
   public get<T>(parameters: IHttpClientRequestParameters<T>): Promise<T> {
     return new Promise<T>((resolve, reject) => {
       // extract the individual parameters
-      const { endPoint, method, payload, headers } = parameters;
+      const { method, payload, headers } = parameters;
 
       // axios request options like headers etc
       const options: AxiosRequestConfig = {
         headers: headers || {}
       }
 
-      const url = buildUrl(this._url, endPoint, method) + '?' + this.encodeGetParams(payload);
+      const url = buildUrl(this._url, method) + '?' + this.encodeGetParams(payload);
 
       // finally execute the GET request with axios:
       axios
@@ -49,14 +49,14 @@ export class HttpClient implements IHttpClient {
 
   public post<T>(parameters: IHttpClientRequestParameters<T>): Promise<T> {
     return new Promise<T>((resolve, reject) => {
-      const { endPoint, method, payload, headers } = parameters;
+      const { method, payload, headers } = parameters;
 
       // axios request options like headers etc
       const options: AxiosRequestConfig = {
         headers: headers || {}
       }
 
-      const url = buildUrl(this._url, endPoint, method);
+      const url = buildUrl(this._url, method);
 
       // finally execute the POST request with axios:
       axios
@@ -71,12 +71,8 @@ export class HttpClient implements IHttpClient {
   }
 }
 
-function buildUrl (base: string, endPoint: string, method: string): string {
+function buildUrl (base: string, method: string): string {
   const url = [ base ];
-
-  if (endPoint) {
-    url.push(endPoint);
-  }
 
   url.push(method);
 

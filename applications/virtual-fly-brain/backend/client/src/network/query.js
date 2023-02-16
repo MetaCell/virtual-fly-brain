@@ -1,5 +1,5 @@
 import { backendClient } from "./client";
 
-export const queryById = (queryId) => {
-  return backendClient.get({ endPoint: "vfb_json", method: "query", payload: { q : "id:" + queryId } })
+export const get_term_info = (queryId) => {
+  return backendClient.get({ method: "get_term_info", payload: { id: queryId } })
 }

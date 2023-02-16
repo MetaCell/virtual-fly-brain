@@ -17,10 +17,10 @@ RUN npm run build
 
 WORKDIR /usr/src/app
 
-COPY requirements.txt /usr/src/app/
+COPY backend/requirements.txt /usr/src/app/
 RUN pip3 install --no-cache-dir -r requirements.txt
 
-COPY . /usr/src/app
+COPY backend/ /usr/src/app
 
 RUN pip3 install -e .
 

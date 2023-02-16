@@ -1,0 +1,44 @@
+
+{"queries": [
+	{
+		"name": "Neurons with some part in medulla",
+		"id": "NeuronsPartHere",
+		"steps": [
+					{	
+						"querytype": "jsonurl",
+						"takes": [],
+						"query": "http://owl.virtualflybrain.org/kbs/vfb/instances?object=%3Chttp://purl.obolibrary.org/obo/FBbt_00005106%3E%20and%20%3Chttp://purl.obolibrary.org/obo/RO_0002131%3E%20some%20%3Chttp://purl.obolibrary.org/obo/FBbt_00003748%3E&direct=false&includeDeprecated=false",
+						"resultmask": "{\"@id\":\"_:b0\",\"value\":\"ObjectIntersectionOf(<http://purl.obolibrary.org/obo/FBbt_00005106> ObjectSomeValuesFrom(<http://purl.obolibrary.org/obo/RO_0002131> <http://purl.obolibrary.org/obo/FBbt_00003748>))\",\"hasInstance\":[$XXXXXXXX$],\"@context\":\"https://owlery.phenoscape.org/json/context.jsonld\"}",
+						"values": [
+								{
+									"name": "IRIs",
+									"mask": "$XXXXXXXX$",
+									"valuetype": "string"
+								} 	
+							]
+					},
+					{	
+						"querytype": "jsonurl",
+						"takes": ["IDs"],
+						"query": "http://solr.virtualflybrain.org/solr/vfb_json/query?q=$IDs$&defType=edismax&qf=id&wt=json&fl=anat_image_query",
+						"regex": "true",
+						"resultmask": "{.*\"responseHeader\":{.*},.*\"response\":{\"numFound\":$YYYYYYYY$,\"start\":0,\"numFoundExact\":.*,\"docs\":[$XXXXXXXX$]}}",
+						"values": [
+								{
+									"name": "RESULTS",
+									"mask": "$XXXXXXXX$",
+									"valuetype": "json"
+								},
+								{
+									"name": "NUMBER",
+									"mask": "$YYYYYYYY$",
+									"valuetype": "int"
+								}  	
+							]
+					}
+				],
+			"numresults": "NUMBER",
+			"results": "RESULTS"
+		}
+	]
+}

@@ -15,14 +15,19 @@ def init_webapp_routes(app):
       term_info_data = get_term_info(id)
       return term_info_data
 
+    @app.route('/stack_view_images_from_id', methods=['GET'])
+    @cross_origin(supports_credentials=True)
+    def stack_view_images_from_id():
+      pass
+
     @app.route('/get_instances', methods=['GET'])
     @cross_origin(supports_credentials=True)
     def instances():
-      return get_instances(request.args.get('id'))
+      return get_instances(request.args.get('short_form'))
       
     @app.route('/test', methods=['GET'])
     def test():
-        return 'routing ok'
+      return 'routing ok'
 
     @app.route('/', methods=['GET'])
     def index():

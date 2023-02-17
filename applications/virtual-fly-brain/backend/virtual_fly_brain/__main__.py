@@ -4,7 +4,7 @@ import flask
 from flask import request
 from flask_cors import CORS, cross_origin
 import os
-
+import json
 def init_webapp_routes(app):
     www_path = os.path.dirname(os.path.abspath(__file__)) + "/www"
 
@@ -13,13 +13,12 @@ def init_webapp_routes(app):
     def term_info():
       id = request.args.get('id')
       term_info_data = get_term_info(id)
-      #instances = get_instances(id)
       return term_info_data
 
     @app.route('/get_instances', methods=['GET'])
     @cross_origin(supports_credentials=True)
     def instances():
-      return get_term_info(request.args.get('id'))
+      return get_instances(request.args.get('id'))
       
     @app.route('/test', methods=['GET'])
     def test():

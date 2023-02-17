@@ -8,7 +8,7 @@ ENV PORT=8080
 ENV BUILDDIR=/dist
 
 RUN apk update
-RUN apk add gcc python3-dev musl-dev npm
+RUN apk add gcc python3-dev musl-dev npm git
 
 COPY ./client ${BUILDDIR}
 WORKDIR ${BUILDDIR}
@@ -25,7 +25,7 @@ COPY backend/ /usr/src/app
 RUN pip3 install -e .
 
 RUN git clone https://github.com/VirtualFlyBrain/VFB_queries.git
-RUN cd VFB_queries && pip3 install -e . & cd ..
+RUN cd VFB_queries && pip3 install -e . && cd ..
 
 RUN cp -r ${BUILDDIR}/build /usr/src/app/virtual_fly_brain/www
 

@@ -24,6 +24,9 @@ COPY backend/ /usr/src/app
 
 RUN pip3 install -e .
 
+RUN git clone https://github.com/VirtualFlyBrain/VFB_queries.git
+RUN cd VFB_queries && pip3 install -e . & cd ..
+
 RUN cp -r ${BUILDDIR}/build /usr/src/app/virtual_fly_brain/www
 
 WORKDIR /usr/src/app/virtual_fly_brain

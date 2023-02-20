@@ -15,9 +15,40 @@ def init_webapp_routes(app):
       term_info_data = get_term_info(id)
       return term_info_data
 
+    @app.route('/model_from_id', methods=['GET'])
+    @cross_origin(supports_credentials=True)
+    def model_from_id():
+      pass
+
     @app.route('/stack_view_images_from_id', methods=['GET'])
     @cross_origin(supports_credentials=True)
     def stack_view_images_from_id():
+      pass
+
+    @app.route('/search', methods=['GET'])
+    @cross_origin(supports_credentials=True)
+    def stack_view_images_from_id():
+      pass
+
+    @app.route('/search', methods=['GET'])
+    @cross_origin(supports_credentials=True)
+    def layers_from_id():
+      pass
+
+    @app.route('/search', methods=['GET'])
+    @cross_origin(supports_credentials=True)
+    def circuit_browser_from_id():
+      pass
+
+    @app.route('/search', methods=['GET'])
+    @cross_origin(supports_credentials=True)
+    def download_content():
+      pass
+
+
+    @app.route('/search', methods=['GET'])
+    @cross_origin(supports_credentials=True)
+    def loading_manager():
       pass
 
     @app.route('/get_instances', methods=['GET'])

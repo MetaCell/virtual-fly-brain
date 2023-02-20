@@ -23,7 +23,7 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 COPY backend/ /usr/src/app
 RUN pip3 install -e .
 
-RUN cd virtual_fly_brain/libs && git clone https://github.com/VirtualFlyBrain/VFB_queries.git && cd VFB_queries && git checkout 84568f4 && cd ../../../
+RUN cd virtual_fly_brain/libs && git clone https://github.com/VirtualFlyBrain/VFB_queries.git && cd VFB_queries && git checkout 84568f4 && pip3 install --no-cache-dir -r requirements.txt && cd ../../../
 
 RUN cp -r ${BUILDDIR}/build /usr/src/app/virtual_fly_brain/www
 

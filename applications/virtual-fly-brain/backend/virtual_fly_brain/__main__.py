@@ -25,28 +25,28 @@ def init_webapp_routes(app):
     def stack_view_images_from_id():
       pass
 
-    @app.route('/search', methods=['GET'])
+    @app.route('/stack_view_images_from_id', methods=['GET'])
     @cross_origin(supports_credentials=True)
     def stack_view_images_from_id():
       pass
 
-    @app.route('/search', methods=['GET'])
+    @app.route('/layers_from_id', methods=['GET'])
     @cross_origin(supports_credentials=True)
     def layers_from_id():
       pass
 
-    @app.route('/search', methods=['GET'])
+    @app.route('/circuit_browser_from_id', methods=['GET'])
     @cross_origin(supports_credentials=True)
     def circuit_browser_from_id():
       pass
 
-    @app.route('/search', methods=['GET'])
+    @app.route('/download_content', methods=['GET'])
     @cross_origin(supports_credentials=True)
     def download_content():
       pass
 
 
-    @app.route('/search', methods=['GET'])
+    @app.route('/loading_manager', methods=['GET'])
     @cross_origin(supports_credentials=True)
     def loading_manager():
       pass

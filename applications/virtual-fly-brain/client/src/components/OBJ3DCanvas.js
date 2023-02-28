@@ -23,9 +23,9 @@ const styles = () => ({
   },
 });
 
-const VFBOBJModelLoader = (props) => {
+const OBJ3DCanvas = (props) => {
 
-  const dataSetsQuery = useSelector(state => state.Query.datasets_query);
+  const dataSetsQuery = useSelector(state => state.OBJ3.modelUrl);
   const canvasRef = React.createRef();
   const modelId = props.modelId
   const [canvasData, setCanvasData] = useState(undefined);
@@ -102,4 +102,4 @@ const VFBOBJModelLoader = (props) => {
       : <><div>OBJ Model Loading...</div></> ;
 }
 
-export default withStyles(styles)(VFBOBJModelLoader);
+export default withStyles(styles)(OBJ3DCanvas);

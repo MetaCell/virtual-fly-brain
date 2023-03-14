@@ -5,6 +5,7 @@ from flask import request
 from flask_cors import CORS, cross_origin
 import os
 import json
+
 def init_webapp_routes(app):
     www_path = os.path.dirname(os.path.abspath(__file__)) + "/www"
 
@@ -18,11 +19,6 @@ def init_webapp_routes(app):
     @app.route('/model_from_id', methods=['GET'])
     @cross_origin(supports_credentials=True)
     def model_from_id():
-      pass
-
-    @app.route('/stack_view_images_from_id', methods=['GET'])
-    @cross_origin(supports_credentials=True)
-    def stack_view_images_from_id():
       pass
 
     @app.route('/stack_view_images_from_id', methods=['GET'])
@@ -44,7 +40,6 @@ def init_webapp_routes(app):
     @cross_origin(supports_credentials=True)
     def download_content():
       pass
-
 
     @app.route('/loading_manager', methods=['GET'])
     @cross_origin(supports_credentials=True)

@@ -1,5 +1,5 @@
 #from cloudharness.utils.server import init_flask
-from libs.VFB_queries.src.vfb_queries import get_term_info, get_instances
+import vfbquery as vfb
 import flask
 from flask import request
 from flask_cors import CORS, cross_origin

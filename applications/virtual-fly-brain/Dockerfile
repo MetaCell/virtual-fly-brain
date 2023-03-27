@@ -19,11 +19,8 @@ WORKDIR /usr/src/app
 
 COPY backend/requirements.txt /usr/src/app/
 RUN pip3 install --no-cache-dir -r requirements.txt
-RUN pip3 install --upgrade vfbquery
 COPY backend/ /usr/src/app
 RUN pip3 install -e .
-
-# RUN cd virtual_fly_brain/libs && git clone https://github.com/VirtualFlyBrain/VFB_queries.git && cd VFB_queries && git checkout 84568f4 && pip3 install --no-cache-dir -r requirements.txt && cd ../../../
 
 RUN cp -r ${BUILDDIR}/build /usr/src/app/virtual_fly_brain/www
 

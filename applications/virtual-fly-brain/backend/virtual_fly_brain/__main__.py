@@ -6,6 +6,7 @@ from flask import request
 from flask_cors import CORS, cross_origin
 import os
 import json
+
 def init_webapp_routes(app):
     www_path = os.path.dirname(os.path.abspath(__file__)) + "/www"
 
@@ -13,17 +14,47 @@ def init_webapp_routes(app):
     @cross_origin(supports_credentials=True)
     def term_info():
       id = request.args.get('id')
-      term_info_data = get_term_info(id)
+      term_info_data = vfb.get_term_info(id)
       return term_info_data
+
+    @app.route('/model_from_id', methods=['GET'])
+    @cross_origin(supports_credentials=True)
+    def model_from_id():
+      pass
+
+    @app.route('/stack_view_images_from_id', methods=['GET'])
+    @cross_origin(supports_credentials=True)
+    def stack_view_images_from_id():
+      pass
+
+    @app.route('/layers_from_id', methods=['GET'])
+    @cross_origin(supports_credentials=True)
+    def layers_from_id():
+      pass
+
+    @app.route('/circuit_browser_from_id', methods=['GET'])
+    @cross_origin(supports_credentials=True)
+    def circuit_browser_from_id():
+      pass
+
+    @app.route('/download_content', methods=['GET'])
+    @cross_origin(supports_credentials=True)
+    def download_content():
+      pass
+
+    @app.route('/loading_manager', methods=['GET'])
+    @cross_origin(supports_credentials=True)
+    def loading_manager():
+      pass
 
     @app.route('/get_instances', methods=['GET'])
     @cross_origin(supports_credentials=True)
     def instances():
-      return get_instances(request.args.get('id'))
+      return vfb.get_instances(request.args.get('short_form'))
       
     @app.route('/test', methods=['GET'])
     def test():
-        return 'routing ok'
+      return 'routing ok'
 
     @app.route('/', methods=['GET'])
     def index():

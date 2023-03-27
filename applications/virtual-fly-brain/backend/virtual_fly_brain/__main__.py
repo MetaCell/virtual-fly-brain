@@ -1,5 +1,6 @@
 #from cloudharness.utils.server import init_flask
 import vfbquery as vfb
+from cloudharness.utils.server import init_flask
 import flask
 from flask import request
 from flask_cors import CORS, cross_origin
@@ -41,8 +42,9 @@ def init_webapp_routes(app):
             return error
         return index()
 
+app = init_flask(title="VFB index API", webapp=False, init_app_fn=init_webapp_routes)
+
 def main():
-  app = app = flask.Flask(__name__)
   CORS(app, support_credentials=True)
   init_webapp_routes(app)
   app.run(host='0.0.0.0', port=8080)

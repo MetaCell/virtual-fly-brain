@@ -77,7 +77,6 @@ app = init_flask(title="VFB index API", webapp=False, init_app_fn=init_webapp_ro
 
 def main():
   CORS(app, support_credentials=True)
-  init_webapp_routes(app)
   app.run(host='0.0.0.0', port=8080)
 
 if __name__ == '__main__':

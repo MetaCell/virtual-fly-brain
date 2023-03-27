@@ -24,3 +24,29 @@ paths:
       - test
       x-openapi-router-controller: virtual_fly_brain.controllers.test_controller
     summary: Test API
+  /get_stack_viewer_images/{id}:
+    description: Retrieve stack viewer images given an ID.
+    get:
+      description: Retrieve stack viewer images.
+      operationId: get_stack_viewer_images
+      parameters:
+      - description: VFB ID to search.
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: ok
+      summary: Get stack viewer images for an ID
+      tags:
+      - Stack Viewer
+      x-openapi-router-controller: virtual_fly_brain.controllers.default_controller
+    summary: Test API

@@ -12,8 +12,8 @@ RUN apk add gcc python3-dev musl-dev npm git
 
 COPY ./client ${BUILDDIR}
 WORKDIR ${BUILDDIR}
-RUN npm install
-RUN npm run build
+RUN yarn install
+RUN yarn build
 
 WORKDIR /usr/src/app
 

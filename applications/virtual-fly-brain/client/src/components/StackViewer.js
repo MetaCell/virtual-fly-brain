@@ -6,8 +6,8 @@ import {useSelector, useDispatch} from 'react-redux'
 
 const VFBStackViewer = (props) => {
 
-  const stackViewerData = useSelector(state => state.stackViewerInfo.stackViewerData)
-  const error = useSelector(state => state.stackViewerInfo.error);
+  const stackViewerData = useSelector(state => state.termInfo.termInfoData)
+  const error = useSelector(state => state.termInfo.error);
   const templateID = useSelector(state => state.globalInfo.templateID)
   const fields = useSelector((state) => state.WHATEVER_REDUCER);
   const stackRef = useRef();
@@ -22,6 +22,7 @@ const VFBStackViewer = (props) => {
   const [stackData, setStackData] = React.useState({
     id: props.id, height: props.defHeight, width: props.defWidth, instances: [], selected: []
   });
+
   const [canvasRef, setCanvasRef] = React.useState(props.canvasRef);
   
   // TODO : Ref or redux?
@@ -102,18 +103,7 @@ const VFBStackViewer = (props) => {
 
   // FIXME
   useEffect( () => {
-    fetch(`/get_stack_viewer_images/VFB_00101567`)
-    .then(response => { 
-      console.log("Response received " , response);
-      return response.json();
-    })
-    .then((data) => {
-      console.log("Update data ", data);
-      setStackData(data);
-    })
-    .catch((error) => {
-      console.log("Error loading data for stack viewer")
-    });
+    console.log("term info data : ", stackViewerData);
   });
 
   // Update height and width of the stackwidget, happens when flex layout resizes tabs

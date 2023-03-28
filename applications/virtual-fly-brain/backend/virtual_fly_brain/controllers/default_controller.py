@@ -6,6 +6,6 @@ from flask import request
 def test_api():  # noqa: E501
     return "Test Endpoint"
 
-def get_stack_viewer_images(id):
-    stack_viewer_data = vfb.get_instances(id)
+def get_term_info(id):
+    stack_viewer_data = vfb.get_term_info(id)
     return stack_viewer_data

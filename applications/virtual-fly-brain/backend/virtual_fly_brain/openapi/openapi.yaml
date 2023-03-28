@@ -24,7 +24,7 @@ paths:
       - test
       x-openapi-router-controller: virtual_fly_brain.controllers.test_controller
     summary: Test API
-  /data/{id}:
+  /term_info_data/{id}:
     description: Retrieve stack viewer images given an ID.
     get:
       description: Retrieve stack viewer images.

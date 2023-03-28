@@ -3,7 +3,7 @@ info:
   title: VirtualFlyBrainIndex
   version: 1.0.0
 servers:
-- url: /
+- url: /api
 tags:
 - name: test
 paths:

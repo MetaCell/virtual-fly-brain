@@ -15,9 +15,9 @@ def init_webapp_routes(app):
     def instances():
       return vfb.get_instances(request.args.get('short_form'))
 
-    @app.route('/', methods=['GET'])
-    def index():
-        return flask.send_from_directory(www_path, 'index.html')
+    # @app.route('/', methods=['GET'])
+    # def index():
+    #     return flask.send_from_directory(www_path, 'index.html')
 
     @app.route('/<path:path>', methods=['GET'])
     def send_webapp(path):

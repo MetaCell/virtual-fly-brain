@@ -77,7 +77,7 @@ def init_webapp_routes(app):
             return error
         return index()
 
-app = init_flask(title="VFB index API", webapp=False, init_app_fn=init_webapp_routes)
+app = init_flask(title="VFB index API", webapp=True, init_app_fn=init_webapp_routes)
 
 def main():
   CORS(app, support_credentials=True)

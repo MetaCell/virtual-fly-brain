@@ -60,6 +60,10 @@ def init_webapp_routes(app):
     def index():
         return flask.send_from_directory(www_path, 'index.html')
 
+    @app.route('/<path:path>')
+    def static_file(path):
+        return app.send_static_file(path)
+
     @app.route('/<path:path>', methods=['GET'])
     def send_webapp(path):
         return flask.send_from_directory(www_path, path)

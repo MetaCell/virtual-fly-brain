@@ -3,7 +3,7 @@ info:
   title: VirtualFlyBrainIndex
   version: 1.0.0
 servers:
-- url: /api
+- url: /
 tags:
 - name: test
 paths:
@@ -24,7 +24,7 @@ paths:
       - test
       x-openapi-router-controller: virtual_fly_brain.controllers.test_controller
     summary: Test API
-  /get_term_info/{id}:
+  /data/{id}:
     description: Retrieve stack viewer images given an ID.
     get:
       description: Retrieve stack viewer images.
@@ -36,7 +36,7 @@ paths:
         name: id
         required: true
         schema:
-          type: integer
+          type: string
         style: simple
       responses:
         "200":

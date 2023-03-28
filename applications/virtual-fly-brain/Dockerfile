@@ -25,8 +25,6 @@ RUN pip3 install -e .
 RUN rm -rf ${BACKEND_DIR}/www
 RUN cp -r ${BUILDDIR}/build /usr/src/app/virtual_fly_brain/www
 WORKDIR /usr/src/app/virtual_fly_brain
-RUN mkdir -p www/files
-RUN mv www/static/* www/files
 
 EXPOSE 8080
 ENTRYPOINT gunicorn --log-level=info --preload --bind=0.0.0.0:8080 virtual_fly_brain.__main__:app

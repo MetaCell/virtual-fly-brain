@@ -23,8 +23,8 @@ COPY backend/ /usr/src/app
 RUN pip3 install -e .
 
 RUN rm -rf ${BACKEND_DIR}/www
-COPY ${BUILDDIR}/dist/ /usr/src/app/www
-COPY --from=base ${BUILDDIR}/build ${BACKEND_DIR}/www
+COPY ${BUILDDIR}/ /usr/src/app/www
+COPY build/ ${BACKEND_DIR}/www
 WORKDIR /usr/src/app/virtual_fly_brain
 
 EXPOSE 8080

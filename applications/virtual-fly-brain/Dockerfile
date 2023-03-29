@@ -1,8 +1,6 @@
 ARG CLOUDHARNESS_FLASK
-ARG VFB_UI
 
 FROM $CLOUDHARNESS_FLASK
-FROM $VFB_UI as base
 
 ENV MODULE_NAME=virtual_fly_brain
 ENV WORKERS=2
@@ -25,7 +23,7 @@ COPY backend/ /usr/src/app
 RUN pip3 install -e .
 
 RUN rm -rf ${BACKEND_DIR}/www
-COPY --from=base ${BUILDDIR}/dist/ /usr/src/app/www
+COPY ${BUILDDIR}/dist/ /usr/src/app/www
 COPY --from=base ${BUILDDIR}/build ${BACKEND_DIR}/www
 WORKDIR /usr/src/app/virtual_fly_brain
 

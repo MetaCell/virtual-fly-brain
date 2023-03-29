@@ -14,6 +14,8 @@ COPY ./client ${BUILDDIR}
 WORKDIR ${BUILDDIR}
 RUN yarn install
 RUN yarn build
+RUN ls
+RUN pwd
 COPY ${BUILDDIR}/build /usr/src/app/www
 
 WORKDIR /usr/src/app

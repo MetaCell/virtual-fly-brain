@@ -16,7 +16,6 @@ RUN yarn install
 RUN yarn build
 RUN ls
 RUN pwd
-COPY ${BUILDDIR}/build /usr/src/app/www
 
 WORKDIR /usr/src/app
 
@@ -26,8 +25,8 @@ COPY backend/ /usr/src/app
 RUN pip3 install -e .
 
 RUN rm -rf ${BACKEND_DIR}/www
-RUN cp -r ${BUILDDIR}/build /usr/src/app/www
-COPY ${BUILDDIR}/build /usr/src/app/www
+RUN cp -r ${BUILDDIR}/build ${BACKEND_DIR}/www
+COPY ${BUILDDIR}/build ${BACKEND_DIR}/www
 WORKDIR /usr/src/app/virtual_fly_brain
 
 EXPOSE 8080

@@ -1,6 +1,8 @@
 ARG CLOUDHARNESS_FLASK
+ARG CLOUDHARNESS_FRONTEND_BUILD
 
 FROM $CLOUDHARNESS_FLASK
+FROM $CLOUDHARNESS_FRONTEND_BUILD as frontend
 
 ENV MODULE_NAME=virtual_fly_brain
 ENV WORKERS=2
@@ -12,12 +14,8 @@ RUN apk add gcc python3-dev musl-dev yarn git
 
 COPY ./client ${BUILDDIR}
 WORKDIR ${BUILDDIR}
-RUN pwd && ls
-COPY ./build /usr/src/app/www
 RUN yarn install
 RUN yarn build
-RUN ls
-RUN pwd
 
 WORKDIR /usr/src/app
 
@@ -28,6 +26,7 @@ RUN pip3 install -e .
 
 RUN rm -rf ${BACKEND_DIR}/www
 RUN cp -r ${BUILDDIR}/build /usr/src/app/www
+COPY --from=frontend dist/build /usr/src/app/www
 WORKDIR /usr/src/app/virtual_fly_brain
 
 EXPOSE 8080

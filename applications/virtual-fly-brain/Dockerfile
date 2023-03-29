@@ -26,7 +26,6 @@ RUN pip3 install -e .
 
 RUN rm -rf ${BACKEND_DIR}/www
 RUN cp -r ${BUILDDIR}/build /usr/src/app/www
-COPY --from=frontend dist/build /usr/src/app/www
 WORKDIR /usr/src/app/virtual_fly_brain
 
 EXPOSE 8080

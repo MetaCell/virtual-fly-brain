@@ -19,6 +19,17 @@ def init_webapp_routes(app):
       id = request.args.get('id')
       term_info_data = vfb.get_term_info(id)
       return term_info_data
+      
+    @app.route('/static/<path:path>', methods=['GET'])
+    def send_static(path):
+        www_path = os.path.dirname(os.path.abspath(__file__)) + "/www"
+        print(www_path)
+        wwwp = os.path.join(www_path, 'static')
+        print("www path")
+        print(wwwp)
+        print(path)
+        return flask.send_from_directory(wwwp, path)
+
 app = init_flask(title="VFB index API", webapp=True, init_app_fn=init_webapp_routes)
 
 def main():

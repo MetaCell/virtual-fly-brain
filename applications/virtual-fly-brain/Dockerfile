@@ -12,6 +12,8 @@ RUN apk add gcc python3-dev musl-dev yarn git
 
 COPY ./client ${BUILDDIR}
 WORKDIR ${BUILDDIR}
+RUN ls
+RUN pwd
 RUN yarn install
 RUN yarn build
 RUN ls
@@ -26,7 +28,7 @@ RUN pip3 install -e .
 
 RUN rm -rf ${BACKEND_DIR}/www
 RUN cp -r ${BUILDDIR}/build /usr/src/app/www
-COPY client/build/ /usr/src/app/www
+COPY /dist/build/ /usr/src/app/www
 RUN ls /usr/src/app/www -ls
 WORKDIR /usr/src/app/virtual_fly_brain
 

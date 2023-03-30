@@ -29,7 +29,6 @@ def init_webapp_routes(app):
         print(wwwp)
         print(path)
         return flask.send_from_directory(wwwp, path)
-        @app.route('/static/js/<path:path>', methods=['GET'])
 
     @app.route('/static/css/<path:path>', methods=['GET']) 
     def send_static_css(path):

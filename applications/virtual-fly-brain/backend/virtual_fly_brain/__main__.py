@@ -36,7 +36,7 @@ def init_webapp_routes(app):
         return flask.send_from_directory(www_path, path)
     
     @app.route('/static/<path:path>', methods=['GET'])
-    def send_static(path):
+    def send_static_file(path):
         print(www_path)
         print(path)
         print("www path static")

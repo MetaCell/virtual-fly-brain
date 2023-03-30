@@ -20,8 +20,19 @@ def init_webapp_routes(app):
       term_info_data = vfb.get_term_info(id)
       return term_info_data
       
-    @app.route('/static/<path:path>', methods=['GET'])
-    def send_static(path):
+    @app.route('/static/js/<path:path>', methods=['GET'])
+    def send_static_js(path):
+        www_path = os.path.dirname(os.path.abspath(__file__)) + "/www"
+        print(www_path)
+        wwwp = os.path.join(www_path, 'static')
+        print("www path")
+        print(wwwp)
+        print(path)
+        return flask.send_from_directory(wwwp, path)
+        @app.route('/static/js/<path:path>', methods=['GET'])
+
+    @app.route('/static/css/<path:path>', methods=['GET']) 
+    def send_static_css(path):
         www_path = os.path.dirname(os.path.abspath(__file__)) + "/www"
         print(www_path)
         wwwp = os.path.join(www_path, 'static')

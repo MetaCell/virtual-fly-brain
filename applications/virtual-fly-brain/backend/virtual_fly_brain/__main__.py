@@ -17,6 +17,8 @@ def init_webapp_routes(app):
       
     @app.route('/', methods=['GET'])
     def index():
+        print(www_path)
+        print("www path")
         return flask.send_from_directory(www_path, 'index.html')
 
     @app.route('/get_term_info', methods=['GET'])
@@ -28,16 +30,9 @@ def init_webapp_routes(app):
 
     @app.route('/<path:path>', methods=['GET'])
     def send_webapp(path):
-        return flask.send_from_directory(www_path, path)
-
-    @app.route('/static/<path:path>', methods=['GET']) 
-    def send_static(path):
         print(www_path)
-        wwwp = os.path.join(www_path, 'static')
-        print("www path")
-        print(wwwp)
-        print(path)
-        return flask.send_from_directory(wwwp, path)
+        print("www path file")
+        return flask.send_from_directory(www_path, path)
 
 app = init_flask(title="VFB index API", webapp=False, init_app_fn=init_webapp_routes)
 

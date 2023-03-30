@@ -34,6 +34,22 @@ def init_webapp_routes(app):
         print(path)
         print("www path file")
         return flask.send_from_directory(www_path, path)
+    
+    @app.route('/static/js/<path:path>', methods=['GET'])
+    def send_static(path):
+        print(www_path)
+        print(os.path.basename(path))
+        print("www path static")
+        root_dir = os.path.dirname(os.getcwd())
+        return flask.send_from_directory(os.path.join(root_dir, 'static', 'js'), os.path.basename(path))
+
+    @app.route('/static/css/<path:path>', methods=['GET'])
+    def send_static_css(path):
+        print(www_path)
+        print(os.path.basename(path))
+        print("www path static css")
+        root_dir = os.path.dirname(os.getcwd())
+        return flask.send_from_directory(os.path.join(root_dir, 'static', 'css'), os.path.basename(path))
 
 app = init_flask(title="VFB index API", webapp=False, init_app_fn=init_webapp_routes)
 
@@ -42,9 +58,6 @@ def main():
   app.static_url_path="/usr/src/app/www/static"
   app.static_folder="/usr/src/app/www/static"
   app.run(host='0.0.0.0', port=8080)
-  app.static_url_path="/usr/src/app/www/static"
-  app.static_folder="/usr/src/app/www/static"
-  print(app.static_url_path)
 
 if __name__ == '__main__':
     main()

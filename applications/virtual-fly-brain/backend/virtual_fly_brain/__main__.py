@@ -39,9 +39,12 @@ app = init_flask(title="VFB index API", webapp=False, init_app_fn=init_webapp_ro
 
 def main():
   # CORS(app, support_credentials=True)
-  app.static_url_path="/usr/src/app/www"
-  app.static_folder="/usr/src/app/www"
+  app.static_url_path="/usr/src/app/www/static"
+  app.static_folder="/usr/src/app/www/static"
   app.run(host='0.0.0.0', port=8080)
+  app.static_url_path="/usr/src/app/www/static"
+  app.static_folder="/usr/src/app/www/static"
+  print(app.static_url_path)
 
 if __name__ == '__main__':
     main()

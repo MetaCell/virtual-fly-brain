@@ -34,7 +34,11 @@ const Main = () => {
         </div>
 
         <div id="stackViewerMain">
-          <VFBStackViewer />
+          <VFBStackViewer
+              id="NewStackViewer"
+              defHeight="100%"
+              defWidth="100%"
+             />
         </div>
         
       </div>

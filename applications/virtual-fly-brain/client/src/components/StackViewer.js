@@ -108,8 +108,8 @@ const VFBStackViewer = (props) => {
 
   // Update height and width of the stackwidget, happens when flex layout resizes tabs
   useEffect( () => {
-    if (stackData?.data?.height !== props?.defHeight || stackData?.data?.width !== props?.defWidth) {
-      let newData = stackData.data;
+    if (stackData?.height !== props?.defHeight || stackData?.width !== props?.defWidth) {
+      let newData = stackData;
       newData.height = props.defHeight;
       newData.width = props.defWidth;
       setStackData(newData);

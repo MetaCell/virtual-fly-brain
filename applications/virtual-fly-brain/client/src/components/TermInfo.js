@@ -36,9 +36,9 @@ const TermInfo = () => {
               <div>
                 <div tabIndex="-1">
                   <div>
-                     { termInfoData.meta.Name }<br/>
+                     { termInfoData?.meta?.Name }<br/>
                     <span className="label types">
-                      { termInfoData.meta.Tags.map( tag => <span className="label">{tag}<br/></span>) }
+                      { termInfoData?.meta?.Tags.map( tag => <span className="label">{tag}<br/></span>) }
                     </span>
                   </div>
                 </div>
@@ -50,7 +50,7 @@ const TermInfo = () => {
             <div>
               <div tabIndex="-1">
                 <div>
-                    { termInfoData.meta.Description }<br/>
+                    { termInfoData?.meta?.Description }<br/>
                 </div>
               </div>
             </div>
@@ -61,7 +61,7 @@ const TermInfo = () => {
               <div>
                 <div tabIndex="-1">
                   <div>
-                    <Queries queries={termInfoData.Queries} ></Queries>
+                    <Queries queries={termInfoData?.Queries} ></Queries>
                   </div>
                 </div>
               </div>
@@ -73,14 +73,14 @@ const TermInfo = () => {
               <div>
                 <div tabIndex="-1">
                   <div>
-                    <ExamplesSlider examples={termInfoData.Examples} ></ExamplesSlider>
+                    <ExamplesSlider examples={termInfoData?.Examples} ></ExamplesSlider>
                   </div>
                 </div>
               </div>
           </div>
         </div>
       </div>
-      : ( error ? (<div>{ error.data}</div>) : ( <div>Loading... </div>  ))
+      : ( error ? (<div>{ error?.data}</div>) : ( <div>Loading... </div>  ))
     )
 }
 

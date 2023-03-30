@@ -18,7 +18,8 @@ const divStyle = {
 }
 
 const ExamplesSlider = (props) => {
-  const keys = Object.keys(props.examples);
+  const keys = [];
+  if ( props.examples ) Object.keys(props.examples);
   const slideImages = keys.map( k => ({
     url: props.examples[k][0].thumbnail,
     caption: props.examples[k][0].label

@@ -28,17 +28,11 @@ def init_webapp_routes(app):
       term_info_data = vfb.get_term_info(id)
       return term_info_data
 
-    @app.route('/<path:path>', methods=['GET'])
-    def send_webapp(path):
-        print(www_path)
-        print(path)
-        print("www path file")
-        return flask.send_from_directory(www_path, path)
-
 app = init_flask(title="VFB index API", webapp=False, init_app_fn=init_webapp_routes)
 
 def main():
   # CORS(app, support_credentials=True)
+  app.static_url_path="/usr/src/app/www/static"
   app.run(host='0.0.0.0', port=8080)
 
 if __name__ == '__main__':

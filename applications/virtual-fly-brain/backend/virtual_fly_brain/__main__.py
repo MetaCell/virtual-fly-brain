@@ -8,11 +8,17 @@ import os
 import json
 
 def init_webapp_routes(app):
+    www_path = "/usr/src/app/www"
+
     @app.route('/get_instances', methods=['GET'])
     @cross_origin(supports_credentials=True)
     def instances():
       return vfb.get_instances(request.args.get('short_form'))
       
+    @app.route('/', methods=['GET'])
+    def index():
+        return flask.send_from_directory(www_path, 'index.html')
+
     @app.route('/get_term_info', methods=['GET'])
     @cross_origin(supports_credentials=True)
     def term_info():
@@ -20,9 +26,12 @@ def init_webapp_routes(app):
       term_info_data = vfb.get_term_info(id)
       return term_info_data
 
+    @app.route('/<path:path>', methods=['GET'])
+    def send_webapp(path):
+        return flask.send_from_directory(www_path, path)
+
     @app.route('/static/<path:path>', methods=['GET']) 
     def send_static(path):
-        www_path = "/usr/src/app/www"
         print(www_path)
         wwwp = os.path.join(www_path, 'static')
         print("www path")

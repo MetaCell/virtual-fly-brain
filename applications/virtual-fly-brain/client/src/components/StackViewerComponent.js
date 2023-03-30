@@ -1683,7 +1683,7 @@ const StackViewerComponent = () =>createClass({
               templateId={this.props.config.templateId}
               templateDomainIds={this.state.tempId}
               templateDomainTypeIds={this.state.tempType}
-              templateDomainNames={this.state.tempName} layout={this.props.layout}
+              templateDomainNames={this.state.tempName}
               slice={this.state.slice} onHome={this.onHome} onZoomIn={this.onZoomIn}
               onResize={this.onResize} />
           </div>

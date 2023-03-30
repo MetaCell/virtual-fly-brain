@@ -28,12 +28,11 @@ const Main = () => {
         <div>
           <VFBToolBar />
         </div>
-        
-        <div id="termInfoMain">
+        <div style={{ height: '100%', width: '50%' }} id="termInfoMain">
           <TermInfo />
         </div>
 
-        <div id="stackViewerMain">
+        <div style={{ height: '100%', width: '50%' }} id="stackViewerMain">
           <VFBStackViewer
               id="NewStackViewer"
               defHeight="100%"

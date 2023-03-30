@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-import React, { Component } from 'react';
+import React, { Component, useState, useEffect } from 'react';
 import {useSelector, useDispatch} from 'react-redux'
 import * as FlexLayout from '@metacell/geppetto-meta-ui/flex-layout/src';
 import '@metacell/geppetto-meta-ui/flex-layout/style/dark.scss'
@@ -21,8 +21,16 @@ const styles = () => ({
 
 const TermInfo = () => {
 
-  const termInfoData = useSelector(state => state.termInfo.termInfoData)
+  const data = useSelector(state => state.termInfo.termInfoData)
   const error = useSelector(state => state.termInfo.error)
+
+  const [termInfoData, setTermInfoData] = useState(data);
+
+  // FIXME
+  useEffect( () => {
+    console.log("term info data : ", data);
+    setTermInfoData(data)
+  },[data]);
 
     return(
       termInfoData ?
@@ -36,9 +44,9 @@ const TermInfo = () => {
               <div>
                 <div tabIndex="-1">
                   <div>
-                     { termInfoData?.meta?.Name }<br/>
+                     { termInfoData?.Name }<br/>
                     <span className="label types">
-                      { termInfoData?.meta?.Tags.map( tag => <span className="label">{tag}<br/></span>) }
+                      { termInfoData?.Tags.map( tag => <span className="label">{tag}<br/></span>) }
                     </span>
                   </div>
                 </div>
@@ -50,7 +58,7 @@ const TermInfo = () => {
             <div>
               <div tabIndex="-1">
                 <div>
-                    { termInfoData?.meta?.Description }<br/>
+                    { termInfoData?.Meta?.Description }<br/>
                 </div>
               </div>
             </div>

@@ -37,9 +37,8 @@ const VFBStackViewer = (props) => {
     if (instances.length == undefined) {
       added = [instances];
       if (instances?.parent) {
-        if (props.onLoad !== undefined) {
-          props.onLoad(instances.parent.getId());
-        }
+        // FIXME
+        // this.props.vfbIdLoaded(instances.parent.getId(), "StackViewer");
         if (instances.parent.getId() == templateID){
           data.instances.unshift(instances);
         } else {
@@ -104,7 +103,8 @@ const VFBStackViewer = (props) => {
   // FIXME
   useEffect( () => {
     console.log("term info data : ", stackViewerData);
-  });
+    stackViewerData && setStackData(stackViewerData)
+  },[stackViewerData]);
 
   // Update height and width of the stackwidget, happens when flex layout resizes tabs
   useEffect( () => {
@@ -141,10 +141,7 @@ const VFBStackViewer = (props) => {
     <StackViewerComponent
       data={stackViewerData}
       config={config}
-      voxel={voxelSize}
-      canvasRef={canvasRef}
-      ref={stackRef}
-      layout={layout}/>
+      voxel={voxelSize}/>
   )
 }
 

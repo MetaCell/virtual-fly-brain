@@ -22,7 +22,7 @@ def init_webapp_routes(app):
       
     @app.route('/static/js/<path:path>', methods=['GET'])
     def send_static_js(path):
-        www_path = os.path.dirname(os.path.abspath(__file__)) + "/www"
+        www_path = "/usr/src/app/www"
         print(www_path)
         wwwp = os.path.join(www_path, 'static')
         print("www path")
@@ -32,7 +32,7 @@ def init_webapp_routes(app):
 
     @app.route('/static/css/<path:path>', methods=['GET']) 
     def send_static_css(path):
-        www_path = os.path.dirname(os.path.abspath(__file__)) + "/www"
+        www_path = "/usr/src/app/www"
         print(www_path)
         wwwp = os.path.join(www_path, 'static')
         print("www path")

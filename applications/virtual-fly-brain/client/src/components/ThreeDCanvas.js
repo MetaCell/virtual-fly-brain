@@ -23,7 +23,7 @@ const styles = () => ({
   },
 });
 
-const OBJ3DCanvas = (props) => {
+const ThreeDCanvas = (props) => {
 
   const dataSetsQuery = useSelector(state => state.OBJ3.modelUrl);
   const canvasRef = React.createRef();
@@ -50,7 +50,7 @@ const OBJ3DCanvas = (props) => {
               "name": "VFB Obj Loader",
               "type": { "eClass": "SimpleType" }
               , "visualValue": {
-                "eClass": "OBJ", //Resources.OBJ,
+                "eClass": Resources.OBJ,
                 'obj': obj
               }
             }
@@ -102,4 +102,4 @@ const OBJ3DCanvas = (props) => {
       : <><div>OBJ Model Loading...</div></> ;
 }
 
-export default withStyles(styles)(OBJ3DCanvas);
+export default withStyles(styles)(ThreeDCanvas);

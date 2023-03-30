@@ -4,6 +4,7 @@ import VFBToolBar from './Toolbar';
 import * as FlexLayout from '@metacell/geppetto-meta-ui/flex-layout/src';
 import '@metacell/geppetto-meta-ui/flex-layout/style/dark.scss'
 import TermInfo from './TermInfo';
+import ThreeDCanvas from './ThreeDCanvas';
 var modelJson = require('./layoutModel').modelJson;
 
 require('../css/base.less');
@@ -30,6 +31,10 @@ const Main = () => {
         
         <div>
           <TermInfo />
+        </div>
+
+        <div>
+          <ThreeDCanvas />
         </div>
         
       </div>

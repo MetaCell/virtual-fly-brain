@@ -10,7 +10,8 @@ ENV BUILDDIR=/app
 RUN apk update
 RUN apk add gcc python3-dev musl-dev npm git
 
-COPY ./client ${BUILDDIR}
+COPY client ${BUILDDIR}
+RUN pwd && ls -ls
 WORKDIR ${BUILDDIR}
 RUN npm install
 RUN npm run build

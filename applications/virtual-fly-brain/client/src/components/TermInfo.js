@@ -36,9 +36,9 @@ const TermInfo = () => {
               <div>
                 <div tabIndex="-1">
                   <div>
-                     { termInfoData.meta.Name }<br/>
+                     { termInfoData.Name }<br/>
                     <span className="label types">
-                      { termInfoData.meta.Tags.map( tag => <span className="label">{tag}<br/></span>) }
+                      { termInfoData.Tags.map( tag => <span className="label">{tag}<br/></span>) }
                     </span>
                   </div>
                 </div>
@@ -50,7 +50,7 @@ const TermInfo = () => {
             <div>
               <div tabIndex="-1">
                 <div>
-                    { termInfoData.meta.Description }<br/>
+                    { termInfoData.Description }<br/>
                 </div>
               </div>
             </div>

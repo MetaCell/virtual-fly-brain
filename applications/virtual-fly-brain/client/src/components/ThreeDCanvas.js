@@ -4,15 +4,9 @@ import Canvas from "@metacell/geppetto-meta-ui/3d-canvas/Canvas";
 import SimpleInstance from "@metacell/geppetto-meta-core/model/SimpleInstance";
 import CameraControls from "@metacell/geppetto-meta-ui/camera-controls/CameraControls";
 import { withStyles } from '@material-ui/core';
-import { applySelection, mapToCanvasData } from "@metacell/geppetto-meta-ui/3d-canvas/utils/SelectionUtils"
-import CaptureControls from "@metacell/geppetto-meta-ui/capture-controls/CaptureControls";
+import Resources from '@metacell/geppetto-meta-core/Resources';
 import { augmentInstancesArray } from '@metacell/geppetto-meta-core/Instances';
 import ModelFactory from '@metacell/geppetto-meta-core/ModelFactory';
-
-function getProxyInstances () {
-  return window.Instances.map(i => (
-    { instancePath: i.getId(), color: { r: 0, g:1, b: 0, a:1 } }))
-}
 
 const styles = () => ({
   container: {
@@ -25,50 +19,31 @@ const styles = () => ({
 
 const ThreeDCanvas = (props) => {
 
-  const dataSetsQuery = useSelector(state => state.OBJ3.modelUrl);
+  const modelUrl = useSelector(state => state.threeD.modelUrl);
   const canvasRef = React.createRef();
-  const modelId = props.modelId
   const [canvasData, setCanvasData] = useState(undefined);
 
-  function getProxyInstances () {
-    return window.Instances.map(i => (
-      { instancePath: i.getId(), }))
-  }
-
   useEffect(() => {
-    if(dataSetsQuery) {
+    if(modelUrl) {
 
-      const loadInstance = async (dataSetsQuery, modelId) => {
-        if (dataSetsQuery.length > 0)
-        {
-          const objUrl = dataSetsQuery.find( query => query.indexOf(modelId) > -1 ) + '/volume.obj';
-          return fetch(objUrl)
-          .then(obj => { 
-            const model = {
-              "eClass": "SimpleInstance",
-              "id": "ANeuron",
-              "name": "VFB Obj Loader",
-              "type": { "eClass": "SimpleType" }
-              , "visualValue": {
-                "eClass": Resources.OBJ,
-                'obj': obj
-              }
-            }
-            ModelFactory.cleanModel();
-            const instance = new SimpleInstance(model)
-            window.Instances = [instance]
-            augmentInstancesArray(window.Instances);
-
-            const data = getProxyInstances();
-            setCanvasData(data);
-          })
+      const loadInstance = async (modelUrl) => {
+        const model = {
+          "eClass": "SimpleInstance",
+          "id": "ANeuron",
+          "name": "VFB Obj Loader",
+          "type": { "eClass": "SimpleType" }
+          , "visualValue": {
+            "eClass": Resources.OBJ,
+            'obj': modelUrl
+          }
         }
+        ModelFactory.cleanModel();
+        const instances = [new SimpleInstance(model)]
       }
-
-      loadInstance(dataSetsQuery, modelId).catch(console.error);
+      loadInstance(modelUrl).catch(console.error);
     }
 
-  }, [dataSetsQuery]); // listen only to currentChannelName changes
+  }, [modelUrl]); // listen only to currentChannelName changes
 
     const state = {
       cameraOptions: {

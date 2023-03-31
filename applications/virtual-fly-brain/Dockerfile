@@ -12,7 +12,7 @@ RUN apk add gcc python3-dev musl-dev npm git
 
 COPY ./client ${BUILDDIR}
 WORKDIR ${BUILDDIR}
-RUN npm ci
+RUN npm install
 RUN npm run build
 RUN pwd && ls
 WORKDIR /usr/src/app

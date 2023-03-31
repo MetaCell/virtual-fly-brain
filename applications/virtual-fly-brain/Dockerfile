@@ -8,13 +8,13 @@ ENV PORT=8080
 ENV BUILDDIR=/app
 
 RUN apk update
-RUN apk add gcc python3-dev musl-dev npm git
+RUN apk add gcc python3-dev musl-dev yarn git
 
 COPY client ${BUILDDIR}
 RUN pwd && ls -ls
 WORKDIR ${BUILDDIR}
-RUN npm install
-RUN npm run build
+RUN yarn install
+RUN yarn run build
 RUN pwd && ls
 WORKDIR /usr/src/app
 

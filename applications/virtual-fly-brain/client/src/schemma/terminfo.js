@@ -1,4 +1,4 @@
-export default terminfoSchemma = {
+let terminfoSchemma = {
   type: 'object',
   required: ['Name', 'Id', 'SuperTypes', 'Meta', 'Tags'],
   properties: {
@@ -126,3 +126,4 @@ export default terminfoSchemma = {
     }
   }
 }
+export default terminfoSchemma;

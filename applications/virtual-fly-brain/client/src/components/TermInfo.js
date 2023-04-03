@@ -1,8 +1,6 @@
 /* eslint-disable no-undef */
 import React, { Component, useState, useEffect } from 'react';
 import {useSelector, useDispatch} from 'react-redux'
-import * as FlexLayout from '@metacell/geppetto-meta-ui/flex-layout/src';
-import '@metacell/geppetto-meta-ui/flex-layout/style/dark.scss'
 import ExamplesSlider from './ExamplesSlider';
 import Queries from './Queries';
 
@@ -34,7 +32,7 @@ const TermInfo = () => {
 
     return(
       termInfoData ?
-      <div className="flexlayout__border_bottom">
+      <div>
         <br/>
         <br/>
         <br/>
@@ -46,7 +44,7 @@ const TermInfo = () => {
                   <div>
                      { termInfoData?.Name }<br/>
                     <span className="label types">
-                      { termInfoData?.Tags.map( tag => <span className="label">{tag}<br/></span>) }
+                      { termInfoData?.Tags.map( tag => <span key={tag} className="label">{tag}<br/></span>) }
                     </span>
                   </div>
                 </div>

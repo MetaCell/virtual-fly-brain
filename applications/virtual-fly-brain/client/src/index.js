@@ -1,13 +1,15 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import ReactDOM from 'react-dom';
 import reportWebVitals from './reportWebVitals';
 import './index.css';
 import App from './App';
-import {Provider} from 'react-redux'
+import { Provider } from 'react-redux'
 import store from './store';
-import { initGeppetto } from '@metacell/geppetto-meta-client/GEPPETTO';
 console.log(store)
-initGeppetto(false, true);
+
+require('./css/base.less');
+require('./css/VFBMain.less');
+// initGeppetto(false, true);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -18,3 +20,4 @@ root.render(
 );
 
 reportWebVitals();
+

@@ -84,7 +84,7 @@ const VFBStackViewer = (props) => {
     // FIXME
     if (templateID !== undefined) {
       // Template ID must always be on top
-      potentialInstances.sort(function (x,y) {
+      potentialInstances.sort((x,y) => {
         return x.includes(templateID) ? -1 : y.includes(templateID) ? 1 : 0;
       });
 

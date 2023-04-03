@@ -401,9 +401,10 @@
       while (window.GEPPETTO.SceneController.getSelection()[0] != undefined) {
         window.GEPPETTO.SceneController.getSelection()[0].deselect();
       }
-      [this.state.stack[0]]?.forEach(function (i, item) {
+      [this.state.stack[0]]?.forEach( (i, item) => {
         (function (i, that, shift) {
-          var shift = window.GEPPETTO.isKeyPressed("shift");
+          // FIXME
+          // var shift = window.GEPPETTO.isKeyPressed("shift");
           var image = that.state.serverUrl.toString() + '?wlz=' + item + '&sel=0,255,255,255&mod=zeta&fxp=' + that.props.fxp.join(',') + '&scl=' + Number(that.state.scl).toFixed(1) + '&dst=' + Number(that.state.dst).toFixed(1) + '&pit=' + Number(that.state.pit).toFixed(0) + '&yaw=' + Number(that.state.yaw).toFixed(0) + '&rol=' + Number(that.state.rol).toFixed(0);
           // get image size;
           fetch({
@@ -475,6 +476,30 @@
       });
     },
 
+    loadProgressHandler : function (loader, resource) {
+      this.setStatusText('Buffering stack ' + loader.progress.toFixed(1) + "%");
+    },
+
+    setup : function (imageLoader) {
+      var k;
+      for (k in imageLoader.resources) {
+        this.state.iBuffer[k] = imageLoader.resources[k].texture;
+      }
+      imageLoader.destroy(true);
+      // console.log('Buffered ' + (1000 - buffMax).toString() + ' tiles');
+      if (this._isMounted === true && this._initialized === false) {
+        // this.props.canvasRef.resetCamera();
+        this._initialized = true;
+        this.props.onHome();
+      }
+      if (this.state.text.indexOf('Buffering stack') > -1) {
+        this.state.buffer[-1].text = '';
+      }
+      this.state.bufferRunning = false;
+      this.state.lastUpdate = Date.now();
+      this.animate();
+    },
+
     listObjects: function () {
       if (!this.state.loadingLabels || this.state.lastLabelCall < (Date.now() - 500)) {
         this.state.lastLabelCall = Date.now();
@@ -483,12 +508,13 @@
         var that = this;
         var callX = that.state.posX.toFixed(0), callY = that.state.posY.toFixed(0);
 
-        [this.state.stack[0]]?.forEach(function (i, item) {
+        [this.state.stack[0]]?.forEach( (i, item) => {
           (function (i, that, shift) {
             if (i == 0) {
               that.state.loadingLabels = true;
             }
-            var shift = window.GEPPETTO.isKeyPressed("shift");
+            // FIXME
+            // var shift = window.GEPPETTO.isKeyPressed("shift");
             var image = that.state.serverUrl.toString() + '?wlz=' + item + '&sel=0,255,255,255&mod=zeta&fxp=' + that.props.fxp.join(',') + '&scl=' + Number(that.state.scl).toFixed(1) + '&dst=' + Number(that.state.dst).toFixed(1) + '&pit=' + Number(that.state.pit).toFixed(0) + '&yaw=' + Number(that.state.yaw).toFixed(0) + '&rol=' + Number(that.state.rol).toFixed(0);
             // get image size;
             fetch({
@@ -514,7 +540,7 @@
                       }
                     }
                   }
-                  var list = that.state.objects?.filter(function(el, index, arr) {
+                  var list = that.state.objects?.filter((el, index, arr) => {
                     return index === arr.indexOf(el);
                   }).sort();
                   var objects = '';
@@ -535,10 +561,10 @@
                   that.state.loadingLabels = false;
                 }
               },
-              error: function (xhr, status, err) {
+              error: (xhr, status, err) => {
                 that.state.loadingLabels = false;
                 console.error("Listing Objects", status + " - " + xhr.progress().state(), err.toString());
-              }.bind(this)
+              }
             });
           })(i, that);
         });
@@ -630,42 +656,19 @@
         if (loadList.size > 0) {
           this.state.bufferRunning = true;
           console.log('Loading ' + loadList.size + ' slices/tiles...');
-          function loadProgressHandler (loader, resource) {
-            this.setStatusText('Buffering stack ' + loader.progress.toFixed(1) + "%");
-          }
-
-          function setup () {
-            var k;
-            for (k in imageLoader.resources) {
-              this.state.iBuffer[k] = imageLoader.resources[k].texture;
-            }
-            imageLoader.destroy(true);
-            // console.log('Buffered ' + (1000 - buffMax).toString() + ' tiles');
-            if (this._isMounted === true && this._initialized === false) {
-              // this.props.canvasRef.resetCamera();
-              this._initialized = true;
-              this.props.onHome();
-            }
-            if (this.state.text.indexOf('Buffering stack') > -1) {
-              this.state.buffer[-1].text = '';
-            }
-            this.state.bufferRunning = false;
-            this.state.lastUpdate = Date.now();
-            this.animate();
-          }
 
           var imageLoader = new PIXI.Assets();
           var loaderOptions = {
             loadType: PIXI.Resource.LOAD_TYPE.IMAGE,
             xhrType: PIXI.Resource.XHR_RESPONSE_TYPE.BLOB
           };
-          loadList.forEach(function (value) {
+          loadList.forEach( (value) => {
             imageLoader.load(value, value, loaderOptions);
           });
           imageLoader
-            .on('progress', loadProgressHandler.bind(this))
+            .on('progress', this.loadProgressHandler)
             .on('error', console.error)
-            .on('complete', setup.bind(this,imageLoader))
+            .on('complete', this.setup(imageLoader))
             .load();
 
         } else {
@@ -1093,7 +1096,7 @@
       return (
         < div
           className="stack-canvas-container"
-          ref="stackCanvas" > </div>
+          > </div>
       )
       ;
     }
@@ -1206,7 +1209,7 @@ const StackViewerComponent = () =>createClass({
               if (a[i].parent.isVisible() != b[i].parent.isVisible()) {
                 return true;
               }
-            } catch (ignore) { }
+            } catch (ignore) { console.log("Error ", ignore)}
           }
           return false;
         }
@@ -1268,9 +1271,9 @@ const StackViewerComponent = () =>createClass({
       support = "onwheel" in document.createElement("div") ? "wheel" // Modern browsers support "wheel"
         : document.onmousewheel !== undefined ? "mousewheel" // Webkit and IE support at least "mousewheel"
           : "DOMMouseScroll"; // let's assume that remaining browsers are older Firefox
-      this.addWheelListener(document.getElementById(this.props.data.id + 'displayArea')[0], function (e) {
+      this.addWheelListener(document.getElementById(this.props.data.id + 'displayArea')[0], (e) => {
         this.onWheelEvent(e);
-      }.bind(this));
+      });
 
       if (this.props.data && this.props.data != null && this.props.data.instances && this.props.data.instances != null) {
         this.setState(this.handleInstances(this.props.data.instances));
@@ -1559,7 +1562,7 @@ const StackViewerComponent = () =>createClass({
     },
 
     _addWheelListener: function (elem, eventName, callback, useCapture) {
-      elem[this._addEventListener](prefix + eventName, support == "wheel" ? callback : function (originalEvent) {
+      elem[this._addEventListener](prefix + eventName, support == "wheel" ? callback : (originalEvent) => {
         !originalEvent && (originalEvent = window.event);
 
         // create a normalized event object

@@ -1,4 +1,4 @@
-import { getInstancesTypes } from './actions/types/getInstancesTypes';
+import { getTermInfoTypes } from './actions/types/getInstancesTypes';
 
 const initialState = {
   termInfoData: undefined,

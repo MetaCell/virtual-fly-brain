@@ -11,13 +11,11 @@ RUN apk update
 RUN apk add gcc python3-dev musl-dev yarn git
 
 COPY client ${BUILDDIR}
-RUN pwd && ls -ls
 WORKDIR ${BUILDDIR}
 RUN yarn install
 RUN yarn run build
-RUN pwd && ls
-WORKDIR /usr/src/app
 
+WORKDIR /usr/src/app
 COPY backend/requirements.txt /usr/src/app/
 RUN pip3 install --no-cache-dir -r requirements.txt
 COPY backend/ /usr/src/app

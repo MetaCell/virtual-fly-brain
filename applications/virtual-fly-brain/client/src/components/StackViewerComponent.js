@@ -398,9 +398,10 @@
       var i, j, result, id, label;
       var that = this;
       var isSelected = false;
-      while (window.GEPPETTO.SceneController.getSelection()[0] != undefined) {
-        window.GEPPETTO.SceneController.getSelection()[0].deselect();
-      }
+      // FIXME
+      // while (window.GEPPETTO.SceneController.getSelection()[0] != undefined) {
+      //   window.GEPPETTO.SceneController.getSelection()[0].deselect();
+      // }
       [this.state.stack[0]]?.forEach( (i, item) => {
         (function (i, that, shift) {
           // FIXME

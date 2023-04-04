@@ -1,23 +1,24 @@
-import { getTermInfoTypes } from './actions/types/getInstancesTypes';
+import { getInstancesTypes } from './actions/types/getInstancesTypes';
 
 const initialState = {
   termInfoData: undefined,
+  allPotentialInstances : [],
   isLoading: false,
   error: false
 };
 
-const TermInfoReducer = (state = initialState, response) => {
+const InstancesReducer = (state = initialState, response) => {
   switch (response.type) {
-     case getTermInfoTypes.GET_INSTANCES_STARTED:
+     case getInstancesTypes.GET_INSTANCES_STARTED:
         return Object.assign({}, state, {
            isLoading: true
         })
-     case getTermInfoTypes.GET_INSTANCES_SUCCESS:
+     case getInstancesTypes.GET_INSTANCES_SUCCESS:
         return Object.assign({}, state, {
           termInfoData: response.payload,
           isLoading: false
         })
-      case getTermInfoTypes.GET_INSTANCES_FAILURE:
+      case getInstancesTypes.GET_INSTANCES_FAILURE:
         return Object.assign({}, state, {
           termInfoData: response.payload.error,
           error: true
@@ -27,4 +28,4 @@ const TermInfoReducer = (state = initialState, response) => {
   }
 }
 
-export default TermInfoReducer;
+export default InstancesReducer;

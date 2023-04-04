@@ -65,13 +65,16 @@ module.exports = function webpacking(envVariables) {
             loader: "css-loader",
           },
           {
-            loader: "less-loader",
-            options: {
-              lessOptions: {
-                strictMath: true,
-              },
-            },
+            loader: "less-loader"
           },
+        ],
+      },
+      {
+        test: /\.s[a|c]ss$/,
+        use: [
+          { loader: 'style-loader' },
+          { loader: 'css-loader' },
+          { loader: 'sass-loader' },
         ],
       },
       {

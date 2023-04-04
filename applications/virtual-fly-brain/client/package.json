@@ -7,7 +7,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "prebuild": "eslint . --color",
-    "build": "webpack --config webpack.config.js",
+    "build": "webpack --config webpack.config.dev.js",
     "build-dev": "webpack --config webpack.config.js --env mode=development",
     "prestart": "eslint . --color --fix",
     "start": "webpack serve --progress --config webpack.config.dev.js",

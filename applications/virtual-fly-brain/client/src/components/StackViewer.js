@@ -7,6 +7,7 @@ import {useSelector, useDispatch} from 'react-redux'
 const VFBStackViewer = (props) => {
 
   const stackViewerData = useSelector(state => state.termInfo.termInfoData)
+  const allPotentialInstances = useSelector(state => state.termInfo.allPotentialInstances)
   const error = useSelector(state => state.termInfo.error);
   const templateID = useSelector(state => state.globalInfo.templateID)
   const fields = useSelector((state) => state.WHATEVER_REDUCER);
@@ -78,18 +79,19 @@ const VFBStackViewer = (props) => {
   // stack widget helper methods
   const getSliceInstances = () => {
     // FIXME
-    var potentialInstances = window.GEPPETTO.ModelFactory.getAllPotentialInstancesEndingWith('_slices');
+    var potentialInstances = allPotentialInstances;
+    // window.GEPPETTO.ModelFactory.getAllPotentialInstancesEndingWith('_slices');
     var sliceInstances = [];
     var instance;
     // FIXME
     if (templateID !== undefined) {
       // Template ID must always be on top
-      potentialInstances.sort((x,y) => {
+      potentialInstances?.sort((x,y) => {
         return x.includes(templateID) ? -1 : y.includes(templateID) ? 1 : 0;
       });
 
-      for (var i = 0; i < potentialInstances.length; i++) {
-        instance = stackData.data[i];
+      for (var i = 0; i < potentialInstances?.length; i++) {
+        instance = stackData?.data[i];
         if (instance) {
           sliceInstances.push(instance);
         }

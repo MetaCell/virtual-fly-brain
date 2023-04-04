@@ -1,7 +1,6 @@
 import { getInstancesTypes } from './actions/types/getInstancesTypes';
 
 const initialState = {
-  termInfoData: undefined,
   allPotentialInstances : [],
   isLoading: false,
   error: false
@@ -15,12 +14,12 @@ const InstancesReducer = (state = initialState, response) => {
         })
      case getInstancesTypes.GET_INSTANCES_SUCCESS:
         return Object.assign({}, state, {
-          termInfoData: response.payload,
+          allPotentialInstances: response.payload,
           isLoading: false
         })
       case getInstancesTypes.GET_INSTANCES_FAILURE:
         return Object.assign({}, state, {
-          termInfoData: response.payload.error,
+          termInfoData: [],
           error: true
         })
      default:

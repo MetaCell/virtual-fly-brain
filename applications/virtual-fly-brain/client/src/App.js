@@ -3,7 +3,7 @@ import Main from './components/Main'
 import React from 'react';
 import { termInfoById } from './reducers/actions/termInfo';
 import { queryString } from './utils/queryString';
-import {useSelector, useDispatch} from 'react-redux'
+import {useSelector} from 'react-redux'
 
 const App = () => { 
 

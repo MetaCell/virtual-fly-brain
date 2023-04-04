@@ -6,6 +6,7 @@ tox.ini
 virtual_fly_brain/__init__.py
 virtual_fly_brain/__main__.py
 virtual_fly_brain/controllers/__init__.py
+virtual_fly_brain/controllers/default_controller_.py
 virtual_fly_brain/controllers/security_controller_.py
 virtual_fly_brain/controllers/test_controller.py
 virtual_fly_brain/encoder.py

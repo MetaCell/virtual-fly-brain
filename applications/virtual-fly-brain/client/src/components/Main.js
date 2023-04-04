@@ -2,8 +2,8 @@
 import React, { Component } from 'react';
 import VFBToolBar from './Toolbar';
 import * as FlexLayout from '@metacell/geppetto-meta-ui/flex-layout/src';
-import '@metacell/geppetto-meta-ui/flex-layout/style/dark.scss'
 import TermInfo from './TermInfo';
+import VFBStackViewer from './StackViewer';
 var modelJson = require('./layoutModel').modelJson;
 
 require('../css/base.less');
@@ -27,9 +27,11 @@ const Main = () => {
         <div>
           <VFBToolBar />
         </div>
-        
-        <div>
+        <div style={{ height: '100%', width: '50%' }} id="termInfoMain">
           <TermInfo />
+        </div>
+        <div style={{ height: '100%', width: '50%' }} id="termInfoMain">
+          <VFBStackViewer />
         </div>
         
       </div>

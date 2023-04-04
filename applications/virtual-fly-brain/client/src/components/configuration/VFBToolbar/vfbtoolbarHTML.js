@@ -13,7 +13,7 @@ var feedback
   + "[<a href='https://github.com/VirtualFlyBrain/VFB2' target='_blank'>VirtualFlyBrain/VFB2</a>].</p>"
   + "<p>If you have a GitHub account you can easily raise a new issue: "
   + "<form id='GitHubIssue' method='get' action='https://github.com/VirtualFlyBrain/VFB2/issues/new' target='_blank'>"
-  + "<input type='hidden' name='body' value='Please give details of the issue:\n\n\n\n\nSupport info:\n$DATE$\n$BROWSER$\n$VERSION$ [$SCREEN$]\n$URL$\n\n\n\'\'\'diff\n$LOG$\n\'\'\'\n' />"
+  + "<input type='hidden' name='body' value='Please give details of the issue:\n\n\n\n\nSupport info:\n$DATE$\n$BROWSER$\n$VERSION$ [$SCREEN$]\n$URL$\n\n\ndiff\n$LOG$\n\n' />"
   + "<input type='submit' value='Create GitHub Issue' style='color: black; border-color: darkcyan;'></form>"
   + "</p>"
   + "<p> This could simply be a question or a new feature request, but if you have found a bug we missed please copy in "

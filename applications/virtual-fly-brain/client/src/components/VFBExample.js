@@ -179,7 +179,8 @@ class VFBExample extends Component {
     const model = await response.json();
     Manager.loadModel(model);
     for (const iname of INSTANCES) {
-      Instances.getInstance(iname);
+      //FIXME
+      window.Instances.getInstance(iname);
     }
     this.setState({ hasModelLoaded: true, showLoader: false })
   }

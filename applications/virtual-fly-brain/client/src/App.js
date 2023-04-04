@@ -3,10 +3,17 @@ import Main from './components/Main'
 import React from 'react';
 import { termInfoById } from './reducers/actions/termInfo';
 import { queryString } from './utils/queryString';
+import { blue, orange } from '@material-ui/core/colors';
+import CssBaseline from '@material-ui/core/CssBaseline';
 import {useSelector} from 'react-redux'
 import { initFileWithoutReading } from './reducers/actions/readFile';
 import Ajv from 'ajv'
 import { termInfoSchemma } from './schemma/termInfo';
+import {
+  createTheme,
+  responsiveFontSizes,
+  MuiThemeProvider,
+} from '@material-ui/core/styles';
 
 const App = () => { 
 
@@ -37,9 +44,24 @@ const App = () => {
     initFileWithoutReading({ url: obj });
   }
 
+  let theme = createTheme({
+    typography: { fontFamily: 'Roboto, Helvetica, Arial, sans-serif' },
+    palette: {
+      type: 'dark',
+      primary: { main: orange[500] },
+      secondary: { main: blue[500] },
+      button: { main: '#fc6320' },
+      toolbarBackground: { main: 'rgb(0,0,0,0.5)' },
+    },
+  });
+  theme = responsiveFontSizes(theme);
+
   return (
     <div className="App">
-      <Main />
+      <MuiThemeProvider theme={theme}>
+        <CssBaseline />
+        <Main />
+      </MuiThemeProvider>
     </div>
   );
 }

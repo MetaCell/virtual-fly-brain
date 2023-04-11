@@ -1,18 +1,29 @@
-Installing backend and running
+###Installing submodule
 
-cd applications/virtual-fly-brain/backend
-
-pip install -r requirements.txt
-
-cd virtual_fly_brain/libs/
+```
+cd virtual-fly-brain/applications/virtual-fly-brain/backend/virtual_fly_brain/libs/
+git submodule add https://github.com/VirtualFlyBrain/VFBquery
+cd VFBquery
+```
+Verify that setup.py exists in the current folder
+```
 pip install -e .
+```
 
-after that you will be able to run the server locally, using VSCode
+###Installing backend and running
 
-Installing front end and running
+```
+cd applications/virtual-fly-brain/backend
+pip install -r requirements.txt
+```
 
+after that you will be able to run the server locally, using your favorite IDE
+
+###Installing front end and running
+
+```
 cd applications/virtual-fly-brain/client
 yarn
 yarn build
 yarn start
-
+```

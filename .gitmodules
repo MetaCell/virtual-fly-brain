@@ -1,12 +1,3 @@
-[submodule "applications/virtual-fly-brain/backend/virtual_fly_brain/libs/vfbqueries"]
-	path = applications/virtual-fly-brain/backend/virtual_fly_brain/libs/vfbqueries
-	url = https://github.com/VirtualFlyBrain/vfbqueries.git
-[submodule "libs/vfbqueries"]
-	path = libs/vfbqueries
-	url = https://github.com/VirtualFlyBrain/vfbqueries
-[submodule "applications/virtual-fly-brain/backend/libs/vfbqueries"]
-	path = applications/virtual-fly-brain/backend/libs/vfbqueries
-	url = https://github.com/VirtualFlyBrain/vfbqueries
 [submodule "applications/virtual-fly-brain/backend/virtual_fly_brain/libs/VFBquery"]
 	path = applications/virtual-fly-brain/backend/virtual_fly_brain/libs/VFBquery
 	url = https://github.com/VirtualFlyBrain/VFBquery

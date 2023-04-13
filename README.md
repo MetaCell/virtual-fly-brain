@@ -1,10 +1,10 @@
-###Initialize and activate a new conda environment using python 3.9
+### Initialize and activate a new conda environment using python 3.9
 
 ```
 conda create -n vfb python=3.9
 conda activate vfb
 ```
-###Installing submodule
+### Installing submodule
 
 From project's root folder:
 
@@ -33,7 +33,7 @@ Home-page: https://github.com/VirtualFlyBrain/VFBquery
 Author: VirtualFlyBrain
 ```
 
-###Installing backend and running
+### Installing backend and running
 
 ```
 cd applications/virtual-fly-brain/backend
@@ -53,7 +53,7 @@ after that you will see Flask running with the following prompt:
 ```
 
 
-###Installing front end and running
+### Installing front end and running
 
 ```
 cd applications/virtual-fly-brain/client

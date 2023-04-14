@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Canvas from "@metacell/geppetto-meta-ui/3d-canvas/Canvas";
 import CameraControls from "@metacell/geppetto-meta-ui/camera-controls/CameraControls";
 import CaptureControls from '@metacell/geppetto-meta-ui/capture-controls/CaptureControls';
@@ -7,25 +7,7 @@ import { applySelection, mapToCanvasData } from "@metacell/geppetto-meta-ui/3d-c
 import Resources from '@metacell/geppetto-meta-core/Resources';
 import ModelFactory from '@metacell/geppetto-meta-core/ModelFactory';
 import { augmentInstancesArray } from '@metacell/geppetto-meta-core/Instances';
-
-
-function loadInstance (objUrl){
-  const instance1spec = {
-    "eClass": "SimpleInstance",
-    "id": "FBbt_00003748",
-    "name": "The first SimpleInstance to be render with Geppetto Canvas",
-    "type": { "eClass": "SimpleType" },
-    "visualValue": {
-      "eClass": Resources.GLTF,
-      'gltf': objUrl
-    }
-  }
-
-  ModelFactory.cleanModel();
-  const instance1 = new SimpleInstance(instance1spec)
-  window.Instances = [instance1]
-  augmentInstancesArray(window.Instances);
-}
+import { withStyles } from '@material-ui/core';
 
 function getProxyInstances () {
   return window.Instances.map(i => (
@@ -41,45 +23,40 @@ const styles = () => ({
   },
 });
 
+function loadInstances (instance){
+  ModelFactory.cleanModel();
+  const instance1 = new SimpleInstance(instance)
+  window.Instances = [instance1]
+  augmentInstancesArray(window.Instances);
+}
+
 const ThreeDCanvas = (props) =>  {
   const [modelUrl, setModelUrl] = useState("");
   const [canvasData, setCanvasData] = useState(undefined);
-  const [decodedString, setDecodedString] = useState(undefined);
-  const [needsRendering, setNeedsRendering] = useState(false);
+  const canvasRef = useRef(null);
 
   useEffect(() => {
     if (!canvasData) {
-      fetch('base64.txt')
+      fetch('volume_man.obj')
       .then(response => response.text())
       .then(base64Content => {
-        console.log(base64Content);
-        setDecodedString(base64Content);
+        const instance = {
+          "eClass": "SimpleInstance",
+          "id": "ANeuron",
+          "name": "The first SimpleInstance to be render with Geppetto Canvas",
+          "type": { "eClass": "SimpleType" },
+          "visualValue": {
+            "eClass": Resources.OBJ,
+            'obj': base64Content
+          }
+        }
+        loadInstances(instance)
+        const data = getProxyInstances();
+        const mappedDanvasData = mapToCanvasData(data)
+        setCanvasData(mappedDanvasData);
       });
     }
   }, []);
-
-  // useEffect(() => {
-  //   if (needsRendering) {
-  //     setNeedsRendering(false);
-  //   }
-  // }, [needsRendering]);
-
-  useEffect(() => {
-    if (decodedString) {
-      loadInstance(decodedString);
-      const data = getProxyInstances();
-      const mapped = mapToCanvasData(data);
-      setCanvasData(mapped);
-      setNeedsRendering(true);
-    }
-  }, [decodedString]);
-
-  const cameraOptions = {
-    cameraControls: {
-      instance: CameraControls,
-      props: { wireframeButtonEnabled: false },
-    }
-  };
 
   const captureOptions = {
     captureControls: {
@@ -99,20 +76,42 @@ const ThreeDCanvas = (props) =>  {
       pixelRatio: 1,
       filter: () => true
     },
-  };
+  }
+
+  const cameraOptions = {
+    angle: 50,
+    near: 0.01,
+    far: 1000,
+    baseZoom: 1,
+    cameraControls: {
+      instance: CameraControls,
+      props: { wireframeButtonEnabled: false },
+    },
+    initialFlip: ['y', 'z'],
+    reset: false,
+    autorotate: false,
+    wireframe: false,
+  }
 
   return (
-    needsRendering ?  
-      <>
-        <Canvas
-          data={canvasData}
-          cameraOptions={cameraOptions}
-          captureOptions={captureOptions}
-          backgroundColor={0x505050}
-          dracoDecoderPath={'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/jsm/libs/draco/'}
-        />
-      </> : <> Loading model ... </>
+    canvasData ?  
+        <div  >
+          <>
+            <Canvas
+              ref={canvasRef}
+              data={canvasData}
+              cameraOptions={cameraOptions}
+              captureOptions={captureOptions}
+              backgroundColor={0x505050}
+              onSelection={ () => {} }
+              onMount={ () => {} }
+              onHoverListeners={{ 'hoverId': ()=> {} }}
+              dracoDecoderPath={'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/jsm/libs/draco/'}
+            />
+          </>
+        </div>
+        : <> Loading model ... </>
   );
 };
 
-export default ThreeDCanvas ;
+export default withStyles(styles)(ThreeDCanvas);

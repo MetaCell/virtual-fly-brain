@@ -9,6 +9,7 @@ import CaptureControls from "@metacell/geppetto-meta-ui/capture-controls/Capture
 import Resources from '@metacell/geppetto-meta-core/Resources';
 import ModelFactory from '@metacell/geppetto-meta-core/ModelFactory';
 import { augmentInstancesArray } from '@metacell/geppetto-meta-core/Instances';
+import { connect } from 'react-redux';
 
 function loadInstances (instance){
   ModelFactory.cleanModel();
@@ -53,8 +54,10 @@ class ThreeDCanvas extends Component {
         autorotate: false,
         wireframe: false,
       },
-      showModel: false
+      showModel: false,
+      mappedCanvasData: undefined
     };
+
     this.hoverHandler = this.hoverHandler.bind(this);
     this.handleClickOutside = this.handleClickOutside.bind(this);
     this.handleToggle = this.handleToggle.bind(this);
@@ -64,32 +67,32 @@ class ThreeDCanvas extends Component {
   }
 
   componentDidMount () {
-    document.addEventListener('mousedown', this.handleClickOutside);
-    if (!this.state.canvasData) {
-      fetch('base64.txt')
-        .then(response => response.text())
-        .then(base64Content => {
-          console.log(base64Content);
-          this.setState({ ...this.state, ...{ decodedString: base64Content }});
-        });
-    }
+
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (this.state.decodedString && !this.state.loaded) {
-
-      const instance = {
-        "eClass": "SimpleInstance",
-        "id": "ANeuron",
-        "name": "The first SimpleInstance to be render with Geppetto Canvas",
-        "type": { "eClass": "SimpleType" },
-        "visualValue": {
-          "eClass": Resources.GLTF,
-          'gltf': this.state.decodedString
+    if (this.props.modelUrl !== prevProps.modelUrl)
+    {
+      fetch(this.props.modelUrl)
+      .then(response => response.text())
+      .then(base64Content => {
+        const instance = {
+          "eClass": "SimpleInstance",
+          "id": "ANeuron",
+          "name": "The first SimpleInstance to be render with Geppetto Canvas",
+          "type": { "eClass": "SimpleType" },
+          "visualValue": {
+            "eClass": Resources.OBJ,
+            'obj': base64Content
+          }
         }
-      }
-      
-      this.setState({ ...prevState, ...{ instance: instance, loaded: true }});
+        
+        loadInstances(instance)
+        const data = getProxyInstances();
+        const mappedCanvasData = mapToCanvasData(data)
+
+        this.setState({ ...this.state, ...{ mappedCanvasData }})
+      });
     }
   }
 
@@ -97,8 +100,8 @@ class ThreeDCanvas extends Component {
     document.removeEventListener('mousedown', this.handleClickOutside);
   }
 
-
   hoverHandler (objs, canvasX, canvasY) {
+
   }
 
   handleToggle () {
@@ -149,19 +152,12 @@ class ThreeDCanvas extends Component {
       },
     }
 
-    if (this.state.loaded)
-    {
-      loadInstances(this.state.instance)
-      data = getProxyInstances();
-      canvasData = mapToCanvasData(data)
-    }
-
-    return this.state.loaded ? (
+    return this.state.mappedCanvasData ? (
       <div ref={node => this.node = node} className={classes.container}>
         <>
           <Canvas
             ref={this.canvasRef}
-            data={canvasData}
+            data={this.state.mappedCanvasData}
             cameraOptions={cameraOptions}
             captureOptions={captureOptions}
             backgroundColor={0x505050}
@@ -182,4 +178,9 @@ class ThreeDCanvas extends Component {
   }
 }
 
-export default withStyles(styles)(ThreeDCanvas);
+const mapStateToProps = state => ({
+  modelUrl: state.threeD.modelUrl?.url
+});
+
+
+export default connect(mapStateToProps)(withStyles(styles)(ThreeDCanvas));

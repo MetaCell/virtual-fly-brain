@@ -24,8 +24,7 @@ const Main = () => {
 
     return(
       <div className="unselectable" style={{ height: '100%', width: '100%' }}>
-        
-        {/* <div>
+        <div>
           <VFBToolBar />
         </div>
         
@@ -34,9 +33,9 @@ const Main = () => {
         </div>
 
         <div>
-          
-        </div> */}
         <ThreeDCanvas />
+        </div>
+        
       </div>
     )
 }

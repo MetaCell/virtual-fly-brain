@@ -1,0 +1,99 @@
+import React from "react";
+import { Box, TextField, Typography } from "@mui/material";
+import { Search } from "../../icons";
+import vars from "../../theme/variables";
+import MediaQuery from 'react-responsive'
+
+const {
+  primaryBg,
+  secondaryBg,
+  searchBoxBg,
+  whiteColor,
+  shortcutBg
+} = vars;
+
+const SubHeader = () => {
+  const classes = {
+    root: {},
+
+    shortcut: {
+      backgroundColor: shortcutBg,
+      borderRadius: 2,
+      width: '4.1875rem',
+      height: '1.75rem',
+
+      '& p': {
+        fontWeight: 400,
+        fontSize: '0.875rem',
+        lineHeight: '1.125rem',
+        color: whiteColor,
+      }
+    }
+  };
+  return (
+    <Box sx={{
+      ...classes.root,
+      py: {
+        xs: 1,
+        lg: 0.5
+      },
+      px: 1.5,
+      backgroundColor: {
+        xs: primaryBg,
+        lg: secondaryBg
+      }
+    }}>
+      <Box
+        sx={{
+          width: {
+            lg: '35rem'
+          },
+          mx: {
+            lg: 'auto'
+          },
+          borderRadius: {
+            lg: 2
+          },
+          pl: {
+            lg: 1.5
+          },
+          py: {
+            lg: 0.25
+          },
+          pr: {
+            lg: 0.5
+          },
+          backgroundColor: {
+            lg: searchBoxBg
+          }
+        }}
+        display='flex'
+        alignItems='center'>
+        <Search />
+        <TextField
+          sx={{
+            ml: 1
+          }}
+          fullWidth
+          placeholder="Find something..."
+          variant="standard"
+        />
+        <MediaQuery minWidth={1200}>
+          <Box
+            display='flex'
+            flexShrink={0}
+            alignItems='center'
+            justifyContent='center'
+            sx={classes.shortcut}
+          >
+            <Typography>
+              Ctrl + K
+            </Typography>
+          </Box>
+        </MediaQuery>
+      </Box>
+    </Box>
+  )
+};
+
+export default SubHeader

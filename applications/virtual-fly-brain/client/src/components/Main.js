@@ -4,8 +4,9 @@ import VFBToolBar from './Toolbar';
 import * as FlexLayout from '@metacell/geppetto-meta-ui/flex-layout/src';
 import '@metacell/geppetto-meta-ui/flex-layout/style/dark.scss'
 import TermInfo from './TermInfo';
-import Header from '../shared/header';
-import SubHeader from '../shared/subHeader';
+import Wrapper from '../shared/Wrapper';
+import MainLayout from './Layout';
+
 var modelJson = require('./layoutModel').modelJson;
 
 require('../css/base.less');
@@ -27,8 +28,9 @@ const Main = () => {
 
      </div> */}
 
-      <Header />
-      <SubHeader />
+      <Wrapper>
+        <MainLayout />
+      </Wrapper>
     </>
   )
 }

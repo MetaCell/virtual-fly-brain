@@ -35,6 +35,22 @@ theme = createTheme({
           height: '2.125rem',
         },
 
+        text: {
+          borderRadius: 0,
+          '&:hover': {
+            backgroundColor: 'rgba(255, 255, 255, 0.04)',
+          }
+        },
+
+        textPrimary: {
+          color: outlinedBtnTextColor,
+
+          '&.active': {
+            color: whiteColor,
+            fontWeight: 500,
+          }
+        },
+
         outlined: {
           '& svg': {
             marginRight: '0.5rem'
@@ -83,7 +99,7 @@ theme = createTheme({
           fontWeight: 400,
           color: whiteColor,
 
-          '&:not(:first-child)': {
+          '&:not(:first-of-type)': {
             marginTop: '0.75rem',
             [theme.breakpoints.up('lg')]: {
               marginLeft: '1.5rem',

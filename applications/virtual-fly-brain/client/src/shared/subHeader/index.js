@@ -1,8 +1,41 @@
-import React from "react";
-import { Box, TextField, Typography } from "@mui/material";
-import { Search } from "../../icons";
+import React, { useState } from "react";
+import { Box, Button, TextField, Typography } from "@mui/material";
+import { ClearAll, Download, History, Layers, Query, Search, Upload } from "../../icons";
 import vars from "../../theme/variables";
 import MediaQuery from 'react-responsive'
+
+const navArr = [
+  {
+    id: 0,
+    icon: <Upload />,
+    name: 'Upload'
+  },
+  {
+    id: 1,
+    icon: <Download />,
+    name: 'Download'
+  },
+  {
+    id: 2,
+    icon: <Query />,
+    name: 'Query'
+  },
+  {
+    id: 3,
+    icon: <Layers />,
+    name: 'Layer'
+  },
+  {
+    id: 3,
+    icon: <ClearAll />,
+    name: 'Clear all'
+  },
+  {
+    id: 3,
+    icon: <History />,
+    name: 'Recent'
+  },
+]
 
 const {
   primaryBg,
@@ -14,7 +47,16 @@ const {
 
 const SubHeader = () => {
   const classes = {
-    root: {},
+    root: {
+      position: 'relative',
+    },
+
+    nav: {
+      position: 'absolute',
+      right: '1rem',
+      top: '50%',
+      transform: 'translateY(-50%)'
+    },
 
     shortcut: {
       backgroundColor: shortcutBg,
@@ -30,6 +72,7 @@ const SubHeader = () => {
       }
     }
   };
+
   return (
     <Box sx={{
       ...classes.root,
@@ -92,6 +135,25 @@ const SubHeader = () => {
           </Box>
         </MediaQuery>
       </Box>
+
+      <MediaQuery minWidth={1200}>
+        <Box
+          display='flex'
+          flexWrap='wrap'
+          sx={classes.nav}
+        >
+          {navArr.map((item) => (
+            <Button
+              sx={{
+                minWidth: '0.0625rem'
+              }}
+              key={item.id}
+            >
+              {item.icon}
+            </Button>
+          ))}
+        </Box>
+      </MediaQuery>
     </Box>
   )
 };

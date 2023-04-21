@@ -74,15 +74,14 @@
       // Setup PIXI Canvas in componentDidMount
       this.app = new Application(this.props.width, this.props.height);
       // maintain full window size
-      // FIXME
       this.refs.stackCanvas?.appendChild(this.app.view);
 
       // create the root of the scene graph
       this.stage = this.app.stage;
-      this.stage.pivot.x = 0;
-      this.stage.pivot.y = 0;
-      this.stage.position.x = 0;
-      this.stage.position.y = 0;
+      this.stage.pivot._x = 0;
+      this.stage.pivot._y = 0;
+      this.stage.x = 0;
+      this.stage.y = 0;
       this.disp = new Container();
       this.disp.pivot.x = 0;
       this.disp.pivot.y = 0;
@@ -794,10 +793,10 @@
                   this.state.iBuffer[image] = this.state.images[d].texture;
                   this.state.imagesUrl[d] = image;
                 }
-                this.state.images[d].anchor.x = 0;
-                this.state.images[d].anchor.y = 0;
-                this.state.images[d].position.x = x;
-                this.state.images[d].position.y = y;
+                // this.state.images[d].anchor.x = 0;
+                // this.state.images[d].anchor.y = 0;
+                // this.state.images[d].position.x = x;
+                // this.state.images[d].position.y = y;
                 this.state.images[d].zOrder = i;
                 this.state.images[d].visible = true;
                 if (!this.state.color[i]) {
@@ -808,7 +807,7 @@
                   // this.state.images[d].alpha = 0.9;
                   this.state.images[d].blendMode = BLEND_MODES.SCREEN;
                 }
-                this.stack.addChild(this.state.images[d]);
+                this.stage.addChild(this.state.images[d]);
               } else {
                 if (this.state.imagesUrl[d] != image) {
                   if (this.state.iBuffer[image]) {
@@ -818,14 +817,14 @@
                     if (this.state.txtUpdated < Date.now() - this.state.txtStay) {
                       this.state.buffer[-1].text = 'Loading slice ' + Number(this.state.dst - ((this.state.minDst / 10.0) * this.state.scl)).toFixed(1) + '...';
                     }
-                    this.state.images[d].texture = new Texture.fromImage(image);
+                    this.state.images[d].texture =  Texture.from(image);
                     this.state.iBuffer[image] = this.state.images[d].texture;
                     this.state.imagesUrl[d] = image;
                   }
-                  this.state.images[d].anchor.x = 0;
-                  this.state.images[d].anchor.y = 0;
-                  this.state.images[d].position.x = x;
-                  this.state.images[d].position.y = y;
+                  // this.state.images[d].anchor.x = 0;
+                  // this.state.images[d].anchor.y = 0;
+                  // this.state.images[d].position.x = x;
+                  // this.state.images[d].position.y = y;
                   this.state.images[d].zOrder = i;
                   this.state.images[d].visible = true;
                   if (i > 0) {
@@ -874,8 +873,8 @@
         this.state.buffer[-1] = new Text(this.state.text, style);
         this.stage.addChild(this.state.buffer[-1]);
         // fix position
-        this.state.buffer[-1].x = -this.stage?.position?.x + 35;
-        this.state.buffer[-1].y = -this.stage?.position?.y + 8;
+        this.state.buffer[-1].x = -this.stage?.x + 35;
+        this.state.buffer[-1].y = -this.stage?.y + 8;
         this.state.buffer[-1].anchor.x = 0;
         this.state.buffer[-1].anchor.y = 0;
         this.state.buffer[-1].zOrder = 1000;
@@ -1001,16 +1000,16 @@
     },
 
     setStatusText: function (text) {
-      this.state.buffer[-1].x = (-this.stage.position.x + 35);
-      this.state.buffer[-1].y = (-this.stage.position.y + 8);
-      this.state.buffer[-1].text = text;
-      this.state.text = text;
-      this.state.txtUpdated = Date.now();
+      // this.state.buffer[-1].x = (-35);
+      // this.state.buffer[-1].y = (8);
+      // this.state.buffer[-1].text = text;
+      // this.state.text = text;
+      // this.state.txtUpdated = Date.now();
     },
 
     setHoverText: function (x,y,text) {
-      this.state.buffer[-1].x = -this.stage.position.x + this.disp.position.x + (this.stack.position.x * this.disp.scale.x) + (Number(x) * this.disp.scale.x) - 10;
-      this.state.buffer[-1].y = -this.stage.position.y + this.disp.position.y + (this.stack.position.y * this.disp.scale.y) + (Number(y) * this.disp.scale.y) + 15;
+      this.state.buffer[-1].x = this.disp.position.x + (this.stack.position.x * this.disp.scale.x) + (Number(x) * this.disp.scale.x) - 10;
+      this.state.buffer[-1].y = this.disp.position.y + (this.stack.position.y * this.disp.scale.y) + (Number(y) * this.disp.scale.y) + 15;
       this.state.buffer[-1].text = text;
       this.state.text = text;
     },

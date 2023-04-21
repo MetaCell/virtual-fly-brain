@@ -63,13 +63,7 @@ const SubHeader = () => {
       borderRadius: 2,
       width: '4.1875rem',
       height: '1.75rem',
-
-      '& p': {
-        fontWeight: 400,
-        fontSize: '0.875rem',
-        lineHeight: '1.125rem',
-        color: whiteColor,
-      }
+      color: whiteColor,
     }
   };
 
@@ -122,17 +116,14 @@ const SubHeader = () => {
           variant="standard"
         />
         <MediaQuery minWidth={1200}>
-          <Box
-            display='flex'
-            flexShrink={0}
-            alignItems='center'
-            justifyContent='center'
-            sx={classes.shortcut}
+          <Button
+            sx={{
+              ...classes.shortcut,
+              flexShrink: 0,
+            }}
           >
-            <Typography>
-              Ctrl + K
-            </Typography>
-          </Box>
+            Ctrl + K
+          </Button>
         </MediaQuery>
       </Box>
 

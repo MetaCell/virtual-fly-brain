@@ -9,7 +9,8 @@ import vars from "../theme/variables";
 
 const {
   secondaryBg,
-  headerBorderColor
+  headerBorderColor,
+  tabActiveColor
 } = vars;
 
 const tabsArr = [
@@ -36,6 +37,18 @@ const MainLayout = () => {
       '& .MuiButton-text': {
         height: '100%',
         flex: 1,
+        position: 'relative',
+
+        '&.active': {
+          '&:after': {
+            position: 'absolute',
+            content: '""',
+            height: '0.125rem',
+            width: '100%',
+            bottom: 0,
+            background: tabActiveColor,
+          }
+        }
       }
     },
 

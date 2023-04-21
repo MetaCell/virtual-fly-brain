@@ -61,7 +61,7 @@ const SideBar = () => {
           lg: 'solid'
         },
         borderTopRightRadius: {
-          lg: 2
+          lg: '0.5rem'
         },
         borderWidth: {
           lg: '0.0625rem 0.0625rem 0 0'

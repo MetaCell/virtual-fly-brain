@@ -144,6 +144,7 @@ const SubHeader = () => {
         >
           {navArr.map((item) => (
             <Button
+              aria-label={item.name}
               sx={{
                 minWidth: '0.0625rem'
               }}

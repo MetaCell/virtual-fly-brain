@@ -2,6 +2,7 @@
   import { Application, Container, Assets, Sprite, Text, utils, extensions, ExtensionType, Texture , Resource, BLEND_MODES } from 'pixi.js';
   import * as PIXI from 'pixi.js';
   var createClass = require('create-react-class');
+  import { useRef, useEffect } from 'react';
 
   const Canvas = createClass({
     _isMounted: false,
@@ -58,6 +59,7 @@
         imagesUrl: {}
       };
     },
+
     /**
      * In this case, componentDidMount is used to grab the canvas container ref, and
      * and hook up the PixiJS renderer
@@ -73,7 +75,7 @@
       this.app = new Application(this.props.width, this.props.height);
       // maintain full window size
       // FIXME
-      //this.refs.stackCanvas.appendChild(this.app.view);
+      this.refs.stackCanvas?.appendChild(this.app.view);
 
       // create the root of the scene graph
       this.stage = this.app.stage;
@@ -191,8 +193,7 @@
 
 
     componentWillUnmount: function () {
-      //FIXME
-      //this.refs.stackCanvas.removeChild(this.app.view);
+      this.refs.stackCanvas?.removeChild(this.app.view);
       this.app.destroy(true,true);
       this.app = null;
 
@@ -1632,9 +1633,9 @@ const StackViewerComponent = () => createClass({
       var markup = '';
       if (this.state.stack.length > 0) {
         markup = (
-          <div id={displayArea} style={{ position: 'absolute', top: 3, left: 3 }}>
+          <div id={displayArea} style={{ position: 'absolute', top: 30, left: 3 }}>
             <button style={{
-              position: 'relative',
+              position: 'absolute',
               left: 15,
               top: startOffset + 20,
               padding: 0,
@@ -1642,7 +1643,7 @@ const StackViewerComponent = () => createClass({
               background: 'transparent'
             }} className={homeClass} onClick={this.onHome} title={'Center Stack'} />
             <button style={{
-              position: 'relative',
+              position: 'absolute',
               left: 15,
               top: startOffset + 82,
               padding: 0,
@@ -1650,7 +1651,7 @@ const StackViewerComponent = () => createClass({
               background: 'transparent'
             }} className={zoomInClass} onClick={this.onZoomIn} title={'Zoom In'} />
             <button style={{
-              position: 'relative',
+              position: 'absolute',
               left: 15,
               top: startOffset + 104,
               padding: 0,
@@ -1658,7 +1659,7 @@ const StackViewerComponent = () => createClass({
               background: 'transparent'
             }} className={zoomOutClass} onClick={this.onZoomOut} title={'Zoom Out'} />
             <button style={{
-              position: 'relative',
+              position: 'absolute',
               left: 15,
               top: startOffset + 40,
               padding: 0,
@@ -1666,7 +1667,7 @@ const StackViewerComponent = () => createClass({
               background: 'transparent'
             }} className={stepInClass} onClick={this.onStepIn} title={'Step Into Stack'} />
             <button style={{
-              position: 'relative',
+              position: 'absolute',
               left: 15,
               top: startOffset,
               padding: 0,
@@ -1674,7 +1675,7 @@ const StackViewerComponent = () => createClass({
               background: 'transparent'
             }} className={stepOutClass} onClick={this.onStepOut} title={'Step Out Of Stack'} />
             <button style={{
-              position: 'relative',
+              position: 'absolute',
               left: 15,
               top: startOffset + 60,
               padding: 0,
@@ -1683,7 +1684,7 @@ const StackViewerComponent = () => createClass({
               background: 'transparent'
             }} className={orthClass} onClick={this.toggleOrth} title={'Change Slice Plane Through Stack'} />
             <button style={{
-              position: 'relative',
+              position: 'absolute',
               left: 15,
               top: startOffset + 130,
               padding: 0,

@@ -27,17 +27,16 @@ const Main = () => {
         <div>
           <VFBToolBar />
         </div>
-        <div style={{ height: '100%', display : 'inline-flex'}} id="termInfoMain">
-          <TermInfo />
-        </div>
-        <div style={{ height: '100%', paddingTom : 20}} id="stackViewerMain">
+        <div style={{ height: '100%', paddingTom : 20,}} id="stackViewerMain">
           <VFBStackViewer 
             id="NewStackViewer"
             defHeight={600}
             defWidth={600}
           />
         </div>
-        
+        <div style={{ height: '100%',  width : "50%", float : "right", display : 'inline-flex'}} id="termInfoMain">
+          <TermInfo />
+        </div>
       </div>
     )
 }

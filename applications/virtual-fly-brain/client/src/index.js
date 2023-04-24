@@ -6,25 +6,19 @@ import './index.css';
 import App from './App';
 import { Provider } from 'react-redux'
 import store from './store';
+import { CssBaseline } from "@mui/material";
+import { ThemeProvider } from "@mui/material/styles";
 import theme from './theme';
-
-// const { initGeppetto } = require('@metacell/geppetto-meta-client/GEPPETTO');
-// initGeppetto(false, true);
-require('./css/base.less');
-require('./css/VFBMain.less');
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
-  <div>
-    <React.StrictMode>
-    <Provider store={store}>
-      <MuiThemeProvider theme={theme}>
-        <App />
-      </MuiThemeProvider>
-    </Provider>
-  </React.StrictMode>,
-  </div>,
+  <Provider store={store} >
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <App />
+    </ThemeProvider>
+  </Provider>,
 );
 
 reportWebVitals();

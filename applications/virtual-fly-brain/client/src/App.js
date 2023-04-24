@@ -3,9 +3,6 @@ import Main from './components/Main'
 import React from 'react';
 import { termInfoById } from './reducers/actions/termInfo';
 import { queryString } from './utils/queryString';
-<<<<<<< HEAD
-import {useSelector} from 'react-redux'
-=======
 import { blue, orange } from '@material-ui/core/colors';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import {useSelector} from 'react-redux'
@@ -17,7 +14,6 @@ import {
   responsiveFontSizes,
   MuiThemeProvider,
 } from '@material-ui/core/styles';
->>>>>>> feature/vfb11
 
 const App = () => { 
 

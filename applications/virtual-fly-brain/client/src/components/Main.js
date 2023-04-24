@@ -1,14 +1,7 @@
 /* eslint-disable no-undef */
-import React, { Component } from 'react';
-import VFBToolBar from './Toolbar';
-import * as FlexLayout from '@metacell/geppetto-meta-ui/flex-layout/src';
-import TermInfo from './TermInfo';
-<<<<<<< HEAD
-import VFBStackViewer from './StackViewer';
-=======
+import React from 'react';
 import ThreeDCanvas from './ThreeDCanvas';
->>>>>>> feature/vfb11
-var modelJson = require('./layoutModel').modelJson;
+import TermInfo from './TermInfo';
 
 require('../css/base.less');
 require('../css/VFBMain.less');
@@ -29,12 +22,12 @@ const Main = () => {
       <div className="unselectable" style={{ height: '100%', width: '100%' }}>
         {/* <div>
           <VFBToolBar />
-        </div>
+        </div>*/}
         <div style={{ height: '100%', width: '50%' }} id="termInfoMain">
           <TermInfo />
-        </div> */}
+        </div> 
         <div style={{ height: '100%', width: '50%' }} id="termInfoMain">
-          <VFBStackViewer />
+          <ThreeDCanvas />
         </div>
         
       </div>

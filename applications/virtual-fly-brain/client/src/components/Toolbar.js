@@ -80,16 +80,16 @@ export default class VFBToolBar extends React.Component {
     this.clickQuickHelp = this.clickQuickHelp.bind(this);
   }
 
-  componentWillMount () {
-    var head = document.head;
-    var link = document.createElement("link");
+  // componentWillMount () {
+  //   var head = document.head;
+  //   var link = document.createElement("link");
 
-    link.type = "text/css";
-    link.rel = "stylesheet";
-    link.href = "https://fonts.googleapis.com/css?family=Khand:300,400&display=swap"
+  //   link.type = "text/css";
+  //   link.rel = "stylesheet";
+  //   link.href = "https://fonts.googleapis.com/css?family=Khand:300,400&display=swap"
 
-    head.appendChild(link);
-  }
+  //   head.appendChild(link);
+  // }
 
   clickFeedback () {
     
@@ -137,6 +137,8 @@ export default class VFBToolBar extends React.Component {
     default:
       return this.props.menuHandler(click);
     }
+
+    return;
   }
 
   render () {

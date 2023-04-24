@@ -3,7 +3,11 @@ import React, { Component } from 'react';
 import VFBToolBar from './Toolbar';
 import * as FlexLayout from '@metacell/geppetto-meta-ui/flex-layout/src';
 import TermInfo from './TermInfo';
+<<<<<<< HEAD
 import VFBStackViewer from './StackViewer';
+=======
+import ThreeDCanvas from './ThreeDCanvas';
+>>>>>>> feature/vfb11
 var modelJson = require('./layoutModel').modelJson;
 
 require('../css/base.less');
@@ -23,13 +27,12 @@ const Main = () => {
 
     return(
       <div className="unselectable" style={{ height: '100%', width: '100%' }}>
-        
-        <div>
+        {/* <div>
           <VFBToolBar />
         </div>
         <div style={{ height: '100%', width: '50%' }} id="termInfoMain">
           <TermInfo />
-        </div>
+        </div> */}
         <div style={{ height: '100%', width: '50%' }} id="termInfoMain">
           <VFBStackViewer />
         </div>

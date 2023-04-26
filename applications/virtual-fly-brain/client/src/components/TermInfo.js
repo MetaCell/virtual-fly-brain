@@ -1,4 +1,5 @@
 /* eslint-disable no-undef */
+import 'regenerator-runtime/runtime';
 import React, { Component, useState, useEffect } from 'react';
 import {useSelector, useDispatch} from 'react-redux'
 import ExamplesSlider from './ExamplesSlider';

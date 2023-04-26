@@ -16,6 +16,7 @@ const Main = () => {
         <MainLayout />
       </Wrapper>
     </>
+  )
 }
 
 export default Main;

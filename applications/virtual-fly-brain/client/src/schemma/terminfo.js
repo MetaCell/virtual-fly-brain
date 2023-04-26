@@ -1,4 +1,4 @@
-export default terminfoSchemma = {
+export const terminfoSchemma = {
   type: 'object',
   required: ['Name', 'Id', 'SuperTypes', 'Meta', 'Tags'],
   properties: {

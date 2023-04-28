@@ -1,4 +1,4 @@
-import { backendClient } from "./client";
+import { backendClient } from "./client.js";
 
 export const get_term_info = (queryId) => {
   return backendClient.get({ method: "get_term_info", payload: { id: queryId } })

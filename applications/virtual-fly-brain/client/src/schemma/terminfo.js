@@ -1,4 +1,4 @@
-export const terminfoSchemma = {
+export const termInfoSchemma = {
   type: 'object',
   required: ['Name', 'Id', 'SuperTypes', 'Meta', 'Tags'],
   properties: {

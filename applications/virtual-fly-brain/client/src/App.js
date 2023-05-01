@@ -4,7 +4,7 @@ import React from 'react';
 import { termInfoById } from './reducers/actions/termInfo';
 import { queryString } from './utils/queryString';
 import { useSelector } from 'react-redux'
-import { terminfoSchemma } from './schemma/terminfo';
+import { termInfoSchemma } from './schemma/termInfo';
 import { initFileWithoutReading } from './reducers/actions/readFile';
 import Ajv from 'ajv';
 
@@ -24,7 +24,7 @@ const App = () => {
     //validate schemma
 
     const ajv = new Ajv(); // create an Ajv instance
-    const validate = ajv.compile(terminfoSchemma); // compile the schema
+    const validate = ajv.compile(termInfoSchemma); // compile the schema
 
     const isValid = validate(termInfoData); // validate the data against the schema
 

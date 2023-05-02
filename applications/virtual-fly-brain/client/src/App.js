@@ -4,7 +4,7 @@ import React from 'react';
 import { termInfoById } from './reducers/actions/termInfo';
 import { queryString } from './utils/queryString';
 import { useSelector } from 'react-redux'
-import { termInfoSchemma } from './schemma/termInfo';
+import { termInfoSchemma } from './schemma/termInfoSchemma';
 import { initFileWithoutReading } from './reducers/actions/readFile';
 import Ajv from 'ajv';
 

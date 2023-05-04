@@ -1,4 +1,6 @@
-var toolbarMenu = {
+import React from 'react';
+
+export const toolbarMenu = {
   global: {
     buttonsStyle: {
       standard: {
@@ -514,10 +516,24 @@ var toolbarMenu = {
       icon: "",
       action: "",
       position: "bottom-start",
-      dynamicListInjector: {
-        handlerAction: "historyMenuInjector",
-        parameters: ["undefined"]
-      }
+      list: [
+        {
+          label: "JRC_FlyEM_Hemibrain",
+          icon: "",
+          action: {
+            handlerAction: "",
+            parameters: [""]
+          }
+        },
+        {
+          label: "V_ilPN(FlyEM-HB:2064165421)",
+          icon: "",
+          action: {
+            handlerAction: "",
+            parameters: [""]
+          }
+        },
+      ]
     },
     {
       label: "Templates",
@@ -754,6 +770,54 @@ var toolbarMenu = {
       ]
     },
     {
+      label: "View",
+      icon: "",
+      action: "",
+      position: "bottom-start",
+      list: [
+        {
+          label: "Default layout 1",
+          icon: "",
+          action: {
+            handlerAction: "",
+            parameters: [""]
+          }
+        },
+        {
+          label: "Default layout 2",
+          icon: "",
+          action: {
+            handlerAction: "",
+            parameters: [""]
+          }
+        },
+        {
+          label: "Default layout 3",
+          icon: "",
+          action: {
+            handlerAction: "",
+            parameters: [""]
+          }
+        },
+        {
+          label: "User custom layout",
+          icon: "",
+          action: {
+            handlerAction: "",
+            parameters: [""]
+          }
+        },
+        {
+          label: "Autosave disabled",
+          icon: "fa fa-twitter",
+          action: {
+            handlerAction: "",
+            parameters: [""]
+          }
+        },
+      ]
+    },
+    {
       label: "Help",
       icon: "",
       action: "",
@@ -813,4 +877,3 @@ var toolbarMenu = {
   ]
 };
 
-module.exports = { toolbarMenu };

@@ -2,8 +2,9 @@ import { Box, Button, Link } from "@mui/material";
 import React, { useState } from "react";
 import vars from '../../theme/variables';
 import MediaQuery from 'react-responsive';
-import { History, Logo, Menu, QueryStats } from "../../icons";
-
+import { History, Logo, Menu as MenuIcon, QueryStats } from "../../icons";
+import Menu from '@metacell/geppetto-meta-ui/menu/Menu';
+import { toolbarMenu } from "../../components/configuration/VFBToolbar/vfbtoolbarMenuConfiguration";
 const { primaryBg, headerBoxShadow, headerBorderColor } = vars;
 
 const Header = () => {
@@ -96,7 +97,7 @@ const Header = () => {
             >
               <History onClick={handleHistoryClick} />
               <QueryStats onClick={handleQueryStatsClick} />
-              <Menu onClick={handleMenuClick} />
+              <MenuIcon onClick={handleMenuClick} />
             </Box>
           </MediaQuery>
         </Box>
@@ -120,13 +121,17 @@ const Header = () => {
             }
           }}
         >
-          <Link underline="hover" href='#'>Virtual Fly Brain</Link>
+          <Menu
+            configuration={toolbarMenu}
+            menuHandler={() => {}}
+          />
+          {/* <Link underline="hover" href='#'>Virtual Fly Brain</Link>
           <Link underline="hover" href='#'>Tools</Link>
           <Link underline="hover" href='#'>History</Link>
           <Link underline="hover" href='#'>Templates</Link>
           <Link underline="hover" href='#'>Datasets</Link>
           <Link underline="hover" href='#'>View</Link>
-          <Link underline="hover" href='#'>Help</Link>
+          <Link underline="hover" href='#'>Help</Link> */}
         </Box>
       </Box>
 

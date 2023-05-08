@@ -14,6 +14,7 @@
     "@metacell/geppetto-meta-client": "1.0.0-final",
     "@metacell/geppetto-meta-core": "1.0.0-final",
     "@metacell/geppetto-meta-ui": "1.0.0-final",
+    "@mui/lab": "^5.0.0-alpha.129",
     "@mui/material": "^5.12.1",
     "@reduxjs/toolkit": "^1.8.5",
     "@testing-library/jest-dom": "^5.16.5",

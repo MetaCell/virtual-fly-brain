@@ -6,6 +6,8 @@ import vars from "../../theme/variables";
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
+import TreeView from '@mui/lab/TreeView';
+import { TreeItem } from "@mui/lab";
 
 const {
   whiteColor,
@@ -244,10 +246,29 @@ const SideBar = () => {
                 <Typography>Queries (28)</Typography>
               </AccordionSummary>
               <AccordionDetails>
-                <Typography>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-                  malesuada lacus ex, sit amet blandit leo lobortis eget.
-                </Typography>
+              <TreeView
+                aria-label="customized"
+                defaultExpanded={['1']}
+                defaultCollapseIcon={<Eye />}
+                defaultExpandIcon={<ChevronDown />}
+                defaultEndIcon={<Remove />}
+                sx={{ height: 264, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
+              >
+                <TreeItem nodeId="1" label="Main">
+                  <TreeItem nodeId="2" label="Hello" />
+                  <TreeItem nodeId="3" label="Subtree with children">
+                    <TreeItem nodeId="6" label="Hello" />
+                    <TreeItem nodeId="7" label="Sub-subtree with children">
+                      <TreeItem nodeId="9" label="Child 1" />
+                      <TreeItem nodeId="10" label="Child 2" />
+                      <TreeItem nodeId="11" label="Child 3" />
+                    </TreeItem>
+                    <TreeItem nodeId="8" label="Hello" />
+                  </TreeItem>
+                  <TreeItem nodeId="4" label="World" />
+                  <TreeItem nodeId="5" label="Something something" />
+                </TreeItem>
+              </TreeView>
               </AccordionDetails>
             </Accordion>
           </Box>

@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom/client';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 import reportWebVitals from './reportWebVitals';
 import './index.css';

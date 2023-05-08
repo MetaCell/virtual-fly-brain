@@ -3,7 +3,10 @@ import Main from './components/Main'
 import React from 'react';
 import { termInfoById } from './reducers/actions/termInfo';
 import { queryString } from './utils/queryString';
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
+import { termInfoSchemma } from './schemma/termInfoSchemma';
+import { initFileWithoutReading } from './reducers/actions/readFile';
+import Ajv from 'ajv';
 
 const App = () => {
 
@@ -32,18 +35,6 @@ const App = () => {
     const obj = termInfoData.Examples[key][0].obj
     initFileWithoutReading({ url: obj });
   }
-
-  let theme = createTheme({
-    typography: { fontFamily: 'Roboto, Helvetica, Arial, sans-serif' },
-    palette: {
-      type: 'dark',
-      primary: { main: orange[500] },
-      secondary: { main: blue[500] },
-      button: { main: '#fc6320' },
-      toolbarBackground: { main: 'rgb(0,0,0,0.5)' },
-    },
-  });
-  theme = responsiveFontSizes(theme);
 
   return (
     <Main />

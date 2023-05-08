@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import MediaQuery from 'react-responsive';
 import { ChevronLeft, ChevronRight } from "../../icons";
 import vars from "../../theme/variables";
-
+import TermInfo from "../../components/TermInfo";
 const {
   whiteColor,
   secondaryBg,
@@ -96,7 +96,7 @@ const SideBar = () => {
         ) : (
           'SideBar'
         )}
-
+        <TermInfo />
       </Box>
 
       <MediaQuery minWidth={1200}>

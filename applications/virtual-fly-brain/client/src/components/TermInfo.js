@@ -28,6 +28,7 @@ const TermInfo = () => {
   useEffect( () => {
     console.log("term info data : ", data);
     setTermInfoData(data)
+    console.log(data)
   },[data]);
 
     return(

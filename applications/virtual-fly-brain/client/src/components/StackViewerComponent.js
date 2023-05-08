@@ -671,6 +671,7 @@ import React from 'react';
             async load(value) {
               return new Promise((resolve, reject) => {
                 const img = new Image();
+                img.crossOrigin = "anonymous";
                 img.onload = () => {
                   let im = Texture.from(img);
                   resolve(im)
@@ -791,10 +792,10 @@ import React from 'react';
                   this.state.iBuffer[image] = this.state.images[d].texture;
                   this.state.imagesUrl[d] = image;
                 }
-                // this.state.images[d].anchor.x = 0;
-                // this.state.images[d].anchor.y = 0;
-                // this.state.images[d].position.x = x;
-                // this.state.images[d].position.y = y;
+                this.state.images[d].anchor.x = 0;
+                this.state.images[d].anchor.y = 0;
+                this.state.images[d].position.x = x;
+                this.state.images[d].position.y = y;
                 this.state.images[d].zOrder = i;
                 this.state.images[d].visible = true;
                 if (!this.state.color[i]) {
@@ -806,7 +807,7 @@ import React from 'react';
                   this.state.images[d].blendMode = BLEND_MODES.SCREEN;
                 }
                 console.log("adding image ", this.state.images[d])
-                // this.app.stage.addChild(this.state.images[d]);
+                this.stack.addChild(this.state.images[d]);
               } else {
                 if (this.state.imagesUrl[d] != image) {
                   if (this.state.iBuffer[image]) {
@@ -1077,8 +1078,8 @@ import React from 'react';
         }
         var currentPosition = this.app.renderer.plugins.interaction.mouse?.getLocalPosition(this.stack);
         // update new position:
-        this.state.posX = Number(currentPosition.x.toFixed(0));
-        this.state.posY = Number(currentPosition.y.toFixed(0));
+        this.state.posX = Number(currentPosition?.x?.toFixed(0));
+        this.state.posY = Number(currentPosition?.y?.toFixed(0));
         if (!(this.state.posX == this.state.oldX && this.state.posY == this.state.oldY)) {
           this.listObjects();
           this.state.hoverTime = Date.now();
@@ -1087,8 +1088,8 @@ import React from 'react';
           this.state.hoverTime = Date.now() + 30000;
           this.listObjects();
         }
-        this.state.oldX = Number(currentPosition.x.toFixed(0));
-        this.state.oldY = Number(currentPosition.y.toFixed(0));
+        this.state.oldX = Number(currentPosition?.x?.toFixed(0));
+        this.state.oldY = Number(currentPosition?.y?.toFixed(0));
       }
     },
 
@@ -1632,7 +1633,7 @@ const StackViewerComponent = () => createClass({
       var markup = '';
       if (this.state.stack.length > 0) {
         markup = (
-          <div id={displayArea} style={{ position: 'absolute', top: 30, left: 3 }}>
+          <div id={displayArea} style={{ position: 'absolute'}}>
             <div  onClick={this.onHome} >
             <button style={{
               position: 'absolute',

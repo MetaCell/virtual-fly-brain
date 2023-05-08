@@ -1,11 +1,27 @@
 import React from 'react';
+import { Box } from "@mui/material";
 import StackViewerComponent from './StackViewerComponent';
 import { useEffect, useMemo, useRef } from 'react';
 import {useSelector, useDispatch} from 'react-redux'
 import SimpleInstance from "@metacell/geppetto-meta-core/model/SimpleInstance";
 import Resources from '@metacell/geppetto-meta-core/Resources';
+import vars from "../theme/variables";
+
+const {
+  secondaryBg,
+  whiteColor,
+  blackColor
+} = vars;
+
 
 const VFBStackViewer = (props) => {
+  const classes = {
+    root: {
+      height: 'calc(100% - 0.5rem)',
+      width : '400px',
+      color: whiteColor
+    }
+  }
 
   const stackViewerData = useSelector(state => state.termInfo.termInfoData)
   const error = useSelector(state => state.termInfo.error);
@@ -175,10 +191,37 @@ const VFBStackViewer = (props) => {
 
   const StackComponent = StackViewerComponent();
   return (
-    <StackComponent
+    <Box
+      sx={{
+        ...classes.root,
+        background: {
+          lg: blackColor
+        },
+        p: {
+          xs: 2,
+          lg: 0
+        },
+        borderColor: {
+          lg: secondaryBg
+        },
+        borderStyle: {
+          lg: 'solid'
+        },
+        borderRadius: {
+          lg: 2
+        },
+        borderWidth: {
+          xs: 0,
+          lg: '0.0625rem 0.0625rem 0 0'
+        }
+      }}
+    >
+      Stack Viewer
+      <StackComponent
       data={stackData}
       config={config}
       voxel={voxelSize}/>
+    </Box>
   )
 }
 

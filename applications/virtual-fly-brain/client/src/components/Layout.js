@@ -57,7 +57,7 @@ const MainLayout = () => {
     tabContent: {
       background: headerBorderColor,
       '& > div': {
-        flex: 1,
+        flex: '1 auto',
       }
     },
   }
@@ -103,16 +103,15 @@ const MainLayout = () => {
         {tab.includes(1) && (
           <Images />
         )}
-
         {tab.includes(2) && (
           <Circuit />
         )}
         {tab.includes(3) && (
-                    <StackViewer 
-                    id="NewStackViewer"
-                    defHeight={600}
-                    defWidth={600}
-                  />
+          <StackViewer 
+            id="NewStackViewer"
+            defHeight={600}
+            defWidth={600}
+          />
         )}
       </Box>
     </>

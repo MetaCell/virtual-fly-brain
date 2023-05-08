@@ -66,28 +66,24 @@
      *
      */
     componentDidMount: function () {
+      console.log("Component is mounted ")
+
       // signal component mounted (used to avoid calling isMounted() deprecated method)
       this._isMounted = true;
 
       // console.log('Loading....');
 
       // Setup PIXI Canvas in componentDidMount
-      this.app = new Application(this.props.width, this.props.height);
+      this.app = new Application({ width : this.props.width, height : this.props.height});
       // maintain full window size
-      this.refs.stackCanvas?.appendChild(this.app.view);
+      this.refs.stackCanvas?.getElementsByTagName("canvas")?.length == 0 && this.refs.stackCanvas?.appendChild(this.app.view);
 
-      // create the root of the scene graph
-      this.stage = this.app.stage;
-      this.stage.pivot._x = 0;
-      this.stage.pivot._y = 0;
-      this.stage.x = 0;
-      this.stage.y = 0;
-      this.disp = new Container();
+      this.disp = new Container({ width : this.props.width, height : this.props.height});
       this.disp.pivot.x = 0;
       this.disp.pivot.y = 0;
       this.disp.scale.x = this.props.zoomLevel / this.props.scl;
       this.disp.scale.y = this.props.zoomLevel / this.props.scl;
-      this.stage.addChild(this.disp);
+      this.app.stage.addChild(this.disp);
       this.stack = new Container();
       this.stack.pivot.x = 0;
       this.stack.pivot.y = 0;
@@ -192,9 +188,10 @@
 
 
     componentWillUnmount: function () {
-      this.refs.stackCanvas?.removeChild(this.app.view);
-      this.app.destroy(true,true);
-      this.app = null;
+      console.log("Component is unmounted ")
+      // this.refs.stackCanvas?.removeChild(this.app.view);
+      // this.app.destroy(true,true);
+      // this.app = null;
 
       if (this.props.canvasRef != null && this.props.canvasRef != undefined) {
         this.props.canvasRef.removeObject(this.state.stackViewerPlane);
@@ -420,7 +417,7 @@
             url: image + '&prl=-1,' + that.state.posX.toFixed(0) + ',' + that.state.posY.toFixed(0) + '&obj=Wlz-foreground-objects',
             type: 'POST',
             success: function (data) {
-              if (window.GEPPETTO.SceneController.getSelection()[0] == undefined) { // check nothing already selected
+              if (window.GEPPETTO?.SceneController.getSelection()[0] == undefined) { // check nothing already selected
                 result = data.trim().split(':')[1].trim().split(' ');
                 if (result !== '') {
                   for (j in result) {
@@ -491,9 +488,11 @@
 
     setup : function (images) {
       var k;
-      for (k in images) {
-        this.state.iBuffer[k] = images[k];
-      }
+      console.log("Images ", images)
+      images.forEach ( ( k, index) => {
+        this.state.iBuffer[index] = k;
+        console.log("Image ", k)
+      });
       // console.log('Buffered ' + (1000 - buffMax).toString() + ' tiles');
       if (this._isMounted === true && this._initialized === false) {
         // this.props.canvasRef.resetCamera();
@@ -782,7 +781,6 @@
             for (i in this.state.stack) {
               d = i.toString() + ',' + t.toString();
               image = this.state.serverUrl.toString() + '?wlz=' + this.state.stack[i] + '&sel=0,255,255,255&mod=zeta&fxp=' + this.props.fxp.join(',') + '&scl=' + Number(this.state.scl).toFixed(1) + '&dst=' + Number(this.state.dst).toFixed(1) + '&pit=' + Number(this.state.pit).toFixed(0) + '&yaw=' + Number(this.state.yaw).toFixed(0) + '&rol=' + Number(this.state.rol).toFixed(0) + '&qlt=80&jtl=' + t.toString();
-              // console.log(image);
               if (!this.state.images[d]) {
                 // console.log('Adding ' + this.state.stack[i].toString());
                 if (this.state.iBuffer[image]) {
@@ -807,7 +805,8 @@
                   // this.state.images[d].alpha = 0.9;
                   this.state.images[d].blendMode = BLEND_MODES.SCREEN;
                 }
-                this.stage.addChild(this.state.images[d]);
+                console.log("adding image ", this.state.images[d])
+                // this.app.stage.addChild(this.state.images[d]);
               } else {
                 if (this.state.imagesUrl[d] != image) {
                   if (this.state.iBuffer[image]) {
@@ -821,10 +820,10 @@
                     this.state.iBuffer[image] = this.state.images[d].texture;
                     this.state.imagesUrl[d] = image;
                   }
-                  // this.state.images[d].anchor.x = 0;
-                  // this.state.images[d].anchor.y = 0;
-                  // this.state.images[d].position.x = x;
-                  // this.state.images[d].position.y = y;
+                  this.state.images[d].anchor.x = 0;
+                  this.state.images[d].anchor.y = 0;
+                  this.state.images[d].position.x = x;
+                  this.state.images[d].position.y = y;
                   this.state.images[d].zOrder = i;
                   this.state.images[d].visible = true;
                   if (i > 0) {
@@ -839,6 +838,7 @@
                   this.state.images[d].tint = this.state.color[i];
                 }
               }
+              
             }
           } else {
             for (i in this.state.stack) {
@@ -871,10 +871,10 @@
           textAlign: 'right'
         };
         this.state.buffer[-1] = new Text(this.state.text, style);
-        this.stage.addChild(this.state.buffer[-1]);
+        this.app.stage.addChild(this.state.buffer[-1]);
         // fix position
-        this.state.buffer[-1].x = -this.stage?.x + 35;
-        this.state.buffer[-1].y = -this.stage?.y + 8;
+        this.state.buffer[-1].x = -this.app.stage?.x + 35;
+        this.state.buffer[-1].y = -this.app.stage?.y + 8;
         this.state.buffer[-1].anchor.x = 0;
         this.state.buffer[-1].anchor.y = 0;
         this.state.buffer[-1].zOrder = 1000;
@@ -1021,7 +1021,7 @@
     animate: function () {
       if (this._isMounted) {
         // render the stage container (if the component is still mounted)
-        this.app.render();
+        this.app.renderer.render(this.disp);
         // this.frame = requestAnimationFrame(this.animate);
       }
     },
@@ -1075,7 +1075,7 @@
         if (this.app === null ) {
           return;
         }
-        var currentPosition = this.app.renderer.plugins.interaction.mouse.getLocalPosition(this.stack);
+        var currentPosition = this.app.renderer.plugins.interaction.mouse?.getLocalPosition(this.stack);
         // update new position:
         this.state.posX = Number(currentPosition.x.toFixed(0));
         this.state.posY = Number(currentPosition.y.toFixed(0));
@@ -1404,7 +1404,7 @@ const StackViewerComponent = () => createClass({
       var newDst = Number(this.state.dst);
       var stackX = this.state.stackX;
       var stackY = this.state.stackY;
-      if (window.GEPPETTO.isKeyPressed("shift")) {
+      if (window.GEPPETTO?.isKeyPressed("shift")) {
         zoomLevel = Number((this.state.zoomLevel += 1).toFixed(1));
       } else {
         zoomLevel = Number((this.state.zoomLevel += 0.1).toFixed(1));
@@ -1476,7 +1476,7 @@ const StackViewerComponent = () => createClass({
       var newDst = Number(this.state.dst);
       var stackX = this.state.stackX;
       var stackY = this.state.stackY;
-      if (window.GEPPETTO.isKeyPressed("shift")) {
+      if (window.GEPPETTO?.isKeyPressed("shift")) {
         zoomLevel = Number((this.state.zoomLevel -= 1).toFixed(1));
       } else {
         zoomLevel = Number((this.state.zoomLevel -= 0.1).toFixed(1));
@@ -1510,7 +1510,7 @@ const StackViewerComponent = () => createClass({
      *
      */
     onStepIn: function () {
-      var shift = window.GEPPETTO.isKeyPressed("shift");
+      var shift = window.GEPPETTO?.isKeyPressed("shift");
       var newdst = this.state.dst
       if (shift) {
         newdst += (this.state.voxelZ * this.state.scl) * 10;
@@ -1532,7 +1532,7 @@ const StackViewerComponent = () => createClass({
      *
      */
     onStepOut: function () {
-      var shift = window.GEPPETTO.isKeyPressed("shift");
+      var shift = window.GEPPETTO?.isKeyPressed("shift");
       var newdst = this.state.dst
       if (shift) {
         newdst -= (this.state.voxelZ * this.state.scl) * 10;
@@ -1633,14 +1633,17 @@ const StackViewerComponent = () => createClass({
       if (this.state.stack.length > 0) {
         markup = (
           <div id={displayArea} style={{ position: 'absolute', top: 30, left: 3 }}>
+            <div  onClick={this.onHome} >
             <button style={{
               position: 'absolute',
               left: 15,
               top: startOffset + 20,
               padding: 0,
               border: 0,
+              id : "home",
               background: 'transparent'
-            }} className={homeClass} onClick={this.onHome} title={'Center Stack'} />
+            }} className={homeClass} title={'Center Stack'} /></div>
+            <div  onClick={this.onZoomIn} >
             <button style={{
               position: 'absolute',
               left: 15,
@@ -1648,7 +1651,9 @@ const StackViewerComponent = () => createClass({
               padding: 0,
               border: 0,
               background: 'transparent'
-            }} className={zoomInClass} onClick={this.onZoomIn} title={'Zoom In'} />
+            }} className={zoomInClass} title={'Zoom In'} />
+            </div>
+            <div  onClick={this.onZoomOut} >
             <button style={{
               position: 'absolute',
               left: 15,
@@ -1656,7 +1661,9 @@ const StackViewerComponent = () => createClass({
               padding: 0,
               border: 0,
               background: 'transparent'
-            }} className={zoomOutClass} onClick={this.onZoomOut} title={'Zoom Out'} />
+            }} className={zoomOutClass} title={'Zoom Out'} />
+            </div>
+            <div  onClick={this.onStepIn} >
             <button style={{
               position: 'absolute',
               left: 15,
@@ -1664,7 +1671,9 @@ const StackViewerComponent = () => createClass({
               padding: 0,
               border: 0,
               background: 'transparent'
-            }} className={stepInClass} onClick={this.onStepIn} title={'Step Into Stack'} />
+            }} className={stepInClass} title={'Step Into Stack'} />
+            </div>
+            <div  onClick={this.onStepOut} >
             <button style={{
               position: 'absolute',
               left: 15,
@@ -1672,7 +1681,8 @@ const StackViewerComponent = () => createClass({
               padding: 0,
               border: 0,
               background: 'transparent'
-            }} className={stepOutClass} onClick={this.onStepOut} title={'Step Out Of Stack'} />
+            }} className={stepOutClass} title={'Step Out Of Stack'} />
+            </div>
             <button style={{
               position: 'absolute',
               left: 15,

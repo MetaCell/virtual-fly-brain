@@ -1,8 +1,11 @@
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, ButtonGroup, Grid, Menu, MenuItem, Typography } from "@mui/material";
 import React, { useState } from "react";
 import MediaQuery from 'react-responsive';
-import { ChevronLeft, ChevronRight } from "../../icons";
+import { ArView, ArrowDown, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Delete, Expand, Eye, Focus, Remove } from "../../icons";
 import vars from "../../theme/variables";
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
 
 const {
   whiteColor,
@@ -13,6 +16,14 @@ const {
 
 const SideBar = () => {
   const [open, setOpen] = useState(true);
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const openMenu = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
   const classes = {
     root: {
       // transition: 'all ease-in-out .3s',
@@ -20,6 +31,14 @@ const SideBar = () => {
       color: whiteColor,
       display: 'flex',
       flexDirection: 'column'
+    },
+
+    header: {
+
+    },
+
+    buttonGroup: {
+
     },
 
     footer: {
@@ -33,6 +52,23 @@ const SideBar = () => {
       }
     },
   }
+
+  const termInfoHeading = (
+    <>
+      <Typography
+        component='span'
+        sx={{
+          fontWeight: 500,
+          lineHeight: 1,
+          mr: 1,
+          color: 'rgba(255, 255, 255, 0.8)'
+        }}
+      >
+        Term info:
+      </Typography>
+      JRC2018Unisex [VFB_00101567]
+    </>
+  )
 
   return (
     <Box
@@ -80,21 +116,141 @@ const SideBar = () => {
             lineHeight: 1,
             color: whiteColor
           }}>
-            <Typography
-              component='span'
-              sx={{
-                fontWeight: 500,
-                lineHeight: 1,
-                mr: 1,
-                color: 'rgba(255, 255, 255, 0.8)'
-              }}
-            >
-              Term info:
-            </Typography>
-            JRC2018Unisex [VFB_00101567]
+            {termInfoHeading}
           </Typography>
         ) : (
-          'SideBar'
+          <Box sx={{
+            p: {
+              lg: 2
+            }
+          }}>
+            <Box mb={2} sx={classes.header}>
+              <Grid container>
+                <MediaQuery minWidth={768}>
+                  <Grid item xs={12} lg={6} md={6}>
+                    <Box>
+                      <Typography sx={{
+                        fontWeight: 500,
+                        fontSize: '0.875rem',
+                        color: whiteColor
+                      }}>
+                        {termInfoHeading}
+                      </Typography>
+                    </Box>
+                  </Grid>
+                </MediaQuery>
+
+                <Grid item xs={12} lg={6} md={6}>
+                  <Box
+                    display='flex'
+                    rowGap={1}
+                    flexWrap='wrap'
+                    sx={{
+                      flexDirection: {
+                        lg: 'column'
+                      },
+                      alignItems: {
+                        lg: 'flex-end',
+                      },
+                      justifyContent: {
+                        xs: 'space-between',
+                        lg: 'flex-end'
+                      },
+                      columnGap: {
+                        xs: 1,
+                        md: 3
+                      }
+                    }}
+                  >
+                    <Box display='flex' gap="6px">
+                      <Box>
+                        <Button
+                          variant="contained"
+                          color="secondary"
+                          id="basic-button"
+                          aria-controls={openMenu ? 'basic-menu' : undefined}
+                          aria-haspopup="true"
+                          aria-expanded={openMenu ? 'true' : undefined}
+                          onClick={handleClick}
+                        >
+                            Sections <ArrowDown style={{marginLeft: '6px'}} />
+                        </Button>
+                        <Menu
+                          id="basic-menu"
+                          anchorEl={anchorEl}
+                          open={openMenu}
+                          onClose={handleClose}
+                          MenuListProps={{
+                            'aria-labelledby': 'basic-button',
+                          }}
+                        >
+                          <MenuItem onClick={handleClose}>General Information</MenuItem>
+                          <MenuItem onClick={handleClose}>Queries</MenuItem>
+                        </Menu>
+                      </Box>
+                      <ButtonGroup color="secondary" sx={classes.buttonGroup} variant="contained">
+                        <Button>
+                          <Expand />
+                        </Button>
+                        <Button>
+                          <Remove />
+                        </Button>
+                      </ButtonGroup>
+                    </Box>
+
+                    <Box>
+                      <ButtonGroup color="secondary" sx={classes.buttonGroup} variant="contained">
+                        <Button>
+                          <Eye />
+                        </Button>
+                        <Button>
+                          <Focus />
+                        </Button>
+                        <Button>
+                          <ArView />
+                        </Button>
+                        <Button>
+                          <Delete />
+                        </Button>
+                      </ButtonGroup>
+                    </Box>
+                  </Box>
+                </Grid>
+              </Grid>
+
+            </Box>
+
+            <Accordion>
+              <AccordionSummary
+                  expandIcon={<ChevronDown />}
+                aria-controls="panel1a-content"
+                id="panel1a-header"
+              >
+                <Typography>General Information</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Typography>
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
+                  malesuada lacus ex, sit amet blandit leo lobortis eget.
+                </Typography>
+              </AccordionDetails>
+            </Accordion>
+            <Accordion>
+              <AccordionSummary
+                expandIcon={<ChevronDown />}
+                aria-controls="panel2a-content"
+                id="panel2a-header"
+              >
+                <Typography>Queries (28)</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Typography>
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
+                  malesuada lacus ex, sit amet blandit leo lobortis eget.
+                </Typography>
+              </AccordionDetails>
+            </Accordion>
+          </Box>
         )}
 
       </Box>

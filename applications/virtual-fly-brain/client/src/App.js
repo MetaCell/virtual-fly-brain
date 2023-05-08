@@ -31,8 +31,8 @@ const App = () => {
     if (!isValid)
       console.log('Failed to validate schemma.');
 
-    const key = Object.keys(termInfoData.Examples)[0];
-    const obj = termInfoData.Examples[key][0].obj
+    const key = Object.keys(termInfoData.Images)[0];
+    const obj = termInfoData.Images[key][0].obj
     initFileWithoutReading({ url: obj });
   }
 

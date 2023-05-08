@@ -5,6 +5,7 @@ import { Box, Button, useMediaQuery, useTheme } from "@mui/material";
 import SideBar from "../shared/Sidebar";
 import Circuit from "./Circuit";
 import Images from "./Images";
+import StackViewer from './StackViewer';
 import vars from "../theme/variables";
 
 const {
@@ -16,13 +17,14 @@ const {
 const tabsArr = [
   { id: 0, name: 'Term Info' },
   { id: 1, name: 'Images' },
-  { id: 2, name: 'Circuits' }
+  { id: 2, name: 'Circuits' },
+  { id: 3, name: 'Stack Viewer' }
 ]
 
 const MainLayout = () => {
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up('lg'));
-  const defaultActiveTab = matches ? [0, 1, 2] : [0];
+  const defaultActiveTab = matches ? [0, 1, 2, 3] : [0];
   const [tab, setTab] = useState([]);
 
   useEffect(() => {
@@ -104,6 +106,13 @@ const MainLayout = () => {
 
         {tab.includes(2) && (
           <Circuit />
+        )}
+        {tab.includes(3) && (
+                    <StackViewer 
+                    id="NewStackViewer"
+                    defHeight={600}
+                    defWidth={600}
+                  />
         )}
       </Box>
     </>

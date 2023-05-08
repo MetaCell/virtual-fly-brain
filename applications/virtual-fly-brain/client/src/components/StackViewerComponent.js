@@ -1,6 +1,8 @@
-  import React from 'react';
+import React from 'react';
+  import { Application, Container, Assets, Sprite, Text, utils, extensions, ExtensionType, Texture , Resource, BLEND_MODES } from 'pixi.js';
   import * as PIXI from 'pixi.js';
   var createClass = require('create-react-class');
+  import { useRef, useEffect } from 'react';
 
   const Canvas = createClass({
     _isMounted: false,
@@ -57,35 +59,32 @@
         imagesUrl: {}
       };
     },
+
     /**
      * In this case, componentDidMount is used to grab the canvas container ref, and
      * and hook up the PixiJS renderer
      *
      */
     componentDidMount: function () {
+      console.log("Component is mounted ")
+
       // signal component mounted (used to avoid calling isMounted() deprecated method)
       this._isMounted = true;
 
       // console.log('Loading....');
 
       // Setup PIXI Canvas in componentDidMount
-      this.app = new PIXI.Application(this.props.width, this.props.height);
+      this.app = new Application({ width : this.props.width, height : this.props.height});
       // maintain full window size
-      this.refs.stackCanvas.appendChild(this.app.view);
+      this.refs.stackCanvas?.getElementsByTagName("canvas")?.length == 0 && this.refs.stackCanvas?.appendChild(this.app.view);
 
-      // create the root of the scene graph
-      this.stage = this.app.stage;
-      this.stage.pivot.x = 0;
-      this.stage.pivot.y = 0;
-      this.stage.position.x = 0;
-      this.stage.position.y = 0;
-      this.disp = new PIXI.Container();
+      this.disp = new Container({ width : this.props.width, height : this.props.height});
       this.disp.pivot.x = 0;
       this.disp.pivot.y = 0;
       this.disp.scale.x = this.props.zoomLevel / this.props.scl;
       this.disp.scale.y = this.props.zoomLevel / this.props.scl;
-      this.stage.addChild(this.disp);
-      this.stack = new PIXI.Container();
+      this.app.stage.addChild(this.disp);
+      this.stack = new Container();
       this.stack.pivot.x = 0;
       this.stack.pivot.y = 0;
       this.stack.position.x = 0;
@@ -189,9 +188,10 @@
 
 
     componentWillUnmount: function () {
-      this.refs.stackCanvas.removeChild(this.app.view);
-      this.app.destroy(true,true);
-      this.app = null;
+      console.log("Component is unmounted ")
+      // this.refs.stackCanvas?.removeChild(this.app.view);
+      // this.app.destroy(true,true);
+      // this.app = null;
 
       if (this.props.canvasRef != null && this.props.canvasRef != undefined) {
         this.props.canvasRef.removeObject(this.state.stackViewerPlane);
@@ -199,11 +199,11 @@
 
       // free texture caches
       var textureUrl;
-      for (textureUrl in PIXI.utils.BaseTextureCache) {
-        delete PIXI.utils.BaseTextureCache[textureUrl];
+      for (textureUrl in utils.BaseTextureCache) {
+        delete utils.BaseTextureCache[textureUrl];
       }
-      for (textureUrl in PIXI.utils.TextureCache) {
-        delete PIXI.utils.TextureCache[textureUrl];
+      for (textureUrl in utils.TextureCache) {
+        delete utils.TextureCache[textureUrl];
       }
 
       // signal component is now unmounted
@@ -212,90 +212,95 @@
       return true;
     },
 
-    callDstRange: function () {
+    callDstRange: function async() {
       var image = this.state.serverUrl.toString() + '?wlz=' + this.state.stack[0] + '&sel=0,255,255,255&mod=zeta&fxp=' + this.props.fxp.join(',') + '&scl=10.0&dst=0&pit=' + Number(this.state.pit).toFixed(0) + '&yaw=' + Number(this.state.yaw).toFixed(0) + '&rol=' + Number(this.state.rol).toFixed(0);
       /*
        * this.state.buffer[-1].text = 'Buffering stack...';
        *get distance range;
        */
-      fetch({
-        url: image + '&obj=Wlz-distance-range',
-        type: 'POST',
-        success: function (data) {
+      let that = this;
+      let file = image + '&obj=Wlz-distance-range';
+      fetch(file,{ method : "POST", url : file})
+        .then(response => 
+          response.text()
+        )
+        .then( data => {
           if (data.indexOf('html') < 0) {
-            var result = data.trim().split(':')[1].split(' ');
-            var min = Number(result[0]);
-            var max = Number(result[1]);
-            this.setState({ minDst: min, maxDst: max });
-            var extent = { minDst: min, maxDst: max };
-            this.props.setExtent(extent);
+            let result = data.trim().split(':')[1].split(' ');
+            let min = Number(result[0]);
+            let max = Number(result[1]);
+            that.setState({ minDst: min, maxDst: max });
+            let extent = { minDst: min, maxDst: max };
+            that.props.setExtent(extent);
             // console.log('Stack Depth: ' + ((max - min) / 10.0).toFixed(0));
-            this.checkStack();
-            this.callPlaneEdges();
-            this.iBuffer = {};
-            this.state.lastUpdate = 0;
-            this.bufferStack();
-            this.animate();
+            that.checkStack();
+            that.callPlaneEdges();
+            that.iBuffer = {};
+            that.state.lastUpdate = 0;
+            that.bufferStack();
+            that.animate();
           }
-        }.bind(this),
-        error: function (xhr, status, err) {
-          console.error("Calling Dst Range", status + " - " + xhr.progress().state(), err.toString());
-        }.bind(this)
-      });
+        })
+        .catch(error => {
+          console.error("Calling Dst Range error : ", error);
+        });
     },
 
     callTileSize: function () {
       var image = this.state.serverUrl.toString() + '?wlz=' + this.state.stack[0] + '&sel=0,255,255,255&mod=zeta&fxp=' + this.props.fxp.join(',') + '&scl=1.0&dst=0&pit=' + Number(this.state.pit).toFixed(0) + '&yaw=' + Number(this.state.yaw).toFixed(0) + '&rol=' + Number(this.state.rol).toFixed(0);
-      // get tile size;
-      fetch({
-        url: image + '&obj=Tile-size',
-        type: 'POST',
-        success: function (data) {
+
+        let that = this;
+        let file = image + '&obj=Tile-size';
+        fetch(file,{ method : "POST",url : file })
+          .then(response => 
+            response.text()
+          )
+        .then( data => {
           if (data.indexOf('html') < 0) {
-            var result = data.trim().split(':')[1].split(' ');
-            var tileX = Number(result[0]);
-            var tileY = Number(result[1]);
-            this.setState({ tileX: tileX, tileY: tileY });
-            this.checkStack();
-            this.callPlaneEdges();
-            this.iBuffer = {};
-            this.state.lastUpdate = 0;
-            this.bufferStack();
-            this.animate();
+            let result = data.trim().split(':')[1].split(' ');
+            let tileX = Number(result[0]);
+            let tileY = Number(result[1]);
+            that.setState({ tileX: tileX, tileY: tileY });
+            that.checkStack();
+            that.callPlaneEdges();
+            that.iBuffer = {};
+            that.state.lastUpdate = 0;
+            that.bufferStack();
+            that.animate();
           }
-        }.bind(this),
-        error: function (xhr, status, err) {
-          console.error("Calling Tile Size", status + " - " + xhr.progress().state(), err.toString());
-        }.bind(this)
-      });
+        })
+        .catch(error => {
+          console.error("Calling Tile size error : ", error);
+        });
     },
 
     callImageSize: function () {
       var image = this.state.serverUrl.toString() + '?wlz=' + this.state.stack[0] + '&sel=0,255,255,255&mod=zeta&fxp=' + this.props.fxp.join(',') + '&scl=10.0&dst=0&pit=' + Number(this.state.pit).toFixed(0) + '&yaw=' + Number(this.state.yaw).toFixed(0) + '&rol=' + Number(this.state.rol).toFixed(0);
-      // get image size;
-      fetch({
-        url: image + '&obj=Max-size',
-        type: 'POST',
-        success: function (data) {
+      let that = this;
+        let file = image + '&obj=Max-size';
+        fetch(file,{ method : "POST", url : file})
+          .then(response =>
+            response.text()
+          )
+        .then( data => {
           if (data.indexOf('html') < 0) {
-            var result = data.trim().split(':')[1].split(' ');
-            var imageX = Math.ceil( Number(result[0] ));
-            var imageY = Math.ceil( Number(result[1] ));
-            var extent = { imageX: imageX, imageY: imageY };
-            this.setState(extent);
-            this.props.setExtent(extent);
-            this.checkStack();
-            this.callPlaneEdges();
-            this.iBuffer = {};
-            this.state.lastUpdate = 0;
-            this.bufferStack();
-            this.animate();
+            let result = data.trim().split(':')[1].split(' ');
+            let imageX = Math.ceil( Number(result[0] ));
+            let imageY = Math.ceil( Number(result[1] ));
+            let extent = { imageX: imageX, imageY: imageY };
+            that.setState(extent);
+            that.props.setExtent(extent);
+            that.checkStack();
+            that.callPlaneEdges();
+            that.iBuffer = {};
+            that.state.lastUpdate = 0;
+            that.bufferStack();
+            that.animate();
           }
-        }.bind(this),
-        error: function (xhr, status, err) {
-          console.error("Calling Max Size", status + " - " + xhr.progress().state(), err.toString());
-        }.bind(this)
-      });
+        })
+        .catch(error => {
+          console.error("Calling Tile size error : ", error);
+        });
     },
 
     callPlaneEdges: function () {
@@ -381,14 +386,14 @@
         if (this.props.canvasRef != undefined && this.props.canvasRef != null) {
           this.state.stackViewerPlane = this.props.canvasRef.add3DPlane(this.state.plane[0], this.state.plane[1], this.state.plane[2], this.state.plane[3], this.state.plane[4], this.state.plane[5], this.state.plane[6], this.state.plane[7], this.state.plane[8], this.state.plane[9], this.state.plane[10], this.state.plane[11], "window.GEPPETTO/node_modules/@window.GEPPETTOengine/window.GEPPETTO-client/js/components/widgets/stackViewer/images/glass.jpg");
         }
-        if (this.state.stackViewerPlane.visible) {
-          this.state.stackViewerPlane.visible = true;
+        if (this.state.stackViewerPlane) {
+          this.state.stackViewerPlane = true;
         }
       }
       if (this.disp.width > 0 && this.props.slice) {
-        this.state.stackViewerPlane.visible = true;
+        this.state.stackViewerPlane = true;
       } else {
-        this.state.stackViewerPlane.visible = false;
+        this.state.stackViewerPlane = false;
       }
       this.state.planeUpdating = false;
     },
@@ -412,7 +417,7 @@
             url: image + '&prl=-1,' + that.state.posX.toFixed(0) + ',' + that.state.posY.toFixed(0) + '&obj=Wlz-foreground-objects',
             type: 'POST',
             success: function (data) {
-              if (window.GEPPETTO.SceneController.getSelection()[0] == undefined) { // check nothing already selected
+              if (window.GEPPETTO?.SceneController.getSelection()[0] == undefined) { // check nothing already selected
                 result = data.trim().split(':')[1].trim().split(' ');
                 if (result !== '') {
                   for (j in result) {
@@ -481,12 +486,13 @@
       this.setStatusText('Buffering stack ' + loader.progress.toFixed(1) + "%");
     },
 
-    setup : function (imageLoader) {
+    setup : function (images) {
       var k;
-      for (k in imageLoader.resources) {
-        this.state.iBuffer[k] = imageLoader.resources[k].texture;
-      }
-      imageLoader.destroy(true);
+      console.log("Images ", images)
+      images.forEach ( ( k, index) => {
+        this.state.iBuffer[index] = k;
+        console.log("Image ", k)
+      });
       // console.log('Buffered ' + (1000 - buffMax).toString() + ' tiles');
       if (this._isMounted === true && this._initialized === false) {
         // this.props.canvasRef.resetCamera();
@@ -572,7 +578,7 @@
       }
     },
 
-    bufferStack: function () {
+    bufferStack: async function () {
       if (!this.state.bufferRunning && this.state.lastUpdate < (Date.now() - 60000)) {
         this.state.bufferRunning = true;
         var loadList = new Set();
@@ -658,19 +664,34 @@
           this.state.bufferRunning = true;
           console.log('Loading ' + loadList.size + ' slices/tiles...');
 
-          var imageLoader = new PIXI.Assets();
-          var loaderOptions = {
-            loadType: PIXI.Resource.LOAD_TYPE.IMAGE,
-            xhrType: PIXI.Resource.XHR_RESPONSE_TYPE.BLOB
-          };
-          loadList.forEach( (value) => {
-            imageLoader.load(value, value, loaderOptions);
-          });
-          imageLoader
-            .on('progress', this.loadProgressHandler)
-            .on('error', console.error)
-            .on('complete', this.setup(imageLoader))
-            .load();
+          const imageDelivery = {
+            extension: ExtensionType.LoadParser,
+            name : "customParser",
+            test: (url) => url.startsWith('http://www.virtualflybrain.org/fcgi/wlziipsrv.fcgi'),
+            async load(value) {
+              return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = "anonymous";
+                img.onload = () => {
+                  let im = Texture.from(img);
+                  resolve(im)
+                };
+                img.onerror = reject;
+                img.src = value;
+              });
+            }
+          }
+          extensions.add(imageDelivery);
+
+          let list = Array.from(loadList);
+          let images = list.map( async (value) => {
+            let im = await Assets.load({ src : value, loadParser : 'customParser' })
+            return im;
+          })
+          let results = await Promise.allSettled(images);
+          results = results.map( result => result.value );
+            
+          this.setup(results);
 
         } else {
           this.state.bufferRunning = false;
@@ -726,7 +747,7 @@
       }
     },
 
-    createImages: function () {
+    createImages: async function () {
       if (this.state.stack.length > 0) {
         var i, x, y, w, h, d, offX, offY, t, image, Xpos, Ypos, XboundMax, YboundMax, XboundMin, YboundMin;
         /*
@@ -761,14 +782,13 @@
             for (i in this.state.stack) {
               d = i.toString() + ',' + t.toString();
               image = this.state.serverUrl.toString() + '?wlz=' + this.state.stack[i] + '&sel=0,255,255,255&mod=zeta&fxp=' + this.props.fxp.join(',') + '&scl=' + Number(this.state.scl).toFixed(1) + '&dst=' + Number(this.state.dst).toFixed(1) + '&pit=' + Number(this.state.pit).toFixed(0) + '&yaw=' + Number(this.state.yaw).toFixed(0) + '&rol=' + Number(this.state.rol).toFixed(0) + '&qlt=80&jtl=' + t.toString();
-              // console.log(image);
               if (!this.state.images[d]) {
                 // console.log('Adding ' + this.state.stack[i].toString());
                 if (this.state.iBuffer[image]) {
-                  this.state.images[d] = new PIXI.Sprite.from(this.state.iBuffer[image]);
+                  this.state.images[d] = Sprite.from(this.state.iBuffer[image]);
                   this.state.imagesUrl[d] = image;
                 } else {
-                  this.state.images[d] = new PIXI.Sprite.fromImage(image);
+                  this.state.images[d] = Sprite.from(image);
                   this.state.iBuffer[image] = this.state.images[d].texture;
                   this.state.imagesUrl[d] = image;
                 }
@@ -784,8 +804,9 @@
                 this.state.images[d].tint = this.state.color[i];
                 if (i > 0) {
                   // this.state.images[d].alpha = 0.9;
-                  this.state.images[d].blendMode = PIXI.BLEND_MODES.SCREEN;
+                  this.state.images[d].blendMode = BLEND_MODES.SCREEN;
                 }
+                console.log("adding image ", this.state.images[d])
                 this.stack.addChild(this.state.images[d]);
               } else {
                 if (this.state.imagesUrl[d] != image) {
@@ -796,7 +817,7 @@
                     if (this.state.txtUpdated < Date.now() - this.state.txtStay) {
                       this.state.buffer[-1].text = 'Loading slice ' + Number(this.state.dst - ((this.state.minDst / 10.0) * this.state.scl)).toFixed(1) + '...';
                     }
-                    this.state.images[d].texture = new PIXI.Texture.fromImage(image);
+                    this.state.images[d].texture =  Texture.from(image);
                     this.state.iBuffer[image] = this.state.images[d].texture;
                     this.state.imagesUrl[d] = image;
                   }
@@ -808,7 +829,7 @@
                   this.state.images[d].visible = true;
                   if (i > 0) {
                     // this.state.images[d].alpha = 0.9;
-                    this.state.images[d].blendMode = PIXI.BLEND_MODES.SCREEN;
+                    this.state.images[d].blendMode = BLEND_MODES.SCREEN;
                   }
                 }
                 if (!this.state.color[i]) {
@@ -818,6 +839,7 @@
                   this.state.images[d].tint = this.state.color[i];
                 }
               }
+              
             }
           } else {
             for (i in this.state.stack) {
@@ -849,17 +871,17 @@
           wordWrapWidth: this.app.view.width,
           textAlign: 'right'
         };
-        this.state.buffer[-1] = new PIXI.Text(this.state.text, style);
-        this.stage.addChild(this.state.buffer[-1]);
+        this.state.buffer[-1] = new Text(this.state.text, style);
+        this.app.stage.addChild(this.state.buffer[-1]);
+        // fix position
+        this.state.buffer[-1].x = -this.app.stage?.x + 35;
+        this.state.buffer[-1].y = -this.app.stage?.y + 8;
+        this.state.buffer[-1].anchor.x = 0;
+        this.state.buffer[-1].anchor.y = 0;
+        this.state.buffer[-1].zOrder = 1000;
       } else {
         this.state.buffer[-1].text = this.state.text;
       }
-      // fix position
-      this.state.buffer[-1].x = -this.stage.position.x + 35;
-      this.state.buffer[-1].y = -this.stage.position.y + 8;
-      this.state.buffer[-1].anchor.x = 0;
-      this.state.buffer[-1].anchor.y = 0;
-      this.state.buffer[-1].zOrder = 1000;
     },
 
     /**
@@ -979,16 +1001,16 @@
     },
 
     setStatusText: function (text) {
-      this.state.buffer[-1].x = (-this.stage.position.x + 35);
-      this.state.buffer[-1].y = (-this.stage.position.y + 8);
-      this.state.buffer[-1].text = text;
-      this.state.text = text;
-      this.state.txtUpdated = Date.now();
+      // this.state.buffer[-1].x = (-35);
+      // this.state.buffer[-1].y = (8);
+      // this.state.buffer[-1].text = text;
+      // this.state.text = text;
+      // this.state.txtUpdated = Date.now();
     },
 
     setHoverText: function (x,y,text) {
-      this.state.buffer[-1].x = -this.stage.position.x + this.disp.position.x + (this.stack.position.x * this.disp.scale.x) + (Number(x) * this.disp.scale.x) - 10;
-      this.state.buffer[-1].y = -this.stage.position.y + this.disp.position.y + (this.stack.position.y * this.disp.scale.y) + (Number(y) * this.disp.scale.y) + 15;
+      this.state.buffer[-1].x = this.disp.position.x + (this.stack.position.x * this.disp.scale.x) + (Number(x) * this.disp.scale.x) - 10;
+      this.state.buffer[-1].y = this.disp.position.y + (this.stack.position.y * this.disp.scale.y) + (Number(y) * this.disp.scale.y) + 15;
       this.state.buffer[-1].text = text;
       this.state.text = text;
     },
@@ -1000,7 +1022,7 @@
     animate: function () {
       if (this._isMounted) {
         // render the stage container (if the component is still mounted)
-        this.app.render();
+        this.app.renderer.render(this.disp);
         // this.frame = requestAnimationFrame(this.animate);
       }
     },
@@ -1054,10 +1076,10 @@
         if (this.app === null ) {
           return;
         }
-        var currentPosition = this.app.renderer.plugins.interaction.mouse.getLocalPosition(this.stack);
+        var currentPosition = this.app.renderer.plugins.interaction.mouse?.getLocalPosition(this.stack);
         // update new position:
-        this.state.posX = Number(currentPosition.x.toFixed(0));
-        this.state.posY = Number(currentPosition.y.toFixed(0));
+        this.state.posX = Number(currentPosition?.x?.toFixed(0));
+        this.state.posY = Number(currentPosition?.y?.toFixed(0));
         if (!(this.state.posX == this.state.oldX && this.state.posY == this.state.oldY)) {
           this.listObjects();
           this.state.hoverTime = Date.now();
@@ -1066,8 +1088,8 @@
           this.state.hoverTime = Date.now() + 30000;
           this.listObjects();
         }
-        this.state.oldX = Number(currentPosition.x.toFixed(0));
-        this.state.oldY = Number(currentPosition.y.toFixed(0));
+        this.state.oldX = Number(currentPosition?.x?.toFixed(0));
+        this.state.oldY = Number(currentPosition?.y?.toFixed(0));
       }
     },
 
@@ -1096,7 +1118,7 @@
     render: function () {
       return (
         < div
-          className="stack-canvas-container"
+          className="stack-canvas-container" ref="stackCanvas"
           > </div>
       )
       ;
@@ -1105,7 +1127,7 @@
 
   var prefix = "", _addEventListener, onwheel, support;
 
-const StackViewerComponent = () =>createClass({
+const StackViewerComponent = () => createClass({
     _isMounted: false,
 
     getInitialState: function () {
@@ -1204,12 +1226,13 @@ const StackViewerComponent = () =>createClass({
         if (a.length == b.length) {
           for (var i = 0; i < a.length; i++) {
             try {
-              if (a[i].parent.getColor() != b[i].parent.getColor()) {
-                return true;
-              }
-              if (a[i].parent.isVisible() != b[i].parent.isVisible()) {
-                return true;
-              }
+              // FIXME : Update parent instance to VisualElement
+              // if (a[i].parent.getColor() != b[i].parent.getColor()) {
+              //   return true;
+              // }
+              // if (a[i].parent.isVisible() != b[i].parent.isVisible()) {
+              //   return true;
+              // }
             } catch (ignore) { console.log("Error ", ignore)}
           }
           return false;
@@ -1272,7 +1295,7 @@ const StackViewerComponent = () =>createClass({
       support = "onwheel" in document.createElement("div") ? "wheel" // Modern browsers support "wheel"
         : document.onmousewheel !== undefined ? "mousewheel" // Webkit and IE support at least "mousewheel"
           : "DOMMouseScroll"; // let's assume that remaining browsers are older Firefox
-      this.addWheelListener(document.getElementById(this.props.data.id + 'displayArea')[0], (e) => {
+      this?.addWheelListener(document.getElementById(this.props.data.id + 'displayArea'), (e) => {
         this.onWheelEvent(e);
       });
 
@@ -1330,11 +1353,9 @@ const StackViewerComponent = () =>createClass({
         }
         for (instance in instances) {
           try {
-            if ((instances[instance].id != undefined) && (instances[instance].parent != null) && (typeof instances[instance].parent.isSelected === "function") && (typeof instances[instance].parent.isVisible === "function" && instances[instance].parent.isVisible())){
-              vals = instances[instance].getVariable().getInitialValue().value;
-              data = JSON.parse(vals.data);
-              server = data.serverUrl.replace('http:', window.location.protocol).replace('https:', window.location.protocol);
-              files.push(data.filewindow.location);
+            if ((instances[instance].wrappedObj.id != undefined) && (instances[instance].parent != null) ){
+              data = instances[instance].wrappedObj.visualValue.data;
+              files.push(data);
               // Take multiple ID's for template
               if (typeof this.props.config.templateId !== 'undefined' && typeof this.props.config.templateDomainIds !== 'undefined' && instances[instance].parent.getId() == this.props.config.templateId) {
                 ids.push(this.props.config.templateDomainIds);
@@ -1342,11 +1363,6 @@ const StackViewerComponent = () =>createClass({
                 ids.push([instances[instance].parent.getId()]);
               }
               labels.push(instances[instance].parent.getName());
-              if (instances[instance].parent.isSelected() || (typeof instances[instance].parent[instances[instance].parent.getId() + '_obj'] != 'undefined' && instances[instance].parent[instances[instance].parent.getId() + '_obj'].isSelected()) || (typeof instances[instance].parent[instances[instance].parent.getId() + '_swc'] != 'undefined' && instances[instance].parent[instances[instance].parent.getId() + '_swc'].isSelected())) {
-                colors.push('0Xffcc00'); // selected
-              } else if (instances[instance].parent.getColor() !== undefined){
-                colors.push(instances[instance].parent.getColor().replace('#', '0X'));
-              }
             }
           } catch (err) {
             console.log('Error handling ' + instance);
@@ -1389,7 +1405,7 @@ const StackViewerComponent = () =>createClass({
       var newDst = Number(this.state.dst);
       var stackX = this.state.stackX;
       var stackY = this.state.stackY;
-      if (window.GEPPETTO.isKeyPressed("shift")) {
+      if (window.GEPPETTO?.isKeyPressed("shift")) {
         zoomLevel = Number((this.state.zoomLevel += 1).toFixed(1));
       } else {
         zoomLevel = Number((this.state.zoomLevel += 0.1).toFixed(1));
@@ -1461,7 +1477,7 @@ const StackViewerComponent = () =>createClass({
       var newDst = Number(this.state.dst);
       var stackX = this.state.stackX;
       var stackY = this.state.stackY;
-      if (window.GEPPETTO.isKeyPressed("shift")) {
+      if (window.GEPPETTO?.isKeyPressed("shift")) {
         zoomLevel = Number((this.state.zoomLevel -= 1).toFixed(1));
       } else {
         zoomLevel = Number((this.state.zoomLevel -= 0.1).toFixed(1));
@@ -1495,7 +1511,7 @@ const StackViewerComponent = () =>createClass({
      *
      */
     onStepIn: function () {
-      var shift = window.GEPPETTO.isKeyPressed("shift");
+      var shift = window.GEPPETTO?.isKeyPressed("shift");
       var newdst = this.state.dst
       if (shift) {
         newdst += (this.state.voxelZ * this.state.scl) * 10;
@@ -1517,7 +1533,7 @@ const StackViewerComponent = () =>createClass({
      *
      */
     onStepOut: function () {
-      var shift = window.GEPPETTO.isKeyPressed("shift");
+      var shift = window.GEPPETTO?.isKeyPressed("shift");
       var newdst = this.state.dst
       if (shift) {
         newdst -= (this.state.voxelZ * this.state.scl) * 10;
@@ -1554,11 +1570,11 @@ const StackViewerComponent = () =>createClass({
     },
 
     addWheelListener: function (elem, callback, useCapture) {
-      this._addWheelListener(elem, support, callback, useCapture);
+      this?._addWheelListener(elem, support, callback, useCapture);
 
       // handle MozMousePixelScroll in older Firefox
       if (support == "DOMMouseScroll") {
-        this._addWheelListener(elem, "MozMousePixelScroll", callback, useCapture);
+        this?._addWheelListener(elem, "MozMousePixelScroll", callback, useCapture);
       }
     },
 
@@ -1617,15 +1633,18 @@ const StackViewerComponent = () =>createClass({
       var markup = '';
       if (this.state.stack.length > 0) {
         markup = (
-          <div id={displayArea} style={{ position: 'absolute', top: 3, left: 3 }}>
+          <div id={displayArea} style={{ position: 'absolute'}}>
+            <div  onClick={this.onHome} >
             <button style={{
               position: 'absolute',
               left: 15,
               top: startOffset + 20,
               padding: 0,
               border: 0,
+              id : "home",
               background: 'transparent'
-            }} className={homeClass} onClick={this.onHome} title={'Center Stack'} />
+            }} className={homeClass} title={'Center Stack'} /></div>
+            <div  onClick={this.onZoomIn} >
             <button style={{
               position: 'absolute',
               left: 15,
@@ -1633,7 +1652,9 @@ const StackViewerComponent = () =>createClass({
               padding: 0,
               border: 0,
               background: 'transparent'
-            }} className={zoomInClass} onClick={this.onZoomIn} title={'Zoom In'} />
+            }} className={zoomInClass} title={'Zoom In'} />
+            </div>
+            <div  onClick={this.onZoomOut} >
             <button style={{
               position: 'absolute',
               left: 15,
@@ -1641,7 +1662,9 @@ const StackViewerComponent = () =>createClass({
               padding: 0,
               border: 0,
               background: 'transparent'
-            }} className={zoomOutClass} onClick={this.onZoomOut} title={'Zoom Out'} />
+            }} className={zoomOutClass} title={'Zoom Out'} />
+            </div>
+            <div  onClick={this.onStepIn} >
             <button style={{
               position: 'absolute',
               left: 15,
@@ -1649,7 +1672,9 @@ const StackViewerComponent = () =>createClass({
               padding: 0,
               border: 0,
               background: 'transparent'
-            }} className={stepInClass} onClick={this.onStepIn} title={'Step Into Stack'} />
+            }} className={stepInClass} title={'Step Into Stack'} />
+            </div>
+            <div  onClick={this.onStepOut} >
             <button style={{
               position: 'absolute',
               left: 15,
@@ -1657,7 +1682,8 @@ const StackViewerComponent = () =>createClass({
               padding: 0,
               border: 0,
               background: 'transparent'
-            }} className={stepOutClass} onClick={this.onStepOut} title={'Step Out Of Stack'} />
+            }} className={stepOutClass} title={'Step Out Of Stack'} />
+            </div>
             <button style={{
               position: 'absolute',
               left: 15,
@@ -1697,7 +1723,7 @@ const StackViewerComponent = () =>createClass({
           <div
             id={displayArea}
             style={{
-              position: 'absolute',
+              position: 'relative',
               top: 1,
               left: 1,
               background: 'transparent',
@@ -1713,4 +1739,3 @@ const StackViewerComponent = () =>createClass({
   });
 
   export default StackViewerComponent;
-

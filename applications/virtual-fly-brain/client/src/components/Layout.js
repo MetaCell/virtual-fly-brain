@@ -79,6 +79,7 @@ const MainLayout = () => {
 
       <Box
         display='flex'
+        alignItems='flex-start'
         gap={1}
         sx={{
           ...classes.tabContent,
@@ -87,6 +88,13 @@ const MainLayout = () => {
           },
           paddingRight: {
             lg: 1
+          },
+          pb: {
+            xs: 5,
+            lg: 0
+          },
+          overflow: {
+            xs: 'auto',
           },
           height: {
             xs: 'calc(100vh - 8.8125rem)',

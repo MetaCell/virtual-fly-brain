@@ -8,7 +8,9 @@ const {
   outlinedBtnTextColor,
   secondaryBg,
   blackColor,
-  primaryBg
+  primaryBg,
+  chipPrimaryColor,
+  chipSecondaryColor
 } = vars;
 
 let theme = createTheme();
@@ -50,6 +52,10 @@ theme = createTheme({
 
           '&.Mui-expanded:before': {
             opacity: 1,
+          },
+
+          '&:first-of-type:before': {
+            display: 'block'
           },
 
           '&:last-of-type:before': {
@@ -223,6 +229,45 @@ theme = createTheme({
             opacity: 0.8,
           },
         }
+      }
+    },
+
+    MuiChip: {
+      styleOverrides: {
+        root: {
+          height: '1.5rem',
+          padding: '0 0.5rem',
+
+          '& svg': {
+            marginRight: '0.5rem'
+          }
+        },
+
+        colorPrimary: {
+          background: chipPrimaryColor,
+
+          '& .MuiChip-label': {
+            color: secondaryBg
+          }
+        },
+
+        colorSecondary: {
+          background: chipSecondaryColor
+        },
+
+        label: {
+          padding: 0,
+          fontWeight: 400,
+          fontSize: '0.75rem',
+          lineHeight: '133%',
+          color: whiteColor,
+
+
+        },
+
+        colorDefault: {
+          background: secondaryBg
+        },
       }
     },
 

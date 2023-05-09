@@ -1,7 +1,7 @@
-import { Box, Button, ButtonGroup, Grid, Menu, MenuItem, Typography } from "@mui/material";
+import { Box, Button, ButtonGroup, Chip, Grid, Menu, MenuItem, Typography } from "@mui/material";
 import React, { useState } from "react";
 import MediaQuery from 'react-responsive';
-import { ArView, ArrowDown, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Delete, Expand, Eye, Focus, Remove } from "../../icons";
+import { ArView, ArrowDown, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Delete, Expand, Eye, Focus, Link, Remove } from "../../icons";
 import vars from "../../theme/variables";
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -13,10 +13,15 @@ const {
   whiteColor,
   secondaryBg,
   outlinedBtnTextColor,
-  blackColor
+  blackColor,
+  listHeadingColor,
+  carouselBg,
+  headerBorderColor,
+  tabActiveColor
 } = vars;
 
 const SideBar = () => {
+  const [toggleReadMore, setToggleReadMore] = useState(false);
   const [open, setOpen] = useState(true);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const openMenu = Boolean(anchorEl);
@@ -29,10 +34,12 @@ const SideBar = () => {
   const classes = {
     root: {
       // transition: 'all ease-in-out .3s',
-      height: '100%',
+      height: {
+        lg: '100%'
+      },
       color: whiteColor,
       display: 'flex',
-      flexDirection: 'column'
+      flexDirection: 'column',
     },
 
     header: {
@@ -41,6 +48,13 @@ const SideBar = () => {
 
     buttonGroup: {
 
+    },
+
+    heading: {
+      fontWeight: 400,
+      fontSize: '0.875rem',
+      lineHeight: '1.125rem',
+      color: listHeadingColor,
     },
 
     footer: {
@@ -62,6 +76,7 @@ const SideBar = () => {
         sx={{
           fontWeight: 500,
           lineHeight: 1,
+          fontSize: '1em',
           mr: 1,
           color: 'rgba(255, 255, 255, 0.8)'
         }}
@@ -71,6 +86,10 @@ const SideBar = () => {
       JRC2018Unisex [VFB_00101567]
     </>
   )
+
+  const description = 'A doughnut shaped synaptic neuropil domain of the central complex of the adult brain that lies just anterior to the fan-shaped body. Its hole (the ellipsoid body canal) points anteriorly and has an axon tract (the anterior bundle) running through it. It is divided into concentric layers and into 16 radial segments, 8 per hemisphere, numbered 1-8 from superior medial to inferior medial (Ito et al., 2014).'
+
+  const MAX_LENGTH = 40;
 
   return (
     <Box
@@ -106,7 +125,11 @@ const SideBar = () => {
         }
       }}
     >
-      <Box flexGrow={1}>
+      <Box sx={{
+        height: {
+          lg: 'calc(100% - 3.75rem)'
+        },
+      }} flexGrow={1}>
         {!open ? (
           <Typography sx={{
             display: 'flex',
@@ -122,18 +145,21 @@ const SideBar = () => {
           </Typography>
         ) : (
           <Box sx={{
+            height: {
+              lg: '100%'
+            },
             p: {
               lg: 2
             }
           }}>
             <Box mb={2} sx={classes.header}>
-              <Grid container>
+              <Grid container alignItems='center'>
                 <MediaQuery minWidth={768}>
-                  <Grid item xs={12} lg={6} md={6}>
+                  <Grid item xs={12} lg={7} sm={6}>
                     <Box>
                       <Typography sx={{
                         fontWeight: 500,
-                        fontSize: '0.875rem',
+                        fontSize: '1.25rem',
                         color: whiteColor
                       }}>
                         {termInfoHeading}
@@ -142,7 +168,7 @@ const SideBar = () => {
                   </Grid>
                 </MediaQuery>
 
-                <Grid item xs={12} lg={6} md={6}>
+                <Grid item xs={12} lg={5} sm={6}>
                   <Box
                     display='flex'
                     rowGap={1}
@@ -156,7 +182,7 @@ const SideBar = () => {
                       },
                       justifyContent: {
                         xs: 'space-between',
-                        lg: 'flex-end'
+                        sm: 'flex-end'
                       },
                       columnGap: {
                         xs: 1,
@@ -164,7 +190,7 @@ const SideBar = () => {
                       }
                     }}
                   >
-                    <Box display='flex' gap="6px">
+                    <Box display='flex' gap="0.375rem">
                       <Box>
                         <Button
                           variant="contained"
@@ -175,7 +201,7 @@ const SideBar = () => {
                           aria-expanded={openMenu ? 'true' : undefined}
                           onClick={handleClick}
                         >
-                            Sections <ArrowDown style={{marginLeft: '6px'}} />
+                          Sections <ArrowDown style={{ marginLeft: '0.375rem' }} />
                         </Button>
                         <Menu
                           id="basic-menu"
@@ -222,55 +248,151 @@ const SideBar = () => {
 
             </Box>
 
-            <Accordion>
-              <AccordionSummary
+            <Box mx={-2} px={2} sx={{
+              overflow: {
+                lg: 'auto'
+              },
+              maxHeight: {
+                lg: 'calc(100% - 4.0625rem)'
+              }
+            }}>
+              <Accordion>
+                <AccordionSummary
                   expandIcon={<ChevronDown />}
-                aria-controls="panel1a-content"
-                id="panel1a-header"
-              >
-                <Typography>General Information</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Typography>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-                  malesuada lacus ex, sit amet blandit leo lobortis eget.
-                </Typography>
-              </AccordionDetails>
-            </Accordion>
-            <Accordion>
-              <AccordionSummary
-                expandIcon={<ChevronDown />}
-                aria-controls="panel2a-content"
-                id="panel2a-header"
-              >
-                <Typography>Queries (28)</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-              <TreeView
-                aria-label="customized"
-                defaultExpanded={['1']}
-                defaultCollapseIcon={<Eye />}
-                defaultExpandIcon={<ChevronDown />}
-                defaultEndIcon={<Remove />}
-                sx={{ height: 264, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
-              >
-                <TreeItem nodeId="1" label="Main">
-                  <TreeItem nodeId="2" label="Hello" />
-                  <TreeItem nodeId="3" label="Subtree with children">
-                    <TreeItem nodeId="6" label="Hello" />
-                    <TreeItem nodeId="7" label="Sub-subtree with children">
-                      <TreeItem nodeId="9" label="Child 1" />
-                      <TreeItem nodeId="10" label="Child 2" />
-                      <TreeItem nodeId="11" label="Child 3" />
+                  aria-controls="panel1a-content"
+                  id="panel1a-header"
+                >
+                  <Typography>General Information</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Grid container columnSpacing={1.5}>
+                    <Grid item xs={12} sm={4} md={5} lg={5}>
+                      <Box
+                        sx={{
+                          width: '100%',
+                          height: '14.25rem',
+                          background: {
+                            xs: carouselBg,
+                            lg: headerBorderColor
+                          },
+                          borderRadius: '0.5rem',
+                        }}
+                      ></Box>
+                    </Grid>
+                    <Grid sx={{
+                      mt: {
+                        xs: 2
+                      }
+                    }} item xs={12} sm={8} md={7} lg={7}>
+                      <Box display='flex' flexDirection='column' rowGap={1}>
+                        <Box display='flex' justifyContent='space-between' columnGap={1}>
+                          <Typography sx={classes.heading}>Name</Typography>
+                          <Typography sx={{
+                            ...classes.heading,
+                            color: whiteColor,
+                            textAlign: 'right'
+                          }}>JRC2018Unisex</Typography>
+                        </Box>
+
+                        <Box display='flex' justifyContent='space-between' columnGap={1}>
+                          <Typography sx={classes.heading}>Tags</Typography>
+                            <Box display='flex' gap={0.5}>
+                            <Chip color="primary" label='Adult' />
+                            <Chip color="secondary" label='Nervous system' />
+                            <Chip label='+3' />
+                          </Box>
+                        </Box>
+
+                        <Box display='flex' justifyContent='space-between' columnGap={1}>
+                          <Typography sx={classes.heading}>Classification</Typography>
+                          <Typography sx={{
+                            ...classes.heading,
+                            color: whiteColor,
+                            textAlign: 'right'
+                          }}>Adult brain</Typography>
+                        </Box>
+
+                        <Box display='flex' justifyContent='space-between' columnGap={1}>
+                          <Typography sx={classes.heading}>Description</Typography>
+                          <Box display='flex' flexDirection='column' alignItems='flex-end'>
+                            <Typography sx={{
+                              ...classes.heading,
+                              color: whiteColor,
+                              textAlign: 'right'
+                            }}>
+                                {toggleReadMore ? description : `${description?.substr(0, MAX_LENGTH)}...`}
+                            </Typography>
+                            <Button
+                                onClick={() => setToggleReadMore((prev) => !prev)} disableRipple
+                              sx={{
+                                padding: 0,
+                                marginTop: '0.25rem',
+                                height: 'auto',
+                                color: tabActiveColor
+                              }}>
+                              Read {toggleReadMore ? 'Less' : 'More'}
+                            </Button>
+                          </Box>
+                        </Box>
+
+                        <Box display='flex' justifyContent='space-between' columnGap={1}>
+                          <Typography sx={classes.heading}>Source</Typography>
+                          <Chip icon={<Link />} label='JRC2018Unisex' />
+                        </Box>
+
+                        <Box display='flex' justifyContent='space-between' columnGap={1}>
+                          <Typography sx={classes.heading}>License</Typography>
+                          <Typography sx={{
+                            ...classes.heading,
+                            color: whiteColor,
+                            textAlign: 'right'
+                          }}>CC-BY-NC-SA_4.0</Typography>
+                        </Box>
+
+                        <Box display='flex' justifyContent='space-between' columnGap={1}>
+                          <Typography sx={classes.heading}>Aligned To</Typography>
+                          <Chip icon={<Link />} label='JRC2018Unisex' />
+                        </Box>
+                      </Box>
+                    </Grid>
+                  </Grid>
+                </AccordionDetails>
+              </Accordion>
+              <Accordion>
+                <AccordionSummary
+                  expandIcon={<ChevronDown />}
+                  aria-controls="panel2a-content"
+                  id="panel2a-header"
+                >
+                  <Typography>Queries (28)</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <TreeView
+                    aria-label="customized"
+                    defaultExpanded={['1']}
+                    defaultCollapseIcon={<Eye />}
+                    defaultExpandIcon={<ChevronDown />}
+                    defaultEndIcon={<Remove />}
+                    sx={{ height: 264, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
+                  >
+                    <TreeItem nodeId="1" label="Main">
+                      <TreeItem nodeId="2" label="Hello" />
+                      <TreeItem nodeId="3" label="Subtree with children">
+                        <TreeItem nodeId="6" label="Hello" />
+                        <TreeItem nodeId="7" label="Sub-subtree with children">
+                          <TreeItem nodeId="9" label="Child 1" />
+                          <TreeItem nodeId="10" label="Child 2" />
+                          <TreeItem nodeId="11" label="Child 3" />
+                        </TreeItem>
+                        <TreeItem nodeId="8" label="Hello" />
+                      </TreeItem>
+                      <TreeItem nodeId="4" label="World" />
+                      <TreeItem nodeId="5" label="Something something" />
                     </TreeItem>
-                    <TreeItem nodeId="8" label="Hello" />
-                  </TreeItem>
-                  <TreeItem nodeId="4" label="World" />
-                  <TreeItem nodeId="5" label="Something something" />
-                </TreeItem>
-              </TreeView>
-              </AccordionDetails>
-            </Accordion>
+                  </TreeView>
+                </AccordionDetails>
+              </Accordion>
+            </Box>
           </Box>
         )}
 

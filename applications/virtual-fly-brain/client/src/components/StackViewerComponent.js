@@ -452,12 +452,12 @@ import React from 'react';
                                   console.log('Adding ' + that.props.templateDomainNames[index]);
                                   that.setStatusText('Adding ' + that.props.templateDomainNames[index]);
                                   var varriableId = that.props.templateDomainIds[index];
-                                  window.stackViewerRequest(varriableId); // window.stackViewerRequest must be configured in init script
+                                  //window.stackViewerRequest(varriableId); // window.stackViewerRequest must be configured in init script
                                   isSelected = true;
                                   break;
                                 } else {
                                   that.setStatusText(that.props.templateDomainNames[index] + ' (⇧click to add)');
-                                  window.stackViewerRequest(that.props.templateDomainTypeIds[index]);
+                                  //window.stackViewerRequest(that.props.templateDomainTypeIds[index]);
                                   break;
                                 }
                               }
@@ -873,8 +873,8 @@ import React from 'react';
         this.state.buffer[-1] = new Text(this.state.text, style);
         this.app.stage.addChild(this.state.buffer[-1]);
         // fix position
-        this.state.buffer[-1].x = -this.app.stage?.x + 35;
-        this.state.buffer[-1].y = -this.app.stage?.y + 8;
+        this.state.buffer[-1].x = 0
+        this.state.buffer[-1].y = 8;
         this.state.buffer[-1].anchor.x = 0;
         this.state.buffer[-1].anchor.y = 0;
         this.state.buffer[-1].zOrder = 1000;
@@ -1000,7 +1000,7 @@ import React from 'react';
     },
 
     setStatusText: function (text) {
-      this.state.buffer[-1].x = (-35);
+      this.state.buffer[-1].x = (40);
       this.state.buffer[-1].y = (8);
       this.state.buffer[-1].text = text;
       this.state.text = text;

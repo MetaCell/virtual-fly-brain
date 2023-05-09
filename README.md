@@ -39,7 +39,7 @@ Author: VirtualFlyBrain
 cd applications/virtual-fly-brain/backend
 pip install -r requirements.txt
 cd virtual_fly_brain
-python __main__.py 
+python __main__local__.py 
 ```
 
 after that you will see Flask running with the following prompt:

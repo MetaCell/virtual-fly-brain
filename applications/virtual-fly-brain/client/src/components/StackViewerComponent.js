@@ -232,7 +232,7 @@ import React from 'react';
             that.setState({ minDst: min, maxDst: max });
             let extent = { minDst: min, maxDst: max };
             that.props.setExtent(extent);
-            // console.log('Stack Depth: ' + ((max - min) / 10.0).toFixed(0));
+            console.log('Stack Depth: ' + ((max - min) / 10.0).toFixed(0));
             that.checkStack();
             that.callPlaneEdges();
             that.iBuffer = {};
@@ -491,7 +491,6 @@ import React from 'react';
       console.log("Images ", images)
       images.forEach ( ( k, index) => {
         this.state.iBuffer[index] = k;
-        console.log("Image ", k)
       });
       // console.log('Buffered ' + (1000 - buffMax).toString() + ' tiles');
       if (this._isMounted === true && this._initialized === false) {
@@ -640,12 +639,12 @@ import React from 'react';
               }
             }
           } else {
-            // console.log('Buffering neighbouring layers (' + this.state.numTiles.toString() + ') tiles...');
+            console.log('Buffering neighbouring layers (' + this.state.numTiles.toString() + ') tiles...');
             for (j = 0; j < this.state.numTiles; j++) {
               for (i in this.state.stack) {
                 image = this.state.serverUrl.toString() + '?wlz=' + this.state.stack[i] + '&sel=0,255,255,255&mod=zeta&fxp=' + this.props.fxp.join(',') + '&scl=' + Number(this.state.scl).toFixed(1) + '&dst=' + Number(this.state.dst).toFixed(1) + '&pit=' + Number(this.state.pit).toFixed(0) + '&yaw=' + Number(this.state.yaw).toFixed(0) + '&rol=' + Number(this.state.rol).toFixed(0) + '&qlt=80&jtl=' + j.toString();
                 if (!this.state.iBuffer[image]) {
-                  // console.log('buffering ' + this.state.stack[i].toString() + '...');
+                  console.log('buffering ' + this.state.stack[i].toString() + '...');
                   loadList.add(image);
                   buffMax -= 1;
                 }
@@ -1001,11 +1000,11 @@ import React from 'react';
     },
 
     setStatusText: function (text) {
-      // this.state.buffer[-1].x = (-35);
-      // this.state.buffer[-1].y = (8);
-      // this.state.buffer[-1].text = text;
-      // this.state.text = text;
-      // this.state.txtUpdated = Date.now();
+      this.state.buffer[-1].x = (-35);
+      this.state.buffer[-1].y = (8);
+      this.state.buffer[-1].text = text;
+      this.state.text = text;
+      this.state.txtUpdated = Date.now();
     },
 
     setHoverText: function (x,y,text) {
@@ -1076,7 +1075,7 @@ import React from 'react';
         if (this.app === null ) {
           return;
         }
-        var currentPosition = this.app.renderer.plugins.interaction.mouse?.getLocalPosition(this.stack);
+        var currentPosition = this.app.renderer.plugins.interaction.rootPointerEvent?.screen;
         // update new position:
         this.state.posX = Number(currentPosition?.x?.toFixed(0));
         this.state.posY = Number(currentPosition?.y?.toFixed(0));

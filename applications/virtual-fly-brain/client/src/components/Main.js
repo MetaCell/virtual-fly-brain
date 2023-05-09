@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 import React from 'react';
-import Wrapper from '../shared/Wrapper';
+import Wrapper from '../shared/wrapper';
 import MainLayout from './Layout';
 
 require('../css/base.less');

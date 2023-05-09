@@ -124,7 +124,7 @@ const VFBStackViewer = (props) => {
     console.log("term info data : ", stackViewerData);
     let instances = stackData.instances;
     if (!instances.find( i => i?.Id === stackViewerData?.Id) && stackViewerData) {
-      let keys = Object.keys(stackViewerData.Examples);
+      let keys = Object.keys(stackViewerData.Images);
 
       const instancespec = {
         "eClass": "SimpleInstance",
@@ -133,7 +133,7 @@ const VFBStackViewer = (props) => {
         "type": { "eClass": "SimpleType" },
         "visualValue": {
           "eClass": Resources.IMAGE,
-          data :stackViewerData.Examples[keys[0]]?.[0].wlz.replace("https://www.virtualflybrain.org/data/","/disk/data/VFB/IMAGE_DATA/")
+          data :stackViewerData.Images[keys[0]]?.[0].wlz.replace("https://www.virtualflybrain.org/data/","/disk/data/VFB/IMAGE_DATA/")
         }
       };
 
@@ -144,7 +144,7 @@ const VFBStackViewer = (props) => {
         "type": { "eClass": "SimpleType" },
         "visualValue": {
           "eClass": Resources.IMAGE,
-          data :stackViewerData.Examples[keys[0]]?.[0].wlz.replace("https://www.virtualflybrain.org/data/","/disk/data/VFB/IMAGE_DATA/")
+          data :stackViewerData.Images[keys[0]]?.[0].wlz.replace("https://www.virtualflybrain.org/data/","/disk/data/VFB/IMAGE_DATA/")
         }
       };
       const parent = new SimpleInstance(instancespec);
@@ -174,8 +174,8 @@ const VFBStackViewer = (props) => {
     let sliceInstances = getSliceInstances();
 
     if (sliceInstances?.length > 0 && typeof sliceInstances[0] !== "undefined" && sliceInstances[0]?.Images) {
-      let keys = Object.keys(sliceInstances[0].Examples);
-      config = sliceInstances[0].Examples[keys[0]]?.[0];
+      let keys = Object.keys(sliceInstances[0].Images);
+      config = sliceInstances[0].Images[keys[0]]?.[0];
     }
     if (config == undefined) {
       config = {

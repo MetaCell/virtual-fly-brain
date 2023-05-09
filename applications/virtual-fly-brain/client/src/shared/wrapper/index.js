@@ -2,7 +2,7 @@ import React from "react";
 import MediaQuery from 'react-responsive';
 import Header from "../header";
 import SubHeader from "../subHeader";
-import BottomNav from "../BottomNav";
+import BottomNav from "../bottomNav";
 
 const Wrapper = ({ children }) => {
   return (

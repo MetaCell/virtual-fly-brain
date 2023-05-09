@@ -2,8 +2,8 @@
 import React, { useEffect, useState } from "react";
 import MediaQuery from 'react-responsive';
 import { Box, Button, useMediaQuery, useTheme } from "@mui/material";
-import SideBar from "../shared/Sidebar";
-import Circuit from "./Circuit";
+import ThreeDCanvas from "./ThreeDCanvas"
+import TermInfo from "./TermInfo"
 import Images from "./Images";
 import StackViewer from './StackViewer';
 import vars from "../theme/variables";
@@ -97,14 +97,14 @@ const MainLayout = () => {
         }}
       >
         {tab.includes(0) && (
-          <SideBar />
+          <Images />
         )}
 
         {tab.includes(1) && (
-          <Images />
+          <TermInfo />
         )}
         {tab.includes(2) && (
-          <Circuit />
+          <Images />
         )}
         {tab.includes(3) && (
           <StackViewer 

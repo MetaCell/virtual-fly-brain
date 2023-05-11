@@ -123,7 +123,7 @@ const VFBStackViewer = (props) => {
   useEffect( () => {
     console.log("term info data : ", stackViewerData);
     let instances = stackData.instances;
-    if (!instances.find( i => i?.id === stackViewerData?.id) && stackViewerData) {
+    if (!instances.find( i => i?.Id === stackViewerData?.Id) && stackViewerData) {
       let keys = Object.keys(stackViewerData.Images);
 
       const instancespec = {

@@ -7,6 +7,8 @@ import TermInfo from "./TermInfo"
 import Images from "./Images";
 import StackViewer from './StackViewer';
 import vars from "../theme/variables";
+import SideBar from "../shared/Sidebar";
+import Circuit from "./Circuit";
 
 const {
   secondaryBg,
@@ -105,21 +107,15 @@ const MainLayout = () => {
         }}
       >
         {tab.includes(0) && (
-          <Images />
+          <SideBar />
         )}
 
         {tab.includes(1) && (
-          <TermInfo />
-        )}
-        {tab.includes(2) && (
           <Images />
         )}
-        {tab.includes(3) && (
-          <StackViewer 
-            id="NewStackViewer"
-            defHeight={600}
-            defWidth={600}
-          />
+
+        {tab.includes(2) && (
+          <Circuit />
         )}
       </Box>
     </>

@@ -6,6 +6,7 @@ import {useSelector, useDispatch} from 'react-redux'
 import SimpleInstance from "@metacell/geppetto-meta-core/model/SimpleInstance";
 import Resources from '@metacell/geppetto-meta-core/Resources';
 import vars from "../theme/variables";
+import { integerPropType } from '@mui/utils';
 
 const {
   secondaryBg,
@@ -171,22 +172,34 @@ const VFBStackViewer = (props) => {
 
   // Update config and voxel size before re-rendering
   useMemo(() => {
-    let sliceInstances = getSliceInstances();
+    if (stackViewerData?.Images) {
+      let keys = Object.keys(stackViewerData.Images);
+      config = stackViewerData.Images[keys[0]]?.[0];
+      config.serverUrl = 'http://www.virtualflybrain.org/fcgi/wlziipsrv.fcgi';
+      keys = Object.keys(stackViewerData.Domains);
+      let ids = [parseInt(keys[keys.length - 1]) + 1], labels = [parseInt(keys[keys.length - 1]) + 1], classID = [parseInt(keys[keys.length - 1]) + 1]; 
+      keys.forEach( key => {
+        ids[parseInt(key)] = (stackViewerData.Domains[key].id);
+        labels[parseInt(key)] = (stackViewerData.Domains[key].type_label);
+        classID[parseInt(key)] = (stackViewerData.Domains[key].type_id);
+      })
+      let voxels = [];
+      if (config?.voxel != undefined) {
+        voxelSize.x = Number(config.voxel.X || 0.622088);
+        voxelSize.y = Number(config.voxel.Y || 0.622088);
+        voxelSize.z = Number(config.voxel.Z || 0.622088);
+        voxels = [voxelSize.x, voxelSize.y, voxelSize.z];
+      }
 
-    if (sliceInstances?.length > 0 && typeof sliceInstances[0] !== "undefined" && sliceInstances[0]?.Images) {
-      let keys = Object.keys(sliceInstances[0].Images);
-      config = sliceInstances[0].Images[keys[0]]?.[0];
+      let subDomains = [voxels, ids, labels, classID]
+      config.subDomains = subDomains;
     }
     if (config == undefined) {
       config = {
         serverUrl: 'http://www.virtualflybrain.org/fcgi/wlziipsrv.fcgi',
         templateId: 'NOTSET'
       };
-    } else if (config?.voxel != undefined) {
-      voxelSize.x = Number(config.voxel.X || 0.622088);
-      voxelSize.y = Number(config.voxel.Y || 0.622088);
-      voxelSize.z = Number(config.voxel.Z || 0.622088);
-    }
+    }  
   }, [stackData]);
 
   const StackComponent = StackViewerComponent();

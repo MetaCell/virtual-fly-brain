@@ -1,5 +1,6 @@
 import { Box, Button, ButtonGroup, Chip, Grid, Menu, MenuItem, Typography } from "@mui/material";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import {useSelector, useDispatch} from 'react-redux'
 import MediaQuery from 'react-responsive';
 import { ArView, ArrowDown, ArrowRight, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Delete, Expand, Eye, Focus, Line, Link, Remove } from "../../icons";
 import vars from "../../theme/variables";
@@ -69,6 +70,11 @@ const SideBar = () => {
     },
   }
 
+  const data = useSelector(state => state.termInfo.termInfoData)
+  const error = useSelector(state => state.termInfo.error)
+
+  const [termInfoData, setTermInfoData] = useState(data);
+
   const termInfoHeading = (
     <>
       <Typography
@@ -83,13 +89,17 @@ const SideBar = () => {
       >
         Term info:
       </Typography>
-      JRC2018Unisex [VFB_00101567]
+      {data?.Name} [{data?.Id}]
     </>
   )
 
-  const description = 'A doughnut shaped synaptic neuropil domain of the central complex of the adult brain that lies just anterior to the fan-shaped body. Its hole (the ellipsoid body canal) points anteriorly and has an axon tract (the anterior bundle) running through it. It is divided into concentric layers and into 16 radial segments, 8 per hemisphere, numbered 1-8 from superior medial to inferior medial (Ito et al., 2014).'
-
   const MAX_LENGTH = 40;
+
+  // FIXME
+  useEffect( () => {
+    console.log("term info data : ", data);
+    setTermInfoData(data)
+  },[data]);
 
   return (
     <Box
@@ -291,7 +301,7 @@ const SideBar = () => {
                             ...classes.heading,
                             color: whiteColor,
                             textAlign: 'right'
-                          }}>JRC2018Unisex</Typography>
+                          }}>{data?.Name}[{data?.Id}]</Typography>
                         </Box>
 
                         <Box display='flex' justifyContent='space-between' columnGap={1}>
@@ -320,7 +330,7 @@ const SideBar = () => {
                               color: whiteColor,
                               textAlign: 'right'
                             }}>
-                                {toggleReadMore ? description : `${description?.substr(0, MAX_LENGTH)}...`}
+                                {toggleReadMore ? data?.Meta?.Description : `${ data?.Meta?.Description?.substr(0, MAX_LENGTH)}...`}
                             </Typography>
                             <Button
                                 onClick={() => setToggleReadMore((prev) => !prev)} disableRipple

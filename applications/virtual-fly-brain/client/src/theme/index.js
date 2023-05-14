@@ -37,6 +37,100 @@ theme = createTheme({
       }
     },
 
+    MuiAccordionDetails: {
+      styleOverrides: {
+        root: {
+          margin: 0,
+          padding: 0,
+        }
+      }
+    },
+
+    MuiTreeView: {
+      styleOverrides: {
+        root: {
+          '& .MuiTreeItem-root': {
+            '&:last-of-type': {
+              '&:before': {
+                height: 'calc(100% - 2.8125rem)'
+              }
+            }
+          }
+        }
+      }
+    },
+
+    MuiTreeItem: {
+      styleOverrides: {
+        group: {
+          paddingTop: '0.25rem',
+          marginLeft: '1.25rem',
+        },
+        root: {
+          position: 'relative',
+          padding: 0,
+          '&:not([aria-expanded])': {
+            '& .MuiTreeItem-iconContainer': {
+              position: 'absolute',
+              left: '-0.78125rem',
+              top: '-0.25rem',
+            },
+          },
+          '&[aria-expanded="true"]': {
+            '&:before': {
+              content: "''",
+              position: 'absolute',
+              left: '0.5rem',
+              top: '1.25rem',
+              backgroundColor: primaryBg,
+              height: 'calc(100% - 1rem)',
+              width: '0.0625rem',
+            }
+          }
+
+        },
+        content: {
+          padding: '0.125rem 0',
+
+          '&:hover': {
+            backgroundColor: 'transparent'
+          },
+
+          '&.Mui-selected': {
+            backgroundColor: 'transparent',
+            '&:hover': {
+              backgroundColor: 'transparent'
+            },
+            '&.Mui-focused': {
+              backgroundColor: 'transparent',
+              '&:hover': {
+                backgroundColor: 'transparent'
+              }
+            },
+          },
+          '&.Mui-focused': {
+            backgroundColor: 'transparent',
+            '&:hover': {
+              backgroundColor: 'transparent'
+            }
+          },
+        },
+        iconContainer: {
+          marginRight: 0,
+          width: 'auto'
+        },
+        label: {
+          paddingLeft: 0,
+          userSelect: 'none',
+          fontWeight: 400,
+          fontSize: '1rem',
+          lineHeight: '125%',
+          color: outlinedBtnTextColor
+        }
+      }
+    },
+
+
     MuiAccordion: {
       styleOverrides: {
         root: {

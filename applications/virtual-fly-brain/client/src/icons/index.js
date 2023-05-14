@@ -182,3 +182,15 @@ export const Link = (props) => (
     </defs>
   </svg>
 );
+
+export const ArrowRight = () => (
+  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M7.91667 14.1666L12.0833 9.99992L7.91667 5.83325V14.1666Z" fill="#A0A0A0" />
+  </svg>
+)
+
+export const Line = () => (
+  <svg width="9" height="17" viewBox="0 0 9 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M1 0L1 7.99988C1 12.4182 4.58172 15.9999 9 15.9999V15.9999" stroke="#505050" />
+  </svg>
+)

@@ -1,7 +1,7 @@
 import { Box, Button, ButtonGroup, Chip, Grid, Menu, MenuItem, Typography } from "@mui/material";
 import React, { useState } from "react";
 import MediaQuery from 'react-responsive';
-import { ArView, ArrowDown, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Delete, Expand, Eye, Focus, Link, Remove } from "../../icons";
+import { ArView, ArrowDown, ArrowRight, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Delete, Expand, Eye, Focus, Line, Link, Remove } from "../../icons";
 import vars from "../../theme/variables";
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -368,12 +368,11 @@ const SideBar = () => {
                 </AccordionSummary>
                 <AccordionDetails>
                   <TreeView
-                    aria-label="customized"
-                    defaultExpanded={['1']}
-                    defaultCollapseIcon={<Eye />}
-                    defaultExpandIcon={<ChevronDown />}
-                    defaultEndIcon={<Remove />}
-                    sx={{ height: 264, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
+                      aria-label="customized"
+                      defaultParentIcon={<ArrowRight />}
+                    // defaultCollapseIcon={<ArrowRight />}
+                    // defaultExpandIcon={<ArrowRight />}
+                      defaultEndIcon={<Line />}
                   >
                     <TreeItem nodeId="1" label="Main">
                       <TreeItem nodeId="2" label="Hello" />
@@ -386,8 +385,42 @@ const SideBar = () => {
                         </TreeItem>
                         <TreeItem nodeId="8" label="Hello" />
                       </TreeItem>
+                      <TreeItem nodeId="3" label="Subtree with children">
+                        <TreeItem nodeId="6" label="Hello" />
+                        <TreeItem nodeId="7" label="Sub-subtree with children">
+                          <TreeItem nodeId="9" label="Child 1" />
+                          <TreeItem nodeId="10" label="Child 2" />
+                          <TreeItem nodeId="11" label="Child 3" />
+                        </TreeItem>
+                        <TreeItem nodeId="8" label="Hello" />
+                      </TreeItem>
                       <TreeItem nodeId="4" label="World" />
                       <TreeItem nodeId="5" label="Something something" />
+                    </TreeItem>
+
+                    <TreeItem nodeId="111" label="Main">
+                      <TreeItem nodeId="2222" label="Hello" />
+                      <TreeItem nodeId="3333" label="Subtree with children">
+                        <TreeItem nodeId="6666" label="Hello" />
+                        <TreeItem nodeId="711" label="Sub-subtree with children">
+                          <TreeItem nodeId="911" label="Child 1" />
+                          <TreeItem nodeId="1011" label="Child 2" />
+                          <TreeItem nodeId="1111" label="Child 3" />
+                        </TreeItem>
+                        <TreeItem nodeId="811" label="Hello" />
+                      </TreeItem>
+                      <TreeItem nodeId="311" label="Subtree with children">
+                        <TreeItem nodeId="611" label="Hello" />
+                        <TreeItem nodeId="7111" label="Sub-subtree with children">
+                          <TreeItem nodeId="9111" label="Child 1" />
+                          <TreeItem nodeId="10111" label="Child 2" />
+                          <TreeItem nodeId="11111" label="Child 3" />
+                        </TreeItem>
+                        <TreeItem nodeId="81111" label="Hello" />
+                      </TreeItem>
+                      <TreeItem nodeId="41111" label="World" />
+                      <TreeItem nodeId="51111" label="Something something" />
+
                     </TreeItem>
                   </TreeView>
                 </AccordionDetails>

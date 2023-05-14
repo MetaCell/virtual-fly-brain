@@ -307,9 +307,10 @@ const SideBar = () => {
                         <Box display='flex' justifyContent='space-between' columnGap={1}>
                           <Typography sx={classes.heading}>Tags</Typography>
                             <Box display='flex' gap={0.5}>
-                            <Chip color="primary" label='Adult' />
-                            <Chip color="secondary" label='Nervous system' />
-                            <Chip label='+3' />
+                              {
+                                data?.Tags?.map((tag) => <Chip key={tag} color="primary" label={tag} />) 
+                              }
+                            { data?.Tags?.length > 2 && <Chip label={`+${data?.Tags?.length - 2}`} /> }
                           </Box>
                         </Box>
 
@@ -340,7 +341,7 @@ const SideBar = () => {
                                 height: 'auto',
                                 color: tabActiveColor
                               }}>
-                              Read {toggleReadMore ? 'Less' : 'More'}
+                              {toggleReadMore ? 'Show Less' : 'Read More'}
                             </Button>
                           </Box>
                         </Box>

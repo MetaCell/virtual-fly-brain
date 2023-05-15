@@ -26,7 +26,7 @@ const theme = createTheme({
         '.MuiBox-content': {
           display: 'flex',
           alignItems: 'flex-start',
-          flex: 1 auto,
+          flex: '1 auto',
           minHeight: '100vh',
           padding: '3.75rem 1.0rem 1.0rem',
         },

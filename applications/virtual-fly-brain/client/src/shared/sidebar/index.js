@@ -1,4 +1,4 @@
-import { Box, Button, ButtonGroup, Chip, Grid, Menu, MenuItem, Typography } from "@mui/material";
+import { Box, Button, ButtonGroup, Chip, Grid, Menu, MenuItem, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import {useSelector, useDispatch} from 'react-redux'
 import MediaQuery from 'react-responsive';
@@ -9,6 +9,7 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import TreeView from '@mui/lab/TreeView';
 import { TreeItem } from "@mui/lab";
+import ListAltIcon from '@mui/icons-material/ListAlt';
 
 const {
   whiteColor,
@@ -18,7 +19,8 @@ const {
   listHeadingColor,
   carouselBg,
   headerBorderColor,
-  tabActiveColor
+  tabActiveColor,
+  descriptionBg
 } = vars;
 
 const SideBar = () => {
@@ -93,7 +95,27 @@ const SideBar = () => {
     </>
   )
 
+  function createData(
+    name,
+    calories,
+    fat,
+    carbs,
+    protein,
+  ) {
+    return { name, calories, fat, carbs, protein };
+  }
+
+  const rows = [
+    createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
+    createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
+    createData('Eclair', 262, 16.0, 24, 6.0),
+    createData('Cupcake', 305, 3.7, 67, 4.3),
+    createData('Gingerbread', 356, 16.0, 49, 3.9),
+  ];
+
   const MAX_LENGTH = 40;
+
+  const DUMMY_DESC = "A doughnut shaped synaptic neuropil domain of the central complex of the adult brain that lies just anterior to the fan-shaped body. Its hole (the ellipsoid body canal) points anteriorly and has an axon tract (the anterior bundle) running through it. It is divided into concentric layers and into 16 radial segments, 8 per hemisphere, numbered 1-8 from superior medial to inferior medial (Ito et al., 2014)."
 
   // FIXME
   useEffect( () => {
@@ -291,7 +313,8 @@ const SideBar = () => {
                     </Grid>
                     <Grid sx={{
                       mt: {
-                        xs: 2
+                        xs: 2,
+                        sm: 0,
                       }
                     }} item xs={12} sm={8} md={7} lg={7}>
                       <Box display='flex' flexDirection='column' rowGap={1}>
@@ -308,7 +331,7 @@ const SideBar = () => {
                           <Typography sx={classes.heading}>Tags</Typography>
                             <Box display='flex' gap={0.5}>
                               {
-                                data?.Tags?.map((tag) => <Chip key={tag} color="primary" label={tag} />) 
+                                data?.Tags?.map((tag) => <Chip key={tag} color="primary" label={tag} />)
                               }
                             { data?.Tags?.length > 2 && <Chip label={`+${data?.Tags?.length - 2}`} /> }
                           </Box>
@@ -329,9 +352,17 @@ const SideBar = () => {
                             <Typography sx={{
                               ...classes.heading,
                               color: whiteColor,
-                              textAlign: 'right'
+                              borderRadius: toggleReadMore ? 1 : 0,
+                              textAlign: 'right',
+                              maxHeight: '3.375rem',
+                              overflow: 'auto',
+                              padding: toggleReadMore ? '0.25rem 0.5rem' : 0,
+                              background: {
+                                xs: toggleReadMore ? descriptionBg : 'transparent',
+                                xl: toggleReadMore ? secondaryBg : 'transparent',
+                              }
                             }}>
-                                {toggleReadMore ? data?.Meta?.Description : `${ data?.Meta?.Description?.substr(0, MAX_LENGTH)}...`}
+                                {toggleReadMore ? DUMMY_DESC : `${DUMMY_DESC?.substr(0, MAX_LENGTH)}...`}
                             </Typography>
                             <Button
                                 onClick={() => setToggleReadMore((prev) => !prev)} disableRipple
@@ -385,10 +416,65 @@ const SideBar = () => {
                     // defaultExpandIcon={<ArrowRight />}
                       defaultEndIcon={<Line />}
                   >
-                    <TreeItem nodeId="1" label="Main">
+                    <TreeItem nodeId="1" label={
+                      <Box display='flex' flexWrap='wrap'>
+                        <Typography>Neurons with postsynaptic terminals in posterior ventrolateral protocerebrum</Typography>
+                          <Box display='flex' pl={0.5}>
+                          <Typography sx={{ pr: 0.5 }}>71</Typography>
+                          <ListAltIcon />
+                        </Box>
+                      </Box>
+                    }>
                       <TreeItem nodeId="2" label="Hello" />
                       <TreeItem nodeId="3" label="Subtree with children">
-                        <TreeItem nodeId="6" label="Hello" />
+                        <TreeItem nodeId="6" label={
+                            <TableContainer component={Paper}>
+                            <Table aria-label="simple table">
+                              <TableHead>
+                                <TableRow>
+                                  <TableCell>Name</TableCell>
+                                  <TableCell>Description</TableCell>
+                                  <TableCell>Score</TableCell>
+                                  <TableCell></TableCell>
+                                </TableRow>
+                              </TableHead>
+                              <TableBody>
+                                {rows.map((row) => (
+                                  <TableRow
+                                    key={row.name}
+                                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                  >
+                                    <TableCell>
+                                      <Button
+                                        disableRipple
+                                        variant="text"
+                                        color="info"
+                                        sx={{
+                                          padding: 0,
+                                          minWidth: '0.0625rem',
+                                          textAlign: 'left',
+                                          display: 'inline-block',
+
+                                          '&:not(:hover)': {
+                                            color: 'rgba(255, 255, 255, 0.8)'
+                                          }
+                                        }}
+                                      >
+                                        {row.name}
+                                      </Button>
+                                    </TableCell>
+                                    <TableCell>{row.calories}</TableCell>
+                                    <TableCell>{row.fat}</TableCell>
+                                    <TableCell>
+                                      {/* <Button variant="text" color="error">Delete</Button> */}
+                                      <Button variant="outlined" color="info">Add</Button>
+                                    </TableCell>
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                            </TableContainer>
+                        } />
                         <TreeItem nodeId="7" label="Sub-subtree with children">
                           <TreeItem nodeId="9" label="Child 1" />
                           <TreeItem nodeId="10" label="Child 2" />

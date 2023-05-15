@@ -15,7 +15,9 @@ const vars = {
   chipPrimaryColor: '#FFFFB3',
   chipSecondaryColor: '#9F843C',
   carouselBg: 'linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), #222222',
-  listHeadingColor: '#A0A0A0'
+  listHeadingColor: '#A0A0A0',
+  descriptionBg: 'linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), #222222',
+  textErrorColor: '#F6B6B6',
 };
 
 export default vars;

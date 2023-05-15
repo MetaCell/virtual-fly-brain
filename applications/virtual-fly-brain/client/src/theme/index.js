@@ -10,21 +10,26 @@ const {
   blackColor,
   primaryBg,
   chipPrimaryColor,
-  chipSecondaryColor
+  chipSecondaryColor,
+  textErrorColor,
+  tabActiveColor
 } = vars;
 
 let theme = createTheme();
 
 theme = createTheme({
   typography: {
-    fontFamily: primaryFont,
+    allVariants: {
+      fontFamily: primaryFont,
+    }
   },
 
   components: {
     MuiCssBaseline: {
       styleOverrides: `
         *, body {
-          font-family: ${primaryFont}
+          font-family: ${primaryFont};
+          box-sizing: border-box
         }
       `,
     },
@@ -32,16 +37,8 @@ theme = createTheme({
     MuiAccordionDetails: {
       styleOverrides: {
         root: {
-          padding: '0 0 1rem 0'
-        }
-      }
-    },
-
-    MuiAccordionDetails: {
-      styleOverrides: {
-        root: {
           margin: 0,
-          padding: 0,
+          padding: '0 0 1rem 0'
         }
       }
     },
@@ -56,6 +53,49 @@ theme = createTheme({
               }
             }
           }
+        }
+      }
+    },
+
+    MuiTableCell: {
+      styleOverrides: {
+        root: {
+          padding: 0,
+          color: outlinedBtnTextColor,
+          borderBottomColor: secondaryBg,
+          lineHeight: '150%',
+          padding: '0.5rem 0.75rem',
+        },
+        body: {
+        },
+        head: {
+          background: secondaryBg,
+          fontSize: '0.75rem',
+        }
+      }
+    },
+
+    MuiTableRow: {
+      styleOverrides: {
+        root: {
+        }
+      }
+    },
+
+    MuiTableContainer: {
+      styleOverrides: {
+        root: {
+          backgroundColor: 'transparent',
+          boxShadow: 'none',
+          border: `0.0625rem solid ${secondaryBg}`,
+          marginBottom: '0.5rem'
+        }
+      }
+    },
+
+    MuiTable: {
+      styleOverrides: {
+        root: {
         }
       }
     },
@@ -91,6 +131,7 @@ theme = createTheme({
         },
         content: {
           padding: '0.125rem 0',
+          // cursor: 'auto',
 
           '&:hover': {
             backgroundColor: 'transparent'
@@ -125,7 +166,23 @@ theme = createTheme({
           fontWeight: 400,
           fontSize: '1rem',
           lineHeight: '125%',
-          color: outlinedBtnTextColor
+          color: outlinedBtnTextColor,
+
+          '& > div > p': {
+            flex: 1,
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            overflow:'hidden',
+            position: 'relative',
+            '&:after': {
+              content: "''",
+              position: 'absolute',
+              right: 0,
+              width: '5.5rem',
+              height: '100%',
+              background: 'linear-gradient(270deg, #000000 0%, rgba(0, 0, 0, 0) 26.7%)'
+            }
+          }
         }
       }
     },
@@ -148,18 +205,18 @@ theme = createTheme({
             opacity: 1,
           },
 
-          '&:first-of-type:before': {
-            display: 'block'
-          },
+          // '&:first-of-type:before': {
+          //   display: 'block'
+          // },
 
-          '&:last-of-type:before': {
-            display: 'none'
-          },
+          // '&:last-of-type:before': {
+          //   display: 'none'
+          // },
 
           '&:before': {
             backgroundColor: secondaryBg,
-            top: 'auto',
-            bottom: 0,
+            // top: 'auto',
+            // bottom: 0,
           },
         }
       }
@@ -191,7 +248,7 @@ theme = createTheme({
             fontWeight: 400,
             fontSize: '0.875rem',
             lineHeight: '129%',
-            color: 'rgba(255, 255, 255, 0.8)',
+            color: outlinedBtnTextColor,
           }
         }
       }
@@ -275,6 +332,27 @@ theme = createTheme({
           '&:hover': {
             backgroundColor: primaryBg,
           }
+        },
+
+        outlinedInfo: {
+          fontSize: '0.75rem',
+          height: '1.75rem',
+          borderColor: tabActiveColor,
+          letterSpacing: '-0.005em',
+          color: tabActiveColor,
+          borderRadius: '0.25rem',
+          minWidth: '3.5rem',
+          padding: 0,
+        },
+
+        textError: {
+          fontSize: '0.75rem',
+          height: '1.75rem',
+          letterSpacing: '-0.005em',
+          color: textErrorColor,
+          borderRadius: '0.25rem',
+          minWidth: '3.5rem',
+          padding: 0,
         },
 
         textPrimary: {

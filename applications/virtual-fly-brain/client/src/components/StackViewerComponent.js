@@ -407,18 +407,19 @@ import React from 'react';
       // while (window.GEPPETTO.SceneController.getSelection()[0] != undefined) {
       //   window.GEPPETTO.SceneController.getSelection()[0].deselect();
       // }
-      [this.state.stack[0]]?.forEach( (i, item) => {
+      [this.state.stack[0]]?.forEach( (item,i) => {
         (function (i, that, shift) {
           // FIXME
           // var shift = window.GEPPETTO.isKeyPressed("shift");
           var image = that.state.serverUrl.toString() + '?wlz=' + item + '&sel=0,255,255,255&mod=zeta&fxp=' + that.props.fxp.join(',') + '&scl=' + Number(that.state.scl).toFixed(1) + '&dst=' + Number(that.state.dst).toFixed(1) + '&pit=' + Number(that.state.pit).toFixed(0) + '&yaw=' + Number(that.state.yaw).toFixed(0) + '&rol=' + Number(that.state.rol).toFixed(0);
           // get image size;
-          fetch({
-            url: image + '&prl=-1,' + that.state.posX.toFixed(0) + ',' + that.state.posY.toFixed(0) + '&obj=Wlz-foreground-objects',
-            type: 'POST',
-            success: function (data) {
-              if (window.GEPPETTO?.SceneController.getSelection()[0] == undefined) { // check nothing already selected
-                result = data.trim().split(':')[1].trim().split(' ');
+          let file = image + '&prl=-1,' + that.state.posX.toFixed(0) + ',' + that.state.posY.toFixed(0) + '&obj=Wlz-foreground-objects';
+            fetch(file,{ method : "POST", url : file})
+              .then(response =>
+                response.text()
+              )
+            .then( data => {
+              result = data.trim().split(':')[1].trim().split(' ');
                 if (result !== '') {
                   for (j in result) {
                     if (result[j].trim() !== '') {
@@ -452,12 +453,12 @@ import React from 'react';
                                   console.log('Adding ' + that.props.templateDomainNames[index]);
                                   that.setStatusText('Adding ' + that.props.templateDomainNames[index]);
                                   var varriableId = that.props.templateDomainIds[index];
-                                  window.stackViewerRequest(varriableId); // window.stackViewerRequest must be configured in init script
+                                  //window.stackViewerRequest(varriableId); // window.stackViewerRequest must be configured in init script
                                   isSelected = true;
                                   break;
                                 } else {
                                   that.setStatusText(that.props.templateDomainNames[index] + ' (⇧click to add)');
-                                  window.stackViewerRequest(that.props.templateDomainTypeIds[index]);
+                                  //window.stackViewerRequest(that.props.templateDomainTypeIds[index]);
                                   break;
                                 }
                               }
@@ -472,12 +473,11 @@ import React from 'react';
                 }
                 // update slice view
                 that.checkStack();
-              }
-            },
-            error: function (xhr, status, err) {
-              console.error("Calling Objects", status + " - " + xhr.progress().state(), err.toString());
-            }.bind(this)
-          });
+            })
+            .catch(error => {
+              that.state.loadingLabels = false;
+              console.error("Calling Objects", error);
+            });
         })(i, that);
       });
     },
@@ -488,7 +488,6 @@ import React from 'react';
 
     setup : function (images) {
       var k;
-      console.log("Images ", images)
       images.forEach ( ( k, index) => {
         this.state.iBuffer[index] = k;
       });
@@ -514,7 +513,7 @@ import React from 'react';
         var that = this;
         var callX = that.state.posX.toFixed(0), callY = that.state.posY.toFixed(0);
 
-        [this.state.stack[0]]?.forEach( (i, item) => {
+        [this.state.stack[0]]?.forEach( (item, i) => {
           (function (i, that, shift) {
             if (i == 0) {
               that.state.loadingLabels = true;
@@ -522,12 +521,13 @@ import React from 'react';
             // FIXME
             // var shift = window.GEPPETTO.isKeyPressed("shift");
             var image = that.state.serverUrl.toString() + '?wlz=' + item + '&sel=0,255,255,255&mod=zeta&fxp=' + that.props.fxp.join(',') + '&scl=' + Number(that.state.scl).toFixed(1) + '&dst=' + Number(that.state.dst).toFixed(1) + '&pit=' + Number(that.state.pit).toFixed(0) + '&yaw=' + Number(that.state.yaw).toFixed(0) + '&rol=' + Number(that.state.rol).toFixed(0);
-            // get image size;
-            fetch({
-              url: image + '&prl=-1,' + callX + ',' + callY + '&obj=Wlz-foreground-objects',
-              type: 'POST',
-              success: function (data) {
-                result = data.trim().split(':')[1].trim().split(' ');
+            let file = image + '&prl=-1,' + callX + ',' + callY + '&obj=Wlz-foreground-objects';
+            fetch(file,{ method : "POST", url : file})
+              .then(response =>
+                response.text()
+              )
+            .then( data => {
+              result = data.trim().split(':')[1].trim().split(' ');
                 if (result !== '') {
                   for (j in result) {
                     if (result[j].trim() !== '') {
@@ -566,11 +566,10 @@ import React from 'react';
                 if (i == 0) {
                   that.state.loadingLabels = false;
                 }
-              },
-              error: (xhr, status, err) => {
-                that.state.loadingLabels = false;
-                console.error("Listing Objects", status + " - " + xhr.progress().state(), err.toString());
-              }
+            })
+            .catch(error => {
+              that.state.loadingLabels = false;
+              console.error("Listing Objects", error);
             });
           })(i, that);
         });
@@ -873,8 +872,8 @@ import React from 'react';
         this.state.buffer[-1] = new Text(this.state.text, style);
         this.app.stage.addChild(this.state.buffer[-1]);
         // fix position
-        this.state.buffer[-1].x = -this.app.stage?.x + 35;
-        this.state.buffer[-1].y = -this.app.stage?.y + 8;
+        this.state.buffer[-1].x = 0
+        this.state.buffer[-1].y = 8;
         this.state.buffer[-1].anchor.x = 0;
         this.state.buffer[-1].anchor.y = 0;
         this.state.buffer[-1].zOrder = 1000;
@@ -1000,7 +999,7 @@ import React from 'react';
     },
 
     setStatusText: function (text) {
-      this.state.buffer[-1].x = (-35);
+      this.state.buffer[-1].x = (40);
       this.state.buffer[-1].y = (8);
       this.state.buffer[-1].text = text;
       this.state.text = text;
@@ -1340,13 +1339,14 @@ const StackViewerComponent = () => createClass({
               newState.voxelY = Number(this.props.config.subDomains[0][1] || 0.622088);
               newState.voxelZ = Number(this.props.config.subDomains[0][2] || 0.622088);
             }
-            if (this.props.config.subDomains.length > 4 && this.props.config.subDomains[1] != null) {
+            if (this.props.config.subDomains.length > 3 && this.props.config.subDomains[1] != null) {
               newState.tempName = this.props.config.subDomains[2];
               newState.tempId = this.props.config.subDomains[1];
               newState.tempType = this.props.config.subDomains[3];
-              if (this.props.config.subDomains[4] && this.props.config.subDomains[4].length && this.props.config.subDomains[4].length > 0) {
-                newState.fxp = JSON.parse(this.props.config.subDomains[4][0]);
-              }
+              // FIXME : Add extra subdomain to match previous configuration
+              // if (this.props.config.subDomains[4] && this.props.config.subDomains[4].length && this.props.config.subDomains[4].length > 0) {
+              //   newState.fxp = JSON.parse(this.props.config.subDomains[4][0]);
+              // }
             }
           }
         }

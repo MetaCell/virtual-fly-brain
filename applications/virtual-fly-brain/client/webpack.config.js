@@ -34,6 +34,8 @@ module.exports = function webpacking(envVariables) {
     filename: 'js/[name].[contenthash].js'
   };
 
+  const entry =  { entry: ["regenerator-runtime/runtime", "./src/index.js" ]};
+
   const module = {
     rules: [
       {
@@ -106,6 +108,7 @@ module.exports = function webpacking(envVariables) {
     mode,
     devtool,
     output,
+    entry,
     module,
     resolve,
     plugins

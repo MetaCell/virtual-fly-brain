@@ -11,6 +11,7 @@
     "plugins": [
         "@babel/transform-regenerator",
         "@babel/plugin-proposal-class-properties",
+        "@babel/transform-runtime",
         [
             "module-resolver", {
                 "root": ["./src"]

@@ -1,12 +1,12 @@
 import { getTermInfoTypes } from './actions/types/getTermInfoTypes';
 
-const initialState = {
+export const initialStateTermInfo = {
   termInfoData: undefined,
   isLoading: false,
   error: false
 };
 
-const TermInfoReducer = (state = initialState, response) => {
+const TermInfoReducer = (state = initialStateTermInfo, response) => {
   switch (response.type) {
      case getTermInfoTypes.GET_TERM_INFO_STARTED:
         return Object.assign({}, state, {

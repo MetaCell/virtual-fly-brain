@@ -97,16 +97,12 @@ const MainLayout = () => {
         }}
       >
         {tab.includes(0) && (
-          <Images />
-        )}
-
-        {tab.includes(1) && (
           <TermInfo />
         )}
-        {tab.includes(2) && (
-          <Images />
+        {tab.includes(1) && (
+          <ThreeDCanvas />
         )}
-        {tab.includes(3) && (
+        {tab.includes(2) && (
           <StackViewer 
             id="NewStackViewer"
             defHeight={600}

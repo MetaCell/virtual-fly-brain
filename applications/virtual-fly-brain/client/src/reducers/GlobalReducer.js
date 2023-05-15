@@ -1,10 +1,10 @@
 import { getGlobalTypes } from './actions/types/GlobalTypes';
 
-const initialState = {
+export const initialStateGlobalReducer = {
   templateID: ""
 };
 
-const GlobalReducer = (state = initialState, response) => {
+const GlobalReducer = (state = initialStateGlobalReducer, response) => {
   switch (response.type) {
      case getGlobalTypes.GET_TEMPLATE_ID:
         return Object.assign({}, state, {

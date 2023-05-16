@@ -3,11 +3,10 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-
+const webpack = require('webpack');
 const copyPaths = [
   { from: path.resolve(__dirname, "src/assets"), to: 'assets' },
 ];
-
 module.exports = function webpacking(envVariables) {
   let env = envVariables;
   if (!env) {
@@ -17,7 +16,14 @@ module.exports = function webpacking(envVariables) {
     env.mode = 'production';
   }
 
-
+  const API_URL = {
+    production: JSON.stringify('https://vfb.dev.metacell.us/'),
+    development: JSON.stringify('http://localhost:8080/')
+  }
+  
+  // check environment mode
+  const environment = env.mode === 'production' ? 'production' : 'development';
+  
   console.log('####################');
   console.log('####################');
   console.log('BUILD bundle with parameters:');
@@ -92,9 +98,10 @@ module.exports = function webpacking(envVariables) {
     symlinks: false
   };
 
- 
-
   const plugins = [
+    new webpack.DefinePlugin({
+      'API_URL': API_URL[environment]
+    }),
     new CleanWebpackPlugin(),
     new CopyWebpackPlugin({ patterns: copyPaths }),
     new CompressionPlugin(),

@@ -1,8 +1,8 @@
-import { Box, Button, ButtonGroup, Chip, Grid, Menu, MenuItem, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
+import { Box, Button, ButtonGroup, Chip, Grid, IconButton, Menu, MenuItem, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import {useSelector, useDispatch} from 'react-redux'
 import MediaQuery from 'react-responsive';
-import { ArView, ArrowDown, ArrowRight, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Delete, Expand, Eye, Focus, Line, Link, Remove } from "../../icons";
+import { ArView, ArrowDown, ArrowRight, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Delete, Expand, Eye, Focus, Line, Link, PinDrop, Remove } from "../../icons";
 import vars from "../../theme/variables";
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -10,6 +10,7 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import TreeView from '@mui/lab/TreeView';
 import { TreeItem } from "@mui/lab";
 import ListAltIcon from '@mui/icons-material/ListAlt';
+import ExamplesSlider from "../../components/ExamplesSlider";
 
 const {
   whiteColor,
@@ -46,7 +47,24 @@ const SideBar = () => {
     },
 
     header: {
-
+      top: 0,
+      background: {
+        xs: headerBorderColor,
+        md: 'transparent'
+      },
+      zIndex: 9,
+      position: {
+        xs: 'sticky',
+        md: 'static',
+      },
+      margin: {
+        xs: -2,
+        md: 0
+      },
+      padding: {
+        xs: 2,
+        md: 0
+      }
     },
 
     buttonGroup: {
@@ -113,6 +131,21 @@ const SideBar = () => {
     createData('Gingerbread', 356, 16.0, 49, 3.9),
   ];
 
+  // const slides = [
+  //   {
+  //     url: 'https://images.unsplash.com/photo-1509721434272-b79147e0e708?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1500&q=80',
+  //     // caption: 'Slide 1'
+  //   },
+  //   {
+  //     url: 'https://images.unsplash.com/photo-1506710507565-203b9f24669b?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1536&q=80',
+  //     // caption: 'Slide 2'
+  //   },
+  //   {
+  //     url: 'https://images.unsplash.com/photo-1536987333706-fc9adfb10d91?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1500&q=80',
+  //     // caption: 'Slide 3'
+  //   },
+  // ];
+
   const MAX_LENGTH = 40;
 
   const DUMMY_DESC = "A doughnut shaped synaptic neuropil domain of the central complex of the adult brain that lies just anterior to the fan-shaped body. Its hole (the ellipsoid body canal) points anteriorly and has an axon tract (the anterior bundle) running through it. It is divided into concentric layers and into 16 radial segments, 8 per hemisphere, numbered 1-8 from superior medial to inferior medial (Ito et al., 2014)."
@@ -128,7 +161,8 @@ const SideBar = () => {
       sx={{
         ...classes.root,
         width: {
-          lg: open ? 'auto' : '2.75rem'
+          xs: '100%',
+          lg: open ? '34rem' : '2.75rem'
         },
         flex: {
           lg: open ? 1 : 'none !important'
@@ -158,6 +192,7 @@ const SideBar = () => {
       }}
     >
       <Box sx={{
+        width: '100%',
         height: {
           lg: 'calc(100% - 3.75rem)'
         },
@@ -288,7 +323,7 @@ const SideBar = () => {
                 lg: 'calc(100% - 4.0625rem)'
               }
             }}>
-              <Accordion>
+              <Accordion defaultExpanded>
                 <AccordionSummary
                   expandIcon={<ChevronDown />}
                   aria-controls="panel1a-content"
@@ -309,7 +344,11 @@ const SideBar = () => {
                           },
                           borderRadius: '0.5rem',
                         }}
-                      ></Box>
+                      >
+                        <ExamplesSlider
+                          examples={data?.Images}
+                        />
+                      </Box>
                     </Grid>
                     <Grid sx={{
                       mt: {
@@ -362,7 +401,7 @@ const SideBar = () => {
                                 xl: toggleReadMore ? secondaryBg : 'transparent',
                               }
                             }}>
-                                {toggleReadMore ? DUMMY_DESC : `${DUMMY_DESC?.substr(0, MAX_LENGTH)}...`}
+                                {toggleReadMore ? data?.Meta?.Description : `${data?.Meta?.Description?.substr(0, MAX_LENGTH)}...`}
                             </Typography>
                             <Button
                                 onClick={() => setToggleReadMore((prev) => !prev)} disableRipple
@@ -400,6 +439,7 @@ const SideBar = () => {
                   </Grid>
                 </AccordionDetails>
               </Accordion>
+
               <Accordion>
                 <AccordionSummary
                   expandIcon={<ChevronDown />}
@@ -466,8 +506,8 @@ const SideBar = () => {
                                     <TableCell>{row.calories}</TableCell>
                                     <TableCell>{row.fat}</TableCell>
                                     <TableCell>
-                                      {/* <Button variant="text" color="error">Delete</Button> */}
-                                      <Button variant="outlined" color="info">Add</Button>
+                                      <Button variant="text" color="error">Delete</Button>
+                                      {/* <Button variant="outlined" color="info">Add</Button> */}
                                     </TableCell>
                                   </TableRow>
                                 ))}
@@ -520,6 +560,46 @@ const SideBar = () => {
 
                     </TreeItem>
                   </TreeView>
+                </AccordionDetails>
+              </Accordion>
+
+              <Accordion>
+                <AccordionSummary
+                  expandIcon={<ChevronDown />}
+                  aria-controls="panel1a-content"
+                  id="panel2a-header"
+                >
+                    <Typography>Graphs</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Box
+                    display='flex'
+                    flexDirection='column'
+                  >
+                    <Box
+                      display='flex'
+                      alignItems="center"
+                    >
+                        <Typography sx={{ flexGrow: 1, color: outlinedBtnTextColor }}>
+                        Show location of JRC2018Unisex
+                      </Typography>
+                      <IconButton color="primary">
+                          <PinDrop />
+                      </IconButton>
+                    </Box>
+
+                    <Box
+                      display='flex'
+                      alignItems="center"
+                    >
+                        <Typography sx={{ flexGrow: 1, color: outlinedBtnTextColor }}>
+                        Show location of JRC2018Unisex
+                      </Typography>
+                      <IconButton color="primary">
+                          <PinDrop />
+                      </IconButton>
+                    </Box>
+                  </Box>
                 </AccordionDetails>
               </Accordion>
             </Box>

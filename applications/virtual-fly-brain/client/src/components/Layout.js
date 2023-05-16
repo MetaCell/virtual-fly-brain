@@ -59,7 +59,8 @@ const MainLayout = () => {
     tabContent: {
       background: headerBorderColor,
       '& > div': {
-        flex: '1',
+        flex: 1,
+        // display: 'flex'
       }
     },
   }
@@ -73,7 +74,7 @@ const MainLayout = () => {
       <MediaQuery maxWidth={1199}>
         <Box display='flex' sx={classes.tabs}>
           {tabsArr.map((el) => (
-            <Button className={tab.includes(el.id) ? 'active' : ''} key={el.id} onClick={() => handleTabSelect(el.id)}>
+            <Button sx={{px: 0}} className={tab.includes(el.id) ? 'active' : ''} key={el.id} onClick={() => handleTabSelect(el.id)}>
               {el.name}
             </Button>
           ))}
@@ -83,6 +84,7 @@ const MainLayout = () => {
 
       <Box
         display='flex'
+        flexWrap='wrap'
         alignItems='flex-start'
         gap={1}
         sx={{

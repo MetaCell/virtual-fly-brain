@@ -180,7 +180,11 @@ theme = createTheme({
               right: 0,
               width: '5.5rem',
               height: '100%',
-              background: 'linear-gradient(270deg, #000000 0%, rgba(0, 0, 0, 0) 26.7%)'
+              background: 'linear-gradient(270deg, #222222 0%, rgba(34, 34, 34, 0) 26.7%)',
+
+              [theme.breakpoints.up('lg')]: {
+                background: 'linear-gradient(270deg, #000000 0%, rgba(0, 0, 0, 0) 26.7%)',
+              }
             }
           }
         }

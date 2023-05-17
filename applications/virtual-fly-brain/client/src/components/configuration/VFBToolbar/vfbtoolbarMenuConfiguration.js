@@ -1,103 +1,95 @@
 import React from 'react';
+import vars from "../../../theme/variables";
+
+const { primaryFont, whiteColor, tabActiveColor, primaryBg } = vars;
 
 export const toolbarMenu = {
   global: {
     buttonsStyle: {
       standard: {
-        background: '#010101',
+        background: 'transparent',
         borderRadius: 0,
         border: 0,
-        boxShadow: '0px 0px',
-        color: '#ffffff',
-        fontSize: '16px',
-        fontFamily: 'Barlow Condensed, Khand, sans-serif',
-        margin: '0px 0px 0px 0px',
-        minWidth: '44px',
-        height: '30px',
+        boxShadow: 'none',
+        color: whiteColor,
+        fontSize: '0.875rem',
+        fontFamily: primaryFont,
+        margin: '0',
+        minWidth: '0.0625rem',
+        padding: '0.9375rem 0.75rem',
+        height: 'auto',
         textTransform: 'capitalize',
         textAlign: 'left',
         justifyContent: 'start',
-        marginTop: '1px',
-        fontWeight: '300'
+        marginTop: '0',
+        lineHeight: '1.125rem',
+        fontWeight: 400,
       },
       hover: {
-        background: "#11bffe",
-        backgroundColor: "#11bffe",
+        background: 'transparent',
         borderRadius: 0,
         border: 0,
-        boxShadow: '0px 0px',
-        color: '#ffffff',
-        fontSize: '16px',
-        fontFamily: 'Barlow Condensed, Khand, sans-serif',
-        margin: '0px 0px 0px 0px',
-        minWidth: '44px',
-        height: '30px',
+        boxShadow: 'none',
+        color: tabActiveColor,
+        fontSize: '0.875rem',
+        fontFamily: primaryFont,
+        textDecoration: 'none',
+        margin: '0',
+        minWidth: '0.0625rem',
+        height: 'auto',
         textTransform: 'capitalize',
         textAlign: 'left',
         justifyContent: 'start',
-        marginTop: '1px',
-        fontWeight: '300'
+        marginTop: '0',
+        fontWeight: 400
       }
     },
     drawersStyle: {
       standard: {
-        top: '1px',
-        backgroundColor: '#444141f2',
-        borderRadius: 0,
-        color: '#ffffff',
-        fontSize: '12px',
-        fontFamily: 'Barlow Condensed, Khand, sans-serif',
-        minWidth: '110px',
-        borderTop: '1px solid #585858',
-        borderLeft: '1px solid #585858',
-        borderRight: '1px solid #585858',
-        borderBottom: '1px solid #585858',
-        borderBottomLeftRadius: '2px',
-        borderBottomRightRadius: '2px',
-        fontWeight: '300'
+        top: '0.0625rem',
+        backgroundColor: primaryBg,
+        borderRadius: '0 20px 24px -4px rgba(16, 24, 40, 0.08), 0 8px 8px -4px rgba(16, 24, 40, 0.03)',
+        borderRadius: '0.125rem',
+        color: whiteColor,
+        fontSize: '0.875rem',
+        fontFamily: primaryFont,
+        minWidth: '6.875rem',
+        fontWeight: 400
       },
       hover: {
-        top: '1px',
-        backgroundColor: '#444141f2',
-        borderRadius: 0,
-        color: '#ffffff',
-        fontSize: '12px',
-        fontFamily: 'Barlow Condensed, Khand, sans-serif',
-        minWidth: '110px',
-        borderTop: '1px solid #585858',
-        borderLeft: '1px solid #585858',
-        borderRight: '1px solid #585858',
-        borderBottom: '1px solid #585858',
-        borderBottomLeftRadius: '2px',
-        borderBottomRightRadius: '2px',
-        fontWeight: '300',
+        top: '0.0625rem',
+        backgroundColor: primaryBg,
+        borderRadius: '0 20px 24px -4px rgba(16, 24, 40, 0.08), 0 8px 8px -4px rgba(16, 24, 40, 0.03)',
+        borderRadius: '0.125rem',
+        color: whiteColor,
+        fontSize: '0.875rem',
+        fontFamily: primaryFont,
+        minWidth: '6.875rem',
+        fontWeight: 400,
       }
     },
     labelsStyle: {
       standard: {
-        backgroundColor: '#44414112',
         borderRadius: 0,
-        color: '#ffffff',
-        fontSize: '14px',
-        fontFamily: 'Barlow Condensed, Khand, sans-serif',
-        paddingTop: 0,
-        paddingBottom: 0,
-        fontWeight: '300',
-        minHeight: '30px',
-        height: '30px'
+        color: whiteColor,
+        fontSize: '0.875rem',
+        padding: '0.5rem',
+        fontFamily: primaryFont,
+        lineHeight: '129%',
+        minHeight: '2.125rem',
+        height: '2.125rem'
       },
       hover: {
-        background: "#11bffe",
-        backgroundColor: "#11bffe",
+        background: "transparent",
         borderRadius: 0,
-        color: '#ffffff',
-        fontSize: '14px',
-        fontFamily: 'Barlow Condensed, Khand, sans-serif',
-        paddingTop: 0,
-        paddingBottom: 0,
-        fontWeight: '300',
-        minHeight: '30px',
-        height: '30px'
+        color: tabActiveColor,
+        lineHeight: '129%',
+        padding: '0.5rem',
+        fontSize: '0.875rem',
+        fontFamily: primaryFont,
+        fontWeight: 400,
+        minHeight: '2.125rem',
+        height: '2.125rem'
       }
     }
   },
@@ -876,4 +868,3 @@ export const toolbarMenu = {
     }
   ]
 };
-

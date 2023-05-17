@@ -1,24 +1,17 @@
 /* eslint-disable no-undef */
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import React, { useState, useEffect } from 'react';
 import { Slide } from 'react-slideshow-image';
 import 'react-slideshow-image/dist/styles.css'
+import { ChevronLeft } from '../../icons';
 
-const spanStyle = {
-  padding: '20px',
-  background: '#efefef',
-  color: '#000000'
-}
-
-const divStyle = {
-  backgroundPosition: 'center center',
-  backgroundRepeat: 'no-repeat',
-  backgroundSize: 'cover',
+const imageStyle =  {
   height: '100%',
-  borderRadius: '0.5rem',
+  width: '100%',
+  objectFit: 'cover'
 }
 
-const ExamplesSlider = (props) => {
+const TerminfoSlider = (props) => {
   const classes = {
     root: {
       height: '100%',
@@ -46,6 +39,32 @@ const ExamplesSlider = (props) => {
           height: '100%',
         }
       },
+      },
+
+      '& .react-slideshow-container .nav': {
+        zIndex: 10,
+        position: 'absolute',
+        cursor: 'pointer',
+        bottom: 2,
+        margin: 0,
+        display: 'flex',
+        alignItems: 'center',
+      },
+
+      '& .react-slideshow-container .nav.disabled': {
+        opacity: 0.6
+      },
+
+      '& .react-slideshow-container .nav:first-of-type': {
+        left: '60px'
+      },
+
+      '& .react-slideshow-container .nav:last-of-type': {
+        right: '60px',
+
+        '& svg': {
+          transform: 'rotate(180deg)'
+        }
       },
 
       '& .react-slideshow-container + ul.indicators .each-slideshow-indicator::before': {
@@ -82,21 +101,28 @@ const ExamplesSlider = (props) => {
         caption: props.examples[k][0].label
       })));
     }
-  },[props.examples]);
+  }, [props.examples]);
 
   return (
     <Box sx={classes.root}>
-      <Slide slidesToShow={1} slidesToScroll={1} infinite={false} indicators={true} arrows={false}>
-        {slideImages?.map((slideImage, index)=> (
-          <div key={index}>
-            <div style={{ ...divStyle, 'backgroundImage': `url(${slideImage.url})` }}>
-              {slideImage.caption && <span style={spanStyle}>{slideImage.caption}</span>}
-            </div>
-          </div>
-        ))}
+      <Slide canSwipe={false} slidesToShow={1} slidesToScroll={1} infinite={false} indicators={true} prevArrow={<Typography><ChevronLeft color={'#A0A0A0'} /></Typography>} nextArrow={<Typography><ChevronLeft color={'#A0A0A0'} /></Typography>} arrows={true}>
+        {slideImages.length > 0 && (
+          <>
+            {slideImages?.map((slideImage, index) => (
+              <div key={index}>
+                <img
+                  style={imageStyle}
+                  src={slideImage.url}
+                  alt={slideImage.caption}
+                />
+              </div>
+            ))}
+          </>
+        )}
+
       </Slide>
     </Box>
   )
 }
 
-export default ExamplesSlider ;
+export default TerminfoSlider ;

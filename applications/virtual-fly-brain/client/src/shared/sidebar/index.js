@@ -10,7 +10,7 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import TreeView from '@mui/lab/TreeView';
 import { TreeItem } from "@mui/lab";
 import ListAltIcon from '@mui/icons-material/ListAlt';
-import ExamplesSlider from "../../components/ExamplesSlider";
+import GeneralInformation from "../../components/TermInfo/GeneralInformation";
 
 const {
   whiteColor,
@@ -18,14 +18,10 @@ const {
   outlinedBtnTextColor,
   blackColor,
   listHeadingColor,
-  carouselBg,
   headerBorderColor,
-  tabActiveColor,
-  descriptionBg
 } = vars;
 
 const SideBar = () => {
-  const [toggleReadMore, setToggleReadMore] = useState(false);
   const [open, setOpen] = useState(true);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const openMenu = Boolean(anchorEl);
@@ -131,24 +127,7 @@ const SideBar = () => {
     createData('Gingerbread', 356, 16.0, 49, 3.9),
   ];
 
-  // const slides = [
-  //   {
-  //     url: 'https://images.unsplash.com/photo-1509721434272-b79147e0e708?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1500&q=80',
-  //     // caption: 'Slide 1'
-  //   },
-  //   {
-  //     url: 'https://images.unsplash.com/photo-1506710507565-203b9f24669b?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1536&q=80',
-  //     // caption: 'Slide 2'
-  //   },
-  //   {
-  //     url: 'https://images.unsplash.com/photo-1536987333706-fc9adfb10d91?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1500&q=80',
-  //     // caption: 'Slide 3'
-  //   },
-  // ];
-
   const MAX_LENGTH = 40;
-
-  const DUMMY_DESC = "A doughnut shaped synaptic neuropil domain of the central complex of the adult brain that lies just anterior to the fan-shaped body. Its hole (the ellipsoid body canal) points anteriorly and has an axon tract (the anterior bundle) running through it. It is divided into concentric layers and into 16 radial segments, 8 per hemisphere, numbered 1-8 from superior medial to inferior medial (Ito et al., 2014)."
 
   // FIXME
   useEffect( () => {
@@ -332,111 +311,7 @@ const SideBar = () => {
                   <Typography>General Information</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <Grid container columnSpacing={1.5}>
-                    <Grid item xs={12} sm={4} md={5} lg={5}>
-                      <Box
-                        sx={{
-                          width: '100%',
-                          height: '14.25rem',
-                          background: {
-                            xs: carouselBg,
-                            lg: headerBorderColor
-                          },
-                          borderRadius: '0.5rem',
-                        }}
-                      >
-                        <ExamplesSlider
-                          examples={data?.Images}
-                        />
-                      </Box>
-                    </Grid>
-                    <Grid sx={{
-                      mt: {
-                        xs: 2,
-                        sm: 0,
-                      }
-                    }} item xs={12} sm={8} md={7} lg={7}>
-                      <Box display='flex' flexDirection='column' rowGap={1}>
-                        <Box display='flex' justifyContent='space-between' columnGap={1}>
-                          <Typography sx={classes.heading}>Name</Typography>
-                          <Typography sx={{
-                            ...classes.heading,
-                            color: whiteColor,
-                            textAlign: 'right'
-                          }}>{data?.Name}[{data?.Id}]</Typography>
-                        </Box>
-
-                        <Box display='flex' justifyContent='space-between' columnGap={1}>
-                          <Typography sx={classes.heading}>Tags</Typography>
-                            <Box display='flex' gap={0.5}>
-                              {
-                                data?.Tags?.map((tag) => <Chip key={tag} color="primary" label={tag} />)
-                              }
-                            { data?.Tags?.length > 2 && <Chip label={`+${data?.Tags?.length - 2}`} /> }
-                          </Box>
-                        </Box>
-
-                        <Box display='flex' justifyContent='space-between' columnGap={1}>
-                          <Typography sx={classes.heading}>Classification</Typography>
-                          <Typography sx={{
-                            ...classes.heading,
-                            color: whiteColor,
-                            textAlign: 'right'
-                          }}>Adult brain</Typography>
-                        </Box>
-
-                        <Box display='flex' justifyContent='space-between' columnGap={1}>
-                          <Typography sx={classes.heading}>Description</Typography>
-                          <Box display='flex' flexDirection='column' alignItems='flex-end'>
-                            <Typography sx={{
-                              ...classes.heading,
-                              color: whiteColor,
-                              borderRadius: toggleReadMore ? 1 : 0,
-                              textAlign: 'right',
-                              maxHeight: '3.375rem',
-                              overflow: 'auto',
-                              padding: toggleReadMore ? '0.25rem 0.5rem' : 0,
-                              background: {
-                                xs: toggleReadMore ? descriptionBg : 'transparent',
-                                xl: toggleReadMore ? secondaryBg : 'transparent',
-                              }
-                            }}>
-                                {toggleReadMore ? data?.Meta?.Description : `${data?.Meta?.Description?.substr(0, MAX_LENGTH)}...`}
-                            </Typography>
-                            <Button
-                                onClick={() => setToggleReadMore((prev) => !prev)} disableRipple
-                              sx={{
-                                padding: 0,
-                                marginTop: '0.25rem',
-                                height: 'auto',
-                                color: tabActiveColor
-                              }}>
-                              {toggleReadMore ? 'Show Less' : 'Read More'}
-                            </Button>
-                          </Box>
-                        </Box>
-
-                        <Box display='flex' justifyContent='space-between' columnGap={1}>
-                          <Typography sx={classes.heading}>Source</Typography>
-                          <Chip icon={<Link />} label='JRC2018Unisex' />
-                        </Box>
-
-                        <Box display='flex' justifyContent='space-between' columnGap={1}>
-                          <Typography sx={classes.heading}>License</Typography>
-                          <Typography sx={{
-                            ...classes.heading,
-                            color: whiteColor,
-                            textAlign: 'right'
-                          }}>CC-BY-NC-SA_4.0</Typography>
-                        </Box>
-
-                        <Box display='flex' justifyContent='space-between' columnGap={1}>
-                          <Typography sx={classes.heading}>Aligned To</Typography>
-                          <Chip icon={<Link />} label='JRC2018Unisex' />
-                        </Box>
-                      </Box>
-                    </Grid>
-                  </Grid>
+                  <GeneralInformation data={termInfoData} classes={classes} />
                 </AccordionDetails>
               </Accordion>
 
@@ -574,7 +449,8 @@ const SideBar = () => {
                 <AccordionDetails>
                   <Box
                     display='flex'
-                    flexDirection='column'
+                      flexDirection='column'
+                      rowGap={1}
                   >
                     <Box
                       display='flex'
@@ -583,7 +459,7 @@ const SideBar = () => {
                         <Typography sx={{ flexGrow: 1, color: outlinedBtnTextColor }}>
                         Show location of JRC2018Unisex
                       </Typography>
-                      <IconButton color="primary">
+                      <IconButton sx={{p: 0}}>
                           <PinDrop />
                       </IconButton>
                     </Box>
@@ -595,7 +471,7 @@ const SideBar = () => {
                         <Typography sx={{ flexGrow: 1, color: outlinedBtnTextColor }}>
                         Show location of JRC2018Unisex
                       </Typography>
-                      <IconButton color="primary">
+                      <IconButton sx={{p: 0}}>
                           <PinDrop />
                       </IconButton>
                     </Box>

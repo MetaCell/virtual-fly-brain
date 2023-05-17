@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 import React, { Component, useState, useEffect } from 'react';
 import {useSelector, useDispatch} from 'react-redux'
-import ExamplesSlider from './ExamplesSlider';
+// import ExamplesSlider from './TermInfo/TerminfoSlider';
 import Queries from './Queries';
 
 require('../css/base.less');
@@ -79,7 +79,7 @@ const TermInfo = () => {
               <div>
                 <div tabIndex="-1">
                   <div>
-                    <ExamplesSlider examples={termInfoData?.Examples} ></ExamplesSlider>
+                    {/* <ExamplesSlider examples={termInfoData?.Examples} ></ExamplesSlider> */}
                   </div>
                 </div>
               </div>

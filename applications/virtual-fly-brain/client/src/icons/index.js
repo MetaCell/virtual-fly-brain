@@ -86,7 +86,7 @@ export const Layers = (props) => (
 
 export const ChevronLeft = (props) => (
   <svg width="21" height="20" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M13.9345 6.17476L12.7595 4.99976L7.75946 9.99976L12.7595 14.9998L13.9345 13.8248L10.1178 9.99976L13.9345 6.17476Z" fill="white" />
+    <path d="M13.9345 6.17476L12.7595 4.99976L7.75946 9.99976L12.7595 14.9998L13.9345 13.8248L10.1178 9.99976L13.9345 6.17476Z" fill={props.color || "white"} />
   </svg>
 )
 

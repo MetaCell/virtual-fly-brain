@@ -7,6 +7,8 @@ import TermInfo from "./TermInfo"
 import Images from "./Images";
 import StackViewer from './StackViewer';
 import vars from "../theme/variables";
+import SideBar from "../shared/Sidebar";
+import Circuit from "./Circuit";
 
 const {
   secondaryBg,
@@ -57,7 +59,8 @@ const MainLayout = () => {
     tabContent: {
       background: headerBorderColor,
       '& > div': {
-        flex: '1 auto',
+        flex: 1,
+        // display: 'flex'
       }
     },
   }
@@ -71,7 +74,7 @@ const MainLayout = () => {
       <MediaQuery maxWidth={1199}>
         <Box display='flex' sx={classes.tabs}>
           {tabsArr.map((el) => (
-            <Button className={tab.includes(el.id) ? 'active' : ''} key={el.id} onClick={() => handleTabSelect(el.id)}>
+            <Button sx={{px: 0}} className={tab.includes(el.id) ? 'active' : ''} key={el.id} onClick={() => handleTabSelect(el.id)}>
               {el.name}
             </Button>
           ))}
@@ -81,6 +84,8 @@ const MainLayout = () => {
 
       <Box
         display='flex'
+        flexWrap='wrap'
+        alignItems='flex-start'
         gap={1}
         sx={{
           ...classes.tabContent,
@@ -90,6 +95,13 @@ const MainLayout = () => {
           paddingRight: {
             lg: 1
           },
+          pb: {
+            xs: 5,
+            lg: 0
+          },
+          overflow: {
+            xs: 'auto',
+          },
           height: {
             xs: 'calc(100vh - 8.8125rem)',
             lg: 'calc(100vh - 6.375rem)'
@@ -97,21 +109,15 @@ const MainLayout = () => {
         }}
       >
         {tab.includes(0) && (
-          <Images />
+          <SideBar />
         )}
 
         {tab.includes(1) && (
-          <TermInfo />
-        )}
-        {tab.includes(2) && (
           <Images />
         )}
-        {tab.includes(3) && (
-          <StackViewer 
-            id="NewStackViewer"
-            defHeight={600}
-            defWidth={600}
-          />
+
+        {tab.includes(2) && (
+          <Circuit />
         )}
       </Box>
     </>

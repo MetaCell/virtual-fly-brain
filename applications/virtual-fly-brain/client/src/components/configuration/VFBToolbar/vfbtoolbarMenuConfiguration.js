@@ -53,7 +53,7 @@ export const toolbarMenu = {
         color: whiteColor,
         fontSize: '0.875rem',
         fontFamily: primaryFont,
-        minWidth: '6.875rem',
+        minWidth: '7.75rem',
         fontWeight: 400
       },
       hover: {
@@ -64,7 +64,7 @@ export const toolbarMenu = {
         color: whiteColor,
         fontSize: '0.875rem',
         fontFamily: primaryFont,
-        minWidth: '6.875rem',
+        minWidth: '7.75rem',
         fontWeight: 400,
       }
     },
@@ -89,10 +89,17 @@ export const toolbarMenu = {
         fontFamily: primaryFont,
         fontWeight: 400,
         minHeight: '2.125rem',
-        height: '2.125rem'
+        height: '2.125rem',
       }
-    }
+    },
+    iconStyle: {
+      // display: 'inline-block',
+      color: 'currentColor',
+      minWidth: '1.5rem',
+      width: '1.5rem',
+    },
   },
+  itemOptions: { customArrow: <i className="fa fa-angle-right" style={{marginLeft: 'auto', paddingLeft: '0.875rem'}} /> },
   buttons: [
     {
       label: "Virtual Fly Brain",
@@ -139,7 +146,7 @@ export const toolbarMenu = {
               action: {
                 handlerAction: "openNewTab",
                 parameters: ["http://twitter.com/virtualflybrain"]
-              }
+              },
             },
             {
               label: "Facebook",
@@ -147,7 +154,7 @@ export const toolbarMenu = {
               action: {
                 handlerAction: "openNewTab",
                 parameters: ["https://www.facebook.com/pages/Virtual-Fly-Brain/131151036987118"]
-              }
+              },
             },
             {
               label: "Latest News & Releases",
@@ -155,7 +162,7 @@ export const toolbarMenu = {
               action: {
                 handlerAction: "openNewTab",
                 parameters: ["https://www.virtualflybrain.org/blog/"]
-              }
+              },
             }
           ]
         }

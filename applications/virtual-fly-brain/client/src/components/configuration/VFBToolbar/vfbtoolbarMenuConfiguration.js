@@ -104,7 +104,7 @@ export const toolbarMenu = {
     {
       label: "Virtual Fly Brain",
       icon: "",
-      action: "",
+      action: {},
       position: "bottom-start",
       list: [
         {
@@ -171,7 +171,7 @@ export const toolbarMenu = {
     {
       label: "Tools",
       icon: "",
-      action: "",
+      action: {},
       position: "bottom-start",
       list: [
         {
@@ -265,7 +265,7 @@ export const toolbarMenu = {
         {
           label: "NBLAST",
           icon: "",
-          action: "",
+          action: {},
           position: "right-start",
           list: [
             {
@@ -291,7 +291,7 @@ export const toolbarMenu = {
         {
           label: "CATMAID",
           icon: "",
-          action: "",
+          action: {},
           position: "right-start",
           list: [
             {
@@ -476,7 +476,7 @@ export const toolbarMenu = {
         {
           label: "VFB CONNECT (API)",
           icon: "",
-          action: "",
+          action: {},
           position: "right-start",
           list: [
             {
@@ -513,7 +513,7 @@ export const toolbarMenu = {
     {
       label: "History",
       icon: "",
-      action: "",
+      action: {},
       position: "bottom-start",
       list: [
         {
@@ -537,7 +537,7 @@ export const toolbarMenu = {
     {
       label: "Templates",
       icon: "",
-      action: "",
+      action: {},
       position: "bottom-start",
       list: [
         {
@@ -650,7 +650,7 @@ export const toolbarMenu = {
     {
       label: "Datasets",
       icon: "",
-      action: "",
+      action: {},
       position: "bottom-start",
       list: [
         {
@@ -771,7 +771,7 @@ export const toolbarMenu = {
     {
       label: "View",
       icon: "",
-      action: "",
+      action: {},
       position: "bottom-start",
       list: [
         {
@@ -819,7 +819,7 @@ export const toolbarMenu = {
     {
       label: "Help",
       icon: "",
-      action: "",
+      action: {},
       position: "bottom-start",
       list: [
         {

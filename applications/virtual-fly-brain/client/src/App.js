@@ -6,6 +6,12 @@ import { queryString } from './utils/queryString';
 import { useSelector } from 'react-redux'
 import { termInfoSchemma } from './schemma/termInfoSchemma';
 import { initFileWithoutReading } from './reducers/actions/readFile';
+import {
+  createMuiTheme,
+  responsiveFontSizes,
+  MuiThemeProvider,
+} from '@material-ui/core/styles';
+import { blue, orange } from '@material-ui/core/colors';
 import Ajv from 'ajv';
 
 const App = () => {
@@ -36,8 +42,22 @@ const App = () => {
     initFileWithoutReading({ url: obj });
   }
 
+  let theme = createMuiTheme({
+    typography: { fontFamily: 'Roboto, Helvetica, Arial, sans-serif' },
+    palette: {
+      type: 'dark',
+      primary: { main: orange[500] },
+      secondary: { main: blue[500] },
+      button: { main: '#fc6320' },
+      toolbarBackground: { main: 'rgb(0,0,0,0.5)' },
+    },
+  });
+  theme = responsiveFontSizes(theme);
+
   return (
-    <Main />
+    <MuiThemeProvider theme={theme}>
+      <Main />
+    </MuiThemeProvider>
   );
 }
 

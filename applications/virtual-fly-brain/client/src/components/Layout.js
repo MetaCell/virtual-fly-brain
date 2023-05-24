@@ -113,11 +113,11 @@ const MainLayout = () => {
         )}
 
         {tab.includes(1) && (
-          <Images />
+          <ThreeDCanvas />
         )}
 
         {tab.includes(2) && (
-          <Circuit />
+          <StackViewerComponent />
         )}
       </Box>
     </>

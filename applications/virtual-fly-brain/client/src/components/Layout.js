@@ -2,10 +2,13 @@
 import React, { useEffect, useState } from "react";
 import MediaQuery from 'react-responsive';
 import { Box, Button, useMediaQuery, useTheme } from "@mui/material";
+import ThreeDCanvas from "./ThreeDCanvas"
+import TermInfo from "./TermInfo"
+import Images from "./Images";
+import StackViewer from './StackViewer';
+import vars from "../theme/variables";
 import SideBar from "../shared/Sidebar";
 import Circuit from "./Circuit";
-import Images from "./Images";
-import vars from "../theme/variables";
 
 const {
   secondaryBg,
@@ -16,13 +19,14 @@ const {
 const tabsArr = [
   { id: 0, name: 'Term Info' },
   { id: 1, name: 'Images' },
-  { id: 2, name: 'Circuits' }
+  { id: 2, name: 'Circuits' },
+  { id: 3, name: 'Stack Viewer' }
 ]
 
 const MainLayout = () => {
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up('lg'));
-  const defaultActiveTab = matches ? [0, 1, 2] : [0];
+  const defaultActiveTab = matches ? [0, 1, 2, 3] : [0];
   const [tab, setTab] = useState([]);
 
   useEffect(() => {
@@ -56,6 +60,7 @@ const MainLayout = () => {
       background: headerBorderColor,
       '& > div': {
         flex: 1,
+        // display: 'flex'
       }
     },
   }
@@ -69,7 +74,7 @@ const MainLayout = () => {
       <MediaQuery maxWidth={1199}>
         <Box display='flex' sx={classes.tabs}>
           {tabsArr.map((el) => (
-            <Button className={tab.includes(el.id) ? 'active' : ''} key={el.id} onClick={() => handleTabSelect(el.id)}>
+            <Button sx={{px: 0}} className={tab.includes(el.id) ? 'active' : ''} key={el.id} onClick={() => handleTabSelect(el.id)}>
               {el.name}
             </Button>
           ))}
@@ -79,6 +84,8 @@ const MainLayout = () => {
 
       <Box
         display='flex'
+        flexWrap='wrap'
+        alignItems='flex-start'
         gap={1}
         sx={{
           ...classes.tabContent,
@@ -87,6 +94,13 @@ const MainLayout = () => {
           },
           paddingRight: {
             lg: 1
+          },
+          pb: {
+            xs: 5,
+            lg: 0
+          },
+          overflow: {
+            xs: 'auto',
           },
           height: {
             xs: 'calc(100vh - 8.8125rem)',

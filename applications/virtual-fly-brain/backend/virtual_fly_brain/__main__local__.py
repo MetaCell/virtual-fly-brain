@@ -4,7 +4,6 @@ import flask
 from flask import request
 from flask_cors import CORS, cross_origin
 import os
-import json
 
 def init_webapp_routes(app):
     www_path = os.path.dirname(os.path.abspath(__file__)) + "/www"

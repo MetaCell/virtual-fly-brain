@@ -17,7 +17,7 @@ const {
 const GeneralInformation = ({data, classes}) => {
   const [toggleReadMore, setToggleReadMore] = useState(false);
   const MAX_LENGTH = 40;
-  console.log(data)
+  const license = data?.Licenses[0];
   return (
     <Grid container columnSpacing={1.5}>
       <Grid item xs={12} sm={4} md={5} lg={5}>
@@ -70,7 +70,7 @@ const GeneralInformation = ({data, classes}) => {
               ...classes.heading,
               color: whiteColor,
               textAlign: 'right'
-            }}>Adult brain</Typography>
+            }}>MISSING</Typography>
           </Box>
 
           <Box display='flex' justifyContent='space-between' columnGap={1}>
@@ -106,7 +106,7 @@ const GeneralInformation = ({data, classes}) => {
 
           <Box display='flex' justifyContent='space-between' columnGap={1}>
             <Typography sx={classes.heading}>Source</Typography>
-            <Chip icon={<Link />} label='JRC2018Unisex' />
+            <Chip icon={<Link/>} label={license?.source}>{license?.iri}</Chip>
           </Box>
 
           <Box display='flex' justifyContent='space-between' columnGap={1}>
@@ -115,12 +115,12 @@ const GeneralInformation = ({data, classes}) => {
               ...classes.heading,
               color: whiteColor,
               textAlign: 'right'
-            }}>CC-BY-NC-SA_4.0</Typography>
+            }}>{license?.label}{license?.source_iri}{license?.icon}</Typography>
           </Box>
 
           <Box display='flex' justifyContent='space-between' columnGap={1}>
             <Typography sx={classes.heading}>Aligned To</Typography>
-            <Chip icon={<Link />} label='JRC2018Unisex' />
+            <Chip icon={<Link />} label='MISSING' />
           </Box>
         </Box>
       </Grid>

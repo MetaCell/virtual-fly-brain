@@ -53,7 +53,11 @@ export const toolbarMenu = {
         color: whiteColor,
         fontSize: '0.875rem',
         fontFamily: primaryFont,
+<<<<<<< HEAD
         minWidth: '7.75rem',
+=======
+        minWidth: '6.875rem',
+>>>>>>> 689899f911ce89df304ea550bb2f9901eb18ace5
         fontWeight: 400
       },
       hover: {
@@ -64,7 +68,11 @@ export const toolbarMenu = {
         color: whiteColor,
         fontSize: '0.875rem',
         fontFamily: primaryFont,
+<<<<<<< HEAD
         minWidth: '7.75rem',
+=======
+        minWidth: '6.875rem',
+>>>>>>> 689899f911ce89df304ea550bb2f9901eb18ace5
         fontWeight: 400,
       }
     },
@@ -89,7 +97,11 @@ export const toolbarMenu = {
         fontFamily: primaryFont,
         fontWeight: 400,
         minHeight: '2.125rem',
+<<<<<<< HEAD
         height: '2.125rem',
+=======
+        height: '2.125rem'
+>>>>>>> 689899f911ce89df304ea550bb2f9901eb18ace5
       }
     },
     iconStyle: {

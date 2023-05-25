@@ -14,10 +14,18 @@ const {
   descriptionBg
 } = vars;
 
+function getImages(data) {
+  const images = data?.Images
+  if(!images) return;
+  const firstKey = Object.keys(images)[0];
+  return images[firstKey][0];
+}
+
 const GeneralInformation = ({data, classes}) => {
   const [toggleReadMore, setToggleReadMore] = useState(false);
   const MAX_LENGTH = 40;
   const license = data?.Licenses[0];
+  let images = getImages(data);
   return (
     <Grid container columnSpacing={1.5}>
       <Grid item xs={12} sm={4} md={5} lg={5}>
@@ -122,6 +130,14 @@ const GeneralInformation = ({data, classes}) => {
             <Typography sx={classes.heading}>Aligned To</Typography>
             <Chip icon={<Link />} label='MISSING' />
           </Box>
+
+          <Box display='flex' justifyContent='space-between' columnGap={1}>
+            <Typography sx={classes.heading}>Downloads</Typography>
+            <Chip icon={<Link />} label={images?.nrrd} />
+            <Chip icon={<Link />} label={images?.obj}/>
+            <Chip icon={<Link />} label={images?.wlz}/>
+          </Box>
+
         </Box>
       </Grid>
     </Grid>

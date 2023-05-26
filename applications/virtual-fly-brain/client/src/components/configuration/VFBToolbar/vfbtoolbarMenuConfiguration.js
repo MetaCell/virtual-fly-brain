@@ -99,7 +99,7 @@ export const toolbarMenu = {
       width: '1.5rem',
     },
   },
-  itemOptions: { customArrow: <i className="fa fa-angle-right" style={{marginLeft: 'auto', paddingLeft: '0.875rem'}} /> },
+  itemOptions: { customArrow: <i style={{ marginLeft: 'auto'}} className="fa fa-angle-right menu-caret" /> },
   buttons: [
     {
       label: "Virtual Fly Brain",

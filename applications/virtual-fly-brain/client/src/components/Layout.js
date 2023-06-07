@@ -105,7 +105,7 @@ const MainLayout = () => {
           },
           height: {
             xs: 'calc(100vh - 8.8125rem)',
-            lg: 'calc(100vh - 6.375rem)'
+            lg: 'calc(100vh - 5.75rem)'
           },
         }}
       >

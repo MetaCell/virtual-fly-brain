@@ -12,6 +12,7 @@ import {
   MuiThemeProvider,
 } from '@material-ui/core/styles';
 import { blue, orange } from '@material-ui/core/colors';
+import 'font-awesome/css/font-awesome.min.css';
 import Ajv from 'ajv';
 
 const App = () => {

@@ -488,7 +488,7 @@ const SideBar = () => {
         <Box
           px={open ? 1 : 0}
           display='flex'
-          justifyContent='flex-end'
+          justifyContent={open ? 'flex-end' : 'center'}
           alignItems='center'
           sx={classes.footer}
         >

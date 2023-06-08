@@ -108,6 +108,60 @@ export const ChevronDown = (props) => (
   </svg>
 );
 
+export const AngleDown = (props) => (
+  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M11.6668 7.00016L10.8443 6.17766L7.5835 9.43266L7.5835 2.3335L6.41683 2.3335L6.41683 9.43266L3.16183 6.17183L2.3335 7.00016L7.00016 11.6668L11.6668 7.00016Z" fill="#DCDCDC"/>
+</svg>
+);
+
+export const SplitScreen = (props) => (
+  <svg {...props} width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M9 2V4.5L3 4.5L3 2L9 2ZM9 1L3 1C2.45 1 2 1.45 2 2L2 4.5C2 5.05 2.45 5.5 3 5.5L9 5.5C9.55 5.5 10 5.05 10 4.5V2C10 1.45 9.55 1 9 1ZM9 7.5V10L3 10L3 7.5L9 7.5ZM9 6.5L3 6.5C2.45 6.5 2 6.95 2 7.5L2 10C2 10.55 2.45 11 3 11L9 11C9.55 11 10 10.55 10 10V7.5C10 6.95 9.55 6.5 9 6.5Z" fill="white" fillOpacity="0.8" />
+  </svg>
+);
+
+export const AngleRight = (props) => (
+  <svg {...props} width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M6 2L5.295 2.705L8.085 5.5L2 5.5V6.5L8.085 6.5L5.295 9.295L6 10L10 6L6 2Z" fill="white" fillOpacity="0.8" />
+  </svg>
+);
+
+export const Info = (props) => (
+  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M6.41699 4.08317H7.58366V5.24984L6.41699 5.24984V4.08317ZM6.41699 6.4165L7.58366 6.4165L7.58366 9.9165H6.41699L6.41699 6.4165ZM7.00033 1.1665C3.78033 1.1665 1.16699 3.77984 1.16699 6.99984C1.16699 10.2198 3.78033 12.8332 7.00033 12.8332C10.2203 12.8332 12.8337 10.2198 12.8337 6.99984C12.8337 3.77984 10.2203 1.1665 7.00033 1.1665ZM7.00033 11.6665C4.42783 11.6665 2.33366 9.57234 2.33366 6.99984C2.33366 4.42734 4.42783 2.33317 7.00033 2.33317C9.57283 2.33317 11.667 4.42734 11.667 6.99984C11.667 9.57234 9.57283 11.6665 7.00033 11.6665Z" fill="#A0A0A0"/>
+  </svg>
+);
+
+export const AngleLeft = (props) => (
+ <svg width={props.size || "14"} height={props.size || "14"} viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M11.6668 6.41683L4.56766 6.41683L7.8285 3.156L7.00016 2.3335L2.3335 7.00016L7.00016 11.6668L7.82266 10.8443L4.56766 7.5835L11.6668 7.5835V6.41683Z" fill="#DCDCDC"/>
+</svg>
+);
+
+export const Return = (props) => (
+  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M11.3752 4.08333V6.41667L3.69266 6.41667L5.781 4.3225L4.9585 3.5L1.4585 7L4.9585 10.5L5.781 9.6775L3.69266 7.58333L12.5418 7.58333L12.5418 4.08333L11.3752 4.08333Z" fill="#DCDCDC"/>
+</svg>
+);
+
+export const More = (props) => (
+  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M6 4C6.55 4 7 3.55 7 3C7 2.45 6.55 2 6 2C5.45 2 5 2.45 5 3C5 3.55 5.45 4 6 4ZM6 5C5.45 5 5 5.45 5 6C5 6.55 5.45 7 6 7C6.55 7 7 6.55 7 6C7 5.45 6.55 5 6 5ZM6 8C5.45 8 5 8.45 5 9C5 9.55 5.45 10 6 10C6.55 10 7 9.55 7 9C7 8.45 6.55 8 6 8Z" fill="white" fillOpacity="0.8" />
+  </svg>
+);
+
+export const Filter = (props) => (
+  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M8.33333 15H11.6667V13.3333H8.33333V15ZM2.5 5V6.66667H17.5V5H2.5ZM5 10.8333H15V9.16667H5V10.8333Z" fill="white" fillOpacity="0.8" />
+  </svg>
+);
+
+export const AngleUp = (props) => (
+  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M2.3335 7.00016L3.156 7.82266L6.41683 4.56766L6.41683 11.6668H7.5835L7.5835 4.56766L10.8385 7.8285L11.6668 7.00016L7.00016 2.3335L2.3335 7.00016Z" fill="#DCDCDC"/>
+</svg>
+);
+
 export const Eye = (props) => (
   <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
     <g clipPath="url(#clip0_3548_21059)">
@@ -145,8 +199,20 @@ export const ArView = (props) => (
 );
 
 export const Delete = (props) => (
-  <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg {...props} width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M10.6664 6.91895V13.5856H5.33307V6.91895H10.6664ZM9.6664 2.91895H6.33307L5.6664 3.58561H3.33307V4.91895H12.6664V3.58561H10.3331L9.6664 2.91895ZM11.9997 5.58561H3.99974V13.5856C3.99974 14.3189 4.59974 14.9189 5.33307 14.9189H10.6664C11.3997 14.9189 11.9997 14.3189 11.9997 13.5856V5.58561Z" fill="white" fillOpacity="0.8" />
+  </svg>
+)
+
+export const OpenInNew = (props) => (
+  <svg {...props} width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M9.5 9.5L2.5 9.5L2.5 2.5L6 2.5V1.5L2.5 1.5C1.945 1.5 1.5 1.95 1.5 2.5L1.5 9.5C1.5 10.05 1.945 10.5 2.5 10.5L9.5 10.5C10.05 10.5 10.5 10.05 10.5 9.5V6H9.5V9.5ZM7 1.5V2.5L8.795 2.5L3.88 7.415L4.585 8.12L9.5 3.205V5H10.5V1.5L7 1.5Z" fill="#DCDCDC" />
+  </svg>
+)
+
+export const AddChart = (props) => (
+  <svg {...props} width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M10.75 2.75V3.75L9.25 3.75V5.25H8.25V3.75L6.75 3.75L6.75 2.75L8.25 2.75V1.25L9.25 1.25V2.75L10.75 2.75ZM9.25 9.75L2.25 9.75L2.25 2.75L5.25 2.75V1.75L2.25 1.75C1.7 1.75 1.25 2.2 1.25 2.75L1.25 9.75C1.25 10.3 1.7 10.75 2.25 10.75L9.25 10.75C9.8 10.75 10.25 10.3 10.25 9.75V6.75H9.25V9.75ZM7.25 6.75L7.25 8.75H8.25L8.25 6.75H7.25ZM5.25 8.75H6.25L6.25 4.75H5.25L5.25 8.75ZM4.25 8.75L4.25 5.75L3.25 5.75L3.25 8.75H4.25Z" fill="#DCDCDC" />
   </svg>
 )
 

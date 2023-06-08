@@ -18,6 +18,12 @@ const vars = {
   listHeadingColor: '#A0A0A0',
   descriptionBg: 'linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), #222222',
   textErrorColor: '#F6B6B6',
+  searchHeadingColor: '#DCDCDC',
+  chipPink: '#994EA0',
+  chipRed: '#A04E4E',
+  chipGreen: '#68A04E',
+  chipOrange: '#A07A4E',
+  chipYellow: '#A0984E',
 };
 
 export default vars;

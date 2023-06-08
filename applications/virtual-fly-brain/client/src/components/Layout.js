@@ -10,7 +10,6 @@ import vars from "../theme/variables";
 import SideBar from "../shared/sidebar";
 import Circuit from "./Circuit";
 import StackViewerComponent from "./StackViewerComponent";
-
 const {
   secondaryBg,
   headerBorderColor,

@@ -78,7 +78,7 @@ const GeneralInformation = ({data, classes}) => {
               ...classes.heading,
               color: whiteColor,
               textAlign: 'right'
-            }}>MISSING</Typography>
+            }}>{data?.Meta?.Types}</Typography>
           </Box>
 
           <Box display='flex' justifyContent='space-between' columnGap={1}>

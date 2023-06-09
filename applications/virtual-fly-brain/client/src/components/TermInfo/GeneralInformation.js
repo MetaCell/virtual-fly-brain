@@ -128,7 +128,7 @@ const GeneralInformation = ({data, classes}) => {
 
           <Box display='flex' justifyContent='space-between' columnGap={1}>
             <Typography sx={classes.heading}>Aligned To</Typography>
-            <Chip icon={<Link />} label='MISSING' />
+            <Chip icon={<Link />} label={data?.Name} />
           </Box>
 
           <Box display='flex' justifyContent='space-between' columnGap={1}>

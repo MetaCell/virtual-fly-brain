@@ -161,36 +161,8 @@ class ThreeDCanvas extends Component {
       },
     }
 
-
-
-    return <Box
-      sx={{
-        height: 'calc(100% - 0.5rem)',
-        color: whiteColor,
-        overflow: 'hidden',
-        background: {
-          lg: blackColor
-        },
-        p: {
-          xs: 2,
-          lg: 0
-        },
-        borderColor: {
-          lg: secondaryBg
-        },
-        borderStyle: {
-          lg: 'solid'
-        },
-        borderRadius: {
-          lg: 2
-        },
-        borderWidth: {
-          xs: 0,
-          lg: '0.0625rem 0.0625rem 0 0'
-        }
-      }}
-    >
-      {this.state.mappedCanvasData ? (
+    return (
+      this.state.mappedCanvasData ? (
         <div ref={node => this.node = node} className={classes.container}>
           <>
             <Canvas
@@ -216,8 +188,8 @@ class ThreeDCanvas extends Component {
             Show Example
           </Button>
         </Box>
-      )}
-    </Box>
+      )
+    )
   }
 }
 

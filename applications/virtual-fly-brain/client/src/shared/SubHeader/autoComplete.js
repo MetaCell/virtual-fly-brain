@@ -193,7 +193,8 @@ export default function CustomizedHook({ setFocused }) {
   React.useEffect(() => {
     setFocused(focused)
   }, [focused])
-
+  
+  const addQueryTag = () => { values.unshift({title: 'Queries', tags: []}) }
   return (
     <Box flexGrow={1}>
       <Box {...getRootProps()}>
@@ -210,7 +211,7 @@ export default function CustomizedHook({ setFocused }) {
                   className="secondary"
                   key={`tag-${index}`}
                   sx={{
-                    backgroundColor: outlinedBtnBorderColor,
+                    backgroundColor: option.title === 'Queries' ? 'red' : outlinedBtnBorderColor ,
                     alignSelf: 'center'
                   }}
                   label={option.title}
@@ -581,17 +582,19 @@ export default function CustomizedHook({ setFocused }) {
               </Button>
 
               <Button sx={{
-                px: 1,
-                py: 0.5,
-                fontSize: '0.75rem',
-                height: '1.5rem',
-                backgroundColor: outlinedBtnBorderColor,
-                borderRadius: 1,
-
-                '&:hover': {
+                  px: 1,
+                  py: 0.5,
+                  fontSize: '0.75rem',
+                  height: '1.5rem',
                   backgroundColor: outlinedBtnBorderColor,
-                }
-              }}>
+                  borderRadius: 1,
+
+                  '&:hover': {
+                    backgroundColor: outlinedBtnBorderColor,
+                  }
+                }}
+                onClick={addQueryTag}
+              >
                 <SplitScreen style={{ marginRight: '0.5rem' }} />
                 Queries
                 <AngleRight style={{ marginLeft: '0.5rem' }} />

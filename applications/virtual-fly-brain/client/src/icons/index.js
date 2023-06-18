@@ -1,5 +1,24 @@
 import React from "react"
 
+export const Undo = (props) => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g clipPath="url(#clip0_3127_32257)">
+      <path d="M8.17676 5.66667C6.41009 5.66667 4.81009 6.32667 3.57676 7.4L1.17676 5L1.17676 11H7.17676L4.76342 8.58667C5.69009 7.81333 6.87009 7.33333 8.17676 7.33333C10.5368 7.33333 12.5434 8.87333 13.2434 11L14.8234 10.48C13.8968 7.68667 11.2768 5.66667 8.17676 5.66667Z" fill="white" fillOpacity="0.8" />
+    </g>
+    <defs>
+      <clipPath id="clip0_3127_32257">
+        <rect width="16" height="16" rx="4" fill="white" />
+      </clipPath>
+    </defs>
+  </svg>
+);
+
+export const CleaningServices = (props) => (
+  <svg {...props} width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M8 5.5H7.5L7.5 1.5C7.5 0.95 7.05 0.5 6.5 0.5L5.5 0.5C4.95 0.5 4.5 0.95 4.5 1.5L4.5 5.5H4C2.62 5.5 1.5 6.62 1.5 8L1.5 11.5L10.5 11.5V8C10.5 6.62 9.38 5.5 8 5.5ZM5.5 1.5L6.5 1.5L6.5 5.5H5.5L5.5 1.5ZM9.5 10.5H8.5V9C8.5 8.725 8.275 8.5 8 8.5C7.725 8.5 7.5 8.725 7.5 9V10.5H6.5V9C6.5 8.725 6.275 8.5 6 8.5C5.725 8.5 5.5 8.725 5.5 9V10.5H4.5V9C4.5 8.725 4.275 8.5 4 8.5C3.725 8.5 3.5 8.725 3.5 9L3.5 10.5H2.5L2.5 8C2.5 7.175 3.175 6.5 4 6.5L8 6.5C8.825 6.5 9.5 7.175 9.5 8V10.5Z" fill="white" fillOpacity="0.8" />
+  </svg>
+)
+
 export const Logo = (props) => {
   return (
     <svg {...props} width={props.size || 24} height={props.size || 24} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -87,6 +106,26 @@ export const Layers = (props) => (
 export const ChevronLeft = (props) => (
   <svg width="21" height="20" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M13.9345 6.17476L12.7595 4.99976L7.75946 9.99976L12.7595 14.9998L13.9345 13.8248L10.1178 9.99976L13.9345 6.17476Z" fill={props.color || "white"} />
+  </svg>
+)
+
+export const CheckBoxDefault = (props) => (
+  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0.445455" y="0.445455" width="13.1091" height="13.1091" rx="1.33636" stroke="#A0A0A0" strokeWidth="0.890909" />
+  </svg>
+)
+
+export const CheckBoxGreen = (props) => (
+  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="14" height="14" rx="2" fill="#5E9806" />
+    <path d="M10.5 7.5H7.5V10.5H6.5V7.5H3.5V6.5H6.5V3.5H7.5V6.5H10.5V7.5Z" fill="white" />
+  </svg>
+)
+
+export const CheckBoxRed = (props) => (
+  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="14" height="14" rx="2" fill="#C62724" />
+    <path d="M10.5 7.50098H3.5V6.50098H10.5V7.50098Z" fill="white" />
   </svg>
 )
 
@@ -199,7 +238,7 @@ export const ArView = (props) => (
 );
 
 export const Delete = (props) => (
-  <svg {...props} width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg {...props} width={props.size || "16"} height={props.size || "17"} viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M10.6664 6.91895V13.5856H5.33307V6.91895H10.6664ZM9.6664 2.91895H6.33307L5.6664 3.58561H3.33307V4.91895H12.6664V3.58561H10.3331L9.6664 2.91895ZM11.9997 5.58561H3.99974V13.5856C3.99974 14.3189 4.59974 14.9189 5.33307 14.9189H10.6664C11.3997 14.9189 11.9997 14.3189 11.9997 13.5856V5.58561Z" fill="white" fillOpacity="0.8" />
   </svg>
 )

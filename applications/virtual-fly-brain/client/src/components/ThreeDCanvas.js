@@ -155,7 +155,7 @@ class ThreeDCanvas extends Component {
     return this.state.mappedCanvasData ? (
       <div ref={node => this.node = node} className={classes.container}>
         <>
-          {/* <Canvas
+          <Canvas
             ref={this.canvasRef}
             data={this.state.mappedCanvasData}
             cameraOptions={cameraOptions}
@@ -165,7 +165,7 @@ class ThreeDCanvas extends Component {
             onMount={this.onMount}
             onHoverListeners={{ 'hoverId':this.hoverHandler }}
             dracoDecoderPath={'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/jsm/libs/draco/'}
-          /> */}
+          />
         </>
       </div>
     ) : <Button

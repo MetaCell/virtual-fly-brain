@@ -113,7 +113,8 @@ const MainLayout = () => {
         )}
 
         {tab.includes(1) && (
-          <ThreeDCanvas />
+          // <ThreeDCanvas />
+          <></>
         )}
 
         {tab.includes(2) && (

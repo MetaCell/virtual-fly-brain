@@ -10,7 +10,7 @@ import { AddChart, AngleRight, ChevronDown, CleaningServices, Delete, More, Open
 import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
 
 const {
-  listBg,
+  bottomNavBg,
   outlinedBtnTextColor,
   queryBorderColor,
   primaryBg,
@@ -40,7 +40,7 @@ const InputWrapper = styled('div')(
     background-color: transparent;
     color: ${outlinedBtnTextColor};
     font-size: 0.875rem;
-    line-height: 1.125rem;
+    line-height: 129%;
     height: 2rem;
     box-sizing: border-box;
     padding: 0;
@@ -50,6 +50,15 @@ const InputWrapper = styled('div')(
     border: 0;
     margin: 0;
     outline: 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+
+    &::placeholder {
+      color: ${outlinedBtnTextColor};
+      font-size: 0.875rem;
+      line-height: 129%;
+    }
   }
 `,
 );
@@ -77,12 +86,13 @@ const Listbox = styled('div')(
   padding: 0;
   position: absolute;
   list-style: none;
-  background-color: ${listBg};
+  background-color: ${bottomNavBg};
   overflow: auto;
+  border-top: 0.0625rem solid ${primaryBg};
   max-height: 17.375rem;
   border-radius: 0 0 0.5rem 0.5rem;
   z-index: 1;
-  backdropFilter: blur(0.625rem);
+  backdrop-filter: blur(0.625rem);
 
   & > div:last-of-type {
     padding-bottom: 0;
@@ -174,27 +184,6 @@ export default function CustomizedHook({ setFocused }) {
     },
   ];
   const [value, setValue] = React.useState([]);
-  const {
-    getRootProps,
-    getInputProps,
-    getTagProps,
-    getListboxProps,
-    getOptionProps,
-    groupedOptions,
-    // value,
-    focused,
-    setAnchorEl,
-  } = useAutocomplete({
-    id: 'customized-hook',
-    multiple: true,
-    options: searchResults,
-    getOptionLabel: (option) => option?.title,
-  });
-
-  React.useEffect(() => {
-    setFocused(focused)
-  }, [focused])
-  
   const addQueryTag = () => { setValue((prevValue) => [{title: 'Queries', tags: []}, ...prevValue]) }
 
   const handleResultSelection = (option) => {
@@ -206,6 +195,25 @@ export default function CustomizedHook({ setFocused }) {
   const handleChipDelete = (index) => {
     setValue(value.filter((chip) => chip.title !== index))
   }
+  const {
+    getRootProps,
+    getInputProps,
+    getTagProps,
+    getListboxProps,
+    getOptionProps,
+    groupedOptions,
+    focused,
+    setAnchorEl,
+  } = useAutocomplete({
+    id: 'customized-hook',
+    multiple: true,
+    options: searchResults,
+    getOptionLabel: (option) => option?.title,
+  });
+
+  // React.useEffect(() => {
+  //   setFocused(focused)
+  // }, [focused])
 
   return (
     <Box flexGrow={1}>
@@ -223,14 +231,14 @@ export default function CustomizedHook({ setFocused }) {
                   className="secondary"
                   key={`tag-${index}`}
                   sx={{
-                    backgroundColor: option.title === 'Queries' ? 'red' : outlinedBtnBorderColor ,
-                    alignSelf: 'center'
+                    background: option.title === 'Queries' ? 'red' : outlinedBtnBorderColor ,
+                    alignSelf: 'center',
+                    color: outlinedBtnTextColor
                   }}
                   label={option.title}
                   {...getTagProps({ index })}
                   deleteIcon={<CloseIcon />}
                   value={value}
-                  // onChange={handleInputChange}
                   onDelete={() => handleChipDelete(option.title)}
                 />
               ))}
@@ -240,10 +248,10 @@ export default function CustomizedHook({ setFocused }) {
         </InputWrapper>
       </Box>
       {groupedOptions.length > 0 ? (
-        <Listbox {...getListboxProps()}>
+        <Listbox className='scrollbar' {...getListboxProps()}>
           <Box sx={{
-            px: '1rem',
-            py: '0.75rem',
+            py: '1rem',
+            px: '0.75rem',
             borderBottom: `0.0625rem solid ${primaryBg}`,
           }}>
             <Box
@@ -251,7 +259,13 @@ export default function CustomizedHook({ setFocused }) {
               alignItems='center'
               justifyContent='space-between'
             >
-              <Typography variant="body2" sx={{ fontWeight: 500, color: searchHeadingColor }}>
+              <Typography variant="body2" sx={{
+                fontSize: '0.75rem',
+                lineHeight: '133%',
+                letterSpacing: '-0.005em',
+                fontWeight: 500,
+                color: searchHeadingColor
+              }}>
                 Add other query IDs
               </Typography>
 
@@ -276,27 +290,34 @@ export default function CustomizedHook({ setFocused }) {
             </Box>
 
             <Box
-              my={1}
+              my={1.5}
               display='flex'
               flexDirection='column'
-              rowGap={1}
+              rowGap={1.5}
             >
-
               <Box
                 display='flex'
                 columnGap={1}
               >
-                <Box sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '1.5rem',
-                  height: '1.5rem',
-                  borderRadius: 1,
-                  background: searchBoxBg,
-                }}>
+                <Button
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '1.5rem',
+                    height: '1.5rem',
+                    p: 0,
+                    borderRadius: 1,
+                    background: searchBoxBg,
+                    minWidth: '0.0625rem',
+
+                    '&:hover': {
+                      background: searchBoxBg,
+                    }
+                  }}
+                >
                   <Delete size={12} />
-                </Box>
+                </Button>
 
                 <Box
                   borderRadius={1}
@@ -381,22 +402,37 @@ export default function CustomizedHook({ setFocused }) {
                   </Box>
                 </Box>
               </Box>
+            </Box>
 
+            <Box
+              my={1.5}
+              display='flex'
+              flexDirection='column'
+              rowGap={1.5}
+            >
               <Box
                 display='flex'
                 columnGap={1}
               >
-                <Box sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '1.5rem',
-                  height: '1.5rem',
-                  borderRadius: 1,
-                  background: searchBoxBg,
-                }}>
+                <Button
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '1.5rem',
+                    height: '1.5rem',
+                    p: 0,
+                    borderRadius: 1,
+                    background: searchBoxBg,
+                    minWidth: '0.0625rem',
+
+                    '&:hover': {
+                      background: searchBoxBg,
+                    }
+                  }}
+                >
                   <Delete size={12} />
-                </Box>
+                </Button>
 
                 <Box
                   borderRadius={1}
@@ -510,11 +546,17 @@ export default function CustomizedHook({ setFocused }) {
 
           {/* NARROW YOUR SEARCH STARTS HERE */}
           <Box sx={{
-            px: '1rem',
-            py: '0.75rem',
+            py: '1rem',
+            px: '0.75rem',
             borderBottom: `0.0625rem solid ${primaryBg}`,
           }}>
-            <Typography variant="body2" sx={{ fontWeight: 500, color: searchHeadingColor }}>
+            <Typography variant="body2" sx={{
+              fontSize: '0.75rem',
+              lineHeight: '133%',
+              letterSpacing: '-0.005em',
+              fontWeight: 500,
+              color: searchHeadingColor
+            }}>
               Narrow your search
             </Typography>
 
@@ -554,7 +596,23 @@ export default function CustomizedHook({ setFocused }) {
 
               </Box>
 
-              <Button variant="text">More filters</Button>
+              <Button
+                disableRipple
+                variant="text"
+                sx={{
+                  padding: 0,
+                  fontSize: '0.75rem',
+                  lineHeight: '133%',
+                  height: 'auto',
+                  color: outlinedBtnTextColor,
+
+                  '&:hover': {
+                    background: 'transparent'
+                  }
+                }}
+              >
+                More filters
+              </Button>
             </Box>
           </Box>
           {/* NARROW YOUR SEARCH ENDS HERE */}
@@ -562,11 +620,17 @@ export default function CustomizedHook({ setFocused }) {
 
           {/* I AM LOOKING FOR STARTS HERE */}
           <Box sx={{
-            px: '1rem',
-            py: '0.75rem',
+            py: '1rem',
+            px: '0.75rem',
             borderBottom: `0.0625rem solid ${primaryBg}`,
           }}>
-            <Typography variant="body2" sx={{ fontWeight: 500, color: searchHeadingColor }}>
+            <Typography variant="body2" sx={{
+              fontSize: '0.75rem',
+              lineHeight: '133%',
+              letterSpacing: '-0.005em',
+              fontWeight: 500,
+              color: searchHeadingColor
+            }}>
               I’m looking for...
             </Typography>
 
@@ -621,10 +685,19 @@ export default function CustomizedHook({ setFocused }) {
 
           {/* RECENT SEARCHES STARTS HERE */}
           <Box sx={{
-            px: '1rem',
-            py: '0.75rem',
+            py: '1rem',
+            px: '0.75rem',
           }}>
-            <Typography variant="body2" sx={{ fontWeight: 500, color: searchHeadingColor }}>
+            <Typography
+              variant="body2"
+              sx={{
+                fontSize: '0.75rem',
+                lineHeight: '133%',
+                letterSpacing: '-0.005em',
+                fontWeight: 500,
+                color: searchHeadingColor
+              }}
+            >
               Recent search
             </Typography>
 
@@ -649,7 +722,7 @@ export default function CustomizedHook({ setFocused }) {
                     borderRadius: 1,
                     background: searchBoxBg,
                   }}>
-                    <Search size={12} />
+                    <SplitScreen size={12} />
                   </Box>
 
                   <Typography variant="body2" sx={{ color: searchHeadingColor, px: 1 }}>
@@ -662,7 +735,9 @@ export default function CustomizedHook({ setFocused }) {
                     alignItems: 'center',
                     columnGap: 0.5
                   }}>
-                    {search?.tags?.slice(0, 3)?.map((tag, index) => <Chip key={`search-tag-${index}`} sx={{ backgroundColor: chipColors[tag.id] }} label={tag.label} />)}
+                    {search?.tags?.slice(0, 3)?.map((tag, index) => <Chip key={`search-tag-${index}`} sx={{
+                      lineHeight: '140%',
+                      fontSize: '0.625rem', backgroundColor: chipColors[tag.id] }} label={tag.label} />)}
                     {search?.tags.length > 3 ? (
                       <Tooltip
                         placement="bottom-end"
@@ -673,21 +748,28 @@ export default function CustomizedHook({ setFocused }) {
                             alignItems: 'center',
                             columnGap: 0.5
                           }}>
-                            {search?.tags?.slice(3)?.map((tag, index) => <Chip key={`remaining-tag-${index}`} sx={{ backgroundColor: chipColors[tag.id] }} label={tag.label} />)}
+                            {search?.tags?.slice(3)?.map((tag, index) => <Chip key={`remaining-tag-${index}`} sx={{
+                              lineHeight: '140%',
+                              fontSize: '0.625rem', backgroundColor: chipColors[tag.id] }} label={tag.label} />)}
                           </Box>
                         }
                       >
-                        <Chip sx={{ backgroundColor: searchBoxBg }} label="+2" />
+                        <Chip sx={{
+                          lineHeight: '140%',
+                          fontSize: '0.625rem',
+                          backgroundColor: searchBoxBg
+                        }} label={`+${search?.tags?.slice(3).length }`} />
                       </Tooltip> ) : null
                     }
                     <IconButton
+                      sx={{
+                        width: '20px',
+                        height: '20px',
+                        padding: 0
+                      }}
                       size="small"
                       key={`search_${index}`}
                       ref={anchorEls[index]}
-                      // id="basic-button"
-                      // aria-controls={open ? 'basic-menu' : undefined}
-                      // aria-haspopup="true"
-                      // aria-expanded={open ? 'true' : undefined}
                       onClick={(event) => handleMenuOpen(index, event)}
                     >
                       <More />
@@ -723,10 +805,16 @@ export default function CustomizedHook({ setFocused }) {
 
           {/* SEARCH RESULT STARTS HERE */}
           <Box sx={{
-            px: '1rem',
-            py: '0.75rem',
+            py: '1rem',
+            px: '0.75rem',
           }}>
-            <Typography variant="body2" sx={{ fontWeight: 500, color: searchHeadingColor }}>
+            <Typography variant="body2" sx={{
+              fontSize: '0.75rem',
+              lineHeight: '133%',
+              letterSpacing: '-0.005em',
+              fontWeight: 500,
+              color: searchHeadingColor
+            }}>
               Suggested results
             </Typography>
             <Box mt={1.5}>
@@ -777,7 +865,15 @@ export default function CustomizedHook({ setFocused }) {
                       alignItems: 'center',
                       columnGap: 0.5
                     }}>
-                      { option?.tags.map((tag, index) => <Chip key={tag+index} sx={{ backgroundColor: chipColors[index] || chipColors[0]}} label={tag} />) }
+                      {option?.tags.map((tag, index) => <Chip
+                        key={tag + index}
+                        sx={{
+                          lineHeight: '140%',
+                          fontSize: '0.625rem',
+                          backgroundColor: chipColors[index] || chipColors[0]
+                        }}
+                        label={tag}
+                      />)}
                     </Box>
 
                     <Button sx={{

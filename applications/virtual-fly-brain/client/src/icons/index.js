@@ -1,5 +1,11 @@
 import React from "react"
 
+export const Tick = (props) => (
+  <svg {...props} width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M4.39754 7.93746L2.31254 5.85246L1.60254 6.55746L4.39754 9.35246L10.3975 3.35246L9.69254 2.64746L4.39754 7.93746Z" fill={props.color || "#0AB7FE"} />
+  </svg>
+)
+
 export const Undo = (props) => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <g clipPath="url(#clip0_3127_32257)">

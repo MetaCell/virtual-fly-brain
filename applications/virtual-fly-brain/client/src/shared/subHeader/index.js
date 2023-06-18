@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Box, Button, Checkbox, FormControlLabel, FormGroup, IconButton, Popper, Typography } from "@mui/material";
-import { AngleLeft, CheckBoxDefault, CheckBoxGreen, CheckBoxRed, CleaningServices, ClearAll, Download, Filter, History, Layers, Query, Search, Undo, Upload } from "../../icons";
+import { AngleLeft, CheckBoxDefault, CheckBoxGreen, CheckBoxRed, CleaningServices, ClearAll, Download, Filter, History, Layers, Query, Search, Tick, Undo, Upload } from "../../icons";
 import vars from "../../theme/variables";
 import MediaQuery from 'react-responsive'
 import CustomizedHook from "./autoComplete";
@@ -51,7 +51,7 @@ const {
 } = vars;
 
 const SubHeader = () => {
-  const [focused, setFocused] = useState(false);
+  const [focused, setFocused] = useState(true);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [filterAnchorEl, setFilterAnchorEl] = React.useState(null);
 
@@ -122,7 +122,7 @@ const SubHeader = () => {
             lg: 1.5
           },
           py: {
-            lg: 0.5
+            lg: 0.25
           },
           pr: {
             lg: 0.5
@@ -203,7 +203,7 @@ const SubHeader = () => {
                     <Undo />
                   </IconButton>
                 </Box>
-                <Box p={1.5} sx={{
+                <Box className='scrollbar' p={1.5} sx={{
                   maxHeight: '11.5rem',
                   overflow: 'auto'
                 }}>
@@ -235,11 +235,17 @@ const SubHeader = () => {
                     onClick={filterhandleClick}
                     variant="text"
                     sx={{
-                      borderRadius: '0.5rem'
+                      px: 0,
+                      width: '6.5rem',
+                      borderRadius: '0.25rem',
+                      height: '1.875rem',
+                      fontSize: '0.75rem',
                     }}
                   >
                     <CleaningServices
-                      style={{ marginRight: '0.25rem' }}
+                      style={{
+                        margin: '0 0.25rem 0 0'
+                      }}
                     />
                     Clean all
                   </Button>
@@ -248,14 +254,23 @@ const SubHeader = () => {
                     variant="outlined"
                     color="primary"
                     sx={{
+                      px: 0,
+                      width: '6.5rem',
+                      borderRadius: '0.25rem',
+                      height: '1.875rem',
+                      fontSize: '0.75rem',
                       borderColor: tabActiveColor,
                       color: tabActiveColor,
                       '&:hover': {
+                        borderColor: tabActiveColor,
                         backgroundColor: tabActiveColor,
                         color: whiteColor
                       }
                     }}
                   >
+                    <Tick color='currentColor' style={{
+                      margin: '0 0.25rem 0 0'
+                    }} />
                     Apply filters
                   </Button>
                 </Box>
@@ -266,7 +281,9 @@ const SubHeader = () => {
               sx={{
                 ...classes.shortcut,
                 flexShrink: 0,
-                minWidth: '0.0625rem'
+                p: 0,
+                borderRadius: '0.25rem',
+                minWidth: '4.1875rem'
               }}
             >
               Ctrl + K

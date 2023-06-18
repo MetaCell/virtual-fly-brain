@@ -173,6 +173,7 @@ export default function CustomizedHook({ setFocused }) {
       ]
     },
   ];
+  const [value, setValue] = React.useState([]);
   const {
     getRootProps,
     getInputProps,
@@ -180,7 +181,7 @@ export default function CustomizedHook({ setFocused }) {
     getListboxProps,
     getOptionProps,
     groupedOptions,
-    value,
+    // value,
     focused,
     setAnchorEl,
   } = useAutocomplete({
@@ -194,7 +195,18 @@ export default function CustomizedHook({ setFocused }) {
     setFocused(focused)
   }, [focused])
   
-  const addQueryTag = () => { values.unshift({title: 'Queries', tags: []}) }
+  const addQueryTag = () => { setValue((prevValue) => [{title: 'Queries', tags: []}, ...prevValue]) }
+
+  const handleResultSelection = (option) => {
+    const doesOptionExist =  obj => obj.title === option.title
+    if(!value.some(doesOptionExist)){
+      setValue([...value, option])
+    }
+  };
+  const handleChipDelete = (index) => {
+    setValue(value.filter((chip) => chip.title !== index))
+  }
+
   return (
     <Box flexGrow={1}>
       <Box {...getRootProps()}>
@@ -215,9 +227,11 @@ export default function CustomizedHook({ setFocused }) {
                     alignSelf: 'center'
                   }}
                   label={option.title}
-                  onDelete={() => null}
                   {...getTagProps({ index })}
                   deleteIcon={<CloseIcon />}
+                  value={value}
+                  // onChange={handleInputChange}
+                  onDelete={() => handleChipDelete(option.title)}
                 />
               ))}
             </Box>
@@ -718,7 +732,7 @@ export default function CustomizedHook({ setFocused }) {
             <Box mt={1.5}>
               {groupedOptions.map((option, index) => (
                 <Box key={`groupedOptions-${index}`} {...getOptionProps({ option, index })}>
-                  <Box key={option?.title} onClick={() => setChipInputValues([option?.title])} sx={{
+                  <Box key={option?.title} onClick={() => handleResultSelection(option)} sx={{
                     position: 'relative',
                     p: 0.5,
                     borderRadius: 1,

@@ -52,7 +52,7 @@ const {
 } = vars;
 
 const SubHeader = () => {
-  const [focused, setFocused] = useState(false);
+  const [focused, setFocused] = useState(true);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [filterAnchorEl, setFilterAnchorEl] = React.useState(null);
 
@@ -86,11 +86,6 @@ const SubHeader = () => {
       color: whiteColor,
     }
   };
-
-
-
-
-  const [chipInputValues, setChipInputValues] = useState([]);
 
   return (
     <Box sx={{

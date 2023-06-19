@@ -257,7 +257,7 @@ export default function CustomizedHook({ setFocused }) {
               ))}
             </Box>
           )}
-          <input placeholder='Find something...' {...getInputProps()} onFocus={handleFocus} onBlur={handleBlur}/>
+          <input placeholder='Find something...' {...getInputProps()}/>
         </InputWrapper>
       </Box>
       {groupedOptions.length > 0 ? (

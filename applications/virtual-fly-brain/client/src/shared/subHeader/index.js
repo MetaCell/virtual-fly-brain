@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Box, Button, Checkbox, FormControlLabel, FormGroup, IconButton, Popper, Typography } from "@mui/material";
-import { AngleLeft, CheckBoxDefault, CheckBoxGreen, CheckBoxRed, CleaningServices, ClearAll, Download, Filter, History, Layers, Query, Search, Tick, Undo, Upload } from "../../icons";
+import { AngleLeft, CheckBoxDefault, CheckBoxGreen, CheckBoxRed, CleaningServices, ClearAll, Close, Download, Filter, History, Layers, Query, Search, Tick, Undo, Upload } from "../../icons";
 import vars from "../../theme/variables";
 import MediaQuery from 'react-responsive'
 import CustomizedHook from "./autoComplete";
@@ -47,11 +47,12 @@ const {
   shortcutBg,
   blackColor,
   bottomNavBg,
-  outlinedBtnTextColor
+  outlinedBtnTextColor,
+  headerBorderColor
 } = vars;
 
 const SubHeader = () => {
-  const [focused, setFocused] = useState(true);
+  const [focused, setFocused] = useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [filterAnchorEl, setFilterAnchorEl] = React.useState(null);
 
@@ -95,10 +96,22 @@ const SubHeader = () => {
     <Box sx={{
       ...classes.root,
       py: {
-        xs: 1,
+        // xs: 1,
         lg: 0.5
       },
-      px: 1.5,
+      px: {
+        lg: 1.5
+      },
+
+      borderTop: {
+        xs: `0.0625rem solid ${headerBorderColor}`,
+        lg: 'none'
+      },
+
+      borderColor: {
+        xs: focused ? 'transparent' : headerBorderColor,
+      },
+
       backgroundColor: {
         xs: primaryBg,
         lg: secondaryBg
@@ -116,26 +129,26 @@ const SubHeader = () => {
             lg: 'auto'
           },
           borderRadius: {
+            xs: focused ? '0.375rem 0.375rem 0 0' : 0,
             lg: focused ? '0.5rem 0.5rem 0 0' : 2
           },
           pl: {
+            xs: 1.5,
             lg: 1.5
           },
           py: {
+            xs: 1,
             lg: 0.25
           },
           pr: {
+            xs: 1.5,
             lg: 0.5
           },
           backgroundColor: {
+            xs: focused ? bottomNavBg : primaryBg,
             lg: focused ? bottomNavBg : searchBoxBg
           },
-          boxShadow: {
-            lg: focused ? `0 0.25rem 6.25rem ${blackColor}, 0 0 5rem rgba(0, 0, 0, 0.6)` : 'none'
-          },
-          // backdropFilter: {
-          //   lg: focused ? 'blur(0.625rem)' : 'none'
-          // }
+          boxShadow: focused ? `0 0.25rem 6.25rem ${blackColor}, 0 0 5rem rgba(0, 0, 0, 0.6)` : 'none',
         }}
         display='flex'
         alignItems='center'>
@@ -144,8 +157,8 @@ const SubHeader = () => {
         <Box flexGrow={1} px={1}>
           <CustomizedHook setFocused={setFocused} />
         </Box>
-        <MediaQuery minWidth={1200}>
-          {focused ? (
+        {focused && (
+          (
             <Box
               flexShrink={0}
               display='flex'
@@ -165,15 +178,33 @@ const SubHeader = () => {
               >
                 <Filter />
               </Button>
-              <Button
-                sx={{
-                  ...classes.shortcut,
-                  flexShrink: 0,
-                  minWidth: '0.0625rem'
-                }}
-              >
-                Esc
-              </Button>
+
+              <MediaQuery maxWidth={1199}>
+                <Button
+                  sx={{
+                    ...classes.shortcut,
+                    flexShrink: 0,
+                    minWidth: '0.065rem',
+                    padding: '0 0.25rem',
+                    backgroundColor: 'transparent'
+                  }}
+                >
+                  <Close />
+                </Button>
+              </MediaQuery>
+
+              <MediaQuery minWidth={1200}>
+                <Button
+                  sx={{
+                    ...classes.shortcut,
+                    flexShrink: 0,
+                    minWidth: '0.0625rem'
+                  }}
+                >
+                  Esc
+                </Button>
+              </MediaQuery>
+
 
               <Popper
                 className="filter-popover"
@@ -276,7 +307,11 @@ const SubHeader = () => {
                 </Box>
               </Popper>
             </Box>
-          ): (
+          )
+        )}
+
+        <MediaQuery minWidth={1200}>
+          {!focused && (
             <Button
               sx={{
                 ...classes.shortcut,
@@ -289,7 +324,6 @@ const SubHeader = () => {
               Ctrl + K
             </Button>
           )}
-
         </MediaQuery>
       </Box>
 
@@ -305,7 +339,7 @@ const SubHeader = () => {
               sx={{
                 minWidth: '0.0625rem'
               }}
-              key={item.id}
+              key={`${item.id}_${item.name}`}
             >
               {item.icon}
             </Button>

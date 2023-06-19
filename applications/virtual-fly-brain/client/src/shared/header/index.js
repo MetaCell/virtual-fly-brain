@@ -43,10 +43,6 @@ const Header = () => {
       sx={{
         ...classes.root,
         py: 1.5,
-        borderBottom: {
-          xs: `0.0625rem solid ${headerBorderColor}`,
-          lg: 'none'
-        },
         boxShadow: {
           xs: headerBoxShadow,
           lg: 'none'

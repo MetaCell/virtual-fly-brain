@@ -553,6 +553,7 @@ theme = createTheme({
     MuiPopper: {
       styleOverrides: {
         root: {
+          maxWidth: '100%',
           '&:not(.MuiTooltip-popper)': {
             zIndex: 99,
             background: bottomNavBg,

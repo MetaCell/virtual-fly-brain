@@ -214,9 +214,9 @@ export default function CustomizedHook({ setFocused }) {
     getOptionLabel: (option) => option?.title,
   });
 
-  // React.useEffect(() => {
-  //   setFocused(focused)
-  // }, [focused])
+  React.useEffect(() => {
+    setFocused(focused)
+  }, [focused])
 
   const handleFocus = () => {
     setFocused(true);
@@ -246,7 +246,11 @@ export default function CustomizedHook({ setFocused }) {
                   sx={{
                     background: option.title === 'Queries' ? queryChipBg : outlinedBtnBorderColor ,
                     alignSelf: 'center',
-                    color: outlinedBtnTextColor
+                    color: outlinedBtnTextColor,
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    maxWidth: '5.9375rem'
                   }}
                   label={option.title}
                   {...getTagProps({ index })}
@@ -260,7 +264,7 @@ export default function CustomizedHook({ setFocused }) {
           <input placeholder='Find something...' {...getInputProps()}/>
         </InputWrapper>
       </Box>
-      {groupedOptions.length > 0 ? (
+      {focused ? (
         <Listbox sx={{
           top: {
             xs: '2.875rem',

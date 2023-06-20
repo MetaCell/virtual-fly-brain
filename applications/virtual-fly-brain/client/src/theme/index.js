@@ -563,6 +563,15 @@ theme = createTheme({
             width: '23.9375rem',
             marginTop: '-1.5rem !important',
 
+            '&.menu-popover': {
+              marginTop: '0 !important',
+              width: '10rem',
+              background: filterPopoverBg,
+              boxShadow: filterPopoverShadow,
+              backdropFilter: 'blur(0.375rem)',
+              borderRadius: '0.125rem'
+            },
+
             '&.filter-popover': {
               marginTop: '-1.75rem !important',
               width: '15.5rem',

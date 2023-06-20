@@ -8,6 +8,8 @@ import { Box, Button, Chip, IconButton, List, ListItem, ListItemButton, ListItem
 import vars from "../../theme/variables";
 import { AddChart, AngleRight, ChevronDown, CleaningServices, Delete, More, OpenInNew, Search, SplitScreen } from "../../icons";
 import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
+import { SearchResult } from '../SearchResult';
+import { RecentSearch } from '../RecentSearch';
 
 const {
   bottomNavBg,
@@ -153,19 +155,7 @@ export default function CustomizedHook({ setFocused }) {
 
   const popoverOpen = Boolean(popoverAnchorEl);
   const id = popoverOpen ? 'simple-popover' : undefined;
-  const handleMenuOpen = (index, event) => {
-    const updatedAnchorEls = [...anchorEls];
-    updatedAnchorEls[index] = event.currentTarget;
-    setAnchorEls(updatedAnchorEls);
-    setMenuOpen(true)
-  };
 
-  const handleMenuClose = (index) => {
-    const updatedAnchorEls = [...anchorEls];
-    updatedAnchorEls[index] = null;
-    setAnchorEls(updatedAnchorEls);
-    setMenuOpen(false)
-  };
 
   const recentSearch = [
     {
@@ -215,7 +205,11 @@ export default function CustomizedHook({ setFocused }) {
   });
 
   React.useEffect(() => {
-    setFocused(focused)
+    if (focused) {
+      setFocused(true)
+    } else {
+      setFocused(false)
+    }
   }, [focused])
 
   const handleFocus = () => {
@@ -244,7 +238,7 @@ export default function CustomizedHook({ setFocused }) {
                   className="secondary"
                   key={`tag-${index}`}
                   sx={{
-                    background: option.title === 'Queries' ? queryChipBg : outlinedBtnBorderColor ,
+                    background: option.title === 'Queries' ? queryChipBg : outlinedBtnBorderColor,
                     alignSelf: 'center',
                     color: outlinedBtnTextColor,
                     whiteSpace: 'nowrap',
@@ -718,131 +712,12 @@ export default function CustomizedHook({ setFocused }) {
           </Box>
           {/* I AM LOOKING FOR ENDS HERE */}
 
+
           {/* RECENT SEARCHES STARTS HERE */}
-          <Box sx={{
-            py: '1rem',
-            px: '0.75rem',
-          }}>
-            <Typography
-              variant="body2"
-              sx={{
-                fontSize: '0.75rem',
-                lineHeight: '133%',
-                letterSpacing: '-0.005em',
-                fontWeight: 500,
-                color: searchHeadingColor
-              }}
-            >
-              Recent search
-            </Typography>
-
-            <Box mt={1.5}>
-              { recentSearch.map((search, index) => (
-                <Box key={`recentSearch-${index}`} sx={{
-                  p: 0.5,
-                  borderRadius: 1,
-                  display: 'flex',
-                  alignItems: 'center',
-
-                  '&:hover': {
-                    backgroundColor: secondaryBg
-                  }
-                }}>
-                  <Box sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: '1.5rem',
-                    height: '1.5rem',
-                    borderRadius: 1,
-                    flexShrink: 0,
-                    background: searchBoxBg,
-                  }}>
-                    <SplitScreen size={12} />
-                  </Box>
-
-                  <Typography variant="body2" sx={{
-                    fontSize: '0.75rem',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    color: searchHeadingColor,
-                    px: 1
-                  }}>
-                    {search?.title}
-                  </Typography>
-
-                  <Box sx={{
-                    ml: 'auto',
-                    display: 'flex',
-                    alignItems: 'center',
-                    columnGap: 0.5
-                  }}>
-                    {search?.tags?.slice(0, 2)?.map((tag, index) => <Chip key={`search-tag-${index}`} sx={{
-                      lineHeight: '140%',
-                      fontSize: '0.625rem', backgroundColor: chipColors[tag.id] }} label={tag.label} />)}
-                    {search?.tags.length > 2 ? (
-                      <Tooltip
-                        placement="bottom-end"
-                        arrow
-                        title={
-                          <Box sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            columnGap: 0.5
-                          }}>
-                            {search?.tags?.slice(2)?.map((tag, index) => <Chip key={`remaining-tag-${index}`} sx={{
-                              lineHeight: '140%',
-                              fontSize: '0.625rem', backgroundColor: chipColors[tag.id] }} label={tag.label} />)}
-                          </Box>
-                        }
-                      >
-                        <Chip sx={{
-                          lineHeight: '140%',
-                          fontSize: '0.625rem',
-                          backgroundColor: searchBoxBg
-                        }} label={`+${search?.tags?.slice(2).length }`} />
-                      </Tooltip> ) : null
-                    }
-                    <IconButton
-                      sx={{
-                        width: '1.25rem',
-                        height: '1.25rem',
-                        padding: 0
-                      }}
-                      size="small"
-                      key={`search_${index}`}
-                      ref={anchorEls[index]}
-                      onClick={(event) => handleMenuOpen(index, event)}
-                    >
-                      <More />
-                    </IconButton>
-                    <Menu
-                      open={Boolean(anchorEls[index])}
-                      onClose={() => handleMenuClose(index)}
-                      anchorEl={anchorEls[index]}
-                    >
-                      <MenuItem onClick={handleMenuClose}>
-                        <AddChart style={{ margin: '0 0.375rem 0 0' }} />
-                        Load results
-                      </MenuItem>
-                      <MenuItem onClick={handleMenuClose}>
-                        <OpenInNew style={{ margin: '0 0.375rem 0 0' }} />
-                        Go to query
-                      </MenuItem>
-                      <MenuItem onClick={handleMenuClose}>
-                        <Delete style={{ margin: '0 0.375rem 0 0' }} />
-                        Remove from history
-                      </MenuItem>
-                    </Menu>
-                  </Box>
-                </Box>
-                )
-
-              ) }
-            </Box>
-
-          </Box>
+          <RecentSearch
+            chipColors={chipColors}
+            recentSearch={recentSearch}
+          />
           {/* RECENT SEARCHES ENDS HERE */}
 
           {/* SEARCH RESULT STARTS HERE */}
@@ -860,9 +735,15 @@ export default function CustomizedHook({ setFocused }) {
               Suggested results
             </Typography>
             <Box mt={1.5}>
-              {groupedOptions.map((option, index) => (
+              {groupedOptions?.map((option, index) => (
                 <Box key={`groupedOptions-${index}`} {...getOptionProps({ option, index })}>
-                  <Box key={option?.title} onClick={() => handleResultSelection(option)} sx={{
+                  {/* <Item
+                    chipColors={chipColors}
+                    key={option?.title}
+                    option={option}
+                    onClick={() => handleResultSelection(option)}
+                  /> */}
+                  <Box onClick={() => handleResultSelection(option)} sx={{
                     position: 'relative',
                     p: 0.5,
                     borderRadius: 1,
@@ -950,6 +831,11 @@ export default function CustomizedHook({ setFocused }) {
               ))}
             </Box>
           </Box>
+          {/* <SearchResult
+            resultArr={groupedOptions}
+            getOptionProps={getOptionProps}
+            chipColors={chipColors}
+          /> */}
           {/* SEARCH RESULT ENDS HERE */}
         </Listbox>
       ) : null}

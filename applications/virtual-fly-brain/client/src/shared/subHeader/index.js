@@ -52,7 +52,7 @@ const {
 } = vars;
 
 const SubHeader = () => {
-  const [focused, setFocused] = useState(true);
+  const [focused, setFocused] = useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [filterAnchorEl, setFilterAnchorEl] = React.useState(null);
 

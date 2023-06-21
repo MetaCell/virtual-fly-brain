@@ -135,7 +135,7 @@ const searchResults = [
   { title: 'BCD (anlage in statu nascendi)', tags: ["Anatomy", 'Nervous system'] },
 ];
 
-export default function CustomizedHook({ setFocused }) {
+export default function SearchBuilder({ setFocused }) {
 
   const recentSearch = [
     {

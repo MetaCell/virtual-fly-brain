@@ -1,16 +1,13 @@
 import { Box, Typography } from "@mui/material";
 import React from "react";
-import vars from "../../theme/variables";
+import vars from "../../../theme/variables";
 import { Item } from "./listItem";
 
-
-const {
-  searchHeadingColor } = vars;
+const { searchHeadingColor } = vars;
 
 export const RecentSearch = ({ recentSearch, chipColors }) => {
 
   return (
-
     <Box sx={{
       py: '1rem',
       px: '0.75rem',
@@ -36,9 +33,7 @@ export const RecentSearch = ({ recentSearch, chipColors }) => {
             chipColors={chipColors}
             index={index}
           />
-        )
-
-        )}
+        ))}
       </Box>
     </Box>
   )

@@ -4,31 +4,24 @@ import useAutocomplete from '@mui/base/useAutocomplete';
 import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
 import { autocompleteClasses } from '@mui/material/Autocomplete';
-import { Box, Button, Chip, IconButton, List, ListItem, ListItemButton, ListItemText, Menu, MenuItem, Popper, Tooltip, Typography } from "@mui/material";
+import { Box, Chip } from "@mui/material";
 import vars from "../../theme/variables";
-import { AddChart, AngleRight, ChevronDown, CleaningServices, Delete, More, OpenInNew, Search, SplitScreen } from "../../icons";
-import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
-import { SearchResult } from '../SearchResult';
-import { RecentSearch } from '../RecentSearch';
+import { SearchResult } from './SearchResult';
+import { RecentSearch } from './RecentSearch';
+import { QueriesSelection } from './QueriesSelection';
+import { NarrowSearchFilter } from './NarrowSearchFilter';
+import { ResultSelectionOptions } from './ResultSelectionOptions';
 
 const {
   bottomNavBg,
   outlinedBtnTextColor,
-  queryBorderColor,
   primaryBg,
-  secondaryBg,
-  searchBoxBg,
-  whiteColor,
-  searchHeadingColor,
   outlinedBtnBorderColor,
   chipPink,
   chipRed,
   chipGreen,
   chipYellow,
   chipOrange,
-  chipRedSecondary,
-  chipGreenSecondary,
-  listHover,
   queryChipBg
 } = vars;
 
@@ -132,7 +125,9 @@ const Listbox = styled('div')(
   }
 `,
 );
+
 const chipColors = [chipRed, chipGreen, chipOrange, chipPink, chipYellow];
+
 const searchResults = [
   { title: 'A0 (anlage in statu nascendi)', tags: ["Anatomy", 'Nervous system'] },
   { title: 'A00c_a4', tags: ["Anatomy", 'Nervous system'] },
@@ -141,21 +136,6 @@ const searchResults = [
 ];
 
 export default function CustomizedHook({ setFocused }) {
-  const [anchorEls, setAnchorEls] =  React.useState([]);
-  const [menuOpen, setMenuOpen] = React.useState(false);
-  const [popoverAnchorEl, setPopoverAnchorEl] = React.useState(null);
-
-  const popoverHandleClick = (event) => {
-    setPopoverAnchorEl(popoverAnchorEl ? null : event.target.parentElement.parentElement);
-  };
-
-  const popoverHandleClose = () => {
-    setPopoverAnchorEl(null);
-  };
-
-  const popoverOpen = Boolean(popoverAnchorEl);
-  const id = popoverOpen ? 'simple-popover' : undefined;
-
 
   const recentSearch = [
     {
@@ -176,6 +156,7 @@ export default function CustomizedHook({ setFocused }) {
       ]
     },
   ];
+
   const [value, setValue] = React.useState([]);
   const addQueryTag = () => { setValue((prevValue) => [{title: 'Queries', tags: []}, ...prevValue]) }
 
@@ -185,9 +166,11 @@ export default function CustomizedHook({ setFocused }) {
       setValue([...value, option])
     }
   };
+
   const handleChipDelete = (index) => {
     setValue(value.filter((chip) => chip.title !== index))
   }
+
   const {
     getRootProps,
     getInputProps,
@@ -202,25 +185,13 @@ export default function CustomizedHook({ setFocused }) {
     multiple: true,
     options: searchResults,
     getOptionLabel: (option) => option?.title,
+    disableCloseOnSelect: true,
+    open: true
   });
 
   React.useEffect(() => {
-    if (focused) {
-      setFocused(true)
-    } else {
-      setFocused(false)
-    }
+    setFocused(focused ? true : false)
   }, [focused])
-
-  const handleFocus = () => {
-    setFocused(true);
-  };
-
-  const handleBlur = () => {
-    if(!menuOpen) {
-      setFocused(false)
-    }
-  };
 
   return (
     <Box flexGrow={1}>
@@ -259,584 +230,35 @@ export default function CustomizedHook({ setFocused }) {
         </InputWrapper>
       </Box>
       {focused ? (
-        <Listbox sx={{
-          top: {
-            xs: '2.875rem',
-            lg: '2.125rem'
-          }
-        }} className='scrollbar' {...getListboxProps()}>
-          <Box sx={{
-            py: '1rem',
-            px: '0.75rem',
-            borderBottom: `0.0625rem solid ${primaryBg}`,
-          }}>
-            <Box
-              display='flex'
-              alignItems='center'
-              justifyContent='space-between'
-            >
-              <Typography variant="body2" sx={{
-                fontSize: '0.75rem',
-                lineHeight: '133%',
-                letterSpacing: '-0.005em',
-                fontWeight: 500,
-                color: searchHeadingColor
-              }}>
-                Add other query IDs
-              </Typography>
+        <Listbox
+          sx={{
+            top: {
+              xs: '2.875rem',
+              lg: '2.125rem'
+            }
+          }}
+          className='scrollbar'
+          {...getListboxProps()}
+        >
+          <QueriesSelection />
 
-              <Button
-                disableRipple
-                sx={{
-                  height: 'auto',
-                  letterSpacing: 'normal',
-                  p: 0,
-                  fontSize: '0.75rem',
-                  lineHeight: '133%',
+          <NarrowSearchFilter />
 
-                  '&:hover': {
-                    background: 'transparent'
-                  }
-                }}
-                variant="text"
-              >
-                <CleaningServices style={{ marginRight: '0.375rem' }} />
-                Clear queries
-              </Button>
-            </Box>
+          <ResultSelectionOptions
+            addQueryTag={addQueryTag}
+          />
 
-            <Box
-              my={1.5}
-              display='flex'
-              flexDirection='column'
-              rowGap={2}
-            >
-              <Box
-                display='flex'
-                columnGap={1}
-              >
-                <Button
-                  sx={{
-                    flexShrink: 0,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: '1.5rem',
-                    height: '1.5rem',
-                    p: 0,
-                    borderRadius: 1,
-                    background: searchBoxBg,
-                    minWidth: '0.0625rem',
-
-                    '&:hover': {
-                      background: searchBoxBg,
-                    }
-                  }}
-                >
-                  <Delete size={12} />
-                </Button>
-
-                <Box
-                  borderRadius={1}
-                  display='flex'
-                  sx={{
-                    width: 'calc(100% - 2rem)',
-                    background: searchBoxBg,
-                  }}
-                >
-                  <Box
-                    width={1}
-                    flexGrow={1}
-                    display='flex'
-                  >
-                    <Typography sx={{
-                      width: 'calc(100% - 1.875rem)',
-                      px: 1,
-                      alignSelf: 'center',
-                      flexGrow: 1,
-                      fontSize: '0.75rem',
-                      lineHeight: '133%',
-                      color: whiteColor,
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis'
-                    }}>
-                      Select query for A00c_a4 (L1EM:2511238) expression pattern
-                    </Typography>
-
-                    <Button
-                      aria-describedby={id}
-                      onClick={popoverHandleClick}
-                      sx={{
-                        borderLeft: `0.0625rem solid ${queryBorderColor}`,
-                        minWidth: '0.0625rem',
-                        width: '1.875rem',
-                        height: '100%',
-                        p: 0,
-
-                        '&:hover': {
-                          background: 'transparent'
-                        }
-                      }}
-                    >
-                      <ChevronDown />
-                    </Button>
-
-                    <Popper
-                      placement='bottom-start'
-                      id={id}
-                      open={popoverOpen}
-                      anchorEl={popoverAnchorEl}
-                    >
-
-                      <List>
-                        <ListItem>
-                          <ListItemButton onClick={popoverHandleClose}>
-                            <ListItemText primary="Select query for A00c_a4 (L1EM:2511238) expression pattern" />
-                          </ListItemButton>
-                        </ListItem>
-
-                        <ListItem>
-                          <ListItemButton onClick={popoverHandleClose}>
-                            <ListItemText primary="Anatomy A00c_a4 (L1EM:2511238) expression pattern is expressed in" />
-                          </ListItemButton>
-                        </ListItem>
-
-                        <ListItem>
-                          <ListItemButton onClick={popoverHandleClose}>
-                            <ListItemText primary="Images of fragments of A00c_a4 (L1EM:2511238)expression pattern" />
-                          </ListItemButton>
-                        </ListItem>
-
-                        <ListItem>
-                          <ListItemButton onClick={popoverHandleClose}>
-                            <ListItemText primary="Parts of A00c_a4 (L1EM:2511238) expression pattern" />
-                          </ListItemButton>
-                        </ListItem>
-
-                        <ListItem>
-                          <ListItemButton onClick={popoverHandleClose}>
-                            <ListItemText primary="Subclasses of A00c_a4 (L1EM:2511238) expression pattern" />
-                          </ListItemButton>
-                        </ListItem>
-                      </List>
-                    </Popper>
-                  </Box>
-                </Box>
-              </Box>
-
-              <Box
-                display='flex'
-                columnGap={1}
-              >
-                <Button
-                  sx={{
-                    flexShrink: 0,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: '1.5rem',
-                    height: '1.5rem',
-                    p: 0,
-                    borderRadius: 1,
-                    background: searchBoxBg,
-                    minWidth: '0.0625rem',
-
-                    '&:hover': {
-                      background: searchBoxBg,
-                    }
-                  }}
-                >
-                  <Delete size={12} />
-                </Button>
-
-                <Box
-                  borderRadius={1}
-                  display='flex'
-                  sx={{
-                    width: 'calc(100% - 2rem)',
-                    background: searchBoxBg,
-                  }}
-                >
-                  <Box
-                    width={1}
-                    flexGrow={1}
-                    display='flex'
-                  >
-                    <Typography sx={{
-                      width: 'calc(100% - 1.875rem)',
-                      px: 1,
-                      alignSelf: 'center',
-                      flexGrow: 1,
-                      fontSize: '0.75rem',
-                      lineHeight: '133%',
-                      color: whiteColor,
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis'
-                    }}>
-                      Select query for A00c_a4 (L1EM:2511238) expression pattern
-                    </Typography>
-
-                    <Button
-                      aria-describedby={id}
-                      onClick={popoverHandleClick}
-                      sx={{
-                        borderLeft: `0.0625rem solid ${queryBorderColor}`,
-                        minWidth: '0.0625rem',
-                        width: '1.875rem',
-                        height: '100%',
-                        p: 0,
-
-                        '&:hover': {
-                          background: 'transparent'
-                        }
-                      }}
-                    >
-                      <ChevronDown />
-                    </Button>
-
-                    <Popper
-                      placement='bottom-start'
-                      id={id}
-                      open={popoverOpen}
-                      anchorEl={popoverAnchorEl}
-                    >
-
-                      <List>
-                        <ListItem>
-                          <ListItemButton onClick={popoverHandleClose}>
-                            <ListItemText primary="Select query for A00c_a4 (L1EM:2511238) expression pattern" />
-                          </ListItemButton>
-                        </ListItem>
-
-                        <ListItem>
-                          <ListItemButton onClick={popoverHandleClose}>
-                            <ListItemText primary="Anatomy A00c_a4 (L1EM:2511238) expression pattern is expressed in" />
-                          </ListItemButton>
-                        </ListItem>
-
-                        <ListItem>
-                          <ListItemButton onClick={popoverHandleClose}>
-                            <ListItemText primary="Images of fragments of A00c_a4 (L1EM:2511238)expression pattern" />
-                          </ListItemButton>
-                        </ListItem>
-
-                        <ListItem>
-                          <ListItemButton onClick={popoverHandleClose}>
-                            <ListItemText primary="Parts of A00c_a4 (L1EM:2511238) expression pattern" />
-                          </ListItemButton>
-                        </ListItem>
-
-                        <ListItem>
-                          <ListItemButton onClick={popoverHandleClose}>
-                            <ListItemText primary="Subclasses of A00c_a4 (L1EM:2511238) expression pattern" />
-                          </ListItemButton>
-                        </ListItem>
-                      </List>
-                    </Popper>
-                  </Box>
-                </Box>
-              </Box>
-            </Box>
-
-            <Box
-              display='flex'
-              justifyContent='flex-end'
-            >
-              <Button
-                onClick={() => console.log('Clicked')}
-                sx={{
-                  px: '0.5rem',
-                  py: '0.25rem',
-                  backgroundColor: primaryBg,
-                  borderRadius: 1,
-                  fontSize: '0.75rem',
-                  height: '1.5rem',
-
-                  '&:hover': {
-                    backgroundColor: primaryBg,
-                  }
-                }}
-              >
-                Check 15 results
-                <AngleRight style={{ marginLeft: '0.5rem' }} />
-              </Button>
-            </Box>
-          </Box>
-
-          {/* NARROW YOUR SEARCH STARTS HERE */}
-          <Box sx={{
-            py: '1rem',
-            px: '0.75rem',
-            borderBottom: `0.0625rem solid ${primaryBg}`,
-          }}>
-            <Typography variant="body2" sx={{
-              fontSize: '0.75rem',
-              lineHeight: '133%',
-              letterSpacing: '-0.005em',
-              fontWeight: 500,
-              color: searchHeadingColor
-            }}>
-              Narrow your search
-            </Typography>
-
-            <Box
-              mt={1}
-              columnGap={1}
-              display='flex'
-              sx={{
-                alignItems: {
-                  xs: 'flex-start',
-                  lg: 'center'
-                }
-              }}
-            >
-              <Box sx={{
-                flexGrow: 1,
-                display: 'flex',
-                alignItems: 'center',
-                columnGap: 1,
-                flexWrap: 'wrap',
-                rowGap: 0.5
-              }}>
-                <Chip
-                  className="secondary"
-                  sx={{ backgroundColor: chipGreenSecondary }}
-                  label="Anatomy"
-                  onDelete={() => null}
-                  deleteIcon={<CloseIcon />}
-                />
-                <Chip
-                  className="secondary"
-                  sx={{ backgroundColor: chipGreenSecondary }}
-                  label="Nervous system"
-                  onDelete={() => null}
-                  deleteIcon={<CloseIcon />}
-                />
-                <Chip
-                  className="secondary"
-                  sx={{ backgroundColor: chipRedSecondary }}
-                  label="Neuron"
-                  onDelete={() => null}
-                  deleteIcon={<CloseIcon />}
-                />
-
-              </Box>
-
-              <Button
-                disableRipple
-                variant="text"
-                sx={{
-                  flexShrink: 0,
-                  padding: 0,
-                  fontSize: '0.75rem',
-                  lineHeight: '133%',
-                  height: {
-                    xs: '1.5rem',
-                    lg: 'auto'
-                  },
-                  color: outlinedBtnTextColor,
-
-                  '&:hover': {
-                    background: 'transparent'
-                  }
-                }}
-              >
-                More filters
-              </Button>
-            </Box>
-          </Box>
-          {/* NARROW YOUR SEARCH ENDS HERE */}
-
-          {/* I AM LOOKING FOR STARTS HERE */}
-          <Box sx={{
-            py: '1rem',
-            px: '0.75rem',
-            borderBottom: `0.0625rem solid ${primaryBg}`,
-          }}>
-            <Typography variant="body2" sx={{
-              fontSize: '0.75rem',
-              lineHeight: '133%',
-              letterSpacing: '-0.005em',
-              fontWeight: 500,
-              color: searchHeadingColor
-            }}>
-              I’m looking for...
-            </Typography>
-
-            <Box
-              mt={1.5}
-              sx={{
-                columnGap: 1,
-                display: 'flex',
-                alignItems: 'center',
-              }}
-            >
-              <Button sx={{
-                px: '0.5rem',
-                py: '0.25rem',
-                backgroundColor: outlinedBtnBorderColor,
-                borderRadius: 1,
-                fontSize: '0.75rem',
-                height: '1.5rem',
-
-                '&:hover': {
-                  backgroundColor: outlinedBtnBorderColor,
-                }
-              }}>
-                <AddChart style={{ marginRight: '0.5rem' }} />
-                Load results
-                <AngleRight style={{ marginLeft: '0.5rem' }} />
-              </Button>
-
-              <Button sx={{
-                px: 1,
-                py: 0.5,
-                fontSize: '0.75rem',
-                height: '1.5rem',
-                backgroundColor: outlinedBtnBorderColor,
-                borderRadius: 1,
-
-                '&:hover': {
-                  backgroundColor: outlinedBtnBorderColor,
-                }
-              }}
-                onClick={addQueryTag}
-              >
-                <SplitScreen style={{ marginRight: '0.5rem' }} />
-                Queries
-                <AngleRight style={{ marginLeft: '0.5rem' }} />
-              </Button>
-            </Box>
-          </Box>
-          {/* I AM LOOKING FOR ENDS HERE */}
-
-
-          {/* RECENT SEARCHES STARTS HERE */}
           <RecentSearch
             chipColors={chipColors}
             recentSearch={recentSearch}
           />
-          {/* RECENT SEARCHES ENDS HERE */}
 
-          {/* SEARCH RESULT STARTS HERE */}
-          <Box sx={{
-            py: '1rem',
-            px: '0.75rem',
-          }}>
-            <Typography variant="body2" sx={{
-              fontSize: '0.75rem',
-              lineHeight: '133%',
-              letterSpacing: '-0.005em',
-              fontWeight: 500,
-              color: searchHeadingColor
-            }}>
-              Suggested results
-            </Typography>
-            <Box mt={1.5}>
-              {groupedOptions?.map((option, index) => (
-                <Box key={`groupedOptions-${index}`} {...getOptionProps({ option, index })}>
-                  {/* <Item
-                    chipColors={chipColors}
-                    key={option?.title}
-                    option={option}
-                    onClick={() => handleResultSelection(option)}
-                  /> */}
-                  <Box onClick={() => handleResultSelection(option)} sx={{
-                    position: 'relative',
-                    p: 0.5,
-                    borderRadius: 1,
-                    display: 'flex',
-                    alignItems: 'center',
-
-                    '& > button': {
-                      opacity: 1,
-                      transition: 'all ease-in-out .3s'
-                    },
-
-                    '&:not(:hover)': {
-                      '& > button': {
-                        opacity: 0
-                      }
-                    },
-
-                    '&:hover': {
-                      backgroundColor: secondaryBg,
-                      cursor: 'pointer',
-                    }
-                  }}>
-                    <Box sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      width: '1.5rem',
-                      height: '1.5rem',
-                      borderRadius: 1,
-                      background: searchBoxBg,
-                    }}>
-                      <Search size={12} />
-                    </Box>
-
-                    <Typography variant="body2" sx={{
-                      fontSize: '0.75rem',
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      color: searchHeadingColor,
-                      px: 1
-                    }}>
-                      {option?.title}
-                    </Typography>
-
-                    <Box sx={{
-                      ml: 'auto',
-                      display: 'flex',
-                      alignItems: 'center',
-                      columnGap: 0.5
-                    }}>
-                      {option?.tags.map((tag, index) => <Chip
-                        key={tag + index}
-                        sx={{
-                          lineHeight: '140%',
-                          fontSize: '0.625rem',
-                          backgroundColor: chipColors[index] || chipColors[0]
-                        }}
-                        label={tag}
-                      />)}
-                    </Box>
-
-                    <Button sx={{
-                      color: whiteColor,
-                      zIndex: 9,
-                      justifyContent: 'flex-end',
-                      background: listHover,
-                      borderRadius: '0.25rem',
-                      width: '5.8125rem',
-                      minWidth: '0.0625rem',
-                      p: '0 0.75rem 0 0',
-                      height: '100%',
-                      position: 'absolute',
-                      right: 0,
-                      top: 0
-                    }} variant='text'>
-                      <ArrowOutwardIcon sx={{
-                        fontSize: '0.75rem',
-                        m: 0,
-                      }} />
-                    </Button>
-
-                  </Box>
-                </Box>
-              ))}
-            </Box>
-          </Box>
-          {/* <SearchResult
-            resultArr={groupedOptions}
+          <SearchResult
+            groupedOptions={groupedOptions}
             getOptionProps={getOptionProps}
             chipColors={chipColors}
-          /> */}
-          {/* SEARCH RESULT ENDS HERE */}
+            handleResultSelection={handleResultSelection}
+          />
         </Listbox>
       ) : null}
     </Box>

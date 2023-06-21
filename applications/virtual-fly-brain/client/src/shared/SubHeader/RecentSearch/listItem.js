@@ -1,7 +1,7 @@
 import React, { useRef } from "react"
 import { Box, Button, Chip, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Menu, MenuItem, Popper, Tooltip, Typography } from "@mui/material"
-import { AddChart, Delete, More, OpenInNew, Search, SplitScreen } from "../../icons";
-import vars from "../../theme/variables";
+import { AddChart, Delete, More, OpenInNew, Search, SplitScreen } from "../../../icons";
+import vars from "../../../theme/variables";
 
 const {
   secondaryBg,

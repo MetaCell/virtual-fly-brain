@@ -10,7 +10,7 @@ const vars = {
   shortcutBg: 'rgba(255, 255, 255, 0.1)',
   headerBoxShadow: '0px 20px 24px -4px rgba(16, 24, 40, 0.08), 0px 8px 8px -4px rgba(16, 24, 40, 0.03)',
   headerBorderColor: '#222222',
-  blackColor: '#000000',
+  blackColor: '#1A1A1A',
   bottomNavBg: 'rgba(58, 58, 58, 0.8)',
   tabActiveColor: '#0AB7FE',
   chipPrimaryColor: '#FFFFB3',

@@ -415,7 +415,8 @@ theme = createTheme({
           padding: '0 0.5rem',
 
           '& svg': {
-            marginRight: '0.5rem'
+            marginRight: '0.5rem',
+            flexShrink: 0
           }
         },
 
@@ -442,7 +443,10 @@ theme = createTheme({
         },
 
         colorDefault: {
-          background: secondaryBg
+          background: secondaryBg,
+          '&:hover': {
+            background: secondaryBg
+          }
         },
       }
     },
@@ -454,6 +458,7 @@ theme = createTheme({
           lineHeight: '1.125rem',
           fontWeight: 400,
           color: whiteColor,
+          textDecoration: 'none',
 
           '&:not(:first-of-type)': {
             marginTop: '0.75rem',

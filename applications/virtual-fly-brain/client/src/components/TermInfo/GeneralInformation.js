@@ -1,7 +1,7 @@
-import { Box, Button, Chip, Grid, Typography } from "@mui/material";
+import { Box, Button, Chip, Grid, Link, Typography } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import {useSelector} from 'react-redux'
-import { Link } from "../../icons";
+import { Link as LinkIcon } from "../../icons";
 import vars from "../../theme/variables";
 import TerminfoSlider from "./TerminfoSlider";
 
@@ -78,7 +78,7 @@ const GeneralInformation = ({data, classes}) => {
               ...classes.heading,
               color: whiteColor,
               textAlign: 'right'
-            }}>{data?.Meta?.Types}</Typography>
+            }}><Link href="#">{data?.Meta?.Types}</Link></Typography>
           </Box>
 
           <Box display='flex' justifyContent='space-between' columnGap={1}>
@@ -114,7 +114,7 @@ const GeneralInformation = ({data, classes}) => {
 
           <Box display='flex' justifyContent='space-between' columnGap={1}>
             <Typography sx={classes.heading}>Source</Typography>
-            <Chip icon={<Link/>} label={license?.source}>{license?.iri}</Chip>
+            <Chip onClick={() => console.log('Clicked!')} icon={<LinkIcon />} label={license?.source}>{license?.iri}</Chip>
           </Box>
 
           <Box display='flex' justifyContent='space-between' columnGap={1}>
@@ -123,19 +123,34 @@ const GeneralInformation = ({data, classes}) => {
               ...classes.heading,
               color: whiteColor,
               textAlign: 'right'
-            }}>{license?.label}{license?.source_iri}{license?.icon}</Typography>
+            }}>
+              <Link sx={{
+                display: 'flex',
+                gap: 1,
+              }} href={license?.source_iri}>
+                {license?.label}
+                <img style={{maxHeight: '1.125rem'}} src={license?.icon} alt={license?.label} />
+              </Link>
+            </Typography>
           </Box>
 
           <Box display='flex' justifyContent='space-between' columnGap={1}>
             <Typography sx={classes.heading}>Aligned To</Typography>
-            <Chip icon={<Link />} label={data?.Name} />
+            <Chip onClick={() => console.log('Clicked!')} icon={<LinkIcon />} label={data?.Name} />
           </Box>
 
           <Box display='flex' justifyContent='space-between' columnGap={1}>
             <Typography sx={classes.heading}>Downloads</Typography>
-            <Chip icon={<Link />} label={images?.nrrd} />
-            <Chip icon={<Link />} label={images?.obj}/>
-            <Chip icon={<Link />} label={images?.wlz}/>
+            <Box
+              width='65%'
+              display='flex'
+              flexDirection='column'
+              gap={0.5}
+            >
+              <Chip icon={<LinkIcon />} label={images?.nrrd} />
+              <Chip icon={<LinkIcon />} label={images?.obj} />
+              <Chip icon={<LinkIcon />} label={images?.wlz} />
+            </Box>
           </Box>
 
         </Box>

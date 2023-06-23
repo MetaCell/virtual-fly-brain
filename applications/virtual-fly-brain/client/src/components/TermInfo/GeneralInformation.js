@@ -1,4 +1,4 @@
-import { Box, Button, Chip, Grid, Link, Typography } from "@mui/material";
+import { Box, Button, Chip, Grid, Link, Tooltip, Typography } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import {useSelector} from 'react-redux'
 import { Link as LinkIcon } from "../../icons";
@@ -114,7 +114,12 @@ const GeneralInformation = ({data, classes}) => {
 
           <Box display='flex' justifyContent='space-between' columnGap={1}>
             <Typography sx={classes.heading}>Source</Typography>
-            <Chip onClick={() => console.log('Clicked!')} icon={<LinkIcon />} label={license?.source}>{license?.iri}</Chip>
+            <Tooltip placement="right" arrow title={license?.source}>
+              <Chip onClick={() => console.log('Clicked!')} icon={<LinkIcon />} label={license?.source}>
+                {license?.iri}
+              </Chip>
+            </Tooltip>
+
           </Box>
 
           <Box display='flex' justifyContent='space-between' columnGap={1}>
@@ -147,9 +152,15 @@ const GeneralInformation = ({data, classes}) => {
               flexDirection='column'
               gap={0.5}
             >
-              <Chip icon={<LinkIcon />} label={images?.nrrd} />
-              <Chip icon={<LinkIcon />} label={images?.obj} />
-              <Chip icon={<LinkIcon />} label={images?.wlz} />
+              <Tooltip placement="right" arrow title={images?.nrrd}>
+                <Chip icon={<LinkIcon />} label={images?.nrrd} />
+              </Tooltip>
+              <Tooltip placement="right" arrow title={images?.obj}>
+                <Chip icon={<LinkIcon />} label={images?.obj} />
+              </Tooltip>
+              <Tooltip placement="right" arrow title={images?.wlz}>
+                <Chip icon={<LinkIcon />} label={images?.wlz} />
+              </Tooltip>
             </Box>
           </Box>
 

@@ -28,13 +28,13 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
   const theme = useTheme();
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const matches = useMediaQuery(theme.breakpoints.up('lg'));
-  const defaultActiveTab = matches ? [0, 1, 2, 3] : [0];
+  const desktopScreen = useMediaQuery(theme.breakpoints.up('lg'));
+  const defaultActiveTab = desktopScreen ? [0, 1, 2, 3] : [0];
   const [tab, setTab] = useState([]);
 
   useEffect(() => {
     setTab(defaultActiveTab)
-  }, [matches])
+  }, [desktopScreen])
 
   const classes = {
     tabs: {
@@ -132,7 +132,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
         }}
       >
 
-        {matches ? (
+        {desktopScreen ? (
           <>
             {tabContent}
             {bottomNav === 2 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} />}

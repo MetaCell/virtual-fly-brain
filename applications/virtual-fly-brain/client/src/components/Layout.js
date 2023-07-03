@@ -7,8 +7,9 @@ import TermInfo from "./TermInfo"
 import Images from "./Images";
 import StackViewer from './StackViewer';
 import vars from "../theme/variables";
-import SideBar from "../shared/sidebar";
+import SideBar from "../shared/Sidebar";
 import Circuit from "./Circuit";
+import QueryBuilder from "./queryBuilder";
 
 const {
   secondaryBg,
@@ -23,8 +24,10 @@ const tabsArr = [
   { id: 3, name: 'Stack Viewer' }
 ]
 
-const MainLayout = () => {
+const MainLayout = ({ bottomNav, setBottomNav }) => {
   const theme = useTheme();
+
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const matches = useMediaQuery(theme.breakpoints.up('lg'));
   const defaultActiveTab = matches ? [0, 1, 2, 3] : [0];
   const [tab, setTab] = useState([]);
@@ -69,18 +72,35 @@ const MainLayout = () => {
     setTab([id])
   }
 
+  const tabContent = (
+    <>
+      {tab.includes(0) && (
+        <SideBar open={sidebarOpen} setOpen={setSidebarOpen} />
+      )}
+
+      {tab.includes(1) && (
+        <Images />
+      )}
+
+      {tab.includes(2) && (
+        <Circuit />
+      )}
+    </>
+  )
+
   return (
     <>
       <MediaQuery maxWidth={1199}>
-        <Box display='flex' sx={classes.tabs}>
-          {tabsArr.map((el) => (
-            <Button sx={{px: 0}} className={tab.includes(el.id) ? 'active' : ''} key={el.id} onClick={() => handleTabSelect(el.id)}>
-              {el.name}
-            </Button>
-          ))}
-        </Box>
+        {!bottomNav ? (
+          <Box display='flex' sx={classes.tabs}>
+            {tabsArr.map((el) => (
+              <Button sx={{ px: 0 }} className={tab.includes(el.id) ? 'active' : ''} key={el.id} onClick={() => handleTabSelect(el.id)}>
+                {el.name}
+              </Button>
+            ))}
+          </Box>
+        ) : null}
       </MediaQuery>
-
 
       <Box
         display='flex'
@@ -89,6 +109,9 @@ const MainLayout = () => {
         gap={1}
         sx={{
           ...classes.tabContent,
+          position: {
+            lg: 'relative'
+          },
           paddingTop: {
             lg: 1
           },
@@ -96,32 +119,28 @@ const MainLayout = () => {
             lg: 1
           },
           pb: {
-            xs: 5,
+            xs: 7,
             lg: 0
           },
           overflow: {
             xs: 'auto',
           },
           height: {
-            xs: 'calc(100vh - 8.8125rem)',
+            xs: !bottomNav ? 'calc(100vh - 8.8125rem)' : 'calc(100vh - 6.0625rem)',
             lg: 'calc(100vh - 5.75rem)'
           },
         }}
       >
-        {tab.includes(0) && (
-          <SideBar />
-        )}
 
-        {tab.includes(1) && (
-          <ThreeDCanvas />
-        )}
-
-        {tab.includes(2) && (
-          <StackViewer 
-            id="NewStackViewer"
-            defHeight={600}
-            defWidth={600}
-          />
+        {matches ? (
+          <>
+            {tabContent}
+            {bottomNav === 2 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} />}
+          </>
+        ) : (
+            <>
+              {!bottomNav ? tabContent : bottomNav === 2 ? <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} /> : null}
+            </>
         )}
       </Box>
     </>

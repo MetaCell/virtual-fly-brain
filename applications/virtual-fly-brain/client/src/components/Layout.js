@@ -7,7 +7,7 @@ import TermInfo from "./TermInfo"
 import Images from "./Images";
 import StackViewer from './StackViewer';
 import vars from "../theme/variables";
-import SideBar from "../shared/Sidebar";
+import SideBar from "../shared/sidebar";
 import Circuit from "./Circuit";
 
 const {
@@ -104,7 +104,7 @@ const MainLayout = () => {
           },
           height: {
             xs: 'calc(100vh - 8.8125rem)',
-            lg: 'calc(100vh - 6.375rem)'
+            lg: 'calc(100vh - 5.75rem)'
           },
         }}
       >
@@ -113,11 +113,15 @@ const MainLayout = () => {
         )}
 
         {tab.includes(1) && (
-          <Images />
+          <ThreeDCanvas />
         )}
 
         {tab.includes(2) && (
-          <Circuit />
+          <StackViewer 
+            id="NewStackViewer"
+            defHeight={600}
+            defWidth={600}
+          />
         )}
       </Box>
     </>

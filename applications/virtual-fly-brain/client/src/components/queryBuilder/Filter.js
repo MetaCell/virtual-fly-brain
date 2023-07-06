@@ -3,6 +3,77 @@ import { CheckBoxDefault, CheckBoxGreen, CheckBoxRed, CleaningServices, FilterIc
 import { Box, Button, Checkbox, FormControlLabel, FormGroup, IconButton, Popper, Typography } from "@mui/material";
 import vars from "../../theme/variables";
 
+const filterChipColors = [
+  '#6D4EA0',
+  '#4E5BA0',
+  '#4E91A0',
+  '#4EA082',
+  '#4EA060',
+  '#68A04E',
+  '#7CA04E',
+  '#A0984E',
+  '#A07A4E',
+  '#A0624E',
+  '#A04E6C',
+  '#994EA0',
+  '#A04E4E'
+];
+
+const DUMMY_FILTERS = [
+  {
+    id: 0,
+    label: 'Adult'
+  },
+  {
+    id: 1,
+    label: 'Image'
+  },
+  {
+    id: 2,
+    label: 'Split Expression'
+  },
+  {
+    id: 3,
+    label: 'Expression Pattern'
+  },
+  {
+    id: 4,
+    label: 'Expression Pattern Fragment'
+  },
+  {
+    id: 5,
+    label: 'Anatomy'
+  },
+  {
+    id: 6,
+    label: 'Neuron with Connectivity'
+  },
+  {
+    id: 7,
+    label: 'Nervous system'
+  },
+  {
+    id: 8,
+    label: 'Neuron'
+  },
+  {
+    id: 9,
+    label: 'Neuron Similarity (NBLAST)'
+  },
+  {
+    id: 10,
+    label: 'Synaptic Neuropil'
+  },
+  {
+    id: 11,
+    label: 'Nervous projection bundle'
+  },
+  {
+    id: 12,
+    label: 'Larva'
+  }
+]
+
 
 const { primaryBg, outlinedBtnTextColor, bottomNavBg, tabActiveColor, whiteColor, searchHeadingColor } = vars;
 
@@ -78,16 +149,27 @@ const Filter = () => {
           <FormGroup sx={{
             display: 'flex',
             flexDirection: 'column',
+            alignItems: 'flex-start',
             rowGap: 1.5
           }}>
-            <FormControlLabel control={<Checkbox checkedIcon={<CheckBoxGreen />} icon={<CheckBoxDefault />} />} label="Adult" />
-            <FormControlLabel control={<Checkbox checkedIcon={<CheckBoxRed />} icon={<CheckBoxDefault />} />} label="Larva" />
-            <FormControlLabel control={<Checkbox checkedIcon={<CheckBoxGreen />} icon={<CheckBoxDefault />} />} label="Nervous System" />
-            <FormControlLabel control={<Checkbox checkedIcon={<CheckBoxRed />} icon={<CheckBoxDefault />} />} label="Anatomy" />
-            <FormControlLabel control={<Checkbox checkedIcon={<CheckBoxGreen />} icon={<CheckBoxDefault />} />} label="Neuron" />
-            <FormControlLabel control={<Checkbox checkedIcon={<CheckBoxRed />} icon={<CheckBoxDefault />} />} label="Image" />
-            <FormControlLabel control={<Checkbox checkedIcon={<CheckBoxGreen />} icon={<CheckBoxDefault />} />} label="Split Expression" />
-            <FormControlLabel control={<Checkbox checkedIcon={<CheckBoxRed />} icon={<CheckBoxDefault />} />} label="Expression Pattern" />
+            {DUMMY_FILTERS.map((filter, index) => (
+              <FormControlLabel sx={{
+                height: '20px',
+                borderRadius: '50px',
+                px: '0.5rem',
+                backgroundColor: filterChipColors[index],
+
+                '& .MuiCheckbox-root': {
+                  marginRight: '0.25rem'
+                },
+
+                '& .MuiFormControlLabel-label': {
+                  marginLeft: 0,
+                  fontSize: '0.625rem'
+                }
+
+              }} key={filter.id} control={<Checkbox checkedIcon={<Tick color="#fff" />} icon={<></>} />} label={filter.label} />
+            ))}
           </FormGroup>
         </Box>
         <Box sx={{

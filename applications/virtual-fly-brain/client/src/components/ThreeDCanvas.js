@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Canvas from "@metacell/geppetto-meta-ui/3d-canvas/Canvas";
-import CameraControls from "@metacell/geppetto-meta-ui/camera-controls/CameraControls";
+// import CameraControls from "@metacell/geppetto-meta-ui/camera-controls/CameraControls";
 import SimpleInstance from "@metacell/geppetto-meta-core/model/SimpleInstance";
 import { withStyles } from '@material-ui/core';
 import Button from "@material-ui/core/Button";
@@ -12,6 +12,7 @@ import { augmentInstancesArray } from '@metacell/geppetto-meta-core/Instances';
 import { connect } from 'react-redux';
 import { Box } from '@mui/material';
 import vars from '../theme/variables';
+import CameraControls from './CameraControls';
 
 const {
   secondaryBg,
@@ -196,7 +197,7 @@ class ThreeDCanvas extends Component {
               ref={this.canvasRef}
               data={this.state.mappedCanvasData}
               cameraOptions={cameraOptions}
-              captureOptions={captureOptions}
+              // captureOptions={captureOptions}
               backgroundColor={blackColor}
               onSelection={this.onSelection}
               onMount={this.onMount}

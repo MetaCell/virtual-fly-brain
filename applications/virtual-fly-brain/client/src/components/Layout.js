@@ -7,7 +7,7 @@ import TermInfo from "./TermInfo"
 import Images from "./Images";
 import StackViewer from './StackViewer';
 import vars from "../theme/variables";
-import SideBar from "../shared/Sidebar";
+import SideBar from "../shared/sidebar";
 import Circuit from "./Circuit";
 import StackViewerComponent from "./StackViewerComponent";
 const {
@@ -114,12 +114,15 @@ const MainLayout = () => {
         )}
 
         {tab.includes(1) && (
-          // <ThreeDCanvas />
-          <Images />
+          <ThreeDCanvas />
         )}
 
         {tab.includes(2) && (
-          <StackViewerComponent />
+          <StackViewer 
+            id="NewStackViewer"
+            defHeight={600}
+            defWidth={600}
+          />
         )}
       </Box>
     </>

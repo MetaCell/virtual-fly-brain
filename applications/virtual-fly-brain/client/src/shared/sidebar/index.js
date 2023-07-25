@@ -316,7 +316,7 @@ const SideBar = ({open, setOpen}) => {
                   aria-controls="panel2a-content"
                   id="panel2a-header"
                 >
-                  <Typography>Queries (28)</Typography>
+                  <Typography>Queries (MISSING)</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                   <TreeView
@@ -328,7 +328,7 @@ const SideBar = ({open, setOpen}) => {
                   >
                     <TreeItem nodeId="1" label={
                       <Box display='flex' flexWrap='wrap'>
-                        <Typography>Neurons with postsynaptic terminals in posterior ventrolateral protocerebrum</Typography>
+                        <Typography>MISSING</Typography>
                           <Box display='flex' pl={0.5}>
                           <Typography sx={{ pr: 0.5 }}>71</Typography>
                           <ListAltIcon />
@@ -452,7 +452,7 @@ const SideBar = ({open, setOpen}) => {
                       alignItems="center"
                     >
                         <Typography sx={{ flexGrow: 1, color: outlinedBtnTextColor }}>
-                        Show location of JRC2018Unisex
+                        MISSING
                       </Typography>
                       <IconButton sx={{p: 0}}>
                           <PinDrop />
@@ -464,7 +464,7 @@ const SideBar = ({open, setOpen}) => {
                       alignItems="center"
                     >
                         <Typography sx={{ flexGrow: 1, color: outlinedBtnTextColor }}>
-                        Show location of JRC2018Unisex
+                        MISSING
                       </Typography>
                       <IconButton sx={{p: 0}}>
                           <PinDrop />

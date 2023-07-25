@@ -18,6 +18,25 @@ export const termInfoSchemma = {
     },
     Queries: { type: 'object' },
     IsIndividual: { type: 'boolean', default: false },
+    Licenses: {
+      type: 'object',
+      additionalProperties: {
+        type: 'array',
+        items: {
+          type: 'object',
+          required: ['id', 'label'],
+          properties: {
+            id: { type: 'string' },
+            iri: { type: 'string' },
+            short_form: { type: ['string', 'null'] },
+            label: { type: ['string', 'null'] },
+            icon: { type: ['string', 'null'] },
+            source: { type: ['string', 'null'] },
+            source_iri: { type: ['string', 'null'] },
+          },
+        },
+      },
+    },
     Images: {
       type: 'object',
       additionalProperties: {

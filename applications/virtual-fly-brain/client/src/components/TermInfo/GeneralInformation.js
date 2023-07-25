@@ -1,7 +1,7 @@
-import { Box, Button, Chip, Grid, Typography } from "@mui/material";
+import { Box, Button, Chip, Grid, Link, Tooltip, Typography } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import {useSelector} from 'react-redux'
-import { Link } from "../../icons";
+import { Link as LinkIcon } from "../../icons";
 import vars from "../../theme/variables";
 import TerminfoSlider from "./TerminfoSlider";
 
@@ -14,10 +14,18 @@ const {
   descriptionBg
 } = vars;
 
+function getImages(data) {
+  const images = data?.Images
+  if(!images) return;
+  const firstKey = Object.keys(images)[0];
+  return images[firstKey][0];
+}
+
 const GeneralInformation = ({data, classes}) => {
   const [toggleReadMore, setToggleReadMore] = useState(false);
   const MAX_LENGTH = 40;
-  console.log(data)
+  const license = data?.Licenses[0];
+  let images = getImages(data);
   return (
     <Grid container columnSpacing={1.5}>
       <Grid item xs={12} sm={4} md={5} lg={5}>
@@ -70,7 +78,7 @@ const GeneralInformation = ({data, classes}) => {
               ...classes.heading,
               color: whiteColor,
               textAlign: 'right'
-            }}>Adult brain</Typography>
+            }}><Link href="#">{data?.Meta?.Types}</Link></Typography>
           </Box>
 
           <Box display='flex' justifyContent='space-between' columnGap={1}>
@@ -106,7 +114,12 @@ const GeneralInformation = ({data, classes}) => {
 
           <Box display='flex' justifyContent='space-between' columnGap={1}>
             <Typography sx={classes.heading}>Source</Typography>
-            <Chip icon={<Link />} label='JRC2018Unisex' />
+            <Tooltip placement="right" arrow title={license?.source}>
+              <Chip onClick={() => console.log('Clicked!')} icon={<LinkIcon />} label={license?.source}>
+                {license?.iri}
+              </Chip>
+            </Tooltip>
+
           </Box>
 
           <Box display='flex' justifyContent='space-between' columnGap={1}>
@@ -115,13 +128,42 @@ const GeneralInformation = ({data, classes}) => {
               ...classes.heading,
               color: whiteColor,
               textAlign: 'right'
-            }}>CC-BY-NC-SA_4.0</Typography>
+            }}>
+              <Link sx={{
+                display: 'flex',
+                gap: 1,
+              }} href={license?.source_iri}>
+                {license?.label}
+                <img style={{maxHeight: '1.125rem'}} src={license?.icon} alt={license?.label} />
+              </Link>
+            </Typography>
           </Box>
 
           <Box display='flex' justifyContent='space-between' columnGap={1}>
             <Typography sx={classes.heading}>Aligned To</Typography>
-            <Chip icon={<Link />} label='JRC2018Unisex' />
+            <Chip onClick={() => console.log('Clicked!')} icon={<LinkIcon />} label={data?.Name} />
           </Box>
+
+          <Box display='flex' justifyContent='space-between' columnGap={1}>
+            <Typography sx={classes.heading}>Downloads</Typography>
+            <Box
+              width='65%'
+              display='flex'
+              flexDirection='column'
+              gap={0.5}
+            >
+              <Tooltip placement="right" arrow title={images?.nrrd}>
+                <Chip icon={<LinkIcon />} label={images?.nrrd} />
+              </Tooltip>
+              <Tooltip placement="right" arrow title={images?.obj}>
+                <Chip icon={<LinkIcon />} label={images?.obj} />
+              </Tooltip>
+              <Tooltip placement="right" arrow title={images?.wlz}>
+                <Chip icon={<LinkIcon />} label={images?.wlz} />
+              </Tooltip>
+            </Box>
+          </Box>
+
         </Box>
       </Grid>
     </Grid>

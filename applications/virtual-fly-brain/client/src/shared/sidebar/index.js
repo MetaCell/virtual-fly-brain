@@ -21,8 +21,7 @@ const {
   headerBorderColor,
 } = vars;
 
-const SideBar = () => {
-  const [open, setOpen] = useState(true);
+const SideBar = ({open, setOpen}) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const openMenu = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -63,10 +62,6 @@ const SideBar = () => {
       }
     },
 
-    buttonGroup: {
-
-    },
-
     heading: {
       fontWeight: 400,
       fontSize: '0.875rem',
@@ -100,7 +95,7 @@ const SideBar = () => {
           lineHeight: 1,
           fontSize: '1em',
           mr: 1,
-          color: 'rgba(255, 255, 255, 0.8)'
+          color: outlinedBtnTextColor
         }}
       >
         Term info:
@@ -321,7 +316,7 @@ const SideBar = () => {
                   aria-controls="panel2a-content"
                   id="panel2a-header"
                 >
-                  <Typography>Queries (28)</Typography>
+                  <Typography>Queries (MISSING)</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                   <TreeView
@@ -333,7 +328,7 @@ const SideBar = () => {
                   >
                     <TreeItem nodeId="1" label={
                       <Box display='flex' flexWrap='wrap'>
-                        <Typography>Neurons with postsynaptic terminals in posterior ventrolateral protocerebrum</Typography>
+                        <Typography>MISSING</Typography>
                           <Box display='flex' pl={0.5}>
                           <Typography sx={{ pr: 0.5 }}>71</Typography>
                           <ListAltIcon />
@@ -457,7 +452,7 @@ const SideBar = () => {
                       alignItems="center"
                     >
                         <Typography sx={{ flexGrow: 1, color: outlinedBtnTextColor }}>
-                        Show location of JRC2018Unisex
+                        MISSING
                       </Typography>
                       <IconButton sx={{p: 0}}>
                           <PinDrop />
@@ -469,7 +464,7 @@ const SideBar = () => {
                       alignItems="center"
                     >
                         <Typography sx={{ flexGrow: 1, color: outlinedBtnTextColor }}>
-                        Show location of JRC2018Unisex
+                        MISSING
                       </Typography>
                       <IconButton sx={{p: 0}}>
                           <PinDrop />

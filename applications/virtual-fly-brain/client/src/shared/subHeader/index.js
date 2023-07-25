@@ -9,32 +9,32 @@ import { FilterMenu } from "./FilterMenu";
 const navArr = [
   {
     id: 0,
-    icon: <Upload />,
+    icon: Upload,
     name: 'Upload'
   },
   {
     id: 1,
-    icon: <Download />,
+    icon: Download,
     name: 'Download'
   },
   {
     id: 2,
-    icon: <Query />,
+    icon: Query,
     name: 'Query'
   },
   {
     id: 3,
-    icon: <Layers />,
+    icon: Layers,
     name: 'Layer'
   },
   {
     id: 3,
-    icon: <ClearAll />,
+    icon: ClearAll,
     name: 'Clear all'
   },
   {
     id: 3,
-    icon: <History />,
+    icon: History,
     name: 'Recent'
   },
 ]
@@ -46,6 +46,7 @@ const {
   searchBoxBg,
   whiteColor,
   shortcutBg,
+<<<<<<< HEAD
   blackColor,
   bottomNavBg,
   outlinedBtnTextColor,
@@ -56,6 +57,12 @@ const SubHeader = () => {
   const [focused, setFocused] = useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
 
+=======
+  tabActiveColor
+} = vars;
+
+const SubHeader = ({ setBottomNav, bottomNav }) => {
+>>>>>>> origin/development
   const classes = {
     root: {
       position: 'relative',
@@ -167,15 +174,16 @@ const SubHeader = () => {
           flexWrap='wrap'
           sx={classes.nav}
         >
-          {navArr.map((item) => (
+          {navArr.map((item, index) => (
             <Button
               aria-label={item.name}
+              onClick={() => setBottomNav(index)}
               sx={{
                 minWidth: '0.0625rem'
               }}
               key={`${item.id}_${item.name}`}
             >
-              {item.icon}
+              <item.icon color={item?.id === bottomNav && tabActiveColor} />
             </Button>
           ))}
         </Box>

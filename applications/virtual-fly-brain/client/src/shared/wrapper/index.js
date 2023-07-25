@@ -1,17 +1,17 @@
 import React from "react";
 import MediaQuery from 'react-responsive';
-import Header from "../header";
-import SubHeader from "../subHeader";
-import BottomNav from "../bottomNav";
+import Header from "../Header";
+import SubHeader from "../SubHeader";
+import BottomNav from "../BottomNav";
 
-const Wrapper = ({ children }) => {
+const Wrapper = ({ children, setBottomNav, bottomNav }) => {
   return (
     <>
       <Header />
-      <SubHeader />
+      <SubHeader bottomNav={bottomNav} setBottomNav={setBottomNav} />
       {children}
       <MediaQuery maxWidth={1199}>
-        <BottomNav />
+        <BottomNav bottomNav={bottomNav} setBottomNav={setBottomNav} />
       </MediaQuery>
     </>
   )

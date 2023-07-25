@@ -6,33 +6,34 @@ import vars from "../../theme/variables";
 
 const {
   whiteColor,
-  bottomNavBg
+  bottomNavBg,
+  tabActiveColor
 } = vars;
 
 const navArr = [
   {
     id: 0,
-    icon: <Upload />,
+    icon: Upload,
     name: 'Upload'
   },
   {
     id: 1,
-    icon: <Download />,
+    icon: Download,
     name: 'Download'
   },
   {
     id: 2,
-    icon: <Query />,
+    icon: Query,
     name: 'Query'
   },
   {
     id: 3,
-    icon: <ClearAll />,
+    icon: ClearAll,
     name: 'Clear all'
   },
 ]
 
-const BottomNav = () => {
+const BottomNav = ({ setBottomNav, bottomNav }) => {
   const classes = {
     root: {
       padding: '0 0.75rem',
@@ -59,7 +60,7 @@ const BottomNav = () => {
       flexWrap='wrap'
       sx={classes.root}
     >
-      {navArr.map((item) => (
+      {navArr.map((item, index) => (
         <Button
           sx={{
             height: '100%',
@@ -67,12 +68,13 @@ const BottomNav = () => {
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            flexDirection: 'column'
+            flexDirection: 'column',
           }}
 
+          onClick={() => setBottomNav(index)}
           key={item.id}
         >
-          {item.icon}
+          <item.icon color={item?.id === bottomNav && tabActiveColor} />
           <Typography>{item.name}</Typography>
         </Button>
       ))}

@@ -12,7 +12,12 @@ const {
   chipPrimaryColor,
   chipSecondaryColor,
   textErrorColor,
-  tabActiveColor
+  tabActiveColor,
+  listHeadingColor,
+  bottomNavBg,
+  popperShadow,
+  filterPopoverShadow,
+  filterPopoverBg
 } = vars;
 
 let theme = createTheme();
@@ -39,6 +44,104 @@ theme = createTheme({
         root: {
           margin: 0,
           padding: '0 0 1rem 0'
+        }
+      }
+    },
+
+    MuiCheckbox: {
+      styleOverrides: {
+        root: {
+          padding: 0,
+        }
+      }
+    },
+
+    MuiFormControlLabel: {
+      styleOverrides: {
+        root: {
+          margin: 0,
+        },
+        label: {
+          fontWeight: 400,
+          userSelect: 'none',
+          fontSize: '0.75rem',
+          marginLeft: '0.5rem',
+          lineHeight: '133%',
+          color: outlinedBtnTextColor,
+        }
+      }
+    },
+
+    MuiListItem: {
+      styleOverrides: {
+        root: {
+          padding: 0
+        }
+      }
+    },
+
+    MuiListItemText: {
+      styleOverrides: {
+        root: {
+          margin: 0
+        },
+        primary: {
+          fontWeight: 400,
+          fontSize: '0.75rem',
+          lineHeight: '133%',
+          color: outlinedBtnTextColor,
+          textOverflow: 'ellipsis',
+          overflow: 'hidden',
+          whiteSpace: 'nowrap'
+        }
+      }
+    },
+
+    MuiListItemButton: {
+      styleOverrides: {
+        root: {
+          padding: '0.25rem 0.5rem'
+        }
+      }
+    },
+
+    MuiList: {
+      styleOverrides: {
+        root: {
+          padding: 0
+        }
+      }
+    },
+
+    MuiPopper: {
+      styleOverrides: {
+        root: {
+          maxWidth: '100%',
+          '&:not(.MuiTooltip-popper)': {
+            zIndex: 99,
+            background: bottomNavBg,
+            boxShadow: popperShadow,
+            backdropFilter: 'blur(0.625rem)',
+            borderRadius: '0.375rem',
+            width: '23.9375rem',
+            marginTop: '-1.5rem !important',
+
+            '&.menu-popover': {
+              marginTop: '0 !important',
+              width: '10rem',
+              background: filterPopoverBg,
+              boxShadow: filterPopoverShadow,
+              backdropFilter: 'blur(0.375rem)',
+              borderRadius: '0.125rem'
+            },
+
+            '&.filter-popover': {
+              marginTop: '-1.75rem !important',
+              width: '15.5rem',
+              background: filterPopoverBg,
+              boxShadow: filterPopoverShadow
+            }
+          }
         }
       }
     },
@@ -93,9 +196,119 @@ theme = createTheme({
       }
     },
 
-    MuiTable: {
+    MuiCardMedia: {
       styleOverrides: {
         root: {
+          display: 'flex',
+          justifyContent: 'flex-end',
+          alignItems: 'flex-end'
+        }
+      }
+    },
+
+    MuiPaginationItem: {
+      styleOverrides: {
+        previousNext: {
+          '&:not(.Mui-disabled)': {
+            color: tabActiveColor,
+          }
+        },
+        root: {
+          color: listHeadingColor,
+          textAlign: 'center',
+          fontSize: '0.75rem',
+          fontWeight: 500,
+          lineHeight: '1rem',
+          letterSpacing: '-0.00375rem',
+          margin: 0,
+          height: '1.25rem',
+          padding: '0',
+          minWidth: '1.25rem',
+
+          '&.Mui-selected': {
+            backgroundColor: 'transparent',
+            color: tabActiveColor
+          }
+        }
+      }
+    },
+
+    MuiPagination: {
+      styleOverrides: {
+        root: {
+          width: '100%',
+        },
+
+        ul: {
+          justifyContent: 'center',
+          gap: '0.5rem',
+          '& li': {
+            display: 'flex',
+            '&:first-of-type': {
+              marginRight: 'auto',
+            },
+            '&:last-of-type': {
+              marginLeft: 'auto',
+            },
+          }
+        }
+      }
+    },
+
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          boxShadow: 'none',
+          backgroundColor: secondaryBg,
+        }
+      }
+    },
+
+    MuiCardContent: {
+      styleOverrides: {
+        root: {
+          padding: '0.75rem',
+          '&:last-child': {
+            paddingBottom: '0.75rem',
+          }
+        }
+      }
+    },
+
+    MuiTabs: {
+      styleOverrides: {
+        root: {
+          width: '100%',
+
+          [theme.breakpoints.down('lg')]: {
+            minHeight: 'inherit'
+          }
+        },
+
+        indicator: {
+          backgroundColor: tabActiveColor,
+        }
+      }
+    },
+
+    MuiTab: {
+      styleOverrides: {
+        root: {
+          color: 'rgba(255, 255, 255, 0.80)',
+          textTransform: 'capitalize',
+          fontSize: '0.875rem',
+          flex: '2',
+          maxWidth: '100%',
+
+          [theme.breakpoints.down('lg')]: {
+            padding: 0,
+            height: '2.75rem',
+            minHeight: 'inherit'
+          },
+
+          '&.Mui-selected': {
+            color: whiteColor
+          },
         }
       }
     },
@@ -262,15 +475,30 @@ theme = createTheme({
       styleOverrides: {
         root: {
           boxShadow: 'none',
+          height: '100%',
         },
         grouped: {
           minWidth: '1.75rem',
           borderRadius: '0.25rem',
           padding: 0,
+          [theme.breakpoints.down('lg')]: {
+            height: '100%',
+          },
 
           '&:not(:last-of-type)': {
             borderColor: blackColor
           }
+        }
+      }
+    },
+
+    MuiDialog: {
+      styleOverrides: {
+        paper: {
+          overflow: 'visible',
+          borderRadius: '0.875rem',
+          padding: '0.75rem',
+          boxShadow: '0 0.5rem 0.5rem -0.25rem rgba(16, 24, 40, 0.03), 0 1.25rem 1.5rem -0.25rem rgba(16, 24, 40, 0.08)'
         }
       }
     },

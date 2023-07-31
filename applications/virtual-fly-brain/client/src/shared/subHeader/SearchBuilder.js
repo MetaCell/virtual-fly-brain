@@ -11,6 +11,9 @@ import { RecentSearch } from './RecentSearch';
 import { QueriesSelection } from './QueriesSelection';
 import { NarrowSearchFilter } from './NarrowSearchFilter';
 import { ResultSelectionOptions } from './ResultSelectionOptions';
+import  { getResultsSOLR } from '../../components/configuration/VFBSearchBuilder/SOLRclient'
+import { DatasourceTypes } from '@metacell/geppetto-meta-ui/search/datasources/datasources';
+import { get_queries } from "../../network/query"
 
 const {
   bottomNavBg,
@@ -129,46 +132,78 @@ const Listbox = styled('div')(
 const chipColors = [chipRed, chipGreen, chipOrange, chipPink, chipYellow];
 
 const searchResults = [
-  { title: 'A0 (anlage in statu nascendi)', tags: ["Anatomy", 'Nervous system'] },
-  { title: 'A00c_a4', tags: ["Anatomy", 'Nervous system'] },
-  { title: 'a00c_a41 (a00c_a4 (L1EM:2511238))', tags: ["Anatomy", 'Nervous system'] },
-  { title: 'BCD (anlage in statu nascendi)', tags: ["Anatomy", 'Nervous system'] },
+
 ];
 
-export default function SearchBuilder({ setFocused }) {
-
-  const recentSearch = [
-    {
-      title: 'CDF0 (anlage in statu nascendi)',
-      tags: [
-        { id: 0, label: "Anatomy" },
-        { id: 1, label: 'Nervous system' },
-        { id: 2, label: 'Neuron' },
-        { id: 3, label: 'Nervous projection bundle' },
-        { id: 4, label: 'Larva' }
-      ]
-    },
-    {
-      title: 'a00c_a41 (a00c_a4 (L1EM:2511238))',
-      tags: [
-        { id: 0, label: "Anatomy" },
-        { id: 1, label: 'Nervous system' },
-      ]
-    },
-  ];
+export default function SearchBuilder(props) {
 
   const [value, setValue] = React.useState([]);
-  const addQueryTag = () => { setValue((prevValue) => [{title: 'Queries', tags: []}, ...prevValue]) }
+  const [recentSearch, setRecentSearch] = React.useState([]);
+  const [groupedOptions, setGroupedOptions] = React.useState([]);
+  const addQueryTag = () => { setValue((prevValue) => [{label: 'Queries', tags: []}, ...prevValue]) }
 
-  const handleResultSelection = (option) => {
-    const doesOptionExist =  obj => obj.title === option.title
+  const handleResultSelection = async(option) => {
+    const doesOptionExist =  obj => obj.label === option.label
     if(!value.some(doesOptionExist)){
+      setRecentSearch([...recentSearch, option]);
+
+      let response;
+      try {
+        console.log("option ", option);
+        response = await get_queries(option.short_form);
+        console.log("response ", response);
+        option.queries = response.Queries;
+      } catch (error) {
+        console.log("error ", error);
+      }
+      console.log("option ", option);
       setValue([...value, option])
     }
   };
 
   const handleChipDelete = (index) => {
-    setValue(value.filter((chip) => chip.title !== index))
+    setValue(value.filter((chip) => chip.label !== index))
+  }
+
+  const getDatasource = {
+    [DatasourceTypes.CUSTOM]: props.customDatasourceHandler,
+    [DatasourceTypes.SOLRClient]: getResultsSOLR,
+  };
+
+  const handleResults = (status, data, v) => {
+    console.log("Handle status ", status)
+    console.log("Handle data ", data)
+    console.log("Handle value ", value)
+    switch(status) {
+
+      case "OK":
+          if (v !== value) {
+            // if (v === "") {
+            //   setValue([])
+            // } else {
+            //   setValue(v)
+            // }
+            console.log("Set data ")
+            setGroupedOptions(data)
+          }
+          break;
+      case "ERROR":
+          break;
+      default:
+          console.log("This is a case not considered");
+    }
+  }
+
+  const searchConfiguration = require('../../components/configuration/VFBSearchBuilder/searchConfiguration').searchConfiguration;
+  const datasourceConfiguration = require('../../components/configuration/VFBSearchBuilder/searchConfiguration').datasourceConfiguration;
+
+  const handleSearch = (searchWord) => {
+    console.log("searchWord ",searchWord);
+    searchWord.length > 3 && getResultsSOLR(searchWord,
+      handleResults,
+      searchConfiguration.sorter,
+      datasourceConfiguration,
+      setGroupedOptions);
   }
 
   const {
@@ -177,20 +212,20 @@ export default function SearchBuilder({ setFocused }) {
     getTagProps,
     getListboxProps,
     getOptionProps,
-    groupedOptions,
     focused,
     setAnchorEl,
   } = useAutocomplete({
     id: 'customized-hook',
     multiple: true,
     options: searchResults,
-    getOptionLabel: (option) => option?.title,
+    getOptionLabel: (option) => option?.label,
     disableCloseOnSelect: true,
-    open: true
+    open: true,
+    onInputChange : event => handleSearch(event.target.value)
   });
 
   React.useEffect(() => {
-    setFocused(focused ? true : false)
+    props.setFocused(focused ? true : false)
   }, [focused])
 
   return (
@@ -209,7 +244,7 @@ export default function SearchBuilder({ setFocused }) {
                   className="secondary"
                   key={`tag-${index}`}
                   sx={{
-                    background: option.title === 'Queries' ? queryChipBg : outlinedBtnBorderColor,
+                    background: option.label === 'Queries' ? queryChipBg : outlinedBtnBorderColor,
                     alignSelf: 'center',
                     color: outlinedBtnTextColor,
                     whiteSpace: 'nowrap',
@@ -217,11 +252,11 @@ export default function SearchBuilder({ setFocused }) {
                     textOverflow: 'ellipsis',
                     maxWidth: '5.9375rem'
                   }}
-                  label={option.title}
+                  label={option.label}
                   {...getTagProps({ index })}
                   deleteIcon={<CloseIcon />}
                   value={value}
-                  onDelete={() => handleChipDelete(option.title)}
+                  onDelete={() => handleChipDelete(option.label)}
                 />
               ))}
             </Box>
@@ -240,18 +275,18 @@ export default function SearchBuilder({ setFocused }) {
           className='scrollbar'
           {...getListboxProps()}
         >
-          <QueriesSelection />
+          { value.length >= 1 ? (<QueriesSelection recentSearch={value}/>) : null }
 
           <NarrowSearchFilter />
 
-          <ResultSelectionOptions
+          { value.length >= 1 ? (<ResultSelectionOptions
             addQueryTag={addQueryTag}
-          />
+          />) : null }
 
-          <RecentSearch
+          { recentSearch.length >= 1 ? (<RecentSearch
             chipColors={chipColors}
             recentSearch={recentSearch}
-          />
+          />) : null }
 
           <SearchResult
             groupedOptions={groupedOptions}

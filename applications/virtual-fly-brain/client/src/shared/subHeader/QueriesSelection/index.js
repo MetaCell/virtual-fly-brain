@@ -3,17 +3,19 @@ import React from "react";
 import { AngleRight, ChevronDown, CleaningServices, Delete } from "../../../icons";
 import vars from "../../../theme/variables";
 
+const queryBuilderDatasourceConfig = require('../../../components/configuration/VFBSearchBuilder/queryBuilderConfiguration').queryBuilderDatasourceConfig;
+
 const { searchHeadingColor, searchBoxBg, primaryBg, whiteColor, queryBorderColor } = vars;
 
-export const QueriesSelection = () => {
-  const listItems = [
-    "Select query for A00c_a4 (L1EM:2511238) expression pattern",
-    "Anatomy A00c_a4 (L1EM:2511238) expression pattern is expressed in",
-    "Parts of A00c_a4 (L1EM:2511238) expression pattern",
-    "Subclasses of A00c_a4 (L1EM:2511238) expression pattern"
-  ];
+export const QueriesSelection = ({ recentSearch }) => {
+  const [searchQueries, setSearchQueries] = React.useState([]);
   const [popoverAnchorEl, setPopoverAnchorEl] = React.useState(null);
-  const [selectedOption, setSelectedOption] = React.useState(listItems[0]);
+  const [selectedOption, setSelectedOption] = React.useState({});
+
+  React.useEffect(() => {
+    console.log("Set queries ", recentSearch)
+    setSearchQueries(recentSearch)
+  }, [recentSearch])
 
   const popoverHandleClick = (event) => {
     setPopoverAnchorEl(popoverAnchorEl ? null : event.target.parentElement.parentElement);
@@ -74,8 +76,10 @@ export const QueriesSelection = () => {
         flexDirection='column'
         rowGap={2}
       >
+        { searchQueries?.map((option, index) =>
         <Box
           display='flex'
+          key={option.label}
           columnGap={1}
         >
           <Button
@@ -124,7 +128,7 @@ export const QueriesSelection = () => {
                 overflow: 'hidden',
                 textOverflow: 'ellipsis'
               }}>
-                {selectedOption}
+                {option.label}
               </Typography>
 
               <Button
@@ -153,9 +157,9 @@ export const QueriesSelection = () => {
               >
 
                 <List>
-                  { listItems.map((option, index) => <ListItem key={option+index}>
-                    <ListItemButton onClick={() => handleSelect(option)}>
-                      <ListItemText primary={option} />
+                  { option.queries?.map((query, index) => <ListItem sx={{ top : '1.5rem' }} key={query.label+index}>
+                    <ListItemButton onClick={() => handleSelect(query.label)}>
+                      <ListItemText primary={query.label} />
                     </ListItemButton>
                   </ListItem> )}
                 </List>
@@ -163,6 +167,7 @@ export const QueriesSelection = () => {
             </Box>
           </Box>
         </Box>
+        )}
       </Box>
 
       <Box
@@ -184,7 +189,7 @@ export const QueriesSelection = () => {
             }
           }}
         >
-          Check 15 results
+          Check {searchQueries?.length} results
           <AngleRight style={{ marginLeft: '0.5rem' }} />
         </Button>
       </Box>

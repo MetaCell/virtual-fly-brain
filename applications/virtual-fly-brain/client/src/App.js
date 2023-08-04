@@ -6,7 +6,12 @@ import { queryString } from './utils/queryString';
 import { useSelector } from 'react-redux'
 import { termInfoSchemma } from './schemma/termInfoSchemma';
 import { initFileWithoutReading } from './reducers/actions/readFile';
-import 'font-awesome/css/font-awesome.min.css';
+import {
+  createMuiTheme,
+  responsiveFontSizes,
+  MuiThemeProvider,
+} from '@material-ui/core/styles';
+import { blue, orange } from '@material-ui/core/colors';
 import Ajv from 'ajv';
 
 const App = () => {

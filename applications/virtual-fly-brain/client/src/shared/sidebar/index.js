@@ -21,8 +21,7 @@ const {
   headerBorderColor,
 } = vars;
 
-const SideBar = () => {
-  const [open, setOpen] = useState(true);
+const SideBar = ({open, setOpen}) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const openMenu = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -63,10 +62,6 @@ const SideBar = () => {
       }
     },
 
-    buttonGroup: {
-
-    },
-
     heading: {
       fontWeight: 400,
       fontSize: '0.875rem',
@@ -100,7 +95,7 @@ const SideBar = () => {
           lineHeight: 1,
           fontSize: '1em',
           mr: 1,
-          color: 'rgba(255, 255, 255, 0.8)'
+          color: outlinedBtnTextColor
         }}
       >
         Term info:
@@ -488,7 +483,7 @@ const SideBar = () => {
         <Box
           px={open ? 1 : 0}
           display='flex'
-          justifyContent='flex-end'
+          justifyContent={open ? 'flex-end' : 'center'}
           alignItems='center'
           sx={classes.footer}
         >

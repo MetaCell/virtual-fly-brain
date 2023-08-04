@@ -161,35 +161,29 @@ class ThreeDCanvas extends Component {
       },
     }
 
-    return (
-      this.state.mappedCanvasData ? (
-        <div ref={node => this.node = node} className={classes.container}>
-          <>
-            <Canvas
-              ref={this.canvasRef}
-              data={this.state.mappedCanvasData}
-              cameraOptions={cameraOptions}
-              // captureOptions={captureOptions}
-              backgroundColor={blackColor}
-              onSelection={this.onSelection}
-              onMount={this.onMount}
-              onHoverListeners={{ 'hoverId': this.hoverHandler }}
-              dracoDecoderPath={'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/jsm/libs/draco/'}
-            />
-          </>
-        </div>
-      ) : (
-        <Box p={2}>
-          <Button
-            variant="outlined"
-            color="primary"
-            onClick={this.handleToggle}
-          >
-            Show Example
-          </Button>
-        </Box>
-      )
-    )
+    return this.state.mappedCanvasData ? (
+      <div ref={node => this.node = node} className={classes.container}>
+        <>
+          <Canvas
+            ref={this.canvasRef}
+            data={this.state.mappedCanvasData}
+            cameraOptions={cameraOptions}
+            captureOptions={captureOptions}
+            backgroundColor={0x505050}
+            onSelection={this.onSelection}
+            onMount={this.onMount}
+            onHoverListeners={{ 'hoverId':this.hoverHandler }}
+            dracoDecoderPath={'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/jsm/libs/draco/'}
+          />
+        </>
+      </div>
+    ) : <Button
+      variant="outlined"
+      color="primary"
+      onClick={this.handleToggle}
+    >
+      Show Example
+    </Button>
   }
 }
 

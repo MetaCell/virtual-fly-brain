@@ -12,7 +12,12 @@ const {
   chipPrimaryColor,
   chipSecondaryColor,
   textErrorColor,
-  tabActiveColor
+  tabActiveColor,
+  filterPopoverShadow,
+  popperShadow,
+  bottomNavBg,
+  filterPopoverBg,
+  btnTextHoverColor
 } = vars;
 
 let theme = createTheme();
@@ -320,7 +325,7 @@ theme = createTheme({
         text: {
           borderRadius: 0,
           '&:hover': {
-            backgroundColor: 'rgba(255, 255, 255, 0.04)',
+            backgroundColor: btnTextHoverColor,
           }
         },
 
@@ -408,11 +413,33 @@ theme = createTheme({
       }
     },
 
+    MuiCheckbox: {
+      styleOverrides: {
+        root: {
+          padding: 0,
+        }
+      }
+    },
+
     MuiChip: {
       styleOverrides: {
+        deleteIcon: {
+          margin: 0,
+          fontSize: '0.75rem',
+          color: whiteColor,
+          marginLeft: '0.25rem',
+
+          '&:hover': {
+            color: whiteColor
+          }
+        },
         root: {
           height: '1.5rem',
           padding: '0 0.5rem',
+
+          '&.secondary': {
+            borderRadius: '0.25rem'
+          },
 
           '& svg': {
             marginRight: '0.5rem'
@@ -447,6 +474,47 @@ theme = createTheme({
       }
     },
 
+    MuiListItem: {
+      styleOverrides: {
+        root: {
+          padding: 0
+        }
+      }
+    },
+
+    MuiListItemText: {
+      styleOverrides: {
+        root: {
+          margin: 0
+        },
+        primary: {
+          fontWeight: 400,
+          fontSize: '0.75rem',
+          lineHeight: '133%',
+          color: outlinedBtnTextColor,
+          textOverflow: 'ellipsis',
+          overflow: 'hidden',
+          whiteSpace:'nowrap'
+        }
+      }
+    },
+
+    MuiListItemButton: {
+      styleOverrides: {
+        root: {
+          padding: '0.25rem 0.5rem'
+        }
+      }
+    },
+
+    MuiList: {
+      styleOverrides: {
+        root: {
+          padding: 0
+        }
+      }
+    },
+
     MuiLink: {
       styleOverrides: {
         root: {
@@ -462,6 +530,45 @@ theme = createTheme({
               marginTop: 0,
             },
 
+          }
+        }
+      }
+    },
+
+    MuiFormControlLabel: {
+      styleOverrides: {
+        root: {
+          margin: 0,
+        },
+        label: {
+          fontWeight: 400,
+          userSelect: 'none',
+          fontSize: '0.75rem',
+          marginLeft: '0.5rem',
+          lineHeight: '133%',
+          color: outlinedBtnTextColor,
+        }
+      }
+    },
+
+    MuiPopper: {
+      styleOverrides: {
+        root: {
+          '&:not(.MuiTooltip-popper)': {
+            zIndex: 99,
+            background: bottomNavBg,
+            boxShadow: popperShadow,
+            backdropFilter: 'blur(0.625rem)',
+            borderRadius: '0.375rem',
+            width: '23.9375rem',
+            marginTop: '-1.5rem !important',
+
+            '&.filter-popover': {
+              marginTop: '-1.75rem !important',
+              width: '15.5rem',
+              background: filterPopoverBg,
+              boxShadow: filterPopoverShadow
+            }
           }
         }
       }

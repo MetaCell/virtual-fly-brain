@@ -12,80 +12,11 @@ export const Prev = () => (
   </svg>
 )
 
-export const SplitScreen = (props) => (
-  <svg {...props} width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M9 2V4.5L3 4.5L3 2L9 2ZM9 1L3 1C2.45 1 2 1.45 2 2L2 4.5C2 5.05 2.45 5.5 3 5.5L9 5.5C9.55 5.5 10 5.05 10 4.5V2C10 1.45 9.55 1 9 1ZM9 7.5V10L3 10L3 7.5L9 7.5ZM9 6.5L3 6.5C2.45 6.5 2 6.95 2 7.5L2 10C2 10.55 2.45 11 3 11L9 11C9.55 11 10 10.55 10 10V7.5C10 6.95 9.55 6.5 9 6.5Z" fill="white" fillOpacity="0.8" />
-  </svg>
-);
-
-export const AddChart = (props) => (
-  <svg {...props} width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M10.75 2.75V3.75L9.25 3.75V5.25H8.25V3.75L6.75 3.75L6.75 2.75L8.25 2.75V1.25L9.25 1.25V2.75L10.75 2.75ZM9.25 9.75L2.25 9.75L2.25 2.75L5.25 2.75V1.75L2.25 1.75C1.7 1.75 1.25 2.2 1.25 2.75L1.25 9.75C1.25 10.3 1.7 10.75 2.25 10.75L9.25 10.75C9.8 10.75 10.25 10.3 10.25 9.75V6.75H9.25V9.75ZM7.25 6.75L7.25 8.75H8.25L8.25 6.75H7.25ZM5.25 8.75H6.25L6.25 4.75H5.25L5.25 8.75ZM4.25 8.75L4.25 5.75L3.25 5.75L3.25 8.75H4.25Z" fill="#DCDCDC" />
-  </svg>
-)
-
-export const CheckBoxDefault = (props) => (
-  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect x="0.445455" y="0.445455" width="13.1091" height="13.1091" rx="1.33636" stroke="#A0A0A0" strokeWidth="0.890909" />
-  </svg>
-)
-
-export const Tick = (props) => (
-  <svg {...props} width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M4.39754 7.93746L2.31254 5.85246L1.60254 6.55746L4.39754 9.35246L10.3975 3.35246L9.69254 2.64746L4.39754 7.93746Z" fill={props.color || "#0AB7FE"} />
-  </svg>
-)
-
-export const CleaningServices = (props) => (
-  <svg {...props} width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M8 5.5H7.5L7.5 1.5C7.5 0.95 7.05 0.5 6.5 0.5L5.5 0.5C4.95 0.5 4.5 0.95 4.5 1.5L4.5 5.5H4C2.62 5.5 1.5 6.62 1.5 8L1.5 11.5L10.5 11.5V8C10.5 6.62 9.38 5.5 8 5.5ZM5.5 1.5L6.5 1.5L6.5 5.5H5.5L5.5 1.5ZM9.5 10.5H8.5V9C8.5 8.725 8.275 8.5 8 8.5C7.725 8.5 7.5 8.725 7.5 9V10.5H6.5V9C6.5 8.725 6.275 8.5 6 8.5C5.725 8.5 5.5 8.725 5.5 9V10.5H4.5V9C4.5 8.725 4.275 8.5 4 8.5C3.725 8.5 3.5 8.725 3.5 9L3.5 10.5H2.5L2.5 8C2.5 7.175 3.175 6.5 4 6.5L8 6.5C8.825 6.5 9.5 7.175 9.5 8V10.5Z" fill="white" fillOpacity="0.8" />
-  </svg>
-)
-
-export const CheckBoxGreen = (props) => (
-  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect width="14" height="14" rx="2" fill="#5E9806" />
-    <path d="M10.5 7.5H7.5V10.5H6.5V7.5H3.5V6.5H6.5V3.5H7.5V6.5H10.5V7.5Z" fill="white" />
-  </svg>
-)
-
-export const Undo = (props) => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <g clipPath="url(#clip0_3127_32257)">
-      <path d="M8.17676 5.66667C6.41009 5.66667 4.81009 6.32667 3.57676 7.4L1.17676 5L1.17676 11H7.17676L4.76342 8.58667C5.69009 7.81333 6.87009 7.33333 8.17676 7.33333C10.5368 7.33333 12.5434 8.87333 13.2434 11L14.8234 10.48C13.8968 7.68667 11.2768 5.66667 8.17676 5.66667Z" fill="white" fillOpacity="0.8" />
-    </g>
-    <defs>
-      <clipPath id="clip0_3127_32257">
-        <rect width="16" height="16" rx="4" fill="white" />
-      </clipPath>
-    </defs>
-  </svg>
-);
-
-export const CheckBoxRed = (props) => (
-  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect width="14" height="14" rx="2" fill="#C62724" />
-    <path d="M10.5 7.50098H3.5V6.50098H10.5V7.50098Z" fill="white" />
-  </svg>
-)
-
 export const FilterIcon = (props) => (
   <svg width={props.size || "20"} height={props.size || "20"} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M8.33333 15H11.6667V13.3333H8.33333V15ZM2.5 5V6.66667H17.5V5H2.5ZM5 10.8333H15V9.16667H5V10.8333Z" fill={props.color || "white"} fillOpacity={props.opacity || "0.8"} />
   </svg>
 );
-
-export const More = (props) => (
-  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M6 4C6.55 4 7 3.55 7 3C7 2.45 6.55 2 6 2C5.45 2 5 2.45 5 3C5 3.55 5.45 4 6 4ZM6 5C5.45 5 5 5.45 5 6C5 6.55 5.45 7 6 7C6.55 7 7 6.55 7 6C7 5.45 6.55 5 6 5ZM6 8C5.45 8 5 8.45 5 9C5 9.55 5.45 10 6 10C6.55 10 7 9.55 7 9C7 8.45 6.55 8 6 8Z" fill="white" fillOpacity="0.8" />
-  </svg>
-);
-
-export const OpenInNew = (props) => (
-  <svg {...props} width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M9.5 9.5L2.5 9.5L2.5 2.5L6 2.5V1.5L2.5 1.5C1.945 1.5 1.5 1.95 1.5 2.5L1.5 9.5C1.5 10.05 1.945 10.5 2.5 10.5L9.5 10.5C10.05 10.5 10.5 10.05 10.5 9.5V6H9.5V9.5ZM7 1.5V2.5L8.795 2.5L3.88 7.415L4.585 8.12L9.5 3.205V5H10.5V1.5L7 1.5Z" fill="#DCDCDC" />
-  </svg>
-)
 
 export const Tick = (props) => (
   <svg {...props} width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">

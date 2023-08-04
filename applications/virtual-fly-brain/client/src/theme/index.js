@@ -434,8 +434,13 @@ theme = createTheme({
           }
         },
         root: {
+          fontFamily: primaryFont,
           height: '1.5rem',
           padding: '0 0.5rem',
+          fontWeight: 400,
+          fontSize: '0.75rem',
+          lineHeight: '133%',
+          color: whiteColor,
 
           '&.secondary': {
             borderRadius: '0.25rem'
@@ -460,12 +465,6 @@ theme = createTheme({
 
         label: {
           padding: 0,
-          fontWeight: 400,
-          fontSize: '0.75rem',
-          lineHeight: '133%',
-          color: whiteColor,
-
-
         },
 
         colorDefault: {

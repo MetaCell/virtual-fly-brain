@@ -13,7 +13,8 @@ import StackViewerComponent from "./StackViewerComponent";
 const {
   secondaryBg,
   headerBorderColor,
-  tabActiveColor
+  tabActiveColor,
+  blackColor
 } = vars;
 
 const tabsArr = [
@@ -104,7 +105,7 @@ const MainLayout = () => {
           },
           height: {
             xs: 'calc(100vh - 8.8125rem)',
-            lg: 'calc(100vh - 5.75rem)'
+            lg: 'calc(100vh - 6.625rem)'
           },
         }}
       >
@@ -114,7 +115,7 @@ const MainLayout = () => {
 
         {tab.includes(1) && (
           // <ThreeDCanvas />
-          <></>
+          <Images />
         )}
 
         {tab.includes(2) && (

@@ -81,12 +81,12 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
       )}
 
       {tab.includes(1) && (
-        <Images />
+        <ThreeDCanvas />
       )}
 
-      {tab.includes(2) && (
+      {/* {tab.includes(2) && (
         <Circuit />
-      )}
+      )} */}
     </>
   )
 

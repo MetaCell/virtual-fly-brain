@@ -161,29 +161,63 @@ class ThreeDCanvas extends Component {
       },
     }
 
-    return this.state.mappedCanvasData ? (
-      <div ref={node => this.node = node} className={classes.container}>
-        <>
-          <Canvas
-            ref={this.canvasRef}
-            data={this.state.mappedCanvasData}
-            cameraOptions={cameraOptions}
-            captureOptions={captureOptions}
-            backgroundColor={0x505050}
-            onSelection={this.onSelection}
-            onMount={this.onMount}
-            onHoverListeners={{ 'hoverId':this.hoverHandler }}
-            dracoDecoderPath={'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/jsm/libs/draco/'}
-          />
-        </>
-      </div>
-    ) : <Button
-      variant="outlined"
-      color="primary"
-      onClick={this.handleToggle}
+
+
+    return <Box
+      sx={{
+        height: 'calc(100% - 0.5rem)',
+        color: whiteColor,
+        overflow: 'hidden',
+        background: {
+          lg: blackColor
+        },
+        p: {
+          xs: 2,
+          lg: 0
+        },
+        borderColor: {
+          lg: secondaryBg
+        },
+        borderStyle: {
+          lg: 'solid'
+        },
+        borderRadius: {
+          lg: 2
+        },
+        borderWidth: {
+          xs: 0,
+          lg: '0.0625rem 0.0625rem 0 0'
+        }
+      }}
     >
-      Show Example
-    </Button>
+      {this.state.mappedCanvasData ? (
+        <div ref={node => this.node = node} className={classes.container}>
+          <>
+            <Canvas
+              ref={this.canvasRef}
+              data={this.state.mappedCanvasData}
+              cameraOptions={cameraOptions}
+              // captureOptions={captureOptions}
+              backgroundColor={blackColor}
+              onSelection={this.onSelection}
+              onMount={this.onMount}
+              onHoverListeners={{ 'hoverId': this.hoverHandler }}
+              dracoDecoderPath={'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/jsm/libs/draco/'}
+            />
+          </>
+        </div>
+      ) : (
+        <Box p={2}>
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={this.handleToggle}
+          >
+            Show Example
+          </Button>
+        </Box>
+      )}
+    </Box>
   }
 }
 

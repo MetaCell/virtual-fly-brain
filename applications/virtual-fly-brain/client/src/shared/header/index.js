@@ -43,7 +43,14 @@ const Header = () => {
       display='flex'
       sx={{
         ...classes.root,
-        py: 1.5,
+        py: {
+          xs: 1.5,
+          lg: 0
+        },
+        borderBottom: {
+          xs: `0.0625rem solid ${headerBorderColor}`,
+          lg: 'none'
+        },
         boxShadow: {
           xs: headerBoxShadow,
           lg: 'none'

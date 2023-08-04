@@ -34,6 +34,7 @@ const vars = {
   filterPopoverShadow: '0px 0px 80px rgba(0, 0, 0, 0.6)',
   filterPopoverBg: 'rgba(80, 80, 80, 0.8)',
   btnTextHoverColor: 'rgba(255, 255, 255, 0.04)',
+  queryChipBg: 'rgba(10, 183, 254, 0.8)',
 };
 
 export default vars;

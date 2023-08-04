@@ -275,6 +275,12 @@ export const Remove = (props) => (
   </svg>
 );
 
+export const Close = () => (
+  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M15.8332 5.3415L14.6582 4.1665L9.99984 8.82484L5.3415 4.1665L4.1665 5.3415L8.82484 9.99984L4.1665 14.6582L5.3415 15.8332L9.99984 11.1748L14.6582 15.8332L15.8332 14.6582L11.1748 9.99984L15.8332 5.3415Z" fill="white" fillOpacity="0.8" />
+  </svg>
+)
+
 export const ArrowDown = (props) => (
   <svg {...props} width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M5.51389 6.33318L8.84722 9.66651L12.1806 6.33318H5.51389Z" fill="white" fillOpacity="0.8" />

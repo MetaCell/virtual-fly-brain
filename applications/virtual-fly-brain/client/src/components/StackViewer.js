@@ -124,7 +124,7 @@ const VFBStackViewer = (props) => {
   useEffect( () => {
     console.log("term info data : ", stackViewerData);
     let instances = stackData.instances;
-    if (!instances.find( i => i?.Id === stackViewerData?.Id) && stackViewerData) {
+    if (!instances.find( i => i?.Id === stackViewerData?.Id) && stackViewerData?.Images) {
       let keys = Object.keys(stackViewerData.Images);
 
       const instancespec = {
@@ -176,12 +176,14 @@ const VFBStackViewer = (props) => {
       let keys = Object.keys(stackViewerData.Images);
       config = stackViewerData.Images[keys[0]]?.[0];
       config.serverUrl = 'http://www.virtualflybrain.org/fcgi/wlziipsrv.fcgi';
-      keys = Object.keys(stackViewerData.Domains);
-      let ids = [parseInt(keys[keys.length - 1]) + 1], labels = [parseInt(keys[keys.length - 1]) + 1], classID = [parseInt(keys[keys.length - 1]) + 1]; 
-      keys.forEach( key => {
-        ids[parseInt(key)] = (stackViewerData.Domains[key].id);
-        labels[parseInt(key)] = (stackViewerData.Domains[key].type_label);
-        classID[parseInt(key)] = (stackViewerData.Domains[key].type_id);
+      if ( stackViewerData?.Domains ){
+        keys = Object.keys(stackViewerData?.Domains);
+      }
+      let ids = [parseInt(keys[keys?.length - 1]) + 1], labels = [parseInt(keys[keys?.length - 1]) + 1], classID = [parseInt(keys[keys?.length - 1]) + 1]; 
+      keys?.forEach( key => {
+        ids[parseInt(key)] = (stackViewerData?.Domains?.[key]?.id);
+        labels[parseInt(key)] = (stackViewerData?.Domains?.[key]?.type_label);
+        classID[parseInt(key)] = (stackViewerData?.Domains?.[key]?.type_id);
       })
       let voxels = [];
       if (config?.voxel != undefined) {

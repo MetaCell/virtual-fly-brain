@@ -14,6 +14,10 @@ import { ResultSelectionOptions } from './ResultSelectionOptions';
 import  { getResultsSOLR } from '../../components/configuration/VFBSearchBuilder/SOLRclient'
 import { DatasourceTypes } from '@metacell/geppetto-meta-ui/search/datasources/datasources';
 import { get_queries } from "../../network/query"
+import { getInstanceByID } from './../../reducers/actions/instances';
+import { useSelector } from 'react-redux'
+import { termInfoById } from '../../reducers/actions/termInfo';
+
 
 const {
   bottomNavBg,
@@ -141,12 +145,24 @@ export default function SearchBuilder(props) {
   const [recentSearch, setRecentSearch] = React.useState([]);
   const [groupedOptions, setGroupedOptions] = React.useState([]);
   const addQueryTag = () => { setValue((prevValue) => [{label: 'Queries', tags: []}, ...prevValue]) }
+  const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances);
+
+  const loadResults = () => {
+    console.log("Results ", value);
+    value.forEach( (v, index) => {
+      let id = v.id?.split("/");
+      id = id[id.length - 1];
+      if ( !allLoadedInstances?.find( i => i.id === id) && index <= value.length - 1){
+        getInstanceByID(id);
+        console.log("id loaded ", id);
+      }
+    })
+    termInfoById(value[value.length -1 ].short_form);
+  }
 
   const handleResultSelection = async(option) => {
     const doesOptionExist =  obj => obj.label === option.label
     if(!value.some(doesOptionExist)){
-      setRecentSearch([...recentSearch, option]);
-
       let response;
       try {
         console.log("option ", option);
@@ -199,7 +215,7 @@ export default function SearchBuilder(props) {
 
   const handleSearch = (searchWord) => {
     console.log("searchWord ",searchWord);
-    searchWord.length > 3 && getResultsSOLR(searchWord,
+    searchWord?.length > 3 && getResultsSOLR(searchWord,
       handleResults,
       searchConfiguration.sorter,
       datasourceConfiguration,
@@ -281,6 +297,7 @@ export default function SearchBuilder(props) {
 
           { value.length >= 1 ? (<ResultSelectionOptions
             addQueryTag={addQueryTag}
+            loadResults={loadResults}
           />) : null }
 
           { recentSearch.length >= 1 ? (<RecentSearch

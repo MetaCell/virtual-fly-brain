@@ -1,8 +1,9 @@
 // import './App.css';
 import Main from './components/Main'
 import React from 'react';
-import { termInfoById } from './reducers/actions/termInfo';
+import { getInstanceByID } from './reducers/actions/instances';
 import { queryString } from './utils/queryString';
+import { termInfoById } from './reducers/actions/termInfo';
 import { useSelector } from 'react-redux'
 import { termInfoSchemma } from './schemma/termInfoSchemma';
 import { initFileWithoutReading } from './reducers/actions/readFile';
@@ -18,7 +19,11 @@ const App = () => {
     const id = queryString("id")
 
     if (id)
+    {
+      // TODO : Combine calls
+      getInstanceByID(id);
       termInfoById(id);
+    }
   }
   if ( termInfoData ) // load initial 3d model TODO: proper instance, class treatement
   {
@@ -32,9 +37,11 @@ const App = () => {
     if (!isValid)
       console.log('Failed to validate schemma.');
 
-    const key = Object.keys(termInfoData.Images)[0];
-    const obj = termInfoData.Images[key][0].obj
-    initFileWithoutReading({ url: obj });
+    let key = 0;
+    if ( termInfoData?.Images ) key = Object.keys(termInfoData?.Images)[0];
+    let obj = null;
+    if ( termInfoData?.Images ) obj = termInfoData?.Images[key][0].obj
+    obj && initFileWithoutReading({ url: obj });
   }
 
   // let theme = createMuiTheme({

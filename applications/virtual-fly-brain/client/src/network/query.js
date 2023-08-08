@@ -28,7 +28,7 @@ export const get_queries = async (queryId) => {
 
 export const get_instance = async (short_form) => {
   console.log("Get instance ", short_form)
-  const url =`${API_URL}/get_instances?short_form=${short_form}`;
+  const url =`${API_URL}/get_term_info?id=${short_form}`;
   console.log("Url ", url)
   let response = await fetch(url)
   .then(response => { 

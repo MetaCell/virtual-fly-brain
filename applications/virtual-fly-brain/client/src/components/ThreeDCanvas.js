@@ -179,7 +179,8 @@ class ThreeDCanvas extends Component {
 }
 
 const mapStateToProps = state => ({
-  modelUrl: state.threeD.modelUrl?.url
+  modelUrl: state.threeD.modelUrl?.url,
+  allLoadedInstances : state.instances.allLoadedInstances
 });
 
 

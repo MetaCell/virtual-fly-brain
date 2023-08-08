@@ -17,6 +17,10 @@ export const QueriesSelection = ({ recentSearch }) => {
     setSearchQueries(recentSearch)
   }, [recentSearch])
 
+  const deleteQuery = (event) => {
+    let queries = searchQueries.filter( q => event.currentTarget.id !== q.short_form);
+    setSearchQueries(queries);
+  }
   const popoverHandleClick = (event) => {
     setPopoverAnchorEl(popoverAnchorEl ? null : event.target.parentElement.parentElement);
   };
@@ -99,6 +103,9 @@ export const QueriesSelection = ({ recentSearch }) => {
                 background: searchBoxBg,
               }
             }}
+            key={option.short_form}
+            id={option.short_form}
+            onClick={deleteQuery}
           >
             <Delete size={12} />
           </Button>
@@ -157,11 +164,11 @@ export const QueriesSelection = ({ recentSearch }) => {
               >
 
                 <List>
-                  { option.queries?.map((query, index) => <ListItem sx={{ top : '1.5rem' }} key={query.label+index}>
+                  { option.queries?.map((query, index) => (<ListItem sx={{ top : '1.5rem' }} key={query.label+index}>
                     <ListItemButton onClick={() => handleSelect(query.label)}>
                       <ListItemText primary={query.label} />
                     </ListItemButton>
-                  </ListItem> )}
+                  </ListItem>) )}
                 </List>
               </Popper>
             </Box>

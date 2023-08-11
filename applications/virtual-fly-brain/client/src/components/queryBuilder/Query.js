@@ -6,7 +6,8 @@ import QueryHeader from "./QueryHeader";
 import vars from "../../theme/variables";
 import Filter from "./Filter";
 
-const { chipOrange, chipGreen, headerBorderColor, searchHeadingColor, secondaryBg } = vars;
+const { chipOrange, chipGreen, chipRed, chipPink, chipYellow, headerBorderColor, searchHeadingColor, secondaryBg } = vars;
+const chipColors = [chipRed, chipGreen, chipOrange, chipPink, chipYellow];
 
 const chipsArr = [
   {
@@ -23,6 +24,14 @@ const chipsArr = [
 
 const Query = ({ fullWidth, queries }) => {
   const title = queries.length + " Query results";
+  const tags = [];
+  queries?.forEach( (query, index ) => {
+    query.facets_annotation?.forEach( tag => {
+      if ( !tags.includes(tag) ){
+        tags.push(tag);
+      }
+    })
+  })
   return (
     <>
       <QueryHeader title={title} />
@@ -46,11 +55,11 @@ const Query = ({ fullWidth, queries }) => {
       >
         <Box flex={1}>
           <Box display='flex' gap={0.5}>
-            {chipsArr?.map(item => (
+            {tags?.map( (tag, index) => (
               <Chip
                 onClick={() => null}
                 onDelete={() => null}
-                key={item.id}
+                key={tag}
                 deleteIcon={
                   <Cross
                     size={12}
@@ -60,13 +69,13 @@ const Query = ({ fullWidth, queries }) => {
                 sx={{
                   lineHeight: '0.875rem',
                   fontSize: '0.625rem',
-                  background: item.color,
+                  backgroundColor: chipColors[index%(chipColors.length-1)] || chipColors[0],
                   height: '1.25rem',
                   '&:hover': {
-                    background: item.color,
+                    backgroundColor: chipColors[index%(chipColors.length-1)] || chipColors[0]
                   }
                 }}
-                label={item.label} />
+                label={tag} />
             ))}
           </Box>
         </Box>
@@ -115,7 +124,7 @@ const Query = ({ fullWidth, queries }) => {
                   lg={fullWidth ? 4 : 3}
                   xl={3}
                 >
-                  <QueryCard facet_annotations={query.facet_annotations} query={query?.queries?.Examples[item][0]} fullWidth={fullWidth} />
+                  <QueryCard facets_annotation={query.facets_annotation} query={query?.queries?.Examples[item][0]} fullWidth={fullWidth} />
                 </Grid>
               )
             }))

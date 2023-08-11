@@ -1,10 +1,9 @@
 import React from "react";
 import { Box, Button, Card, CardActionArea, CardContent, CardMedia, Chip, IconButton, Tooltip, Typography } from "@mui/material";
-import { FullScreen, Link as LinkIcon } from "../../icons";
+import { FullScreen, Cross, Link as LinkIcon } from "../../icons";
 import vars from "../../theme/variables";
 import { useState } from "react";
 import FullScreenViewer from "./FullScreenViewer";
-import IMAGE from '../../assets/query.png';
 
 const {
   listHeadingColor,
@@ -22,39 +21,10 @@ const {
 
 const chipColors = [chipRed, chipGreen, chipOrange, chipPink, chipYellow];
 
-const chipsArr = [
-  {
-    id: 0,
-    label: 'Anatomy',
-    color: chipGreen
-  },
-  {
-    id: 1,
-    label: 'Neuron',
-    color: chipOrange
-  },
-  {
-    id: 2,
-    label: 'Nervous system',
-    color: chipYellow
-  },
-  {
-    id: 3,
-    label: 'Anatomy',
-    color: chipGreen
-  },
-  {
-    id: 4,
-    label: 'Neuron',
-    color: chipOrange
-  }
-];
-
-const QueryCard = ({ fullWidth, facet_annotations, query }) => {
+const QueryCard = ({ fullWidth, facets_annotation, query }) => {
   const [toggleReadMore, setToggleReadMore] = useState(false);
   const [showFullScreen, setShowFullScreen] = useState(false);
   const MAX_LENGTH = 40;
-  const DUMMY_STRING = "A doughnut shaped synaptic neuropil domain of the central complex of the adult brain that lies just anterior to the fan-shaped body."
   const classes = {
     heading: {
       fontWeight: 400,
@@ -137,7 +107,7 @@ const QueryCard = ({ fullWidth, facet_annotations, query }) => {
                   color: whiteColor,
                   textAlign: 'right'
                 }}>
-                  {toggleReadMore ? DUMMY_STRING : `${DUMMY_STRING?.substr(0, MAX_LENGTH)}...`}
+                  {toggleReadMore ? "" : `${""?.substr(0, MAX_LENGTH)}...`}
                 </Typography>
                 <Button
                   onClick={() => setToggleReadMore((prev) => !prev)} disableRipple
@@ -236,7 +206,7 @@ const QueryCard = ({ fullWidth, facet_annotations, query }) => {
               columnGap={1}
             >
               <Box display='flex' gap={0.5}>
-                {facet_annotations?.map((tag, index) => (
+                {facets_annotation?.map((tag, index) => (
                   <Chip
                   onClick={() => null}
                   onDelete={() => null}
@@ -259,7 +229,7 @@ const QueryCard = ({ fullWidth, facet_annotations, query }) => {
                   arrow
                   title={
                     <Box display='flex' gap={0.5}>
-                      {facet_annotations?.map((tag, index) => (
+                      {facets_annotation?.map((tag, index) => (
                         <Chip
                           onClick={() => null}
                           onDelete={() => null}
@@ -283,7 +253,7 @@ const QueryCard = ({ fullWidth, facet_annotations, query }) => {
                   <Chip
                     className="default-chip"
                     sx={{ background: primaryBg }}
-                    label={`+${chipsArr?.slice(fullWidth ? 2 : 3).length}`}
+                    label={`+${facets_annotation?.slice(fullWidth ? 2 : 3).length}`}
                   />
                 </Tooltip>
 

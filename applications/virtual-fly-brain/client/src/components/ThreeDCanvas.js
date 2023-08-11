@@ -23,13 +23,17 @@ const {
 function loadInstances (instance){
   ModelFactory.cleanModel();
   const instance1 = new SimpleInstance(instance)
-  window.Instances = [instance1]
+  let instances = window.Instances;
+  if ( instances === undefined ){
+    instances = [];
+  }
+  window.Instances = [...instances, instance1]
   augmentInstancesArray(window.Instances);
 }
 
 function getProxyInstances () {
   return window.Instances.map(i => (
-    { instancePath: i.getId(), color: { r: 0, g:1, b: 0, a:1 } }))
+    { instancePath: i.getId(), color: { r: Math.random(), g:1, b: Math.random(), a:1 } }))
 }
 
 const styles = () => ({
@@ -80,11 +84,10 @@ class ThreeDCanvas extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    console.log("allLoadedInstances ", this.props.allLoadedInstances);
     let that = this;
     let allLoadedInstances = this.props.allLoadedInstances;
     allLoadedInstances?.forEach ( inst => {
-      if ( !that.state.mappedCanvasData?.find( i => inst.Id === i.instancePath )){
+      if ( that.state.mappedCanvasData?.find( i => inst.Id === i.instancePath ) === undefined ){
         let instanceCopy = inst;
         fetch(inst.Images?.[Object.keys(inst.Images)[0]][0].obj)
           .then(response => response.text())
@@ -103,9 +106,7 @@ class ThreeDCanvas extends Component {
             loadInstances(instance)
             const data = getProxyInstances();
             const mappedCanvasData = mapToCanvasData(data)
-            let newCanvasData = this.state.mappedCanvasData.concat(mappedCanvasData);
-            console.log("New canvas data ", newCanvasData);
-            this.setState({ ...this.state, mappedCanvasData : newCanvasData})
+            that.setState({ ...that.state, mappedCanvasData : mappedCanvasData})
           });
       }
     });
@@ -113,6 +114,7 @@ class ThreeDCanvas extends Component {
 
   componentWillUnmount () {
     document.removeEventListener('mousedown', this.handleClickOutside);
+    console.log("Component unmouted")
   }
 
   hoverHandler (objs, canvasX, canvasY) {
@@ -167,7 +169,7 @@ class ThreeDCanvas extends Component {
       },
     }
 
-
+    console.log("Rendering data ", this.state.mappedCanvasData)
 
     return <Box
       sx={{
@@ -228,7 +230,6 @@ class ThreeDCanvas extends Component {
 }
 
 const mapStateToProps = state => ({
-  modelUrl: state.threeD.modelUrl?.url,
   allLoadedInstances : state.instances.allLoadedInstances
 });
 

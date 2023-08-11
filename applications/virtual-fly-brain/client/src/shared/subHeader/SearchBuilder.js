@@ -158,13 +158,11 @@ export default function SearchBuilder(props) {
   const queries = useSelector(state => state.queries.queries);
 
   const loadResults = () => {
-    console.log("Results ", value);
     value.forEach( (v, index) => {
       let id = v.id?.split("/");
       id = id?.[id?.length - 1];
       if ( !allLoadedInstances?.find( i => i.id === id) && index <= value.length - 1){
         getInstanceByID(id);
-        console.log("id loaded ", id);
       }
     })
     termInfoById(value[value.length -1 ].short_form);
@@ -194,19 +192,10 @@ export default function SearchBuilder(props) {
   };
 
   const handleResults = (status, data, v) => {
-    console.log("Handle status ", status)
-    console.log("Handle data ", data)
-    console.log("Handle value ", value)
     switch(status) {
 
       case "OK":
           if (v !== value) {
-            // if (v === "") {
-            //   setValue([])
-            // } else {
-            //   setValue(v)
-            // }
-            console.log("Set data ")
             setGroupedOptions(data)
           }
           break;
@@ -221,7 +210,6 @@ export default function SearchBuilder(props) {
   const datasourceConfiguration = require('../../components/configuration/VFBSearchBuilder/searchConfiguration').datasourceConfiguration;
 
   const handleSearch = (searchWord) => {
-    console.log("searchWord ",searchWord);
     searchWord?.length > 3 && getResultsSOLR(searchWord,
       handleResults,
       searchConfiguration.sorter,

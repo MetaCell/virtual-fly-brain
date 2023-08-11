@@ -27,7 +27,6 @@ const App = () => {
   if ( termInfoData ) // load initial 3d model TODO: proper instance, class treatement
   {
     //validate schemma
-    console.log("Term info data ", termInfoData)
     const ajv = new Ajv(); // create an Ajv instance
     const validate = ajv.compile(termInfoSchemma); // compile the schema
 

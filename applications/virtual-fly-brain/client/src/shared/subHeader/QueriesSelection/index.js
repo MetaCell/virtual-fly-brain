@@ -16,7 +16,6 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
     query?.queries.Examples ? resultsNumbers = resultsNumbers + Object.keys(query?.queries.Examples).length : null;
   })
   React.useEffect(() => {
-    console.log("Set queries ", recentSearch)
     setSearchQueries(recentSearch)
   }, [recentSearch])
 

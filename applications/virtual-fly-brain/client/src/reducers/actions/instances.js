@@ -28,7 +28,6 @@ export const getInstanceByID = async (queryId) => {
 
   try {
     response = await get_instance(queryId);
-    console.log("Response ", response)
   } catch (error) {
     store.dispatch(getInstancesFailure(error.message))
     return

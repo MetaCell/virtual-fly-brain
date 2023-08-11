@@ -10,7 +10,6 @@ const rootReducer = combineReducers({
   termInfo: TermInfoReducer,
   instances: InstancesReducer,
   queries: QueriesReducer,
-  threeD: ThreeDCanvasReducer,
   globalInfo : GlobalReducer
 });
 

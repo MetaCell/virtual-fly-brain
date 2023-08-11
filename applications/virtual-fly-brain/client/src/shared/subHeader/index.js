@@ -9,32 +9,32 @@ import { FilterMenu } from "./FilterMenu";
 const navArr = [
   {
     id: 0,
-    icon: <Upload />,
+    icon: Upload,
     name: 'Upload'
   },
   {
     id: 1,
-    icon: <Download />,
+    icon: Download,
     name: 'Download'
   },
   {
     id: 2,
-    icon: <Query />,
+    icon: Query,
     name: 'Query'
   },
   {
     id: 3,
-    icon: <Layers />,
+    icon: Layers,
     name: 'Layer'
   },
   {
     id: 3,
-    icon: <ClearAll />,
+    icon: ClearAll,
     name: 'Clear all'
   },
   {
     id: 3,
-    icon: <History />,
+    icon: History,
     name: 'Recent'
   },
 ]
@@ -52,10 +52,9 @@ const {
   headerBorderColor
 } = vars;
 
-const SubHeader = () => {
+const SubHeader = ({ setBottomNav, bottomNav }) => {
   const [focused, setFocused] = useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
-
   const classes = {
     root: {
       position: 'relative',
@@ -140,7 +139,7 @@ const SubHeader = () => {
         {focused ? <AngleLeft style={{ margin: 0 }} size={20} /> : <Search style={{ margin: 0 }} />}
 
         <Box flexGrow={1} px={1}>
-          <SearchBuilder setFocused={setFocused} />
+          <SearchBuilder setFocused={setFocused}  bottomNav={bottomNav} setBottomNav={setBottomNav} />
         </Box>
         <FilterMenu classes={classes} />
 
@@ -167,15 +166,16 @@ const SubHeader = () => {
           flexWrap='wrap'
           sx={classes.nav}
         >
-          {navArr.map((item) => (
+          {navArr.map((item, index) => (
             <Button
               aria-label={item.name}
+              onClick={() => setBottomNav(index)}
               sx={{
                 minWidth: '0.0625rem'
               }}
               key={`${item.id}_${item.name}`}
             >
-              {item.icon}
+              <item.icon color={item?.id === bottomNav && tabActiveColor} />
             </Button>
           ))}
         </Box>

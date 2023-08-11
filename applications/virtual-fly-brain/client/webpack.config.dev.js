@@ -3,7 +3,7 @@ const common = require('./webpack.config.js');
 
 var path = require('path');
 
-const PORT = 9000;
+const PORT = 3300;
 
 
 module.exports = env => {

@@ -5,7 +5,7 @@ import vars from "../../../theme/variables";
 
 const { searchHeadingColor, outlinedBtnBorderColor, primaryBg } = vars;
 
-export const ResultSelectionOptions = ({ addQueryTag, loadResults, loadQueries }) => {
+export const ResultSelectionOptions = ({ addQueryTag }) => {
   return (
     <Box sx={{
       py: '1rem',
@@ -41,9 +41,7 @@ export const ResultSelectionOptions = ({ addQueryTag, loadResults, loadQueries }
           '&:hover': {
             backgroundColor: outlinedBtnBorderColor,
           }
-        }}
-        onClick={loadResults}
-        >
+        }}>
           <AddChart style={{ marginRight: '0.5rem' }} />
           Load results
           <AngleRight style={{ marginLeft: '0.5rem' }} />

@@ -15,12 +15,11 @@ const InstancesReducer = (state = initialState, response) => {
         })
      case getInstancesTypes.GET_INSTANCES_SUCCESS:
         return Object.assign({}, state, {
-          allLoadedInstances: !state.allLoadedInstances?.find( i => i.Id === response.Id ) && [...state.allLoadedInstances, response.payload],
+          allLoadedInstances: state.allLoadedInstances?.find( i => i.Id === response.payload.Id ) ? null : [...state.allLoadedInstances, response.payload],
           isLoading: false
         })
       case getInstancesTypes.GET_INSTANCES_FAILURE:
         return Object.assign({}, state, {
-          termInfoData: [],
           error: true
         })
      default:

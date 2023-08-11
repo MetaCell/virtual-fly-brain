@@ -3,30 +3,18 @@ import React from "react";
 import { AngleRight, ChevronDown, CleaningServices, Delete } from "../../../icons";
 import vars from "../../../theme/variables";
 
-const queryBuilderDatasourceConfig = require('../../../components/configuration/VFBSearchBuilder/queryBuilderConfiguration').queryBuilderDatasourceConfig;
-
 const { searchHeadingColor, searchBoxBg, primaryBg, whiteColor, queryBorderColor } = vars;
 
-export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSearch }) => {
-  const [searchQueries, setSearchQueries] = React.useState([]);
+export const QueriesSelection = () => {
+  const listItems = [
+    "Select query for A00c_a4 (L1EM:2511238) expression pattern",
+    "Anatomy A00c_a4 (L1EM:2511238) expression pattern is expressed in",
+    "Parts of A00c_a4 (L1EM:2511238) expression pattern",
+    "Subclasses of A00c_a4 (L1EM:2511238) expression pattern"
+  ];
   const [popoverAnchorEl, setPopoverAnchorEl] = React.useState(null);
-  const [selectedOption, setSelectedOption] = React.useState({});
-  let resultsNumbers = 0;
-  searchQueries.forEach( query => {
-    query?.Examples?.forEach( example => {
-      resultsNumbers = resultsNumbers + Object.keys(example)?.length;
-    })
-  })
-  React.useEffect(() => {
-    console.log("Set queries ", recentSearch)
-    setSearchQueries(recentSearch)
-  }, [recentSearch])
+  const [selectedOption, setSelectedOption] = React.useState(listItems[0]);
 
-  const deleteQuery = (event) => {
-    let queries = searchQueries.filter( q => event.currentTarget.id !== q.label);
-    setSearchQueries(queries);
-    handleQueryDeletion(event.currentTarget.id);
-  }
   const popoverHandleClick = (event) => {
     setPopoverAnchorEl(popoverAnchorEl ? null : event.target.parentElement.parentElement);
   };
@@ -74,7 +62,6 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
             }
           }}
           variant="text"
-          onClick={() => setSearchQueries([])}
         >
           <CleaningServices style={{ marginRight: '0.375rem' }} />
           Clear queries
@@ -87,10 +74,8 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
         flexDirection='column'
         rowGap={2}
       >
-        { searchQueries?.map((option, index) =>
         <Box
           display='flex'
-          key={option.label}
           columnGap={1}
         >
           <Button
@@ -110,9 +95,6 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
                 background: searchBoxBg,
               }
             }}
-            key={option.short_form}
-            id={option.label}
-            onClick={deleteQuery}
           >
             <Delete size={12} />
           </Button>
@@ -142,7 +124,7 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
                 overflow: 'hidden',
                 textOverflow: 'ellipsis'
               }}>
-                Select query for {option.label}
+                {selectedOption}
               </Typography>
 
               <Button
@@ -171,23 +153,24 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
               >
 
                 <List>
-                  { option.queries?.Queries?.map((query, index) => (<ListItem sx={{ top : '1.5rem' }} key={query.label+index}>
-                    <ListItemButton onClick={() => handleSelect(query.label)}>
-                      <ListItemText primary={query.label} />
+                  { listItems.map((option, index) => <ListItem key={option+index}>
+                    <ListItemButton onClick={() => handleSelect(option)}>
+                      <ListItemText primary={option} />
                     </ListItemButton>
-                  </ListItem>) )}
+                  </ListItem> )}
                 </List>
               </Popper>
             </Box>
           </Box>
         </Box>
-        )}
-        <Box
+      </Box>
+
+      <Box
         display='flex'
         justifyContent='flex-end'
       >
-      <Button
-          onClick={checkResults}
+        <Button
+          onClick={() => console.log('Clicked')}
           sx={{
             px: '0.5rem',
             py: '0.25rem',
@@ -201,10 +184,9 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
             }
           }}
         >
-          Check { resultsNumbers } results
+          Check 15 results
           <AngleRight style={{ marginLeft: '0.5rem' }} />
         </Button>
-      </Box>
       </Box>
     </Box>
   )

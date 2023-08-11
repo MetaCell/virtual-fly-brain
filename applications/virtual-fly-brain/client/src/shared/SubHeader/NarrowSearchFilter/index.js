@@ -5,12 +5,7 @@ import vars from "../../../theme/variables";
 
 const { searchHeadingColor, chipGreenSecondary, primaryBg, chipRedSecondary, outlinedBtnTextColor } = vars;
 
-export const NarrowSearchFilter = ({groupedOptions, chipColors}) => {
-  let tags = [];
-  groupedOptions?.forEach((option, index) => (
-    option?.facets_annotation?.forEach( fa => { if ( !tags.find(t => t == fa )) tags.push(fa)})
-  ));
-  
+export const NarrowSearchFilter = () => {
   return (
     <Box sx={{
       py: '1rem',
@@ -46,21 +41,27 @@ export const NarrowSearchFilter = ({groupedOptions, chipColors}) => {
           flexWrap: 'wrap',
           rowGap: 0.5
         }}>
-          {tags?.map((tag, index) => (
-            <Chip
-              className="secondary"
-              key={tag + index}
-              sx={{
-                lineHeight: '140%',
-                fontSize: '0.625rem',
-                backgroundColor: chipColors[index%(chipColors.length-1)] || chipColors[0]
-              }}
-              label= {tag}
-              onDelete={() => null}
-              deleteIcon={<CloseIcon />}
-            />
-          ))
-          }
+          <Chip
+            className="secondary"
+            sx={{ backgroundColor: chipGreenSecondary }}
+            label="Anatomy"
+            onDelete={() => null}
+            deleteIcon={<CloseIcon />}
+          />
+          <Chip
+            className="secondary"
+            sx={{ backgroundColor: chipGreenSecondary }}
+            label="Nervous system"
+            onDelete={() => null}
+            deleteIcon={<CloseIcon />}
+          />
+          <Chip
+            className="secondary"
+            sx={{ backgroundColor: chipRedSecondary }}
+            label="Neuron"
+            onDelete={() => null}
+            deleteIcon={<CloseIcon />}
+          />
 
         </Box>
 

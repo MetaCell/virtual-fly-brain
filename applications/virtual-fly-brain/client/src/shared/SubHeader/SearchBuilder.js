@@ -11,17 +11,6 @@ import { RecentSearch } from './RecentSearch';
 import { QueriesSelection } from './QueriesSelection';
 import { NarrowSearchFilter } from './NarrowSearchFilter';
 import { ResultSelectionOptions } from './ResultSelectionOptions';
-import  { getResultsSOLR } from '../../components/configuration/VFBSearchBuilder/SOLRclient'
-import { DatasourceTypes } from '@metacell/geppetto-meta-ui/search/datasources/datasources';
-import { get_queries } from "../../network/query"
-import { getInstanceByID } from './../../reducers/actions/instances';
-import { useSelector } from 'react-redux'
-import { termInfoById } from '../../reducers/actions/termInfo';
-import { getQueries, deleteQuery } from '../../reducers/actions/queries';
-
-import QueryBuilder from "./../../components/queryBuilder";
-
-const QUERIES = "Queries";
 
 const {
   bottomNavBg,
@@ -140,93 +129,46 @@ const Listbox = styled('div')(
 const chipColors = [chipRed, chipGreen, chipOrange, chipPink, chipYellow];
 
 const searchResults = [
-
+  { title: 'A0 (anlage in statu nascendi)', tags: ["Anatomy", 'Nervous system'] },
+  { title: 'A00c_a4', tags: ["Anatomy", 'Nervous system'] },
+  { title: 'a00c_a41 (a00c_a4 (L1EM:2511238))', tags: ["Anatomy", 'Nervous system'] },
+  { title: 'BCD (anlage in statu nascendi)', tags: ["Anatomy", 'Nervous system'] },
 ];
 
-export default function SearchBuilder(props) {
+export default function SearchBuilder({ setFocused }) {
+
+  const recentSearch = [
+    {
+      title: 'CDF0 (anlage in statu nascendi)',
+      tags: [
+        { id: 0, label: "Anatomy" },
+        { id: 1, label: 'Nervous system' },
+        { id: 2, label: 'Neuron' },
+        { id: 3, label: 'Nervous projection bundle' },
+        { id: 4, label: 'Larva' }
+      ]
+    },
+    {
+      title: 'a00c_a41 (a00c_a4 (L1EM:2511238))',
+      tags: [
+        { id: 0, label: "Anatomy" },
+        { id: 1, label: 'Nervous system' },
+      ]
+    },
+  ];
 
   const [value, setValue] = React.useState([]);
-  const [recentSearch, setRecentSearch] = React.useState([]);
-  const [groupedOptions, setGroupedOptions] = React.useState([]);
-  const addQueryTag = () => { 
-    if ( !value.find( v => v.label === QUERIES )){
-      setValue((prevValue) => [{label: 'Queries', tags: []}, ...prevValue])
-    }
-  };
-  const checkResults = () => {props.setBottomNav(2)}
-  const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances);
-  const queries = useSelector(state => state.queries.queries);
+  const addQueryTag = () => { setValue((prevValue) => [{title: 'Queries', tags: []}, ...prevValue]) }
 
-  const loadResults = () => {
-    console.log("Results ", value);
-    value.forEach( (v, index) => {
-      let id = v.id?.split("/");
-      id = id?.[id?.length - 1];
-      if ( !allLoadedInstances?.find( i => i.id === id) && index <= value.length - 1){
-        getInstanceByID(id);
-        console.log("id loaded ", id);
-      }
-    })
-    termInfoById(value[value.length -1 ].short_form);
-  }
-
-  const handleResultSelection = async(option) => {
-    const doesOptionExist =  obj => obj.label === option.label
+  const handleResultSelection = (option) => {
+    const doesOptionExist =  obj => obj.title === option.title
     if(!value.some(doesOptionExist)){
-      getQueries(option);
       setValue([...value, option])
     }
   };
 
-  const handleChipDelete = (label) => {
-    handleQueryDeletion(label)
-    setValue(value.filter((chip) => chip.label !== label))
-  }
-
-  const handleQueryDeletion = (label) => {
-    let option = value.find((chip) => chip.label === label);
-    deleteQuery(option);
-  }
-
-  const getDatasource = {
-    [DatasourceTypes.CUSTOM]: props.customDatasourceHandler,
-    [DatasourceTypes.SOLRClient]: getResultsSOLR,
-  };
-
-  const handleResults = (status, data, v) => {
-    console.log("Handle status ", status)
-    console.log("Handle data ", data)
-    console.log("Handle value ", value)
-    switch(status) {
-
-      case "OK":
-          if (v !== value) {
-            // if (v === "") {
-            //   setValue([])
-            // } else {
-            //   setValue(v)
-            // }
-            console.log("Set data ")
-            setGroupedOptions(data)
-          }
-          break;
-      case "ERROR":
-          break;
-      default:
-          console.log("This is a case not considered");
-    }
-  }
-
-  const searchConfiguration = require('../../components/configuration/VFBSearchBuilder/searchConfiguration').searchConfiguration;
-  const datasourceConfiguration = require('../../components/configuration/VFBSearchBuilder/searchConfiguration').datasourceConfiguration;
-
-  const handleSearch = (searchWord) => {
-    console.log("searchWord ",searchWord);
-    searchWord?.length > 3 && getResultsSOLR(searchWord,
-      handleResults,
-      searchConfiguration.sorter,
-      datasourceConfiguration,
-      setGroupedOptions);
+  const handleChipDelete = (index) => {
+    setValue(value.filter((chip) => chip.title !== index))
   }
 
   const {
@@ -235,20 +177,20 @@ export default function SearchBuilder(props) {
     getTagProps,
     getListboxProps,
     getOptionProps,
+    groupedOptions,
     focused,
     setAnchorEl,
   } = useAutocomplete({
     id: 'customized-hook',
     multiple: true,
     options: searchResults,
-    getOptionLabel: (option) => option?.label,
+    getOptionLabel: (option) => option?.title,
     disableCloseOnSelect: true,
-    open: true,
-    onInputChange : event => handleSearch(event.target.value)
+    open: true
   });
 
   React.useEffect(() => {
-    props.setFocused(focused ? true : false)
+    setFocused(focused ? true : false)
   }, [focused])
 
   return (
@@ -267,7 +209,7 @@ export default function SearchBuilder(props) {
                   className="secondary"
                   key={`tag-${index}`}
                   sx={{
-                    background: option.label === QUERIES ? queryChipBg : outlinedBtnBorderColor,
+                    background: option.title === 'Queries' ? queryChipBg : outlinedBtnBorderColor,
                     alignSelf: 'center',
                     color: outlinedBtnTextColor,
                     whiteSpace: 'nowrap',
@@ -275,11 +217,11 @@ export default function SearchBuilder(props) {
                     textOverflow: 'ellipsis',
                     maxWidth: '5.9375rem'
                   }}
-                  label={option.label}
+                  label={option.title}
                   {...getTagProps({ index })}
                   deleteIcon={<CloseIcon />}
                   value={value}
-                  onDelete={() => handleChipDelete(option.label)}
+                  onDelete={() => handleChipDelete(option.title)}
                 />
               ))}
             </Box>
@@ -298,19 +240,18 @@ export default function SearchBuilder(props) {
           className='scrollbar'
           {...getListboxProps()}
         >
-          { value.find( v => v.label === QUERIES ) && queries.length >= 1 ? (<QueriesSelection checkResults={checkResults} handleQueryDeletion={handleQueryDeletion} recentSearch={queries}/>) : null }
+          <QueriesSelection />
 
-          {/* { groupedOptions.length >=1 ? <NarrowSearchFilter chipColors={chipColors} groupedOptions={groupedOptions}/> :null } */}
+          <NarrowSearchFilter />
 
-          { value.length >= 1 ? (<ResultSelectionOptions
+          <ResultSelectionOptions
             addQueryTag={addQueryTag}
-            loadResults={loadResults}
-          />) : null }
+          />
 
-          { recentSearch.length >= 1 ? (<RecentSearch
+          <RecentSearch
             chipColors={chipColors}
             recentSearch={recentSearch}
-          />) : null }
+          />
 
           <SearchResult
             groupedOptions={groupedOptions}

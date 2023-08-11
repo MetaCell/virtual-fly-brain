@@ -67,17 +67,16 @@ export const SearchResult = ({ getOptionProps, groupedOptions, chipColors, handl
                 color: searchHeadingColor,
                 px: 1
               }}>
-                {option?.label}
+                {option?.title}
               </Typography>
 
               <Box sx={{
                 ml: 'auto',
                 display: 'flex',
                 alignItems: 'center',
-                width: '30%',
                 columnGap: 0.5
               }}>
-                {option?.facets_annotation.map((tag, index) => <Chip
+                {option?.tags.map((tag, index) => <Chip
                   key={tag + index}
                   sx={{
                     lineHeight: '140%',

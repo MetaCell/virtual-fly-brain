@@ -7,7 +7,6 @@ import { termInfoById } from './reducers/actions/termInfo';
 import { useSelector } from 'react-redux'
 import { termInfoSchemma } from './schemma/termInfoSchemma';
 import { initFileWithoutReading } from './reducers/actions/readFile';
-import 'font-awesome/css/font-awesome.min.css';
 import Ajv from 'ajv';
 
 const App = () => {

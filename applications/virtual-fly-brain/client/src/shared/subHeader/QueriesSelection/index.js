@@ -13,7 +13,7 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
   const [selectedOption, setSelectedOption] = React.useState({});
   let resultsNumbers = 0;
   searchQueries.forEach( query => {
-    query?.queries.Examples ? resultsNumbers = resultsNumbers + Object.keys(query?.queries.Examples).length : null;
+    query?.queries?.Examples ? resultsNumbers = resultsNumbers + Object.keys(query?.queries?.Examples).length : null;
   })
   React.useEffect(() => {
     setSearchQueries(recentSearch)

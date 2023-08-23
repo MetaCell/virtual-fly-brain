@@ -7,7 +7,7 @@ import TermInfo from "./TermInfo"
 import Images from "./Images";
 import StackViewer from './StackViewer';
 import vars from "../theme/variables";
-import SideBar from "../shared/Sidebar";
+import SideBar from "../shared/sidebar";
 import Circuit from "./Circuit";
 import StackViewerComponent from "./StackViewerComponent";
 import QueryBuilder from "./queryBuilder";

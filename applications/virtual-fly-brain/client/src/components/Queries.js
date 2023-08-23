@@ -19,7 +19,7 @@ const Queries = (props) => {
   
   return (
     <div className="slide-container" >
-       {props.queries.map((query, index)=> (
+       {props?.queries?.map((query, index)=> (
           <div key={index}>
             <span style={spanStyle} onClick={ () => { loadInstance(query.takes) } }>{query.query}</span>
           </div>

@@ -1,5 +1,5 @@
 domain: virtual-fly-brain.metacell.us
-namespace: CHANGE ME
+namespace: vfb
 backup:
   active: false
 mainapp: virtual-fly-brain

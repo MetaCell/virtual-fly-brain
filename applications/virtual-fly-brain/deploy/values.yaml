@@ -5,20 +5,6 @@ harness:
     port: 8080
     auto: true
 
-  database:
-    type: postgres
-    auto: true
-    name: virtual-fy-brain-db
-    image_ref: postgres
-    size: 240Gi
-    resources:
-      requests:
-          memory: 2Gi
-          cpu: 1
-      limits:
-        memory: 4Gi
-        cpu: 2
-    args: ["--vm", "1", "--vm-bytes", "8Gi", "--vm-hang", "1"]
   deployment:
     auto: true
     port: 8080
@@ -26,6 +12,5 @@ harness:
     build:
       - cloudharness-base-debian
       - cloudharness-flask
-      - vfb-postgres
     soft:
     - argo

@@ -133,6 +133,7 @@ steps:
         image_name: virtual-fly-brain/virtual-fly-brain
         title: Virtual Fly Brain Dev
         working_directory: ./applications/virtual-fly-brain
+        no_cache: true
   deployment:
     stage: deploy
     image: codefresh/cfstep-helm:3.6.2

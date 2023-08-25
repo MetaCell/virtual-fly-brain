@@ -14,10 +14,8 @@ const App = () => {
   const termInfoData = useSelector(state => state.termInfo.termInfoData)
 
   if (!isLoading && !termInfoData) {
-    const id = queryString("id")
-
-    if (id)
-      termInfoById(id);
+    const id = queryString("id") || "VFB_00101567";
+    termInfoById(id);
   }
   if ( termInfoData ) // load initial 3d model TODO: proper instance, class treatement
   {

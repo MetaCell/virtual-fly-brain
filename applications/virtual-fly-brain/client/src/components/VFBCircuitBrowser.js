@@ -99,7 +99,7 @@ class VFBCircuitBrowser extends Component {
   componentDidUpdate () {
     let self = this;
     if ( this.props.visible && ( !this.focused || this.graphResized ) ) {
-      setTimeout( function () {
+      setTimeout( () => {
         self.resetCamera();
         self.focused = true;
         self.graphResized = false;
@@ -123,7 +123,7 @@ class VFBCircuitBrowser extends Component {
    */
   queriesUpdated (neurons) {
     // Check if new list of neurons is the same as the ones already rendered on last update
-    var matched = (this.state.neurons.length == neurons.length) && this.state.neurons.every(function (element, index) {
+    var matched = (this.state.neurons.length == neurons.length) && this.state.neurons.every( (element, index) => {
       return element.id === neurons[index].id; 
     });
     
@@ -226,7 +226,7 @@ class VFBCircuitBrowser extends Component {
       url: url,
       headers: { 'content-type': contentType },
       data: request,
-    }).then( function (response) {
+    }).then( (response) => {
       var blob = new Blob(["onmessage = " + queryParser ]);
       var blobUrl = window.URL.createObjectURL(blob);
 
@@ -236,7 +236,7 @@ class VFBCircuitBrowser extends Component {
         case "OK":
           self.setState( { graph : e.data.params.results , legend : e.data.params.colorLabels, loading : false, queryLoaded : true });
           self.objectsLoaded = e.data.params.results.nodes.length;
-          setTimeout( function () {
+          setTimeout( () => {
             self.resetCamera();
             if ( self.graphRef.current !== null ) {
               self.graphRef.current.ggv.current.d3Force('charge').strength(-(self.objectsLoaded * 100 ))
@@ -258,7 +258,7 @@ class VFBCircuitBrowser extends Component {
       // Invoke web worker to perform conversion of graph data into format
       worker.postMessage({ message: "refine", params: params });
     })
-      .catch( function (error) {
+      .catch( (error) => {
         self.setState( { loading : false } );
       })
   }

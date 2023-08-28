@@ -491,10 +491,10 @@ class Controls extends Component {
           { this.props.resultsAvailable()
             ? <ul className={classes.legend} id="circuitBrowserLegend">
               { this.props.legend.map((label, index) => (
-                <li><div className={classes.legendItem} style={{ backgroundColor : stylingConfiguration.nodeColorsByLabel[label] }}></div>{label}</li>
+                <li key={index}><div className={classes.legendItem} style={{ backgroundColor : stylingConfiguration.nodeColorsByLabel[label] }}></div>{label}</li>
               ))
               }
-              <li>WEIGHT -Forward [Reverse]→</li>
+              <li key="weight">WEIGHT -Forward [Reverse]→</li>
             </ul>
             : null
           }

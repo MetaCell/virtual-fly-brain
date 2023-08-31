@@ -80,13 +80,13 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
         <SideBar open={sidebarOpen} setOpen={setSidebarOpen} />
       )}
 
-      {tab.includes(1) && (
+      {tab.includes(1) && ( 
         <ThreeDCanvas />
       )}
 
-      {/* {tab.includes(2) && (
-        <Circuit />
-      )} */}
+      {tab.includes(2) && (
+        <StackViewer />
+      )}
     </>
   )
 

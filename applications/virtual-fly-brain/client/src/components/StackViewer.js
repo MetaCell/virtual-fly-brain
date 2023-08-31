@@ -230,10 +230,10 @@ const VFBStackViewer = (props) => {
       }}
     >
       Stack Viewer
-      <StackComponent
+      {/* <StackComponent
       data={stackData}
       config={config}
-      voxel={voxelSize}/>
+      voxel={voxelSize}/> */}
     </Box>
   )
 }

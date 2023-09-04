@@ -25,10 +25,11 @@ const styles = theme => ({
 /**
  * Read configuration from circuitBrowserConfiguration
  */
-const configuration = require('../../configuration/VFBCircuitBrowser/circuitBrowserConfiguration').configuration;
-const restPostConfig = require('../../configuration/VFBCircuitBrowser/circuitBrowserConfiguration').restPostConfig;
-const cypherQuery = require('../../configuration/VFBCircuitBrowser/circuitBrowserConfiguration').locationCypherQuery;
-const stylingConfiguration = require('../../configuration/VFBCircuitBrowser/circuitBrowserConfiguration').styling;
+
+import { restPostConfig } from './configuration/VFBCircuitBrowser/circuitBrowserConfiguration';
+import { configuration } from './configuration/VFBCircuitBrowser/circuitBrowserConfiguration';
+import { locationCypherQuery } from './configuration/VFBCircuitBrowser/circuitBrowserConfiguration';
+import { styling } from './configuration/VFBCircuitBrowser/circuitBrowserConfiguration';
 
 /**
  * If no configuration is given for queries in graphConfiguration.js, we use this configuration.
@@ -199,7 +200,7 @@ class VFBCircuitBrowser extends Component {
       // Show loading spinner while cypher query search occurs
       this.setState({ loading : true , neurons : neurons ? neurons : this.state.neurons, paths : paths ? paths : this.state.paths, weight : weight ? weight : this.state.weight, queryLoaded : false });
       // Perform cypher query. TODO: Remove hardcoded weight once edge weight is implemented
-      this.queryResults(cypherQuery(neurons ? neurons.map(a => `'${a.id}'`).join(",") : this.state.neurons, paths ? paths : this.state.paths, weight ? weight : this.state.weight));
+      this.queryResults(locationCypherQuery(neurons ? neurons.map(a => `'${a.id}'`).join(",") : this.state.neurons, paths ? paths : this.state.paths, weight ? weight : this.state.weight));
     }
   }    
 
@@ -249,7 +250,7 @@ class VFBCircuitBrowser extends Component {
       let params = {
         results: response.data,
         configuration : configuration,
-        styling : stylingConfiguration,
+        styling : styling,
         paths : self.state.paths,
         weight : self.state.weight,
         NODE_WIDTH : NODE_WIDTH, NODE_HEIGHT : NODE_HEIGHT
@@ -321,16 +322,16 @@ class VFBCircuitBrowser extends Component {
     let borderThickness = this.highlightNodes.has(node) ? NODE_BORDER_THICKNESS : 1;
 
     // Node border color
-    ctx.fillStyle = self.hoverNode == node ? stylingConfiguration.defaultNodeHoverBoderColor : (this.highlightNodes.has(node) ? stylingConfiguration.defaultNeighborNodesHoverColor : stylingConfiguration.defaultNodeBorderColor) ;
+    ctx.fillStyle = self.hoverNode == node ? styling.defaultNodeHoverBoderColor : (this.highlightNodes.has(node) ? styling.defaultNeighborNodesHoverColor : styling.defaultNodeBorderColor) ;
     // Create Border
     ctx.fillRect(node.x - cardWidth / 2 - (borderThickness), node.y - cardHeight / 2 - (borderThickness), cardWidth , cardHeight );
 
     // Assign color to Description Area background in Node
-    ctx.fillStyle = stylingConfiguration.defaultNodeDescriptionBackgroundColor;
+    ctx.fillStyle = styling.defaultNodeDescriptionBackgroundColor;
     // Create Description Area in Node
     ctx.fillRect(node.x - cardWidth / 2,node.y - cardHeight / 2, cardWidth - (borderThickness * 2 ), cardHeight - (borderThickness * 2 ));
 
-    ctx.fillStyle = stylingConfiguration.defaultNodeTitleBackgroundColor;
+    ctx.fillStyle = styling.defaultNodeTitleBackgroundColor;
     ctx.fillRect(node.x - cardWidth / 2,node.y - cardHeight / 2, cardWidth - (borderThickness * 2 ), cardHeight / 2 );
 
     const lastIndex = node.nodeColorLabels.length;
@@ -344,9 +345,9 @@ class VFBCircuitBrowser extends Component {
     })
 
     // Assign font to text in Node
-    ctx.font = stylingConfiguration.defaultNodeFont;
+    ctx.font = styling.defaultNodeFont;
     // Assign color to text in Node
-    ctx.fillStyle = stylingConfiguration.defaultNodeFontColor;
+    ctx.fillStyle = styling.defaultNodeFontColor;
     // Text in font to be centered
     ctx.textAlign = "center";
     ctx.textBaseline = 'middle';
@@ -354,7 +355,7 @@ class VFBCircuitBrowser extends Component {
     // Create Title in Node
     this.wrapText(ctx, node.classLabel, node.x, node.y - (cardHeight / 2) + 10, cardWidth * .8 , classnameHeight);
     
-    ctx.font = stylingConfiguration.defaultNodeFont;
+    ctx.font = styling.defaultNodeFont;
     /* 
      * Add Description text to Nodes
      * node.name = text to display
@@ -481,12 +482,12 @@ class VFBCircuitBrowser extends Component {
             nodeRelSize={20}
             nodeSize={30}
             // Assign background color to Canvas
-            backgroundColor = {stylingConfiguration.canvasColor}
+            backgroundColor = {styling.canvasColor}
             // Assign color to Links connecting Nodes
             linkColor = {link => {
-              let color = stylingConfiguration.defaultLinkColor;
+              let color = styling.defaultLinkColor;
               if ( self.highlightLinks.has(link) ) {
-                color = self.highlightNodes.has(link.source) || self.highlightNodes.has(link.targetNode) ? stylingConfiguration.defaultLinkHoverColor : stylingConfiguration.defaultLinkColor;
+                color = self.highlightNodes.has(link.source) || self.highlightNodes.has(link.targetNode) ? styling.defaultLinkHoverColor : styling.defaultLinkColor;
               }
 
               return color;

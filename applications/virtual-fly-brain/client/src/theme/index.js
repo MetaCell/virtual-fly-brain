@@ -27,6 +27,7 @@ theme = createTheme({
   typography: {
     allVariants: {
       fontFamily: primaryFont,
+      letterSpacing: 'normal'
     }
   },
 
@@ -382,6 +383,16 @@ theme = createTheme({
           lineHeight: '125%',
           color: outlinedBtnTextColor,
 
+          '& p': {
+            lineHeight: '125%',
+            fontSize: '1rem',
+            letterSpacing: 'normal'
+          },
+
+          '& > div': {
+            alignItems: 'center'
+          },
+
           '& > div > p': {
             flex: 1,
             textOverflow: 'ellipsis',
@@ -543,7 +554,7 @@ theme = createTheme({
           fontWeight: 400,
           borderRadius: '0.5rem',
           textTransform: 'none',
-          height: '2.125rem',
+          height: '2.125rem'
         },
 
         text: {
@@ -606,6 +617,7 @@ theme = createTheme({
         outlinedPrimary: {
           border: `0.0625rem solid ${outlinedBtnBorderColor}`,
           color: outlinedBtnTextColor,
+          padding: '0 0.75rem',
           '&:hover': {
             borderColor: outlinedBtnBorderColor,
             backgroundColor: outlinedBtnBorderColor,

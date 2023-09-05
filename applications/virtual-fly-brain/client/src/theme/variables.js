@@ -18,7 +18,7 @@ const vars = {
   filterPopoverBg: 'rgba(80, 80, 80, 0.8)',
   chipPrimaryColor: '#FFFFB3',
   chipSecondaryColor: '#9F843C',
-  carouselBg: 'linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), #222222',
+  carouselBg: 'linear-gradient(0deg, rgba(26, 26, 26, 0.50) 0%, rgba(26, 26, 26, 0.50) 100%), #222',
   queryBorderColor: '#5D5D5D',
   listHeadingColor: '#A0A0A0',
   descriptionBg: 'linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), #222222',

@@ -24,7 +24,10 @@ const GeneralInformation = ({data, classes}) => {
         <Box
           sx={{
             width: '100%',
-            height: '14.25rem',
+            height: {
+              xs: '15.188rem',
+              lg: '14.25rem'
+            },
             background: {
               xs: carouselBg,
               lg: headerBorderColor
@@ -44,8 +47,8 @@ const GeneralInformation = ({data, classes}) => {
           sm: 0,
         }
       }} item xs={12} sm={8} md={7} lg={7}>
-        <Box display='flex' flexDirection='column' rowGap={1}>
-          <Box display='flex' justifyContent='space-between' columnGap={1}>
+        <Box display='flex' flexDirection='column' rowGap='0.625rem'>
+          <Box display='flex' justifyContent='space-between' columnGap='0.188rem'>
             <Typography sx={classes.heading}>Name</Typography>
             <Typography sx={{
               ...classes.heading,
@@ -56,7 +59,7 @@ const GeneralInformation = ({data, classes}) => {
 
           <Box display='flex' justifyContent='space-between' columnGap={1}>
             <Typography sx={classes.heading}>Tags</Typography>
-              <Box display='flex' gap={0.5}>
+              <Box display='flex' gap={'0.188rem'}>
                 {
                   data?.Tags?.map((tag) => <Chip key={tag} color="primary" label={tag} />)
                 }

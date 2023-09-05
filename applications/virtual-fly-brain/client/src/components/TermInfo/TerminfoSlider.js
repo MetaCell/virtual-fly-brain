@@ -45,10 +45,15 @@ const TerminfoSlider = (props) => {
         zIndex: 10,
         position: 'absolute',
         cursor: 'pointer',
-        bottom: 2,
+        bottom: '0.5rem',
         margin: 0,
         display: 'flex',
         alignItems: 'center',
+      },
+
+      '& .react-slideshow-container .nav svg': {
+        width: '1.25rem',
+        height: '1.25rem'
       },
 
       '& .react-slideshow-container .nav.disabled': {
@@ -70,7 +75,9 @@ const TerminfoSlider = (props) => {
       '& .react-slideshow-container + ul.indicators .each-slideshow-indicator::before': {
         background: '#fff',
         position: 'static',
-        display: 'block'
+        display: 'block',
+        width: '0.375rem',
+        height: '0.375rem'
       },
 
       '& .react-slideshow-container + ul.indicators li': {
@@ -85,7 +92,7 @@ const TerminfoSlider = (props) => {
         margin: 0,
         padding: 0,
         position: 'absolute',
-        bottom: '8px',
+        bottom: '0.938rem',
         height: 'auto',
         width: '100%',
       }

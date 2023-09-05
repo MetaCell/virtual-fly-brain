@@ -11,6 +11,7 @@ import SideBar from "../shared/sidebar";
 import Circuit from "./Circuit";
 import StackViewerComponent from "./StackViewerComponent";
 import QueryBuilder from "./queryBuilder";
+import VFBCircuitBrowser from "./VFBCircuitBrowser";
 
 const {
   secondaryBg,
@@ -84,9 +85,9 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
         <ThreeDCanvas />
       )}
 
-      {/* {tab.includes(2) && (
-        <Circuit />
-      )} */}
+      {tab.includes(2) && (
+        <VFBCircuitBrowser />
+      )}
     </>
   )
 

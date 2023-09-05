@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import axios from 'axios';
-import GeppettoGraphVisualization from '@geppettoengine/geppetto-ui/graph-visualization/Graph'
+import GeppettoGraphVisualization from '@metacell/geppetto-meta-ui/graph-visualization/Graph';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { withStyles } from '@material-ui/styles';
 import PropTypes from 'prop-types';

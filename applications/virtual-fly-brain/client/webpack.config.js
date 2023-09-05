@@ -50,9 +50,10 @@ module.exports = function webpacking(envVariables) {
         loader: 'babel-loader'
       },
       {
-        test: /\.ts|tsx?$/,
-        loader: "awesome-typescript-loader"
-      },
+        test: /\.tsx?$/,
+        loader: 'ts-loader',
+        exclude: /node_modules/,
+    },
       {
         test: /\.(css)$/,
         use: [

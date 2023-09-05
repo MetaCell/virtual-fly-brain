@@ -26,9 +26,9 @@ import SwapVertIcon from '@material-ui/icons/SwapVert';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import { connect } from "react-redux";
-import { UPDATE_CIRCUIT_QUERY } from './../../../actions/generals';
-import { getResultsSOLR } from "../../configuration/VFBCircuitBrowser/datasources/SOLRclient";
+import { getResultsSOLR } from '../../components/configuration/VFBCircuitBrowser/datasources/SOLRclient'
 
+export const UPDATE_CIRCUIT_QUERY = 'UPDATE_CIRCUIT_QUERY';
 /**
  * Create a local theme to override some default values in material-ui components
  */
@@ -109,15 +109,14 @@ const styles = theme => ({
 /**
  * Read configuration from circuitBrowserConfiguration
  */
-const configuration = require('../../configuration/VFBCircuitBrowser/circuitBrowserConfiguration').configuration;
-const restPostConfig = require('../../configuration/VFBCircuitBrowser/circuitBrowserConfiguration').restPostConfig;
-const cypherQuery = require('../../configuration/VFBCircuitBrowser/circuitBrowserConfiguration').locationCypherQuery;
-const stylingConfiguration = require('../../configuration/VFBCircuitBrowser/circuitBrowserConfiguration').styling;
-const Neo4jLabels = require('../../configuration/VFBCircuitBrowser/circuitBrowserConfiguration').Neo4jLabels;
+import { configuration } from '../configuration/VFBCircuitBrowser/circuitBrowserConfiguration';
+import { stylingConfiguration } from '../configuration/VFBCircuitBrowser/circuitBrowserConfiguration';
+import { Neo4jLabels } from '../configuration/VFBCircuitBrowser/circuitBrowserConfiguration';
 
-const searchConfiguration = require('./../../configuration/VFBCircuitBrowser/datasources/SOLRclient').searchConfiguration;
-const defaultDatasourceConfiguration = require('./../../configuration/VFBCircuitBrowser/datasources/SOLRclient').datasourceConfiguration;
+import { searchConfiguration } from '../configuration/VFBCircuitBrowser/datasources/SOLRclient';
+import { defaultDatasourceConfiguration } from '../configuration/VFBCircuitBrowser/datasources/SOLRclient';
 const datasourceConfiguration = JSON.parse(JSON.stringify(defaultDatasourceConfiguration));
+
 
 /**
  * Create custom marks for Paths slider.

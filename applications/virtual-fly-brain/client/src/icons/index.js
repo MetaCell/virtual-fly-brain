@@ -291,13 +291,13 @@ export const Eye = (props) => (
 );
 
 export const Focus = (props) => (
-  <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M11.3333 8.91894C11.3333 7.07895 9.84 5.58561 8 5.58561C6.16 5.58561 4.66667 7.07895 4.66667 8.91894C4.66667 10.7589 6.16 12.2523 8 12.2523C9.84 12.2523 11.3333 10.7589 11.3333 8.91894ZM8 10.9189C6.9 10.9189 6 10.0189 6 8.91894C6 7.81894 6.9 6.91895 8 6.91895C9.1 6.91895 10 7.81894 10 8.91894C10 10.0189 9.1 10.9189 8 10.9189ZM3.33333 10.9189H2V13.5856C2 14.3189 2.6 14.9189 3.33333 14.9189H6V13.5856H3.33333V10.9189ZM3.33333 4.25228H6V2.91895H3.33333C2.6 2.91895 2 3.51895 2 4.25228V6.91895H3.33333V4.25228ZM12.6667 2.91895H10V4.25228H12.6667V6.91895H14V4.25228C14 3.51895 13.4 2.91895 12.6667 2.91895ZM12.6667 13.5856H10V14.9189H12.6667C13.4 14.9189 14 14.3189 14 13.5856V10.9189H12.6667V13.5856Z" fill="white" fillOpacity="0.8" />
   </svg>
 );
 
 export const ArView = (props) => (
-  <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <g clipPath="url(#clip0_3548_21065)">
       <path d="M2.0002 3.58569C2.0002 3.21903 2.3002 2.91903 2.66687 2.91903H4.0002V1.58569H2.66687C1.5602 1.58569 0.66687 2.47903 0.66687 3.58569V4.91903H2.0002V3.58569Z" fill="white" fillOpacity="0.8" />
       <path d="M2.0002 14.2524V12.919H0.66687V14.2524C0.66687 15.359 1.5602 16.2524 2.66687 16.2524H4.0002V14.919H2.66687C2.3002 14.919 2.0002 14.619 2.0002 14.2524Z" fill="white" fillOpacity="0.8" />
@@ -314,7 +314,7 @@ export const ArView = (props) => (
 );
 
 export const Delete = (props) => (
-  <svg {...props} width={props.size || "16"} height={props.size || "17"} viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg {...props} width={props.size || "16"} height={props.size || "16"} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M10.6664 6.91895V13.5856H5.33307V6.91895H10.6664ZM9.6664 2.91895H6.33307L5.6664 3.58561H3.33307V4.91895H12.6664V3.58561H10.3331L9.6664 2.91895ZM11.9997 5.58561H3.99974V13.5856C3.99974 14.3189 4.59974 14.9189 5.33307 14.9189H10.6664C11.3997 14.9189 11.9997 14.3189 11.9997 13.5856V5.58561Z" fill="white" fillOpacity="0.8" />
   </svg>
 )
@@ -332,7 +332,7 @@ export const AddChart = (props) => (
 )
 
 export const Expand = (props) => (
-  <svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M14.1805 14.2524H3.51385V15.5858H14.1805V14.2524Z" fill="white" fillOpacity="0.8" />
     <path d="M14.1805 2.25244H3.51385V3.58577H14.1805V2.25244Z" fill="white" fillOpacity="0.8" />
     <path d="M7.12052 9.97911L6.18052 10.9191L8.84719 13.5858L11.5139 10.9191L10.5739 9.97911L9.51385 11.0324V6.80577L10.5739 7.85911L11.5139 6.91911L8.84719 4.25244L6.18052 6.91911L7.12052 7.85911L8.18052 6.80577V11.0324L7.12052 9.97911Z" fill="white" fillOpacity="0.8" />
@@ -340,7 +340,7 @@ export const Expand = (props) => (
 );
 
 export const Remove = (props) => (
-  <svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M13.5133 9.58553H4.17999V8.2522H13.5133V9.58553Z" fill="white" fillOpacity="0.8" />
   </svg>
 );
@@ -352,7 +352,7 @@ export const Close = () => (
 )
 
 export const ArrowDown = (props) => (
-  <svg {...props} width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg {...props} width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M5.51389 6.33318L8.84722 9.66651L12.1806 6.33318H5.51389Z" fill="white" fillOpacity="0.8" />
   </svg>
 );

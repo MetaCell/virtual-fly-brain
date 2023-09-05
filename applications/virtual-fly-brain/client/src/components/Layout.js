@@ -80,7 +80,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
         <SideBar open={sidebarOpen} setOpen={setSidebarOpen} />
       )}
 
-      {tab.includes(1) && ( 
+      {tab.includes(1) && (
         <ThreeDCanvas />
       )}
 
@@ -122,6 +122,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
           },
           pb: {
             xs: 7,
+            sm: 9,
             lg: 0
           },
           overflow: {

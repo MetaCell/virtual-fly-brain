@@ -52,12 +52,12 @@ const SideBar = ({open, setOpen}) => {
         xs: 'sticky',
         md: 'static',
       },
-      margin: {
-        xs: -2,
+      mx: {
+        xs: -1.5,
         md: 0
       },
-      padding: {
-        xs: 2,
+      px: {
+        xs: 1.5,
         md: 0
       }
     },
@@ -66,7 +66,7 @@ const SideBar = ({open, setOpen}) => {
       fontWeight: 400,
       fontSize: '0.875rem',
       lineHeight: '1.125rem',
-      color: listHeadingColor,
+      color: listHeadingColor
     },
 
     footer: {
@@ -79,6 +79,12 @@ const SideBar = ({open, setOpen}) => {
         color: outlinedBtnTextColor,
       }
     },
+
+    buttonGroup: {
+      '& .MuiButton-root': {
+        height: '1.875rem'
+      }
+    }
   }
 
   const data = useSelector(state => state.termInfo.termInfoData)
@@ -142,7 +148,7 @@ const SideBar = ({open, setOpen}) => {
           lg: open ? 1 : 'none !important'
         },
         p: {
-          xs: 2,
+          xs: 1.5,
           lg: 0
         },
         pt: {
@@ -194,7 +200,7 @@ const SideBar = ({open, setOpen}) => {
             }
           }}>
             <Box mb={2} sx={classes.header}>
-              <Grid container alignItems='center'>
+              <Grid container alignItems='flex-start'>
                 <MediaQuery minWidth={768}>
                   <Grid item xs={12} lg={7} sm={6}>
                     <Box>
@@ -227,13 +233,23 @@ const SideBar = ({open, setOpen}) => {
                       },
                       columnGap: {
                         xs: 1,
-                        md: 3
+                        sm: 3
                       }
                     }}
                   >
-                    <Box display='flex' gap="0.375rem">
+                    <Box display='flex' sx={{
+                      gap: {
+                        xs: 0.5,
+                        sm: 1.125,
+                      }
+                    }}>
                       <Box>
                         <Button
+                          sx={{
+                            height: '1.875rem',
+                            fontSize: '0.75rem',
+                            color: outlinedBtnTextColor
+                          }}
                           variant="contained"
                           color="secondary"
                           id="basic-button"
@@ -289,7 +305,7 @@ const SideBar = ({open, setOpen}) => {
 
             </Box>
 
-            <Box mx={-2} px={2} sx={{
+            <Box mx={-1.5} px={1.5} sx={{
               overflow: {
                 lg: 'auto'
               },

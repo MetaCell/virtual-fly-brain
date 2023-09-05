@@ -47,10 +47,6 @@ const Header = () => {
           xs: 1.5,
           lg: 0
         },
-        borderBottom: {
-          xs: `0.0625rem solid ${headerBorderColor}`,
-          lg: 'none'
-        },
         boxShadow: {
           xs: headerBoxShadow,
           lg: 'none'
@@ -66,7 +62,8 @@ const Header = () => {
           lg: 'row'
         },
         px: {
-          xs: 1.5
+          xs: 1.5,
+          lg: 2,
         }
       }} >
       <Box
@@ -120,7 +117,7 @@ const Header = () => {
               lg: 0
             },
             ml: {
-              lg: 1.5
+              lg: 1
             }
           }}
         >
@@ -140,7 +137,7 @@ const Header = () => {
 
       <MediaQuery minWidth={1200}>
         <Button variant="outlined">
-          <QueryStats />
+          <QueryStats size={16} />
           Queries for V_ilpn (FlyEM-HB:2064165421)
         </Button>
       </MediaQuery>

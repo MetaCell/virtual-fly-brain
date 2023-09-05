@@ -42,7 +42,7 @@ function getResultsSOLR(searchString, returnResults, sorter, configuration) {
   tempConfig.params.json.params.q = solrConfiguration.params.json.params.q.replace(/\$SEARCH_TERM\$/g, searchString);
 
   axios.get(`${url}`, tempConfig)
-      .then(function (response) {
+      .then( (response) =>{
           var blob = new Blob(["onmessage = " + refineResults]);
           var blobUrl = window.URL.createObjectURL(blob);
 
@@ -59,7 +59,7 @@ function getResultsSOLR(searchString, returnResults, sorter, configuration) {
 
           // refineResults(searchString, response.data.response.docs, returnResults);
       })
-      .catch(function (error) {
+      .catch( (error) => {
           console.log('%c --- SOLR datasource error --- ', 'background: black; color: red');
           console.log(error);
           returnResults("ERROR", undefined, searchString);

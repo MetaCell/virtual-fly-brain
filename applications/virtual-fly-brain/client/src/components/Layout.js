@@ -23,7 +23,7 @@ const tabsArr = [
   { id: 0, name: 'Term Info' },
   { id: 1, name: 'Images' },
   { id: 2, name: 'Circuits' },
-  { id: 3, name: 'Stack Viewer' }
+  // { id: 3, name: 'Stack Viewer' }
 ]
 
 const MainLayout = ({ bottomNav, setBottomNav }) => {
@@ -31,7 +31,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const desktopScreen = useMediaQuery(theme.breakpoints.up('lg'));
-  const defaultActiveTab = desktopScreen ? [0, 1, 2, 3] : [0];
+  const defaultActiveTab = desktopScreen ? [0, 1, 2] : [0];
   const [tab, setTab] = useState([]);
 
   useEffect(() => {
@@ -127,10 +127,11 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
           },
           overflow: {
             xs: 'auto',
+            md: 'visible'
           },
           height: {
             xs: !bottomNav ? 'calc(100vh - 8.8125rem)' : 'calc(100vh - 6.0625rem)',
-            lg: 'calc(100vh - 5.75rem)'
+            lg: 'calc(100vh - 6rem)'
           },
         }}
       >

@@ -1,9 +1,12 @@
 /* eslint-disable no-undef */
-import { Box, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import React, { useState, useEffect } from 'react';
 import { Slide } from 'react-slideshow-image';
 import 'react-slideshow-image/dist/styles.css'
-import { ChevronLeft } from '../../icons';
+import { ChevronLeft, FullScreen } from '../../icons';
+import vars from '../../theme/variables';
+
+const { whiteColor, listHeadingColor } = vars;
 
 const imageStyle =  {
   height: '100%',
@@ -16,8 +19,14 @@ const TerminfoSlider = (props) => {
     root: {
       height: '100%',
       position: 'relative',
+      overflow: !props.allowFullscreen ? 'hidden' : 'visible',
+      borderRadius: !props.allowFullscreen ? '0.5rem' : '0',
 
-      '& > div': {
+      '& img': {
+        display: 'block'
+      },
+
+      '& > div:first-child': {
         height: '100%',
         '& > div': {
           height: '100%',
@@ -61,11 +70,11 @@ const TerminfoSlider = (props) => {
       },
 
       '& .react-slideshow-container .nav:first-of-type': {
-        left: '60px'
+        left: '3.75rem'
       },
 
       '& .react-slideshow-container .nav:last-of-type': {
-        right: '60px',
+        right: '3.75rem',
 
         '& svg': {
           transform: 'rotate(180deg)'
@@ -73,7 +82,7 @@ const TerminfoSlider = (props) => {
       },
 
       '& .react-slideshow-container + ul.indicators .each-slideshow-indicator::before': {
-        background: '#fff',
+        background: whiteColor,
         position: 'static',
         display: 'block',
         width: '0.375rem',
@@ -112,7 +121,7 @@ const TerminfoSlider = (props) => {
 
   return (
     <Box sx={classes.root}>
-      <Slide canSwipe={false} slidesToShow={1} slidesToScroll={1} infinite={false} indicators={true} prevArrow={<Typography><ChevronLeft color={'#A0A0A0'} /></Typography>} nextArrow={<Typography><ChevronLeft color={'#A0A0A0'} /></Typography>} arrows={true}>
+      <Slide canSwipe={ false } slidesToShow={ 1 } slidesToScroll={ 1 } infinite={ false } indicators={ true } prevArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } nextArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } arrows={ true }>
         {slideImages.length > 0 && (
           <>
             {slideImages?.map((slideImage, index) => (
@@ -126,8 +135,21 @@ const TerminfoSlider = (props) => {
             ))}
           </>
         )}
-
       </Slide>
+      {props.allowFullscreen && (
+        <Button onClick={() => props.setFullScreen(true)} sx={ {
+          position: 'absolute',
+          bottom: '0.5rem',
+          right: '0.5rem',
+          padding: 0,
+          minWidth: '0.0625rem',
+          height: 'auto',
+          lineHeight: 1,
+        }}>
+          <FullScreen size="20" />
+        </Button>
+      )}
+
     </Box>
   )
 }

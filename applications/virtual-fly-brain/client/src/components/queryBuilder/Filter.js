@@ -79,7 +79,7 @@ const { primaryBg, outlinedBtnTextColor, bottomNavBg, tabActiveColor, whiteColor
 
 const Filter = () => {
   const [filterAnchorEl, setFilterAnchorEl] = React.useState(null);
-  const [filtersApplied, setFiltersApplied] = useState(false)
+  const [filtersApplied, setFiltersApplied] = useState(true)
 
   const filterhandleClick = (event) => {
     setFilterAnchorEl(filterAnchorEl ? null : event.currentTarget);
@@ -168,7 +168,7 @@ const Filter = () => {
                   fontSize: '0.625rem'
                 }
 
-              }} key={filter.id} control={<Checkbox checkedIcon={<Tick color="#fff" />} icon={<></>} />} label={filter.label} />
+              }} key={filter.id} control={<Checkbox checkedIcon={<Tick color={whiteColor} />} icon={<></>} />} label={filter.label} />
             ))}
           </FormGroup>
         </Box>

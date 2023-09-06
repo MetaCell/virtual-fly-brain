@@ -4,10 +4,11 @@ import Header from "../header";
 import SubHeader from "../subHeader";
 import BottomNav from "../bottomNav";
 
-const Wrapper = ({ children, setBottomNav, bottomNav }) => {
+const Wrapper = ( { children, setBottomNav, bottomNav } ) =>
+{
   return (
     <>
-      <Header />
+      <Header setBottomNav={setBottomNav} />
       <SubHeader bottomNav={bottomNav} setBottomNav={setBottomNav} />
       {children}
       <MediaQuery maxWidth={1199}>

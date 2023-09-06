@@ -1,8 +1,8 @@
-import { Box, Button, ButtonGroup, Chip, Grid, IconButton, Menu, MenuItem, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
+import { Box, Button, ButtonGroup, Grid, IconButton, Menu, MenuItem, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import React, { useState, useEffect } from "react";
-import {useSelector, useDispatch} from 'react-redux'
+import {useSelector} from 'react-redux'
 import MediaQuery from 'react-responsive';
-import { ArView, ArrowDown, ArrowRight, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Delete, Expand, Eye, Focus, Line, Link, PinDrop, Remove } from "../../icons";
+import { ArView, ArrowDown, ArrowRight, ChevronDown, ChevronLeft, ChevronRight, Delete, Expand, Eye, Focus, Line, Remove, ScatterPlot } from "../../icons";
 import vars from "../../theme/variables";
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -19,6 +19,7 @@ const {
   blackColor,
   listHeadingColor,
   headerBorderColor,
+  primaryBg
 } = vars;
 
 const SideBar = ({open, setOpen}) => {
@@ -47,6 +48,9 @@ const SideBar = ({open, setOpen}) => {
         xs: headerBorderColor,
         md: 'transparent'
       },
+      borderBottom: {
+        lg: '0.0625rem solid #3A3A3A'
+      },
       zIndex: 9,
       position: {
         xs: 'sticky',
@@ -71,7 +75,9 @@ const SideBar = ({open, setOpen}) => {
 
     footer: {
       height: '3.75rem',
-      borderTop: `0.0625rem solid ${secondaryBg}`,
+      background: '#1A1A1A',
+      borderTop: `0.0625rem solid ${ secondaryBg }`,
+      zIndex: 9,
       '& p': {
         fontWeight: 400,
         fontSize: '1rem',
@@ -82,7 +88,11 @@ const SideBar = ({open, setOpen}) => {
 
     buttonGroup: {
       '& .MuiButton-root': {
-        height: '1.875rem'
+        height: '1.875rem',
+        background: {
+          xs: primaryBg,
+          lg: secondaryBg
+        }
       }
     }
   }
@@ -199,7 +209,7 @@ const SideBar = ({open, setOpen}) => {
               lg: 2
             }
           }}>
-            <Box mb={2} sx={classes.header}>
+            <Box sx={{...classes.header, pb: {xs: 1.5, lg: 2}}}>
               <Grid container alignItems='flex-start'>
                 <MediaQuery minWidth={768}>
                   <Grid item xs={12} lg={7} sm={6}>
@@ -248,7 +258,11 @@ const SideBar = ({open, setOpen}) => {
                           sx={{
                             height: '1.875rem',
                             fontSize: '0.75rem',
-                            color: outlinedBtnTextColor
+                            color: outlinedBtnTextColor,
+                            background: {
+                              xs: primaryBg,
+                              lg: secondaryBg
+                            }
                           }}
                           variant="contained"
                           color="secondary"
@@ -302,7 +316,6 @@ const SideBar = ({open, setOpen}) => {
                   </Box>
                 </Grid>
               </Grid>
-
             </Box>
 
             <Box mx={-1.5} px={1.5} sx={{
@@ -347,7 +360,7 @@ const SideBar = ({open, setOpen}) => {
                         <Typography>Neurons with postsynaptic terminals in posterior ventrolateral protocerebrum</Typography>
                           <Box display='flex' pl={0.5}>
                           <Typography sx={{ pr: 0.5 }}>71</Typography>
-                          <ListAltIcon />
+                          <ListAltIcon sx={{fontSize: '1.25rem', color: '#A0A0A0'}} />
                         </Box>
                       </Box>
                     }>
@@ -380,6 +393,10 @@ const SideBar = ({open, setOpen}) => {
                                           minWidth: '0.0625rem',
                                           textAlign: 'left',
                                           display: 'inline-block',
+
+                                          '&:hover': {
+                                            backgroundColor: 'transparent'
+                                          },
 
                                           '&:not(:hover)': {
                                             color: 'rgba(255, 255, 255, 0.8)'
@@ -471,7 +488,7 @@ const SideBar = ({open, setOpen}) => {
                         Show location of JRC2018Unisex
                       </Typography>
                       <IconButton sx={{p: 0}}>
-                          <PinDrop />
+                          <ScatterPlot />
                       </IconButton>
                     </Box>
 
@@ -483,7 +500,7 @@ const SideBar = ({open, setOpen}) => {
                         Show location of JRC2018Unisex
                       </Typography>
                       <IconButton sx={{p: 0}}>
-                          <PinDrop />
+                          <ScatterPlot />
                       </IconButton>
                     </Box>
                   </Box>

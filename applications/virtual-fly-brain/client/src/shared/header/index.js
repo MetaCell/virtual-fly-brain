@@ -7,7 +7,7 @@ import Menu from '@metacell/geppetto-meta-ui/menu/Menu';
 import { toolbarMenu } from "../../components/configuration/VFBToolbar/vfbtoolbarMenuConfiguration";
 const { primaryBg, headerBoxShadow, headerBorderColor } = vars;
 
-const Header = () => {
+const Header = ({setBottomNav}) => {
   const classes = {
     root: {
       background: primaryBg,
@@ -103,7 +103,13 @@ const Header = () => {
         </Box>
 
         <Box
-          sx={{
+          sx={ {
+            '& span': {
+              display: {
+                xs: 'block',
+                lg: 'inline-block'
+              },
+            },
             display: {
               xs: navShow ? 'flex' : 'none',
               lg: 'flex'
@@ -125,18 +131,14 @@ const Header = () => {
             configuration={toolbarMenu}
             menuHandler={() => {}}
           />
-          {/* <Link underline="hover" href='#'>Virtual Fly Brain</Link>
-          <Link underline="hover" href='#'>Tools</Link>
-          <Link underline="hover" href='#'>History</Link>
-          <Link underline="hover" href='#'>Templates</Link>
-          <Link underline="hover" href='#'>Datasets</Link>
-          <Link underline="hover" href='#'>View</Link>
-          <Link underline="hover" href='#'>Help</Link> */}
         </Box>
       </Box>
 
       <MediaQuery minWidth={1200}>
-        <Button variant="outlined">
+        <Button
+          onClick={() => setBottomNav((prev) => prev === 2 ? null : 2)}
+          variant="outlined"
+        >
           <QueryStats size={16} />
           Queries for V_ilpn (FlyEM-HB:2064165421)
         </Button>

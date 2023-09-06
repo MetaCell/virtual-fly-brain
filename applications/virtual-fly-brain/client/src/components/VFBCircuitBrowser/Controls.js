@@ -110,12 +110,11 @@ const styles = theme => ({
  * Read configuration from circuitBrowserConfiguration
  */
 import { configuration } from '../configuration/VFBCircuitBrowser/circuitBrowserConfiguration';
-import { stylingConfiguration } from '../configuration/VFBCircuitBrowser/circuitBrowserConfiguration';
+import { styling } from '../configuration/VFBCircuitBrowser/circuitBrowserConfiguration';
 import { Neo4jLabels } from '../configuration/VFBCircuitBrowser/circuitBrowserConfiguration';
 
 import { searchConfiguration } from '../configuration/VFBCircuitBrowser/datasources/SOLRclient';
-import { defaultDatasourceConfiguration } from '../configuration/VFBCircuitBrowser/datasources/SOLRclient';
-const datasourceConfiguration = JSON.parse(JSON.stringify(defaultDatasourceConfiguration));
+import { datasourceConfiguration } from '../configuration/VFBCircuitBrowser/datasources/SOLRclient';
 
 
 /**
@@ -483,14 +482,14 @@ class Controls extends Component {
       <ThemeProvider theme={theme}>
         <div>
           <div style={ { position: "absolute", width: ".75vh", height: "10vh",zIndex: "100" } }>
-            <i style={ { zIndex : "1000" , cursor : "pointer", top : "10px", left : "10px" } } className={stylingConfiguration.controlIcons.home} onClick={self.props.resetCamera }></i>
-            <i style={ { zIndex : "1000" , cursor : "pointer", marginTop : "20px", left : "10px" } } className={stylingConfiguration.controlIcons.zoomIn} onClick={self.props.zoomIn }></i>
-            <i style={ { zIndex : "1000" , cursor : "pointer", marginTop : "5px", left : "10px" } } className={stylingConfiguration.controlIcons.zoomOut} onClick={self.props.clear }></i>
+            <i style={ { zIndex : "1000" , cursor : "pointer", top : "10px", left : "10px" } } className={styling.controlIcons.home} onClick={self.props.resetCamera }></i>
+            <i style={ { zIndex : "1000" , cursor : "pointer", marginTop : "20px", left : "10px" } } className={styling.controlIcons.zoomIn} onClick={self.props.zoomIn }></i>
+            <i style={ { zIndex : "1000" , cursor : "pointer", marginTop : "5px", left : "10px" } } className={styling.controlIcons.zoomOut} onClick={self.props.clear }></i>
           </div>
           { this.props.resultsAvailable()
             ? <ul className={classes.legend} id="circuitBrowserLegend">
               { this.props.legend.map((label, index) => (
-                <li key={index}><div className={classes.legendItem} style={{ backgroundColor : stylingConfiguration.nodeColorsByLabel[label] }}></div>{label}</li>
+                <li key={index}><div className={classes.legendItem} style={{ backgroundColor : styling.nodeColorsByLabel[label] }}></div>{label}</li>
               ))
               }
               <li key="weight">WEIGHT -Forward [Reverse]→</li>

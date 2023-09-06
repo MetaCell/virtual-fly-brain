@@ -3,11 +3,13 @@ import './index.css';
 import TermInfoReducer from './reducers/TermInfoReducer';
 import ThreeDCanvasReducer from './reducers/ThreeDCanvasReducer';
 import GlobalReducer from './reducers/GlobalReducer';
+import CircuitReducer from './reducers/CircuitReducer';
 
 const rootReducer = combineReducers({
   termInfo: TermInfoReducer,
   threeD: ThreeDCanvasReducer,
-  globalInfo : GlobalReducer
+  globalInfo : GlobalReducer,
+  circuit: CircuitReducer
 });
 
 const store = createStore(rootReducer);

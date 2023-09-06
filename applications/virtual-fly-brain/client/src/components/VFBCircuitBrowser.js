@@ -378,11 +378,11 @@ class VFBCircuitBrowser extends Component {
     }
     return (
       this.state.loading
-        ? <CircularProgress id= { COMPONENT_ID } classes={{ root : classes.loader }}
+        ? <CircularProgress id= { COMPONENT_ID } classes={{ root : classes?.loader }}
         />
         : this.state.graph.nodes.length == 0
           ? <div>
-            <h4 className={classes.errorMessage}>{errorMessage}</h4>
+            <h4 className={classes?.errorMessage}>{errorMessage}</h4>
             <Controls
               updateGraph={self.updateGraph}
               updatePaths={self.updatePaths}
@@ -573,7 +573,7 @@ class VFBCircuitBrowser extends Component {
 VFBCircuitBrowser.propTypes = { classes: PropTypes.object.isRequired };
 
 function mapStateToProps (state) {
-  return { circuitQuerySelected : state.generals.ui.circuitBrowser.circuitQuerySelected }
+  return { circuitQuerySelected : state.circuit.querySelected }
 }
 
-export default connect(mapStateToProps, null, null, { forwardRef : true } )(withStyles(styles)(VFBCircuitBrowser));
+export default connect(mapStateToProps, null, null)(VFBCircuitBrowser);

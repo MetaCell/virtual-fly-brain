@@ -45,28 +45,17 @@ export function getResultsSOLR ( searchString: string, returnResults: Function, 
     tempConfig.params.json.params.q = solrConfiguration.params.json.params.q.replace(/\$SEARCH_TERM\$/g, searchString);
 
     axios.get(`${url}`, tempConfig)
-        .then(function(response) {
-            var blob = new Blob(["onmessage = " + refineResults]);
-            var blobUrl = window.URL.createObjectURL(blob);
-
-            var worker = new Worker(blobUrl);
-            worker.onmessage = function (e) {
-                switch(e.data.resultMessage) {
-                    case "OK":
-                        returnResults("OK", e.data.params.results, searchString);
-                        window.URL.revokeObjectURL(blobUrl);
-                        break;
-                }
-            };
-            worker.postMessage({message: "refine", params: {results: response.data.response.docs, value: searchString}});
-
-            // refineResults(searchString, response.data.response.docs, returnResults);
-        })
-        .catch(function(error) {
-            console.log('%c --- SOLR datasource error --- ', 'background: black; color: red');
-            console.log(error);
-            returnResults("ERROR", undefined, searchString);
-        })
+    .then(function(response) {
+        if(response.status == 200) {
+          returnResults("OK", response.data.response.docs, searchString);
+        }
+        // refineResults(searchString, response.data.response.docs, returnResults);
+    })
+    .catch(function(error) {
+      console.log('%c --- SOLR datasource error --- ', 'background: black; color: red');
+      console.log(error);
+      returnResults("ERROR", undefined, searchString);
+    })
 };
 
 function refineResults(e) {

@@ -383,12 +383,27 @@ theme = createTheme({
           userSelect: 'none',
           fontWeight: 400,
           fontSize: '1rem',
+          [theme.breakpoints.down('lg')]: {
+              fontSize: '0.875rem'
+          },
           lineHeight: '125%',
           color: outlinedBtnTextColor,
+
+          '& .MuiTabs-root': {
+            minHeight: '1.75rem'
+          },
+
+          '& .MuiTab-root': {
+            padding: 0,
+            minHeight: '1.75rem'
+          },
 
           '& p': {
             lineHeight: '125%',
             fontSize: '1rem',
+            [theme.breakpoints.down('lg')]: {
+              fontSize: '0.875rem'
+          },
             letterSpacing: 'normal'
           },
 

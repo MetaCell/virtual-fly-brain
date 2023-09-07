@@ -1,8 +1,9 @@
-import { Box, Button, ButtonGroup, Grid, IconButton, Menu, MenuItem, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
+import { Box, Button, ButtonGroup, Grid, IconButton, Menu, MenuItem, Paper, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tabs, Typography } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import {useSelector} from 'react-redux'
 import MediaQuery from 'react-responsive';
 import { ArView, ArrowDown, ArrowRight, ChevronDown, ChevronLeft, ChevronRight, Delete, Expand, Eye, Focus, Line, Remove, ScatterPlot } from "../../icons";
+import PropTypes from 'prop-types';
 import vars from "../../theme/variables";
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -11,6 +12,7 @@ import TreeView from '@mui/lab/TreeView';
 import { TreeItem } from "@mui/lab";
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import GeneralInformation from "../../components/TermInfo/GeneralInformation";
+import RIBBON from '../../assets/ribbon.png';
 
 const {
   whiteColor,
@@ -22,9 +24,48 @@ const {
   primaryBg
 } = vars;
 
+function CustomTabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <Box
+      mt={1}
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <>
+          { children }
+        </>
+      )}
+    </Box>
+  );
+}
+
+CustomTabPanel.propTypes = {
+  children: PropTypes.node,
+  index: PropTypes.number.isRequired,
+  value: PropTypes.number.isRequired,
+};
+
+function a11yProps(index) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+  };
+}
+
 const SideBar = ({open, setOpen}) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const openMenu = Boolean(anchorEl);
+  const openMenu = Boolean( anchorEl );
+  const [value, setValue] = React.useState(0);
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -326,7 +367,7 @@ const SideBar = ({open, setOpen}) => {
                 lg: 'calc(100% - 4.0625rem)'
               }
             }}>
-              <Accordion defaultExpanded>
+              <Accordion>
                 <AccordionSummary
                   expandIcon={<ChevronDown />}
                   aria-controls="panel1a-content"
@@ -365,58 +406,70 @@ const SideBar = ({open, setOpen}) => {
                       </Box>
                     }>
                       <TreeItem nodeId="2" label="Hello" />
-                      <TreeItem nodeId="3" label="Subtree with children">
-                        <TreeItem nodeId="6" label={
-                            <TableContainer component={Paper}>
-                            <Table aria-label="simple table">
-                              <TableHead>
-                                <TableRow>
-                                  <TableCell>Name</TableCell>
-                                  <TableCell>Description</TableCell>
-                                  <TableCell>Score</TableCell>
-                                  <TableCell></TableCell>
-                                </TableRow>
-                              </TableHead>
-                              <TableBody>
-                                {rows.map((row) => (
-                                  <TableRow
-                                    key={row.name}
-                                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                                  >
-                                    <TableCell>
-                                      <Button
-                                        disableRipple
-                                        variant="text"
-                                        color="info"
-                                        sx={{
-                                          padding: 0,
-                                          minWidth: '0.0625rem',
-                                          textAlign: 'left',
-                                          display: 'inline-block',
+                      <TreeItem nodeId="3" label="Subtree with children dfsf">
+                          <TreeItem nodeId="6" label={
+                            <>
+                              <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
+                                <Tab label="Result" {...a11yProps(0)} />
+                                <Tab label="Ribbon" {...a11yProps(1)} />
+                              </Tabs>
 
-                                          '&:hover': {
-                                            backgroundColor: 'transparent'
-                                          },
+                              <CustomTabPanel value={value} index={0}>
+                                <TableContainer component={Paper}>
+                                  <Table aria-label="simple table">
+                                    <TableHead>
+                                      <TableRow>
+                                        <TableCell>Name</TableCell>
+                                        <TableCell>Description</TableCell>
+                                        <TableCell>Score</TableCell>
+                                        <TableCell></TableCell>
+                                      </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                      {rows.map((row) => (
+                                        <TableRow
+                                          key={row.name}
+                                          sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                        >
+                                          <TableCell>
+                                            <Button
+                                              disableRipple
+                                              variant="text"
+                                              color="info"
+                                              sx={{
+                                                padding: 0,
+                                                minWidth: '0.0625rem',
+                                                textAlign: 'left',
+                                                display: 'inline-block',
 
-                                          '&:not(:hover)': {
-                                            color: 'rgba(255, 255, 255, 0.8)'
-                                          }
-                                        }}
-                                      >
-                                        {row.name}
-                                      </Button>
-                                    </TableCell>
-                                    <TableCell>{row.calories}</TableCell>
-                                    <TableCell>{row.fat}</TableCell>
-                                    <TableCell>
-                                      <Button variant="text" color="error">Delete</Button>
-                                      {/* <Button variant="outlined" color="info">Add</Button> */}
-                                    </TableCell>
-                                  </TableRow>
-                                ))}
-                              </TableBody>
-                            </Table>
-                            </TableContainer>
+                                                '&:hover': {
+                                                  backgroundColor: 'transparent'
+                                                },
+
+                                                '&:not(:hover)': {
+                                                  color: 'rgba(255, 255, 255, 0.8)'
+                                                }
+                                              }}
+                                            >
+                                              {row.name}
+                                            </Button>
+                                          </TableCell>
+                                          <TableCell>{row.calories}</TableCell>
+                                          <TableCell>{row.fat}</TableCell>
+                                          <TableCell>
+                                            <Button variant="text" color="error">Delete</Button>
+                                            {/* <Button variant="outlined" color="info">Add</Button> */}
+                                          </TableCell>
+                                        </TableRow>
+                                      ))}
+                                    </TableBody>
+                                  </Table>
+                                </TableContainer>
+                              </CustomTabPanel>
+                              <CustomTabPanel value={value} index={1}>
+                                <img src={RIBBON} alt="" style={{width: '100%'}} />
+                              </CustomTabPanel>
+                            </>
                         } />
                         <TreeItem nodeId="7" label="Sub-subtree with children">
                           <TreeItem nodeId="9" label="Child 1" />
@@ -484,7 +537,13 @@ const SideBar = ({open, setOpen}) => {
                       display='flex'
                       alignItems="center"
                     >
-                        <Typography sx={{ flexGrow: 1, color: outlinedBtnTextColor }}>
+                        <Typography sx={ {
+                          flexGrow: 1, color: outlinedBtnTextColor,
+                          fontSize: {
+                            xs: '0.875rem',
+                            lg: '1rem'
+                          }
+                        } }>
                         Show location of JRC2018Unisex
                       </Typography>
                       <IconButton sx={{p: 0}}>
@@ -496,7 +555,14 @@ const SideBar = ({open, setOpen}) => {
                       display='flex'
                       alignItems="center"
                     >
-                        <Typography sx={{ flexGrow: 1, color: outlinedBtnTextColor }}>
+                        <Typography
+                          sx={ {
+                            flexGrow: 1, color: outlinedBtnTextColor,
+                            fontSize: {
+                              xs: '0.875rem',
+                              lg: '1rem'
+                            }
+                          } }>
                         Show location of JRC2018Unisex
                       </Typography>
                       <IconButton sx={{p: 0}}>

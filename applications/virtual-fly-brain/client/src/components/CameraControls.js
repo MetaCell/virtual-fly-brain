@@ -1,5 +1,5 @@
 
-import { IconButton, Tooltip } from '@mui/material';
+import { Box, IconButton, Tooltip } from '@mui/material';
 import React, { useState, useRef, useEffect } from 'react';
 import UP from "../assets/viewer/up.svg";
 import DOWN from "../assets/viewer/down.svg";
@@ -114,22 +114,23 @@ const CameraControls = (props) => {
 
   const firstElementStyle = {
     ...commonStyle,
-    top: '-34px'
+    top: '-1.3125rem'
   }
 
   const lastElementStyle = {
     ...commonStyle,
-    bottom: "-34px"
+    bottom: "-1.3125rem"
   }
 
   return (
-    <div className="position-toolbar" style={{
+    <Box className="position-toolbar" sx={{
       position: 'absolute',
       top: '50%',
-      width: '102px',
+      width: '4.125rem',
+      left: '1rem',
       transform: 'translateY(-50%)'
     }}>
-      <div className="left position-relative" id="left-controls-id">
+      <Box sx={{gap: '0.375rem', display: 'flex', alignItems: 'center'}} className="left position-relative" id="left-controls-id">
         {
           controlsLeft.map((value, index) => {
             let style = {};
@@ -141,7 +142,8 @@ const CameraControls = (props) => {
             return (
               <Tooltip title={value.tooltip} placement="top" key={`left_'${index}`}>
                 <IconButton
-                  style={style}
+                  style={ style }
+                  sx={{padding: 0}}
                   disableRipple
                   key={value?.tooltip}
                 >
@@ -154,9 +156,9 @@ const CameraControls = (props) => {
             )
           })
         }
-      </div>
+      </Box>
 
-      <div className="right position-relative" id="right-controls-id" style={{marginTop: '70px'}}>
+      <Box className="right position-relative" id="right-controls-id" sx={{marginTop: '3.5625rem', gap: '0.375rem', flexWrap: 'wrap', display: 'flex'}}>
         {
           controlsRight.map((value, index) => {
             let style = {};
@@ -166,7 +168,8 @@ const CameraControls = (props) => {
             return (
               <Tooltip title={value.tooltip} placement="top" key={`left_'${index}`}>
                 <IconButton
-                  style={style}
+                  style={ style }
+                  sx={{padding: 0}}
                   disableRipple
                   key={value?.tooltip}
                 >
@@ -179,14 +182,15 @@ const CameraControls = (props) => {
             )
           })
         }
-      </div>
+      </Box>
 
-      <div className="right position-relative" style={{ display: 'flex', marginTop: '16px', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }} id="right-controls-id">
+      <Box className="right position-relative" style={{ display: 'flex', marginTop: '1.75rem', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '0.375rem' }} id="right-controls-id">
         {
           controlsBottom.map((value, index) => {
             return (
               <Tooltip title={value.tooltip} placement="top" key={`left_'${index}`}>
                 <IconButton
+                  sx={{padding: 0}}
                   disableRipple
                   key={value?.tooltip}
                 >
@@ -199,8 +203,8 @@ const CameraControls = (props) => {
             )
           })
         }
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 };
 

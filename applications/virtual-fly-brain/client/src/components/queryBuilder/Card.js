@@ -4,7 +4,8 @@ import { FullScreen, Link as LinkIcon } from "../../icons";
 import vars from "../../theme/variables";
 import { useState } from "react";
 import FullScreenViewer from "./FullScreenViewer";
-import IMAGE from '../../assets/query.png';
+import QUERY from '../../assets/query.png';
+import QUERY_LARGE from "../../assets/query-large.png";
 
 const {
   listHeadingColor,
@@ -86,7 +87,7 @@ const QueryCard = ({ fullWidth }) => {
           sx={{
             height: '100%',
           }}
-          image={IMAGE}
+          image={QUERY}
         >
           <IconButton onClick={(e) => {
             e.stopPropagation();
@@ -260,7 +261,9 @@ const QueryCard = ({ fullWidth }) => {
       </Card>
 
       {showFullScreen && (
-        <FullScreenViewer open={showFullScreen} onClose={() => setShowFullScreen(false)} />
+        <FullScreenViewer open={ showFullScreen } onClose={ () => setShowFullScreen( false ) }>
+          <img style={{width: '100%', display: 'block'}} src={QUERY_LARGE} alt="" />
+        </FullScreenViewer>
       )}
     </>
   )

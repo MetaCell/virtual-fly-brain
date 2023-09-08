@@ -22,7 +22,8 @@ const {
   chipGreen,
   chipYellow,
   chipOrange,
-  queryChipBg
+  queryChipBg,
+  whiteColor
 } = vars;
 
 
@@ -34,7 +35,7 @@ const InputWrapper = styled('div')(
 
   & input {
     background-color: transparent;
-    color: ${outlinedBtnTextColor};
+    color: ${whiteColor};
     font-size: 0.875rem;
     line-height: 129%;
     height: 2rem;
@@ -44,6 +45,7 @@ const InputWrapper = styled('div')(
     min-width: 1.875rem;
     flex-grow: 1;
     border: 0;
+    cursor: pointer;
     margin: 0;
     outline: 0;
     text-overflow: ellipsis;
@@ -51,7 +53,8 @@ const InputWrapper = styled('div')(
     overflow: hidden;
 
     &::placeholder {
-      color: ${outlinedBtnTextColor};
+      color: ${whiteColor};
+      opacity: 0.8;
       font-size: 0.875rem;
       line-height: 129%;
     }

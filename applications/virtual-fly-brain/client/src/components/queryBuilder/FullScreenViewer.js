@@ -1,11 +1,9 @@
 import React from "react";
-import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog';
 import { CrossCircle } from "../../icons";
 import { IconButton } from "@mui/material";
-import IMAGE from "../../assets/query-large.png";
 
-const FullScreenViewer = ({ open, onClose, maxWidth = 'md' }) => {
+const FullScreenViewer = ({ open, onClose, maxWidth = 'md', children }) => {
   return (
     <Dialog
       fullWidth
@@ -24,7 +22,7 @@ const FullScreenViewer = ({ open, onClose, maxWidth = 'md' }) => {
       >
         <CrossCircle />
       </IconButton>
-      <img style={{width: '100%', display: 'block'}} src={IMAGE} alt="" />
+      {children}
     </Dialog>
   )
 };

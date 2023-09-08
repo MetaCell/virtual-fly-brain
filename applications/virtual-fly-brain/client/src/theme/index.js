@@ -27,6 +27,7 @@ theme = createTheme({
   typography: {
     allVariants: {
       fontFamily: primaryFont,
+      letterSpacing: 'normal'
     }
   },
 
@@ -101,7 +102,10 @@ theme = createTheme({
     MuiListItemButton: {
       styleOverrides: {
         root: {
-          padding: '0.25rem 0.5rem'
+          padding: '0.25rem 0.5rem',
+          '&:hover': {
+            backgroundColor: secondaryBg
+          }
         }
       }
     },
@@ -379,8 +383,33 @@ theme = createTheme({
           userSelect: 'none',
           fontWeight: 400,
           fontSize: '1rem',
+          [theme.breakpoints.down('lg')]: {
+              fontSize: '0.875rem'
+          },
           lineHeight: '125%',
           color: outlinedBtnTextColor,
+
+          '& .MuiTabs-root': {
+            minHeight: '1.75rem'
+          },
+
+          '& .MuiTab-root': {
+            padding: 0,
+            minHeight: '1.75rem'
+          },
+
+          '& p': {
+            lineHeight: '125%',
+            fontSize: '1rem',
+            [theme.breakpoints.down('lg')]: {
+              fontSize: '0.875rem'
+          },
+            letterSpacing: 'normal'
+          },
+
+          '& > div': {
+            alignItems: 'center'
+          },
 
           '& > div > p': {
             flex: 1,
@@ -397,7 +426,7 @@ theme = createTheme({
               background: 'linear-gradient(270deg, #222222 0%, rgba(34, 34, 34, 0) 26.7%)',
 
               [theme.breakpoints.up('lg')]: {
-                background: 'linear-gradient(270deg, #000000 0%, rgba(0, 0, 0, 0) 26.7%)',
+                background: 'linear-gradient(270deg, #1A1A1A 0%, rgba(26, 26, 26, 0.00) 26.7%)'
               }
             }
           }
@@ -416,25 +445,19 @@ theme = createTheme({
           boxShadow: 'none',
 
           '&.Mui-expanded': {
-            margin: 0
+            margin: 0,
           },
 
           '&.Mui-expanded:before': {
             opacity: 1,
+            display: 'block !important'
           },
-
-          // '&:first-of-type:before': {
-          //   display: 'block'
-          // },
-
-          // '&:last-of-type:before': {
-          //   display: 'none'
-          // },
 
           '&:before': {
             backgroundColor: secondaryBg,
-            // top: 'auto',
-            // bottom: 0,
+            top: 'auto',
+            bottom: 0,
+            display: 'block !important'
           },
         }
       }
@@ -500,7 +523,7 @@ theme = createTheme({
           borderRadius: '0.875rem',
           padding: '0.75rem',
           boxShadow: '0 0.5rem 0.5rem -0.25rem rgba(16, 24, 40, 0.03), 0 1.25rem 1.5rem -0.25rem rgba(16, 24, 40, 0.08)'
-        }
+        },
       }
     },
 
@@ -513,8 +536,15 @@ theme = createTheme({
           color: whiteColor,
           padding: '0.375rem 0.5rem',
 
+          '&.Mui-selected': {
+            background: secondaryBg,
+            '&:hover': {
+              background: secondaryBg
+            }
+          },
+
           '&:hover': {
-            background: primaryBg
+            background: secondaryBg
           }
         }
       }
@@ -523,10 +553,11 @@ theme = createTheme({
     MuiMenu: {
       styleOverrides: {
         paper: {
-          background: secondaryBg,
-          boxShadow: '0 1.25rem 1.5rem -0.25rem rgba(16, 24, 40, 0.08), 0 0.5rem 0.5rem -0.25rem rgba(16, 24, 40, 0.03)',
           borderRadius: '0.375rem',
-          padding: '0.5rem'
+          padding: '0.5rem',
+          background: bottomNavBg,
+          boxShadow: popperShadow,
+          backdropFilter: 'blur(0.625rem)',
         },
         list: {
           padding: 0,
@@ -543,7 +574,7 @@ theme = createTheme({
           fontWeight: 400,
           borderRadius: '0.5rem',
           textTransform: 'none',
-          height: '2.125rem',
+          height: '2.125rem'
         },
 
         text: {
@@ -561,9 +592,21 @@ theme = createTheme({
         },
 
         containedSecondary: {
-          backgroundColor: primaryBg,
+          backgroundColor: secondaryBg,
           '&:hover': {
-            backgroundColor: primaryBg,
+            backgroundColor: secondaryBg,
+          }
+        },
+
+        containedInfo: {
+          backgroundColor: tabActiveColor,
+          height: '2rem',
+          padding: '0 0.75rem',
+          fontSize: '0.75rem',
+          fontWeight: 500,
+          borderRadius: '0.25rem',
+          '&:hover': {
+            backgroundColor: tabActiveColor,
           }
         },
 
@@ -606,9 +649,10 @@ theme = createTheme({
         outlinedPrimary: {
           border: `0.0625rem solid ${outlinedBtnBorderColor}`,
           color: outlinedBtnTextColor,
+          padding: '0 0.75rem',
           '&:hover': {
             borderColor: outlinedBtnBorderColor,
-            backgroundColor: outlinedBtnBorderColor,
+            backgroundColor: secondaryBg,
             color: whiteColor
           }
         }
@@ -662,7 +706,7 @@ theme = createTheme({
           height: '1.5rem',
           padding: '0 0.5rem',
           fontWeight: 400,
-          fontSize: '0.75rem',
+          fontSize: '0.625rem',
           lineHeight: '133%',
           color: whiteColor,
 
@@ -679,7 +723,7 @@ theme = createTheme({
           background: chipPrimaryColor,
 
           '& .MuiChip-label': {
-            color: secondaryBg
+            color: whiteColor
           }
         },
 
@@ -692,7 +736,7 @@ theme = createTheme({
         },
 
         colorDefault: {
-          background: secondaryBg
+          background: primaryBg
         },
       }
     },
@@ -718,14 +762,6 @@ theme = createTheme({
           textOverflow: 'ellipsis',
           overflow: 'hidden',
           whiteSpace:'nowrap'
-        }
-      }
-    },
-
-    MuiListItemButton: {
-      styleOverrides: {
-        root: {
-          padding: '0.25rem 0.5rem'
         }
       }
     },

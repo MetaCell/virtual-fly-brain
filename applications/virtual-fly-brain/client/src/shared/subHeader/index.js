@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Box, Button, Checkbox, FormControlLabel, FormGroup, IconButton, Popper, Typography } from "@mui/material";
-import { AngleLeft, CheckBoxDefault, CheckBoxGreen, CheckBoxRed, CleaningServices, ClearAll, Close, Download, Filter, History, Layers, Query, Search, Tick, Undo, Upload } from "../../icons";
+import { Box, Button, Tooltip } from "@mui/material";
+import { AngleLeft, ClearAll, Download, History, Layers, Query, Search, Upload } from "../../icons";
 import vars from "../../theme/variables";
 import MediaQuery from 'react-responsive'
 import SearchBuilder from "./SearchBuilder";
@@ -28,12 +28,12 @@ const navArr = [
     name: 'Layer'
   },
   {
-    id: 3,
+    id: 4,
     icon: ClearAll,
     name: 'Clear all'
   },
   {
-    id: 3,
+    id: 5,
     icon: History,
     name: 'Recent'
   },
@@ -57,13 +57,14 @@ const SubHeader = ({ setBottomNav, bottomNav }) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const classes = {
     root: {
-      position: 'relative',
+      position: 'relative'
     },
 
     nav: {
       position: 'absolute',
       right: '1rem',
       top: '50%',
+      gap: '1rem',
       transform: 'translateY(-50%)'
     },
 
@@ -81,10 +82,10 @@ const SubHeader = ({ setBottomNav, bottomNav }) => {
       ...classes.root,
       py: {
         // xs: 1,
-        lg: 0.5
+        lg: 0.75
       },
       px: {
-        lg: 1.5
+        lg: 2
       },
 
       borderTop: {
@@ -128,12 +129,14 @@ const SubHeader = ({ setBottomNav, bottomNav }) => {
             xs: 1.5,
             lg: 0.5
           },
+          cursor: 'pointer',
           backgroundColor: {
             xs: focused ? bottomNavBg : primaryBg,
             lg: focused ? bottomNavBg : searchBoxBg
           },
           boxShadow: focused ? `0 0.25rem 6.25rem ${blackColor}, 0 0 5rem rgba(0, 0, 0, 0.6)` : 'none',
         }}
+
         display='flex'
         alignItems='center'>
         {focused ? <AngleLeft style={{ margin: 0 }} size={20} /> : <Search style={{ margin: 0 }} />}
@@ -166,17 +169,24 @@ const SubHeader = ({ setBottomNav, bottomNav }) => {
           flexWrap='wrap'
           sx={classes.nav}
         >
-          {navArr.map((item, index) => (
-            <Button
-              aria-label={item.name}
-              onClick={() => setBottomNav(index)}
-              sx={{
-                minWidth: '0.0625rem'
-              }}
-              key={`${item.id}_${item.name}`}
-            >
-              <item.icon color={item?.id === bottomNav && tabActiveColor} />
-            </Button>
+          {navArr.map((item) => (
+            <Tooltip key={`${item.id}_${item.name}`} title={item.name}>
+              <Button
+                aria-label={ item.name }
+                disableRipple
+                onClick={() => setBottomNav((prev) => prev === item.id ? null : item.id)}
+                sx={{
+                  minWidth: '0.0625rem',
+                  padding: 0,
+
+                  '&:hover': {
+                    backgroundColor: 'transparent'
+                  }
+                }}
+              >
+                <item.icon color={item?.id === bottomNav && tabActiveColor} />
+              </Button>
+            </Tooltip>
           ))}
         </Box>
       </MediaQuery>

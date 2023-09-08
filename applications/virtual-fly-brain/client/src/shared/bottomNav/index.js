@@ -36,8 +36,14 @@ const navArr = [
 const BottomNav = ({ setBottomNav, bottomNav }) => {
   const classes = {
     root: {
-      padding: '0 0.75rem',
-      height: '3.5rem',
+      padding: {
+        xs: '0 0.75rem',
+        sm: '0 1.5rem'
+      },
+      height: {
+        xs: '3.5rem',
+        sm: '4.5rem'
+      },
       position: 'fixed',
       width: '100%',
       bottom: 0,
@@ -45,11 +51,17 @@ const BottomNav = ({ setBottomNav, bottomNav }) => {
       backdropFilter: 'blur(0.3125rem)',
 
       '& p': {
-        fontSize: '0.625rem',
+        fontSize: {
+          xs: '0.625rem',
+          sm: '0.875rem'
+        },
         lineHeight: '0.875rem',
         fontWeight: 400,
         color: whiteColor,
-        marginTop: '0.375rem'
+        marginTop: {
+          xs: '0.375rem',
+          sm: '0.5rem'
+        }
       }
     }
   };

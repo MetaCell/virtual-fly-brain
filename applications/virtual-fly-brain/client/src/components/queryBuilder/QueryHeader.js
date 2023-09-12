@@ -1,10 +1,11 @@
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, Divider, Typography } from "@mui/material";
 import React from "react";
-import { ChevronDown, ImportExport } from "../../icons";
+import { Add, ChevronDown, ImportExport } from "../../icons";
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import vars from "../../theme/variables";
+import { dividerStyle } from "./Query";
 
 const { searchHeadingColor, whiteColor, secondaryBg, primaryBg } = vars
 
@@ -47,7 +48,31 @@ const QueryHeader = ({ title }) => {
         gap: '0.5rem',
         display: 'flex',
         alignItems: 'center'
-      }}>
+      } }>
+        <Button
+          disableRipple
+          variant="text"
+          sx={{
+            gap: '0.25rem',
+            display: 'flex',
+            minWidth: '0.0625rem',
+            padding: 0,
+            color: searchHeadingColor,
+            fontSize: '0.6875rem',
+            fontWeight: 500,
+            height: '1.25rem',
+            lineHeight: '0.9375rem',
+            letterSpacing: '-0.00344rem',
+
+            '&:hover': {
+              background: 'transparent'
+            }
+          }}
+        >
+          Crescent
+          <ImportExport />
+        </Button>
+        <Divider sx={dividerStyle} />
         <Box sx={{
           gap: '0.25rem',
           display: 'flex',
@@ -97,28 +122,48 @@ const QueryHeader = ({ title }) => {
           </FormControl>
         </Box>
         <Button
-          disableRipple
-          variant="text"
-          sx={{
-            gap: '0.25rem',
-            display: 'flex',
-            minWidth: '0.0625rem',
-            padding: 0,
-            color: searchHeadingColor,
-            fontSize: '0.6875rem',
-            fontWeight: 500,
-            height: '1.25rem',
-            lineHeight: '0.9375rem',
-            letterSpacing: '-0.00344rem',
+            disableRipple
+            variant="text"
+            sx={{
+              minWidth: '0.0625rem',
+              padding: 0,
+              color: searchHeadingColor,
+              fontSize: '0.6875rem',
+              fontWeight: 500,
+              height: '1.25rem',
+              lineHeight: '0.9375rem',
+              gap: '0.25rem',
+              letterSpacing: '-0.00344rem',
 
-            '&:hover': {
-              background: 'transparent'
-            }
-          }}
+              '&:hover': {
+                background: 'transparent'
+              }
+            }}
         >
-          Crescent
-          <ImportExport />
-        </Button>
+            <Add size={12} opacity={1} color={searchHeadingColor} />
+            Add sorting
+          </Button>
+        <Divider sx={ dividerStyle } />
+        <Button
+            disableRipple
+            variant="text"
+            sx={{
+              minWidth: '0.0625rem',
+              padding: 0,
+              color: searchHeadingColor,
+              fontSize: '0.6875rem',
+              fontWeight: 500,
+              height: '1.25rem',
+              lineHeight: '0.9375rem',
+              letterSpacing: '-0.00344rem',
+
+              '&:hover': {
+                background: 'transparent'
+              }
+            }}
+          >
+            Clear all
+          </Button>
       </Box>
     </Box>
   )

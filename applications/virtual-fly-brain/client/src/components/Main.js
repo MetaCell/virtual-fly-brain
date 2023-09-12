@@ -7,10 +7,10 @@ require('../css/base.less');
 require('../css/VFBMain.less');
 
 const Main = () => {
-  const [bottomNav, setBottomNav] = useState()
+  const [bottomNav, setBottomNav] = useState();
 
   return (
-    <Wrapper setBottomNav={setBottomNav}>
+    <Wrapper bottomNav={bottomNav} setBottomNav={setBottomNav}>
       <MainLayout
         bottomNav={bottomNav}
         setBottomNav={setBottomNav}

@@ -136,8 +136,8 @@ const QueryBuilder = ({ fullWidth, bottomNav, setBottomNav }) => {
             <Cross />
           </Button>
           <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
-            <Tab label="Query" {...a11yProps(0)} />
-            <Tab label="History" {...a11yProps(1)} />
+            <Tab disableRipple label="Query" {...a11yProps(0)} />
+            <Tab disableRipple label="History" {...a11yProps(1)} />
           </Tabs>
         </Box>
       </Box>
@@ -195,6 +195,7 @@ const QueryBuilder = ({ fullWidth, bottomNav, setBottomNav }) => {
 
                   '&::placeholder': {
                     color: outlinedBtnTextColor,
+                    opacity: 1
                   }
                 }
               }}

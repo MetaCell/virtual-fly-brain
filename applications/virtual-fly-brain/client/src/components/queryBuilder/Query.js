@@ -1,12 +1,12 @@
 import React from "react";
-import { Box, Button, Chip, Grid, Typography } from "@mui/material";
+import { Box, Button, Chip, Divider, Grid } from "@mui/material";
 import QueryCard from "./Card";
-import { Cross, ImportExport } from "../../icons";
+import { Cross } from "../../icons";
 import QueryHeader from "./QueryHeader";
 import vars from "../../theme/variables";
 import Filter from "./Filter";
 
-const { chipOrange, chipGreen, headerBorderColor, searchHeadingColor, secondaryBg } = vars;
+const { chipOrange, chipGreen, headerBorderColor, searchHeadingColor, secondaryBg, listHeadingColor } = vars;
 
 const chipsArr = [
   {
@@ -20,6 +20,10 @@ const chipsArr = [
     color: chipOrange
   }
 ];
+
+export const dividerStyle = {
+  height: '0.875rem', width: '0.0625rem', background: listHeadingColor, borderRadius: '0.125rem'
+}
 
 const Query = ({ fullWidth }) => {
   return (
@@ -70,7 +74,9 @@ const Query = ({ fullWidth }) => {
           </Box>
         </Box>
 
-        <Box display='flex' gap={1.2}>
+        <Box display='flex' alignItems='center' gap={ 1.2 }>
+          <Filter />
+          <Divider sx={dividerStyle} />
           <Button
             disableRipple
             variant="text"
@@ -91,8 +97,6 @@ const Query = ({ fullWidth }) => {
           >
             Clear all
           </Button>
-
-          <Filter />
         </Box>
       </Box>
 

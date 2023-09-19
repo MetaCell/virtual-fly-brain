@@ -26,7 +26,6 @@ const TermInfo = () => {
 
   // FIXME
   useEffect( () => {
-    console.log("term info data : ", data);
     setTermInfoData(data)
   },[data]);
 

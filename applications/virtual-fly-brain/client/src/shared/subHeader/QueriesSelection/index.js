@@ -3,18 +3,27 @@ import React from "react";
 import { AngleRight, ChevronDown, CleaningServices, Delete } from "../../../icons";
 import vars from "../../../theme/variables";
 
+const queryBuilderDatasourceConfig = require('../../../components/configuration/VFBSearchBuilder/queryBuilderConfiguration').queryBuilderDatasourceConfig;
+
 const { searchHeadingColor, searchBoxBg, primaryBg, whiteColor, queryBorderColor } = vars;
 
-export const QueriesSelection = () => {
-  const listItems = [
-    "Select query for A00c_a4 (L1EM:2511238) expression pattern",
-    "Anatomy A00c_a4 (L1EM:2511238) expression pattern is expressed in",
-    "Parts of A00c_a4 (L1EM:2511238) expression pattern",
-    "Subclasses of A00c_a4 (L1EM:2511238) expression pattern"
-  ];
+export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSearch }) => {
+  const [searchQueries, setSearchQueries] = React.useState([]);
   const [popoverAnchorEl, setPopoverAnchorEl] = React.useState(null);
-  const [selectedOption, setSelectedOption] = React.useState(listItems[0]);
+  const [selectedOption, setSelectedOption] = React.useState({});
+  let resultsNumbers = 0;
+  searchQueries.forEach( query => {
+    query?.queries?.Images ? resultsNumbers = resultsNumbers + Object.keys(query?.queries?.Images).length : null;
+  })
+  React.useEffect(() => {
+    setSearchQueries(recentSearch)
+  }, [recentSearch])
 
+  const deleteQuery = (event) => {
+    let queries = searchQueries.filter( q => event.currentTarget.id !== q.label);
+    setSearchQueries(queries);
+    handleQueryDeletion(event.currentTarget.id);
+  }
   const popoverHandleClick = (event) => {
     setPopoverAnchorEl(popoverAnchorEl ? null : event.target.parentElement.parentElement);
   };
@@ -62,6 +71,7 @@ export const QueriesSelection = () => {
             }
           }}
           variant="text"
+          onClick={() => setSearchQueries([])}
         >
           <CleaningServices style={{ marginRight: '0.375rem' }} />
           Clear queries
@@ -74,8 +84,10 @@ export const QueriesSelection = () => {
         flexDirection='column'
         rowGap={2}
       >
+        { searchQueries?.map((option, index) =>
         <Box
           display='flex'
+          key={option.label}
           columnGap={1}
         >
           <Button
@@ -95,6 +107,9 @@ export const QueriesSelection = () => {
                 background: searchBoxBg,
               }
             }}
+            key={option.short_form}
+            id={option.label}
+            onClick={deleteQuery}
           >
             <Delete size={12} />
           </Button>
@@ -124,7 +139,7 @@ export const QueriesSelection = () => {
                 overflow: 'hidden',
                 textOverflow: 'ellipsis'
               }}>
-                {selectedOption}
+                Select query for {option.label}
               </Typography>
 
               <Button
@@ -153,24 +168,24 @@ export const QueriesSelection = () => {
               >
 
                 <List>
-                  { listItems.map((option, index) => <ListItem key={option+index}>
-                    <ListItemButton onClick={() => handleSelect(option)}>
-                      <ListItemText primary={option} />
+                  { option.queries?.Queries?.map((query, index) => (<ListItem sx={{ top : '1.5rem' }} key={query.label+index}>
+                    <ListItemButton onClick={() => handleSelect(query.label)}>
+                      <ListItemText primary={query.label} />
                     </ListItemButton>
-                  </ListItem> )}
+                  </ListItem>) )}
                 </List>
               </Popper>
             </Box>
           </Box>
         </Box>
-      </Box>
-
-      <Box
+        )}
+        <Box
         display='flex'
         justifyContent='flex-end'
       >
-        <Button
-          onClick={() => console.log('Clicked')}
+      <Button
+          onClick={checkResults}
+          disabled={resultsNumbers <= 0}
           sx={{
             px: '0.5rem',
             py: '0.25rem',
@@ -184,9 +199,10 @@ export const QueriesSelection = () => {
             }
           }}
         >
-          Check 15 results
+          Check { resultsNumbers } results
           <AngleRight style={{ marginLeft: '0.5rem' }} />
         </Button>
+      </Box>
       </Box>
     </Box>
   )

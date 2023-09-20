@@ -6,37 +6,44 @@ import vars from "../../theme/variables";
 
 const {
   whiteColor,
-  bottomNavBg
+  bottomNavBg,
+  tabActiveColor
 } = vars;
 
 const navArr = [
   {
     id: 0,
-    icon: <Upload />,
+    icon: Upload,
     name: 'Upload'
   },
   {
     id: 1,
-    icon: <Download />,
+    icon: Download,
     name: 'Download'
   },
   {
     id: 2,
-    icon: <Query />,
+    icon: Query,
     name: 'Query'
   },
   {
     id: 3,
-    icon: <ClearAll />,
+    icon: ClearAll,
     name: 'Clear all'
   },
 ]
 
-const BottomNav = () => {
+const BottomNav = ({ setBottomNav, bottomNav }) => {
   const classes = {
     root: {
-      padding: '0 0.75rem',
-      height: '3.5rem',
+      padding: {
+        xs: '0 0.75rem',
+        sm: '0 1.5rem'
+      },
+      height: {
+        xs: '3.5rem',
+        sm: '4.5rem'
+      },
       position: 'fixed',
       width: '100%',
       bottom: 0,
@@ -44,11 +51,17 @@ const BottomNav = () => {
       backdropFilter: 'blur(0.3125rem)',
 
       '& p': {
-        fontSize: '0.625rem',
+        fontSize: {
+          xs: '0.625rem',
+          sm: '0.875rem'
+        },
         lineHeight: '0.875rem',
         fontWeight: 400,
         color: whiteColor,
-        marginTop: '0.375rem'
+        marginTop: {
+          xs: '0.375rem',
+          sm: '0.5rem'
+        }
       }
     }
   };
@@ -59,7 +72,7 @@ const BottomNav = () => {
       flexWrap='wrap'
       sx={classes.root}
     >
-      {navArr.map((item) => (
+      {navArr.map((item, index) => (
         <Button
           sx={{
             height: '100%',
@@ -67,12 +80,13 @@ const BottomNav = () => {
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            flexDirection: 'column'
+            flexDirection: 'column',
           }}
 
+          onClick={() => setBottomNav(index)}
           key={item.id}
         >
-          {item.icon}
+          <item.icon color={item?.id === bottomNav && tabActiveColor} />
           <Typography>{item.name}</Typography>
         </Button>
       ))}

@@ -20,7 +20,7 @@ const getInstancesFailure = error => ({
   }
 });
 
-export const InstancesById = async (queryId) => {
+export const getInstanceByID = async (queryId) => {
 
   store.dispatch(getInstancesStarted())
 

@@ -1,109 +1,110 @@
-var toolbarMenu = {
+import React from 'react';
+import vars from "../../../theme/variables";
+
+const { primaryFont, whiteColor, tabActiveColor, primaryBg } = vars;
+
+export const toolbarMenu = {
   global: {
     buttonsStyle: {
       standard: {
-        background: '#010101',
+        background: 'transparent',
         borderRadius: 0,
         border: 0,
-        boxShadow: '0px 0px',
-        color: '#ffffff',
-        fontSize: '16px',
-        fontFamily: 'Barlow Condensed, Khand, sans-serif',
-        margin: '0px 0px 0px 0px',
-        minWidth: '44px',
-        height: '30px',
+        boxShadow: 'none',
+        color: whiteColor,
+        fontSize: '0.875rem',
+        fontFamily: primaryFont,
+        margin: '0',
+        minWidth: '0.0625rem',
+        padding: '0 0.75rem',
+        height: '3rem',
         textTransform: 'capitalize',
         textAlign: 'left',
         justifyContent: 'start',
-        marginTop: '1px',
-        fontWeight: '300'
+        marginTop: '0',
+        lineHeight: '1.125rem',
+        fontWeight: 400,
       },
       hover: {
-        background: "#11bffe",
-        backgroundColor: "#11bffe",
+        background: 'transparent',
         borderRadius: 0,
         border: 0,
-        boxShadow: '0px 0px',
-        color: '#ffffff',
-        fontSize: '16px',
-        fontFamily: 'Barlow Condensed, Khand, sans-serif',
-        margin: '0px 0px 0px 0px',
-        minWidth: '44px',
-        height: '30px',
+        boxShadow: 'none',
+        color: tabActiveColor,
+        fontSize: '0.875rem',
+        fontFamily: primaryFont,
+        textDecoration: 'none',
+        margin: '0',
+        minWidth: '0.0625rem',
+        height: 'auto',
         textTransform: 'capitalize',
         textAlign: 'left',
         justifyContent: 'start',
-        marginTop: '1px',
-        fontWeight: '300'
+        marginTop: '0',
+        fontWeight: 400
       }
     },
     drawersStyle: {
       standard: {
-        top: '1px',
-        backgroundColor: '#444141f2',
-        borderRadius: 0,
-        color: '#ffffff',
-        fontSize: '12px',
-        fontFamily: 'Barlow Condensed, Khand, sans-serif',
-        minWidth: '110px',
-        borderTop: '1px solid #585858',
-        borderLeft: '1px solid #585858',
-        borderRight: '1px solid #585858',
-        borderBottom: '1px solid #585858',
-        borderBottomLeftRadius: '2px',
-        borderBottomRightRadius: '2px',
-        fontWeight: '300'
+        top: '0.0625rem',
+        backgroundColor: primaryBg,
+        borderRadius: '0 20px 24px -4px rgba(16, 24, 40, 0.08), 0 8px 8px -4px rgba(16, 24, 40, 0.03)',
+        borderRadius: '0.125rem',
+        color: whiteColor,
+        fontSize: '0.875rem',
+        fontFamily: primaryFont,
+        minWidth: '7.75rem',
+        fontWeight: 400
       },
       hover: {
-        top: '1px',
-        backgroundColor: '#444141f2',
-        borderRadius: 0,
-        color: '#ffffff',
-        fontSize: '12px',
-        fontFamily: 'Barlow Condensed, Khand, sans-serif',
-        minWidth: '110px',
-        borderTop: '1px solid #585858',
-        borderLeft: '1px solid #585858',
-        borderRight: '1px solid #585858',
-        borderBottom: '1px solid #585858',
-        borderBottomLeftRadius: '2px',
-        borderBottomRightRadius: '2px',
-        fontWeight: '300',
+        top: '0.0625rem',
+        backgroundColor: primaryBg,
+        borderRadius: '0 20px 24px -4px rgba(16, 24, 40, 0.08), 0 8px 8px -4px rgba(16, 24, 40, 0.03)',
+        borderRadius: '0.125rem',
+        color: whiteColor,
+        fontSize: '0.875rem',
+        fontFamily: primaryFont,
+        minWidth: '7.75rem',
+        fontWeight: 400,
       }
     },
     labelsStyle: {
       standard: {
-        backgroundColor: '#44414112',
         borderRadius: 0,
-        color: '#ffffff',
-        fontSize: '14px',
-        fontFamily: 'Barlow Condensed, Khand, sans-serif',
-        paddingTop: 0,
-        paddingBottom: 0,
-        fontWeight: '300',
-        minHeight: '30px',
-        height: '30px'
+        color: whiteColor,
+        fontSize: '0.875rem',
+        padding: '0.5rem',
+        fontFamily: primaryFont,
+        lineHeight: '129%',
+        minHeight: '2.125rem',
+        height: '2.125rem'
       },
       hover: {
-        background: "#11bffe",
-        backgroundColor: "#11bffe",
+        background: "transparent",
         borderRadius: 0,
-        color: '#ffffff',
-        fontSize: '14px',
-        fontFamily: 'Barlow Condensed, Khand, sans-serif',
-        paddingTop: 0,
-        paddingBottom: 0,
-        fontWeight: '300',
-        minHeight: '30px',
-        height: '30px'
+        color: tabActiveColor,
+        lineHeight: '129%',
+        padding: '0.5rem',
+        fontSize: '0.875rem',
+        fontFamily: primaryFont,
+        fontWeight: 400,
+        minHeight: '2.125rem',
+        height: '2.125rem',
       }
-    }
+    },
+    iconStyle: {
+      // display: 'inline-block',
+      color: 'currentColor',
+      minWidth: '1.5rem',
+      width: '1.5rem',
+    },
   },
+  itemOptions: { customArrow: <i style={{ marginLeft: 'auto', marginRight: 0}} className="fa fa-angle-right menu-caret" /> },
   buttons: [
     {
       label: "Virtual Fly Brain",
       icon: "",
-      action: "",
+      action: {},
       position: "bottom-start",
       list: [
         {
@@ -145,7 +146,7 @@ var toolbarMenu = {
               action: {
                 handlerAction: "openNewTab",
                 parameters: ["http://twitter.com/virtualflybrain"]
-              }
+              },
             },
             {
               label: "Facebook",
@@ -153,7 +154,7 @@ var toolbarMenu = {
               action: {
                 handlerAction: "openNewTab",
                 parameters: ["https://www.facebook.com/pages/Virtual-Fly-Brain/131151036987118"]
-              }
+              },
             },
             {
               label: "Latest News & Releases",
@@ -161,7 +162,7 @@ var toolbarMenu = {
               action: {
                 handlerAction: "openNewTab",
                 parameters: ["https://www.virtualflybrain.org/blog/"]
-              }
+              },
             }
           ]
         }
@@ -170,7 +171,7 @@ var toolbarMenu = {
     {
       label: "Tools",
       icon: "",
-      action: "",
+      action: {},
       position: "bottom-start",
       list: [
         {
@@ -264,7 +265,7 @@ var toolbarMenu = {
         {
           label: "NBLAST",
           icon: "",
-          action: "",
+          action: {},
           position: "right-start",
           list: [
             {
@@ -290,7 +291,7 @@ var toolbarMenu = {
         {
           label: "CATMAID",
           icon: "",
-          action: "",
+          action: {},
           position: "right-start",
           list: [
             {
@@ -475,7 +476,7 @@ var toolbarMenu = {
         {
           label: "VFB CONNECT (API)",
           icon: "",
-          action: "",
+          action: {},
           position: "right-start",
           list: [
             {
@@ -512,17 +513,31 @@ var toolbarMenu = {
     {
       label: "History",
       icon: "",
-      action: "",
+      action: {},
       position: "bottom-start",
-      dynamicListInjector: {
-        handlerAction: "historyMenuInjector",
-        parameters: ["undefined"]
-      }
+      list: [
+        {
+          label: "JRC_FlyEM_Hemibrain",
+          icon: "",
+          action: {
+            handlerAction: "",
+            parameters: [""]
+          }
+        },
+        {
+          label: "V_ilPN(FlyEM-HB:2064165421)",
+          icon: "",
+          action: {
+            handlerAction: "",
+            parameters: [""]
+          }
+        },
+      ]
     },
     {
       label: "Templates",
       icon: "",
-      action: "",
+      action: {},
       position: "bottom-start",
       list: [
         {
@@ -635,7 +650,7 @@ var toolbarMenu = {
     {
       label: "Datasets",
       icon: "",
-      action: "",
+      action: {},
       position: "bottom-start",
       list: [
         {
@@ -754,9 +769,57 @@ var toolbarMenu = {
       ]
     },
     {
+      label: "View",
+      icon: "",
+      action: {},
+      position: "bottom-start",
+      list: [
+        {
+          label: "Default layout 1",
+          icon: "",
+          action: {
+            handlerAction: "",
+            parameters: [""]
+          }
+        },
+        {
+          label: "Default layout 2",
+          icon: "",
+          action: {
+            handlerAction: "",
+            parameters: [""]
+          }
+        },
+        {
+          label: "Default layout 3",
+          icon: "",
+          action: {
+            handlerAction: "",
+            parameters: [""]
+          }
+        },
+        {
+          label: "User custom layout",
+          icon: "",
+          action: {
+            handlerAction: "",
+            parameters: [""]
+          }
+        },
+        {
+          label: "Autosave disabled",
+          icon: "fa fa-twitter",
+          action: {
+            handlerAction: "",
+            parameters: [""]
+          }
+        },
+      ]
+    },
+    {
       label: "Help",
       icon: "",
-      action: "",
+      action: {},
       position: "bottom-start",
       list: [
         {
@@ -812,5 +875,3 @@ var toolbarMenu = {
     }
   ]
 };
-
-module.exports = { toolbarMenu };

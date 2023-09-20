@@ -2,11 +2,12 @@ import { Box, Button, Link } from "@mui/material";
 import React, { useState } from "react";
 import vars from '../../theme/variables';
 import MediaQuery from 'react-responsive';
-import { History, Logo, Menu, QueryStats } from "../../icons";
-
+import { History, Logo, Menu as MenuIcon, QueryStats } from "../../icons";
+import Menu from '@metacell/geppetto-meta-ui/menu/Menu';
+import { toolbarMenu } from "../../components/configuration/VFBToolbar/vfbtoolbarMenuConfiguration";
 const { primaryBg, headerBoxShadow, headerBorderColor } = vars;
 
-const Header = () => {
+const Header = ({setBottomNav}) => {
   const classes = {
     root: {
       background: primaryBg,
@@ -42,10 +43,9 @@ const Header = () => {
       display='flex'
       sx={{
         ...classes.root,
-        py: 1.5,
-        borderBottom: {
-          xs: `0.0625rem solid ${headerBorderColor}`,
-          lg: 'none'
+        py: {
+          xs: 1.5,
+          lg: 0
         },
         boxShadow: {
           xs: headerBoxShadow,
@@ -62,7 +62,8 @@ const Header = () => {
           lg: 'row'
         },
         px: {
-          xs: 1.5
+          xs: 1.5,
+          lg: 2,
         }
       }} >
       <Box
@@ -96,13 +97,19 @@ const Header = () => {
             >
               <History onClick={handleHistoryClick} />
               <QueryStats onClick={handleQueryStatsClick} />
-              <Menu onClick={handleMenuClick} />
+              <MenuIcon onClick={handleMenuClick} />
             </Box>
           </MediaQuery>
         </Box>
 
         <Box
-          sx={{
+          sx={ {
+            '& span': {
+              display: {
+                xs: 'block',
+                lg: 'inline-block'
+              },
+            },
             display: {
               xs: navShow ? 'flex' : 'none',
               lg: 'flex'
@@ -116,23 +123,23 @@ const Header = () => {
               lg: 0
             },
             ml: {
-              lg: 1.5
+              lg: 1
             }
           }}
         >
-          <Link underline="hover" href='#'>Virtual Fly Brain</Link>
-          <Link underline="hover" href='#'>Tools</Link>
-          <Link underline="hover" href='#'>History</Link>
-          <Link underline="hover" href='#'>Templates</Link>
-          <Link underline="hover" href='#'>Datasets</Link>
-          <Link underline="hover" href='#'>View</Link>
-          <Link underline="hover" href='#'>Help</Link>
+          <Menu
+            configuration={toolbarMenu}
+            menuHandler={() => {}}
+          />
         </Box>
       </Box>
 
       <MediaQuery minWidth={1200}>
-        <Button variant="outlined">
-          <QueryStats />
+        <Button
+          onClick={() => setBottomNav((prev) => prev === 2 ? null : 2)}
+          variant="outlined"
+        >
+          <QueryStats size={16} />
           Queries for V_ilpn (FlyEM-HB:2064165421)
         </Button>
       </MediaQuery>

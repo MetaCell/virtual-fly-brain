@@ -11,7 +11,6 @@ import SideBar from "../shared/sidebar";
 import Circuit from "./Circuit";
 import StackViewerComponent from "./StackViewerComponent";
 import QueryBuilder from "./queryBuilder";
-
 const {
   secondaryBg,
   headerBorderColor,
@@ -85,8 +84,12 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
       )}
 
       {tab.includes(2) && (
-        <StackViewer />
-      )}
+          <StackViewer 
+            id="NewStackViewer"
+            defHeight={600}
+            defWidth={600}
+          />
+        )}
     </>
   )
 
@@ -143,7 +146,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
           </>
         ) : (
             <>
-              {!bottomNav ? tabContent : bottomNav === 2 ? <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} /> : null}
+              <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} />
             </>
         )}
       </Box>

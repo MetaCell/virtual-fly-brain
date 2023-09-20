@@ -6,7 +6,8 @@ import QueryHeader from "./QueryHeader";
 import vars from "../../theme/variables";
 import Filter from "./Filter";
 
-const { chipOrange, chipGreen, headerBorderColor, searchHeadingColor, secondaryBg, listHeadingColor } = vars;
+const { chipOrange, chipGreen, chipRed, chipPink, chipYellow, headerBorderColor, searchHeadingColor, secondaryBg, listHeadingColor } = vars;
+const chipColors = [chipRed, chipGreen, chipOrange, chipPink, chipYellow];
 
 const chipsArr = [
   {
@@ -25,10 +26,19 @@ export const dividerStyle = {
   height: '0.875rem', width: '0.0625rem', background: listHeadingColor, borderRadius: '0.125rem'
 }
 
-const Query = ({ fullWidth }) => {
+const Query = ({ fullWidth, queries }) => {
+  const title = queries.length + " Query results";
+  const tags = [];
+  queries?.forEach( (query, index ) => {
+    query.facets_annotation?.forEach( tag => {
+      if ( !tags.includes(tag) ){
+        tags.push(tag);
+      }
+    })
+  })
   return (
     <>
-      <QueryHeader title="24 Query results" />
+      <QueryHeader title={title} />
 
       <Box
         position='sticky'
@@ -49,11 +59,11 @@ const Query = ({ fullWidth }) => {
       >
         <Box flex={1}>
           <Box display='flex' gap={0.5}>
-            {chipsArr?.map(item => (
+            {tags?.map( (tag, index) => (
               <Chip
                 onClick={() => null}
                 onDelete={() => null}
-                key={item.id}
+                key={tag}
                 deleteIcon={
                   <Cross
                     size={12}
@@ -63,13 +73,13 @@ const Query = ({ fullWidth }) => {
                 sx={{
                   lineHeight: '0.875rem',
                   fontSize: '0.625rem',
-                  background: item.color,
+                  backgroundColor: chipColors[index%(chipColors.length-1)] || chipColors[0],
                   height: '1.25rem',
                   '&:hover': {
-                    background: item.color,
+                    backgroundColor: chipColors[index%(chipColors.length-1)] || chipColors[0]
                   }
                 }}
-                label={item.label} />
+                label={tag} />
             ))}
           </Box>
         </Box>
@@ -102,20 +112,26 @@ const Query = ({ fullWidth }) => {
 
       <Box overflow='auto' height='calc(100% - 5.375rem)' p={1.5}>
         <Grid container spacing={1.5}>
-          {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((item, index) => {
-            return (
-              <Grid
-                key={index}
-                item
-                xs={12}
-                sm={6}
-                md={4}
-                lg={fullWidth ? 4 : 3}
-                xl={3}
-              >
-                <QueryCard fullWidth={fullWidth} />
-              </Grid>
-            )
+          {queries?.map( (query, index ) => {
+            let examples = {};
+            if ( query?.queries?.Images ){
+              examples = query?.queries?.Images;
+            }
+            return ( Object.keys(examples)?.map((item, index) => {
+              return (
+                <Grid
+                  key={index}
+                  item
+                  xs={12}
+                  sm={6}
+                  md={4}
+                  lg={fullWidth ? 4 : 3}
+                  xl={3}
+                >
+                  <QueryCard facets_annotation={query.facets_annotation} query={query?.queries?.Images[item][0]} fullWidth={fullWidth} />
+                </Grid>
+              )
+            }))
           })}
         </Grid>
       </Box>

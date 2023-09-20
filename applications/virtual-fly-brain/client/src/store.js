@@ -3,10 +3,13 @@ import './index.css';
 import TermInfoReducer from './reducers/TermInfoReducer';
 import ThreeDCanvasReducer from './reducers/ThreeDCanvasReducer';
 import GlobalReducer from './reducers/GlobalReducer';
+import InstancesReducer from './reducers/InstancesReducer';
+import QueriesReducer from './reducers/QueriesReducer';
 
 const rootReducer = combineReducers({
   termInfo: TermInfoReducer,
-  threeD: ThreeDCanvasReducer,
+  instances: InstancesReducer,
+  queries: QueriesReducer,
   globalInfo : GlobalReducer
 });
 

@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Button, Card, CardActionArea, CardContent, CardMedia, Chip, IconButton, Tooltip, Typography } from "@mui/material";
-import { FullScreen, Link as LinkIcon } from "../../icons";
+import { FullScreen, Cross, Link as LinkIcon } from "../../icons";
 import vars from "../../theme/variables";
 import { useState } from "react";
 import FullScreenViewer from "./FullScreenViewer";
@@ -13,45 +13,20 @@ const {
   tabActiveColor,
   chipGreen,
   chipOrange,
+  chipRed,
+  chipPink,
   primaryBg,
   chipYellow,
   secondaryBg,
   outlinedBtnBorderColor
 } = vars;
 
-const chipsArr = [
-  {
-    id: 0,
-    label: 'Anatomy',
-    color: chipGreen
-  },
-  {
-    id: 1,
-    label: 'Neuron',
-    color: chipOrange
-  },
-  {
-    id: 2,
-    label: 'Nervous system',
-    color: chipYellow
-  },
-  {
-    id: 3,
-    label: 'Anatomy',
-    color: chipGreen
-  },
-  {
-    id: 4,
-    label: 'Neuron',
-    color: chipOrange
-  }
-];
+const chipColors = [chipRed, chipGreen, chipOrange, chipPink, chipYellow];
 
-const QueryCard = ({ fullWidth }) => {
+const QueryCard = ({ fullWidth, facets_annotation, query }) => {
   const [toggleReadMore, setToggleReadMore] = useState(false);
   const [showFullScreen, setShowFullScreen] = useState(false);
   const MAX_LENGTH = 40;
-  const DUMMY_STRING = "A doughnut shaped synaptic neuropil domain of the central complex of the adult brain that lies just anterior to the fan-shaped body."
   const classes = {
     heading: {
       fontWeight: 400,
@@ -87,7 +62,7 @@ const QueryCard = ({ fullWidth }) => {
           sx={{
             height: '100%',
           }}
-          image={QUERY}
+          image={query.thumbnail}
         >
           <IconButton onClick={(e) => {
             e.stopPropagation();
@@ -102,7 +77,7 @@ const QueryCard = ({ fullWidth }) => {
 
         <CardContent>
           <Tooltip placement="right"
-            arrow title="JRC_R80G01_GAL4_Brain_20100223">
+            arrow title={query.label}>
             <Typography sx={{
               ...classes.ellipsis,
               fontSize: '1rem',
@@ -110,7 +85,7 @@ const QueryCard = ({ fullWidth }) => {
               fontWeight: 400,
               lineHeight: '1.25rem',
             }}>
-              JRC_R80G01_GAL4_Brain_20100223
+              {query.label}
             </Typography>
           </Tooltip>
 
@@ -126,7 +101,7 @@ const QueryCard = ({ fullWidth }) => {
               columnGap={1}
             >
               <Typography sx={classes.heading}>
-                Description
+                {query.description}
               </Typography>
               <Box display='flex' flexDirection='column' alignItems='flex-end'>
                 <Typography sx={{
@@ -134,7 +109,7 @@ const QueryCard = ({ fullWidth }) => {
                   color: whiteColor,
                   textAlign: 'right'
                 }}>
-                  {toggleReadMore ? DUMMY_STRING : `${DUMMY_STRING?.substr(0, MAX_LENGTH)}...`}
+                  {toggleReadMore ? "" : `${""?.substr(0, MAX_LENGTH)}...`}
                 </Typography>
                 <Button
                   onClick={() => setToggleReadMore((prev) => !prev)} disableRipple
@@ -174,7 +149,7 @@ const QueryCard = ({ fullWidth }) => {
                   color: whiteColor,
                   textAlign: 'right'
                 }}>
-                  {`P{GMR80G01-GAL4} expression pattern; anatomical entity`}
+                   {query.type}
                 </Typography>
               </Tooltip>
             </Box>
@@ -185,7 +160,7 @@ const QueryCard = ({ fullWidth }) => {
               columnGap={1}
             >
               <Typography sx={classes.heading}>
-                Imaging_Tecnique
+                {query.imaging_tecnique}
               </Typography>
 
               <Tooltip
@@ -199,7 +174,7 @@ const QueryCard = ({ fullWidth }) => {
                   color: whiteColor,
                   textAlign: 'right'
                 }}>
-                  Confocal
+                  {query.confocal}
                 </Typography>
               </Tooltip>
             </Box>
@@ -210,7 +185,7 @@ const QueryCard = ({ fullWidth }) => {
               columnGap={1}
             >
               <Typography sx={classes.heading}>
-                Template_Space
+               {query.template_space}
               </Typography>
 
 
@@ -220,7 +195,7 @@ const QueryCard = ({ fullWidth }) => {
                 arrow
                 title="JRC2018U"
               >
-                <Chip className="default-chip" sx={{ backgroundColor: primaryBg }} onClick={() => console.log('Clicked!')} icon={<LinkIcon />} label="JRC2018U" />
+                <Chip className="default-chip" sx={{ backgroundColor: primaryBg }} onClick={() => console.log('Clicked!')} icon={<LinkIcon />} label={query.template} />
               </Tooltip>
             </Box>
 
@@ -233,16 +208,46 @@ const QueryCard = ({ fullWidth }) => {
               columnGap={1}
             >
               <Box display='flex' gap={0.5}>
-                {chipsArr?.slice(0, fullWidth ? 2 : 3).map(item => (
-                  <Chip key={item.id} sx={{ background: item.color }} label={item.label} />
+                {facets_annotation?.map((tag, index) => (
+                  <Chip
+                  onClick={() => null}
+                  onDelete={() => null}
+                  key={tag + index}
+                  deleteIcon={
+                    <Cross
+                      size={12}
+                      style={{ marginRight: 0, marginLeft: '0.25rem' }}
+                    />
+                  }
+                  sx={{
+                    lineHeight: '140%',
+                    fontSize: '0.625rem',
+                    backgroundColor: chipColors[index%(chipColors.length-1)] || chipColors[0]
+                  }}
+                  label={tag} />
                 ))}
 
                 <Tooltip
                   arrow
                   title={
                     <Box display='flex' gap={0.5}>
-                      {chipsArr?.slice(fullWidth ? 2 : 3).map(item => (
-                        <Chip key={item.id} sx={{ background: item.color }} label={item.label} />
+                      {facets_annotation?.map((tag, index) => (
+                        <Chip
+                          onClick={() => null}
+                          onDelete={() => null}
+                          key={tag + index}
+                          deleteIcon={
+                            <Cross
+                              size={12}
+                              style={{ marginRight: 0, marginLeft: '0.25rem' }}
+                            />
+                          }
+                          sx={{
+                            lineHeight: '140%',
+                            fontSize: '0.625rem',
+                            backgroundColor: chipColors[index%(chipColors.length-1)] || chipColors[0]
+                          }}
+                          label={tag} />
                       ))}
                     </Box>
                   }
@@ -250,7 +255,7 @@ const QueryCard = ({ fullWidth }) => {
                   <Chip
                     className="default-chip"
                     sx={{ background: primaryBg }}
-                    label={`+${chipsArr?.slice(fullWidth ? 2 : 3).length}`}
+                    label={`+${facets_annotation?.slice(fullWidth ? 2 : 3).length}`}
                   />
                 </Tooltip>
 

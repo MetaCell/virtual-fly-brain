@@ -5,6 +5,7 @@ import { Box, Button, ButtonGroup, IconButton, InputAdornment, Pagination, Pagin
 import Query from "./Query";
 import History from "./History";
 import vars from "../../theme/variables";
+import { useSelector } from 'react-redux'
 
 
 const { secondaryBg, outlinedBtnTextColor, headerBorderColor, blackColor, queryBuilderBg, whiteColor, primaryBg } = vars;
@@ -45,6 +46,7 @@ function a11yProps(index) {
 
 const QueryBuilder = ({ fullWidth, bottomNav, setBottomNav }) => {
   const [value, setValue] = React.useState(0);
+  const queries = useSelector(state => state.queries.queries);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -144,7 +146,7 @@ const QueryBuilder = ({ fullWidth, bottomNav, setBottomNav }) => {
 
       <Box sx={classes.body}>
         <TabPanel value={value} index={0}>
-          <Query fullWidth={fullWidth} />
+          <Query fullWidth={fullWidth} queries={queries} />
         </TabPanel>
         <TabPanel value={value} index={1}>
           <History />

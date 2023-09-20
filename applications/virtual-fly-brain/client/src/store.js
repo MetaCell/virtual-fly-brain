@@ -1,18 +1,33 @@
-import { legacy_createStore as createStore, combineReducers } from 'redux'
+import { combineReducers } from 'redux';
+import { createStore } from '@metacell/geppetto-meta-client/common';
 import './index.css';
-import TermInfoReducer from './reducers/TermInfoReducer';
-import ThreeDCanvasReducer from './reducers/ThreeDCanvasReducer';
-import GlobalReducer from './reducers/GlobalReducer';
+
+import TermInfoReducer, { initialStateTermInfo } from './reducers/TermInfoReducer';
+import ThreeDCanvasReducer, { initialStateThreeDCanvas } from './reducers/ThreeDCanvasReducer';
+import GlobalReducer, { initialStateGlobalReducer } from './reducers/GlobalReducer';
 import InstancesReducer from './reducers/InstancesReducer';
 import QueriesReducer from './reducers/QueriesReducer';
+import { layout as baseLayout } from './components/layout/layout'; 
+import componentMap from './components/layout/componentMap'; 
 
-const rootReducer = combineReducers({
+const INIT_STATE = {
+  termInfo: initialStateTermInfo,
+  threeD: initialStateThreeDCanvas,
+  globalInfo: initialStateGlobalReducer
+};
+
+const reducers = {
   termInfo: TermInfoReducer,
   instances: InstancesReducer,
   queries: QueriesReducer,
   globalInfo : GlobalReducer
-});
+};
 
-const store = createStore(rootReducer);
+const store = createStore(
+  reducers,
+  INIT_STATE,
+  [],
+  { baseLayout, componentMap }
+)
 
 export default store; 

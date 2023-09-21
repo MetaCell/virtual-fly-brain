@@ -178,7 +178,11 @@ export default function SearchBuilder(props) {
 
   const handleChipDelete = (label) => {
     handleQueryDeletion(label)
-    setValue(value.filter((chip) => chip.label !== label))
+    let filtered = value.filter((chip) => chip.label !== label);
+    setValue(filtered);
+    if ( filtered.length == 0 || ( filtered.length === 1 && value.find( v => v.label === QUERIES ))){
+      setGroupedOptions([]);
+    }
   }
 
   const handleQueryDeletion = (label) => {
@@ -290,7 +294,7 @@ export default function SearchBuilder(props) {
 
           {/* { groupedOptions.length >=1 ? <NarrowSearchFilter chipColors={chipColors} groupedOptions={groupedOptions}/> :null } */}
 
-          { value.length >= 1 ? (<ResultSelectionOptions
+          { (value.length >= 1 && !value.find( v => v.label === QUERIES )) ? (<ResultSelectionOptions
             addQueryTag={addQueryTag}
             loadResults={loadResults}
           />) : null }

@@ -11,10 +11,6 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
   const [searchQueries, setSearchQueries] = React.useState([]);
   const [popoverAnchorEl, setPopoverAnchorEl] = React.useState(null);
   const [selectedOption, setSelectedOption] = React.useState({});
-  let resultsNumbers = 0;
-  searchQueries.forEach( query => {
-    query?.queries?.Images ? resultsNumbers = resultsNumbers + Object.keys(query?.queries?.Images).length : null;
-  })
   React.useEffect(() => {
     setSearchQueries(recentSearch)
   }, [recentSearch])
@@ -30,6 +26,7 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
 
   const handleSelect = (option) => {
     setSelectedOption(option)
+    console.log("Selection ", option)
     setPopoverAnchorEl(null);
   };
 
@@ -71,7 +68,7 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
             }
           }}
           variant="text"
-          onClick={() => setSearchQueries([])}
+          onClick={() => setSelectedOption({})}
         >
           <CleaningServices style={{ marginRight: '0.375rem' }} />
           Clear queries
@@ -127,7 +124,9 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
               flexGrow={1}
               display='flex'
             >
-              <Typography sx={{
+              
+              {selectedOption?.label ? 
+              (<Typography sx={{
                 width: 'calc(100% - 1.875rem)',
                 px: 1,
                 alignSelf: 'center',
@@ -139,9 +138,23 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
                 overflow: 'hidden',
                 textOverflow: 'ellipsis'
               }}>
-                Select query for {option.label}
-              </Typography>
-
+                { selectedOption.label }
+              </Typography>)
+              :
+              (<Typography sx={{
+                width: 'calc(100% - 1.875rem)',
+                px: 1,
+                alignSelf: 'center',
+                flexGrow: 1,
+                fontSize: '0.75rem',
+                lineHeight: '133%',
+                color: whiteColor,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
+              }}>
+               Select query for { option.label }
+              </Typography>) }
               <Button
                 aria-describedby={id}
                 onClick={popoverHandleClick}
@@ -169,7 +182,7 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
 
                 <List>
                   { option.queries?.Queries?.map((query, index) => (<ListItem sx={{ top : '1.5rem' }} key={query.label+index}>
-                    <ListItemButton onClick={() => handleSelect(query.label)}>
+                    <ListItemButton onClick={() => handleSelect(query)}>
                       <ListItemText primary={query.label} />
                     </ListItemButton>
                   </ListItem>) )}
@@ -185,7 +198,7 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
       >
       <Button
           onClick={checkResults}
-          disabled={resultsNumbers <= 0}
+          disabled={selectedOption?.count <= 0}
           sx={{
             px: '0.5rem',
             py: '0.25rem',
@@ -199,7 +212,7 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
             }
           }}
         >
-          Check { resultsNumbers } results
+          Check { selectedOption.count } results
           <AngleRight style={{ marginLeft: '0.5rem' }} />
         </Button>
       </Box>

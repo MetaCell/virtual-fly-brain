@@ -198,7 +198,7 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
       >
       <Button
           onClick={checkResults}
-          disabled={selectedOption?.count <= 0}
+          disabled={!(selectedOption?.count > 1)}
           sx={{
             px: '0.5rem',
             py: '0.25rem',

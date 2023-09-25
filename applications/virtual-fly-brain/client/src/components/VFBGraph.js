@@ -481,14 +481,14 @@ class VFBGraph extends Component {
     let syncColor = this.state.optionsIconColor;
 
     // No graph to display, message is shown instead of graph
-    if (Object.keys(this.props.instanceOnFocus).length === 0 && this.props.instanceOnFocus.constructor === Object) {
+    if (this.props.instanceOnFocus && Object.keys(this.props.instanceOnFocus).length === 0 && this.props.instanceOnFocus?.constructor === Object) {
       return (
         <p>Model not loaded, graph not available yet</p>
       );
     }
 
     // Out of sync if instanceOnFocus is not what's on display
-    if ( !this.props.instanceOnFocus.id.includes(this.focusedInstance.id) ) {
+    if ( !this.props.instanceOnFocus?.id.includes(this.focusedInstance.id) ) {
       syncColor = stylingConfiguration.outOfSyncIconColor;
     }
 

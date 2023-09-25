@@ -9,7 +9,7 @@ var locationCypherQuery = instance => ({
   ]
 });
 
-var whatCypherQuery = instance => ({
+export const cypherQuery = instance => ({
   "statements": [
     {
       "statement": "MATCH (n:Entity {short_form:'" + instance + "'}) OPTIONAL MATCH p=(n)-[:INSTANCEOF|SUBCLASSOF*..]->(x) "
@@ -21,7 +21,7 @@ var whatCypherQuery = instance => ({
   ]
 });
 
-var configuration = {
+export const configuration = {
   resultsMapping:
   {
     "node": { 
@@ -37,7 +37,7 @@ var configuration = {
   }
 }
 
-var styling = {
+export const stylingConfiguration = {
   // Background color for canvas
   canvasColor : "black",
   // Color for links between nodes
@@ -83,15 +83,8 @@ var styling = {
   dropDownTextColor : "white"
 }
 
-var restPostConfig = {
+export const restPostConfig = {
   url: "https://pdb-dev.virtualflybrain.org/db/neo4j/tx/commit",
   contentType: "application/json"
 };
 
-module.exports = { 
-  configuration,
-  styling,
-  restPostConfig,
-  locationCypherQuery,
-  whatCypherQuery
-};

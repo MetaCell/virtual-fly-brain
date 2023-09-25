@@ -1,7 +1,7 @@
 const initialState = {
-  graphQueryIndex : number = 0,
-  sync : boolean = false,
-  instanceOnFocus : boolean = false
+  graphQueryIndex : -1,
+  sync : false,
+  instanceOnFocus : undefined
 };
 
 const GraphReducer = (state = initialState, action) => {

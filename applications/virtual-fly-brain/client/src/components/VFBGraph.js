@@ -5,13 +5,14 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import { queryParser } from './VFBGraph/QueryParser';
 import DropDownQueries from './VFBGraph/DropDownQueries';
 import Tooltip from '@material-ui/core/Tooltip';
-import { UPDATE_GRAPH } from './../../../actions/generals';
 import { connect } from "react-redux";
 
 import { configuration } from './configuration/VFBGraph/graphConfiguration';
 import { restPostConfig } from './configuration/VFBGraph/graphConfiguration';
 import { cypherQuery } from './configuration/VFBGraph/graphConfiguration';
 import { stylingConfiguration } from './configuration/VFBGraph/graphConfiguration';
+
+const UPDATE_GRAPH = 'UPDATE_GRAPH';
 
 /**
  * If no configuration is given for queries in graphConfiguration.js, we use this configuration.
@@ -685,14 +686,10 @@ class VFBGraph extends Component {
 
 function mapStateToProps (state) {
   return {
-    graphQueryIndex : state.generals.ui.graph.graphQueryIndex,
-    sync : state.generals.ui.graph.sync,
-    instanceOnFocus : state.generals.instanceOnFocus
+    graphQueryIndex : state.graph.graphQueryIndex,
+    sync : state.graph.sync,
+    instanceOnFocus : state.graph.instanceOnFocus
   }
 }
 
-function mapDispatchToProps (dispatch) {
-  return { vfbGraph: (type, path, index, visible, sync) => dispatch ( { type : type, data : { instance : path, queryIndex : index, visible : visible, sync : sync } } ) }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps, null, { forwardRef : true } )(VFBGraph);
+export default connect(mapStateToProps, null, null)(VFBGraph);

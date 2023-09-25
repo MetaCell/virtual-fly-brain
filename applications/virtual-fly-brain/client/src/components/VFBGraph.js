@@ -1,20 +1,17 @@
 import React, { Component } from 'react'
 import axios from 'axios';
-import GeppettoGraphVisualization from '@geppettoengine/geppetto-ui/graph-visualization/Graph'
+import GeppettoGraphVisualization from '@metacell/geppetto-meta-ui/graph-visualization/Graph';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import { queryParser } from './QueryParser';
-import DropDownQueries from './DropDownQueries';
+import { queryParser } from './VFBGraph/QueryParser';
+import DropDownQueries from './VFBGraph/DropDownQueries';
 import Tooltip from '@material-ui/core/Tooltip';
 import { UPDATE_GRAPH } from './../../../actions/generals';
 import { connect } from "react-redux";
 
-/**
- * Read configuration from graphConfiguration.js
- */
-const configuration = require('../../configuration/VFBGraph/graphConfiguration').configuration;
-const restPostConfig = require('../../configuration/VFBGraph/graphConfiguration').restPostConfig;
-const cypherQuery = require('../../configuration/VFBGraph/graphConfiguration').locationCypherQuery;
-const stylingConfiguration = require('../../configuration/VFBGraph/graphConfiguration').styling;
+import { configuration } from './configuration/VFBGraph/graphConfiguration';
+import { restPostConfig } from './configuration/VFBGraph/graphConfiguration';
+import { cypherQuery } from './configuration/VFBGraph/graphConfiguration';
+import { stylingConfiguration } from './configuration/VFBGraph/graphConfiguration';
 
 /**
  * If no configuration is given for queries in graphConfiguration.js, we use this configuration.
@@ -215,7 +212,7 @@ class VFBGraph extends Component {
   updateCameraAtStart () {
     let self = this;
     // Reset camera view after graph component becomes visible
-    setTimeout( function () {
+    setTimeout( () => {
       self.resetCamera();
       self.focused = true;
       self.loading = false;
@@ -390,7 +387,7 @@ class VFBGraph extends Component {
       url: url,
       headers: { 'content-type': contentType },
       data: request,
-    }).then( function (response) {
+    }).then( (response) => {
       var blob = new Blob(["onmessage = " + queryParser ]);
       var blobUrl = window.URL.createObjectURL(blob);
 
@@ -410,7 +407,7 @@ class VFBGraph extends Component {
           self.setState( { graph : e.data.params.results, currentQuery : query });
           self.objectsLoaded = e.data.params.results.nodes.length;
           // Reset camera after loading new graph
-          setTimeout( function () {
+          setTimeout( () => {
             self.resetCamera();
             if ( self.graphRef.current !== null ) {
               self.graphRef.current.ggv.current.d3Force('charge').strength(-(self.objectsLoaded * 100 ))
@@ -432,7 +429,7 @@ class VFBGraph extends Component {
       // Invoke web worker to perform conversion of graph data into format
       worker.postMessage({ message: "refine", params: params });
     })
-      .catch( function (error) {
+      .catch( (error)=> {
         self.loading = false;
       })
   }

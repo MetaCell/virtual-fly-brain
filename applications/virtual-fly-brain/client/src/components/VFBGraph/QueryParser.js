@@ -12,7 +12,7 @@ export function queryParser (e) {
       }
 
       let newLink = true;
-      linksMap.get(startNode).find( function ( ele ) {
+      linksMap.get(startNode).find( ( ele ) => {
         if ( ele.target !== endNode ) {
           newLink = true;
         } else {

@@ -12,6 +12,7 @@ import Circuit from "./Circuit";
 import StackViewerComponent from "./StackViewerComponent";
 import QueryBuilder from "./queryBuilder";
 import VFBCircuitBrowser from "./VFBCircuitBrowser";
+import VFBGraph from "./VFBGraph";
 
 const {
   secondaryBg,
@@ -86,7 +87,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
       )}
 
       {tab.includes(2) && (
-        <StackViewer />
+        <VFBGraph />
       )}
     </>
   )

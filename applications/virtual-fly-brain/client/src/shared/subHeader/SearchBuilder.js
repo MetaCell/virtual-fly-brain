@@ -148,6 +148,8 @@ export default function SearchBuilder(props) {
   const [value, setValue] = React.useState([]);
   const [recentSearch, setRecentSearch] = React.useState([]);
   const [groupedOptions, setGroupedOptions] = React.useState([]);
+  const [isOpen, setIsOpen] = React.useState(true);
+
   const addQueryTag = () => { 
     if ( !value.find( v => v.label === QUERIES )){
       setValue((prevValue) => [{label: 'Queries', tags: []}, ...prevValue])
@@ -166,6 +168,7 @@ export default function SearchBuilder(props) {
       }
     })
     termInfoById(value[value.length -1 ].short_form);
+    setIsOpen(false)
   }
 
   const handleResultSelection = async(option) => {
@@ -178,7 +181,11 @@ export default function SearchBuilder(props) {
 
   const handleChipDelete = (label) => {
     handleQueryDeletion(label)
-    setValue(value.filter((chip) => chip.label !== label))
+    let filtered = value.filter((chip) => chip.label !== label);
+    setValue(filtered);
+    if ( filtered.length == 0 || ( filtered.length === 1 && value.find( v => v.label === QUERIES ))){
+      setGroupedOptions([]);
+    }
   }
 
   const handleQueryDeletion = (label) => {
@@ -230,14 +237,8 @@ export default function SearchBuilder(props) {
     multiple: true,
     options: searchResults,
     getOptionLabel: (option) => option?.label,
-    disableCloseOnSelect: true,
-    open: true,
     onInputChange : event => handleSearch(event.target.value)
   });
-
-  React.useEffect(() => {
-    props.setFocused(focused ? true : false)
-  }, [focused])
 
   return (
     <Box flexGrow={1}>
@@ -290,7 +291,7 @@ export default function SearchBuilder(props) {
 
           {/* { groupedOptions.length >=1 ? <NarrowSearchFilter chipColors={chipColors} groupedOptions={groupedOptions}/> :null } */}
 
-          { value.length >= 1 ? (<ResultSelectionOptions
+          { (value.length >= 1 && !value.find( v => v.label === QUERIES )) ? (<ResultSelectionOptions
             addQueryTag={addQueryTag}
             loadResults={loadResults}
           />) : null }

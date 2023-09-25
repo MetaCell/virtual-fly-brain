@@ -114,8 +114,8 @@ const Query = ({ fullWidth, queries }) => {
         <Grid container spacing={1.5}>
           {queries?.map( (query, index ) => {
             let examples = {};
-            if ( query?.queries?.Images ){
-              examples = query?.queries?.Images;
+            if ( query?.queries?.Examples ){
+              examples = query?.queries?.Examples;
             }
             return ( Object.keys(examples)?.map((item, index) => {
               return (
@@ -128,7 +128,7 @@ const Query = ({ fullWidth, queries }) => {
                   lg={fullWidth ? 4 : 3}
                   xl={3}
                 >
-                  <QueryCard facets_annotation={query.facets_annotation} query={query?.queries?.Images[item][0]} fullWidth={fullWidth} />
+                  <QueryCard facets_annotation={query.facets_annotation} query={query?.queries?.Examples[item][0]} fullWidth={fullWidth} />
                 </Grid>
               )
             }))

@@ -1,13 +1,13 @@
 import { getOBJ3DTypes } from './actions/types/getOBJ3DTypes';
 import { loadFileType } from './actions/readFile';
 
-const initialState = {
+export const initialStateThreeDCanvas = {
   modelUrl: undefined,
   isLoading: false,
   error: false
 };
 
-const ThreeDCanvasReducer = (state = initialState, response) => {
+const ThreeDCanvasReducer = (state = initialStateThreeDCanvas, response) => {
   switch (response.type) {
     case loadFileType.FILE_READ_INITED:
       return Object.assign({}, state, {

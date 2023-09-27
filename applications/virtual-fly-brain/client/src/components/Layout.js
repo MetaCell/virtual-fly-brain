@@ -138,7 +138,6 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
           },
         }}
       >
-
         {desktopScreen ? (
           <>
             {tabContent}

@@ -31,7 +31,6 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
 
   const handleSelect = (option, query) => {
     let count = 0;
-    let options = Object.keys(selectedOption);
     if ( query.queries?.Examples && !selectedOption[query.short_form]) {
       count = Object.keys(query.queries?.Examples)?.length;
     }

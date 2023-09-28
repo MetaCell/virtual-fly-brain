@@ -1,6 +1,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import useAutocomplete from '@mui/base/useAutocomplete';
+import CircularProgress from '@mui/material/CircularProgress';
 import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
 import { autocompleteClasses } from '@mui/material/Autocomplete';
@@ -146,6 +147,7 @@ const searchResults = [
 export default function SearchBuilder(props) {
 
   const [value, setValue] = React.useState([]);
+  const [retrievingResults, setRetrievingResults] = React.useState(false)
   const [recentSearch, setRecentSearch] = React.useState([]);
   const [groupedOptions, setGroupedOptions] = React.useState([]);
   const [isOpen, setIsOpen] = React.useState(true);
@@ -204,24 +206,31 @@ export default function SearchBuilder(props) {
       case "OK":
           if (v !== value) {
             setGroupedOptions(data)
+            setRetrievingResults(false);
           }
           break;
       case "ERROR":
-          break;
+        setRetrievingResults(false);    
+      break;
       default:
           console.log("This is a case not considered");
     }
+
   }
 
   const searchConfiguration = require('../../components/configuration/VFBSearchBuilder/searchConfiguration').searchConfiguration;
   const datasourceConfiguration = require('../../components/configuration/VFBSearchBuilder/searchConfiguration').datasourceConfiguration;
 
   const handleSearch = (searchWord) => {
-    searchWord?.length > 3 && getResultsSOLR(searchWord,
-      handleResults,
-      searchConfiguration.sorter,
-      datasourceConfiguration,
-      setGroupedOptions);
+    if ( searchWord?.length > 3 ){
+      setRetrievingResults(true);
+      setIsOpen(true)
+      getResultsSOLR(searchWord,
+        handleResults,
+        searchConfiguration.sorter,
+        datasourceConfiguration,
+        setGroupedOptions);
+    }
   }
 
   const {
@@ -235,6 +244,7 @@ export default function SearchBuilder(props) {
   } = useAutocomplete({
     id: 'customized-hook',
     multiple: true,
+    open: isOpen,
     options: searchResults,
     getOptionLabel: (option) => option?.label,
     onInputChange : event => handleSearch(event.target.value)
@@ -276,7 +286,7 @@ export default function SearchBuilder(props) {
           <input placeholder='Find something...' {...getInputProps()}/>
         </InputWrapper>
       </Box>
-      {focused ? (
+      {focused && isOpen ? (
         <Listbox
           sx={{
             top: {
@@ -301,12 +311,12 @@ export default function SearchBuilder(props) {
             recentSearch={recentSearch}
           />) : null }
 
-          <SearchResult
+          { !retrievingResults ? (<SearchResult
             groupedOptions={groupedOptions}
             getOptionProps={getOptionProps}
             chipColors={chipColors}
             handleResultSelection={handleResultSelection}
-          />
+          />) : <CircularProgress sx={{left: '50%', marginTop : '10%', position : 'relative'}}/> }
         </Listbox>
       ) : null}
     </Box>

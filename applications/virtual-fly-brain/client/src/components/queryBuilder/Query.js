@@ -27,7 +27,13 @@ export const dividerStyle = {
 }
 
 const Query = ({ fullWidth, queries }) => {
-  const title = queries.length + " Query results";
+  let count = 0;
+  queries.forEach( query => {
+    if ( query.queries?.Examples) {
+      count = count + Object.keys(query.queries?.Examples)?.length;
+    }
+  });
+  const title = count + " Query results";
   const tags = [];
   queries?.forEach( (query, index ) => {
     query.facets_annotation?.forEach( tag => {

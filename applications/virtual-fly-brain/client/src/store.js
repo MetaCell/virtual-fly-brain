@@ -1,12 +1,24 @@
 import { legacy_createStore as createStore, combineReducers } from 'redux'
 import './index.css';
-import TermInfoReducer from './reducers/TermInfoReducer';
-import ThreeDCanvasReducer from './reducers/ThreeDCanvasReducer';
-import GlobalReducer from './reducers/GlobalReducer';
-import CircuitReducer from './reducers/CircuitReducer';
-import GraphReducer from './reducers/GraphReducer';
 
-const rootReducer = combineReducers({
+import TermInfoReducer, { initialStateTermInfoReducer } from './reducers/TermInfoReducer';
+import ThreeDCanvasReducer, { initialStateThreeDCanvasReducer } from './reducers/ThreeDCanvasReducer';
+import GlobalReducer, { initialStateGlobalReducer } from './reducers/GlobalReducer';
+import CircuitReducer, { initialStateCircuitReducer } from './reducers/CircuitReducer';
+import GraphReducer, { initialStateGraphReducer } from './reducers/GraphReducer';
+
+import { layout as baseLayout } from './components/layout/layout'; 
+import componentMap from './components/layout/componentMap'; 
+
+const INIT_STATE = {
+  termInfo: initialStateTermInfoReducer,
+  threeD: initialStateThreeDCanvasReducer,
+  globalInfo: initialStateGlobalReducer,
+  circuit: initialStateCircuitReducer,
+  graph: initialStateGraphReducer
+};
+
+const reducers = combineReducers({
   termInfo: TermInfoReducer,
   threeD: ThreeDCanvasReducer,
   globalInfo : GlobalReducer,
@@ -14,6 +26,11 @@ const rootReducer = combineReducers({
   graph: GraphReducer
 });
 
-const store = createStore(rootReducer);
+const store = createStore(
+  reducers,
+  INIT_STATE,
+  [],
+  { baseLayout, componentMap }
+)
 
 export default store; 

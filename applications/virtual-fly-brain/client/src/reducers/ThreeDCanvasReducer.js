@@ -1,7 +1,7 @@
 import { getOBJ3DTypes } from './actions/types/getOBJ3DTypes';
 import { loadFileType } from './actions/readFile';
 
-const initialState = {
+export const initialStateThreeDCanvasReducer = {
   modelUrl: undefined,
   isLoading: false,
   error: false

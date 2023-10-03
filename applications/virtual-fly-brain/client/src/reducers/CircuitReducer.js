@@ -1,9 +1,9 @@
-const initialState = {
+export const initialStateCircuitReducer = {
   querySelected : [{ id : "", label : "" } , { id : "", label : "" }],
   visible : true
 };
 
-const CircuitReducer = (state = initialState, action) => {
+const CircuitReducer = (state = initialStateCircuitReducer, action) => {
   return state;
 }
 export default CircuitReducer;

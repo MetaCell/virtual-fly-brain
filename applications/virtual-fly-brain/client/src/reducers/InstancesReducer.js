@@ -1,13 +1,13 @@
 import { getInstancesTypes } from './actions/types/getInstancesTypes';
 
-const initialState = {
+export const initialStateInstancesReducer = {
   allPotentialInstances : [],
   allLoadedInstances : [],
   isLoading: false,
   error: false
 };
 
-const InstancesReducer = (state = initialState, response) => {
+const InstancesReducer = (state = initialStateInstancesReducer, response) => {
   switch (response.type) {
      case getInstancesTypes.GET_INSTANCES_STARTED:
         return Object.assign({}, state, {

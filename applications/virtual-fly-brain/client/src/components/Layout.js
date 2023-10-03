@@ -3,17 +3,10 @@ import React, { useEffect, useState } from "react";
 import MediaQuery from 'react-responsive';
 import { Box, Button, useMediaQuery, useTheme } from "@mui/material";
 import ThreeDCanvas from "./ThreeDCanvas"
-import TermInfo from "./TermInfo"
-import Images from "./Images";
 import StackViewer from './StackViewer';
 import vars from "../theme/variables";
 import SideBar from "../shared/sidebar";
-import Circuit from "./Circuit";
-import StackViewerComponent from "./StackViewerComponent";
 import QueryBuilder from "./queryBuilder";
-import VFBCircuitBrowser from "./VFBCircuitBrowser";
-import VFBGraph from "./VFBGraph";
-
 const {
   secondaryBg,
   headerBorderColor,
@@ -87,8 +80,12 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
       )}
 
       {tab.includes(2) && (
-        <VFBGraph />
-      )}
+          <StackViewer 
+            id="NewStackViewer"
+            defHeight={600}
+            defWidth={600}
+          />
+        )}
     </>
   )
 
@@ -137,7 +134,6 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
           },
         }}
       >
-
         {desktopScreen ? (
           <>
             {tabContent}
@@ -145,7 +141,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
           </>
         ) : (
             <>
-              {!bottomNav ? tabContent : bottomNav === 2 ? <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} /> : null}
+              <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} />
             </>
         )}
       </Box>

@@ -66,7 +66,7 @@ class VFBGraph extends Component {
     this.graphResized = false;
     this.focusedInstance = { id : "" };
     this.selectedDropDownQuery = -1;
-    this.loading = true;
+    this.loading = false;
     this.firstLoad = true;
     this.nodeSelectedID = "";
     this.queryRequests = [];

@@ -4,20 +4,32 @@ import { ChromePicker } from "react-color";
 import { MuiThemeProvider } from "@material-ui/core/styles";
 import Tree from "./Tree";
 import CircularProgress from "@mui/material/CircularProgress";
+import Box from "@mui/material/Box";
 import Tooltip from "@mui/material/Tooltip";
 import axios from 'axios';
 import vars from "../../theme/variables";
 import { useSelector, connect } from "react-redux";
-import { withStyles } from '@material-ui/core/styles';
 import { termInfoById } from "../../reducers/actions/termInfo";
 import theme from "../../theme/index";
-
+const {
+    secondaryBg,
+    whiteColor,
+    blackColor
+  } = vars;
 const restPostConfig =
     require("../../components/configuration/ROIBrowser/ROIBrowserConfiguration").restPostConfig;
 const treeCypherQuery =
     require("../../components/configuration/ROIBrowser/ROIBrowserConfiguration").treeCypherQuery;
 
 const ROIBrowser = (props) => {
+    const classes = {
+        root: {
+          height: 'calc(100% - 0.5rem)',
+          width : '400px',
+          color: whiteColor
+        }
+    }
+    
     const templateID = useSelector((state) => state.globalInfo.templateID);
     const data = useSelector(state => state.termInfo.termInfoData)
 
@@ -67,11 +79,10 @@ const ROIBrowser = (props) => {
                 }
               })
               .then((response) => {
-                console.log("response.data ", response.data)
                 resolve(response.data);
               })
               .catch((error) => {
-                console.log("Error ", error)
+                console.log("Error retrieving ROI query ", error)
                 reject(error);
             });
         });
@@ -186,13 +197,7 @@ const ROIBrowser = (props) => {
          * function handler called by the VFBMain whenever there is an update of the instance on focus,
          * this will reflect and move to the node (if it exists) that we have on focus.
          */
-        let innerInstance = undefined;
-        if (instance?.getParent() !== null) {
-            innerInstance = instance.getParent();
-        } else {
-            innerInstance = instance;
-        }
-        let idToSearch = innerInstance?.getId();
+        let idToSearch = instance.Id;
 
         if (
             state?.nodeSelected !== undefined &&
@@ -200,7 +205,7 @@ const ROIBrowser = (props) => {
             idToSearch !== state?.nodeSelected?.classId
         ) {
             if (idToSearch === templateID) {
-                selectNode(dataTree[0]);
+                selectNode(state?.dataTree[0]);
                 return;
             }
             let node = [];
@@ -209,10 +214,10 @@ const ROIBrowser = (props) => {
              * check the instance's id with the nodes, if this match we will use its subtitle
              * in the searchQuery in the render to move the tree focus on this node
              */
-            while (nodes.length > i) {
+            while (state?.nodes.length > i) {
                 if (
-                    idToSearch === nodes[i]["instanceId"] ||
-                    idToSearch === nodes[i]["classId"]
+                    idToSearch === state?.nodes[i]["instanceId"] ||
+                    idToSearch === state?.nodes[i]["classId"]
                 ) {
                     node.push(i);
                     break;
@@ -220,7 +225,7 @@ const ROIBrowser = (props) => {
                 i++;
             }
             if (node.length > 0) {
-                selectNode(nodes[node[0]]);
+                selectNode(state?.nodes[node[0]]);
             }
         }
     };
@@ -229,12 +234,9 @@ const ROIBrowser = (props) => {
         // This function is the core and starting point of the component itself
         let that = this;
         setState({ ...state, loading : true, errors : undefined });
-        console.log("Instance ", instance)
         if ( instance === undefined ) return
         let queryCypher = treeCypherQuery(instance.Id);
-        console.log("query cypher ", queryCypher)
         restPost(queryCypher).then((data) => {
-            console.log("Received data ", data)
             /*
              * we take the data provided by the cypher query and consume the until we obtain the treeData that can be given
              * to the react-sortable-tree since it understands this data structure
@@ -260,30 +262,14 @@ const ROIBrowser = (props) => {
                     defaultComparator
                 );
                 let treeData = convertDataForTree(nodes, edges, vertix, imagesMap);
-                console.log("treeData ", treeData)
                 setState({ 
+                    ...state,
                     loading : false,
                     errors : undefined,
                     root : vertix,
                     edges : edges,
                     nodes : nodes,
-                    nodeSelected :  treeData[0],
-                    dataTree : treeData
-
-                })
-            } else {
-                let treeData = [
-                    {
-                        title: "No data available.",
-                        subtitle: null,
-                        children: [],
-                    },
-                ];
-                setState({ 
-                    ...state,
-                    loading : false,
-                    errors : undefined,
-                    root : undefined,
+                    nodeSelected :  state?.nodeSelected === undefined ? treeData[0] : state.nodeSelected,
                     dataTree : treeData
 
                 })
@@ -526,59 +512,63 @@ const ROIBrowser = (props) => {
         return title;
     };
 
-    const reloadData = () => {
-        if (templateID !== undefined) {
-            initTree(templateID);
-        } else {
-            setState({ ...state, errors : "Template not loaded yet." });
-        }
-    };
     React.useEffect(() => {
         if (templateID !== undefined) {
-            initTree(templateID);
+            if ( state.dataTree === undefined ) initTree(templateID)
+
         } else {
             setState({ ...state, errors : "Template not loaded yet." });
         }
     }, [templateID]);
 
     React.useEffect( () => {
-        initTree(data)
+        if ( state.dataTree === undefined ) { 
+            initTree(data)
+        } else {
+            updateTree(data)
+        }
     },[data]);
 
     React.useEffect(() => {
-        let that = this;
         document.addEventListener("mousedown", monitorMouseClick, false);
         // returned function will be called on component unmount
         return () => {
             document.removeEventListener("mousedown", monitorMouseClick, false);
         };
-        // GEPPETTO.on(GEPPETTO.Events.Select, function (instance) {
-        //   that.updateTree(instance);
-        // });
-
-        // GEPPETTO.on(GEPPETTO.Events.Instance_deleted, function (parameters) {
-        //   if (Instances[parameters] !== undefined ) {
-        //     that.setState({ nodeSelected: undefined });
-        //   }
-        // });
-
-        // GEPPETTO.on(GEPPETTO.Events.Instances_created, function () {
-        //   that.setState({ displayColorPicker: false });
-        //   if (that.state.errors !== undefined) {
-        //     that.reloadData();
-        //   }
-        // });
-
-        // GEPPETTO.on(GEPPETTO.Events.Color_set, function (instance) {
-        //   that.forceUpdate();
-        // });
     }, []);
 
-    return( state?.errors !== undefined ? (
+    return( 
+        <Box
+      sx={{
+        ...classes.root,
+        background: {
+          lg: blackColor
+        },
+        p: {
+          xs: 2,
+          lg: 0
+        },
+        borderColor: {
+          lg: secondaryBg
+        },
+        borderStyle: {
+          lg: 'solid'
+        },
+        borderRadius: {
+          lg: 2
+        },
+        borderWidth: {
+          xs: 0,
+          lg: '0.0625rem 0.0625rem 0 0'
+        }
+      }}
+    >
+      ROI Browser
+      { state?.errors !== undefined ? (
         <div id="treeError">{state?.errors}</div>
     ) : (
         <div>
-            {state?.loading === true ? (
+            {state?.loading === true || state?.dataTree?.length < 1 ? (
                 <CircularProgress
                     style={{
                         position: "absolute",
@@ -598,7 +588,7 @@ const ROIBrowser = (props) => {
                     componentType={"TREE"}
                     toggleMode={true}
                     treeData={
-                        state?.dataTree === undefined || state?.dataTree?.results?.length < 1
+                        state?.dataTree === undefined 
                             ? [
                                 {
                                     title: "No data available.",
@@ -620,15 +610,15 @@ const ROIBrowser = (props) => {
                     getButtons={getButtons}
                     getNodesProps={getNodes}
                     searchQuery={
-                        state?.nodeSelected === undefined
-                            ? props.instance?.getParent()?.getId()
-                            : state?.nodeSelected?.subtitle
+                        state?.nodeSelected?.subtitle
                     }
                     onlyExpandSearchedNodes={false}
                 />
             )}
-        </div>
-    ));
+        </div>)
+    }
+    </Box>
+    );
 };
 
 export default ROIBrowser;

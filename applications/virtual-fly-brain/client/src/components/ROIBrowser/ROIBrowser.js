@@ -188,6 +188,7 @@ const ROIBrowser = (props) => {
              * var treeData = this.state.dataTree;
              * this.updateSubtitle(treeData, instance.instanceId);
              */
+            console.log("Node selected ", instance)
             setState({ ...state, nodeSelected : instance });
         }
     };
@@ -357,7 +358,8 @@ const ROIBrowser = (props) => {
                         onClick={(e) => {
                             e.stopPropagation();
                             // rowInfo.node.subtitle = rowInfo.node.instanceId;
-                            props.selectionHandler(rowInfo.node.instanceId);
+                            // TODO : Connect selection handler
+                            //props.selectionHandler(rowInfo.node.instanceId);
                             setState({ ...state, nodeSelected : rowInfo.node });
                         }}
                     />

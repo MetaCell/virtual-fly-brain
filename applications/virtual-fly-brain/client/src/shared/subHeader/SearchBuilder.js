@@ -225,11 +225,11 @@ export default function SearchBuilder(props) {
     if ( searchWord?.length > 3 ){
       setRetrievingResults(true);
       setIsOpen(true)
-      // getResultsSOLR(searchWord,
-      //   handleResults,
-      //   searchConfiguration.sorter,
-      //   datasourceConfiguration,
-      //   setGroupedOptions);
+      getResultsSOLR(searchWord,
+        handleResults,
+        searchConfiguration.sorter,
+        datasourceConfiguration,
+        setGroupedOptions);
     }
   }
 

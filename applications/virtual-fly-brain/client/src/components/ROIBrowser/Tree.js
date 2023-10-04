@@ -3,7 +3,6 @@
     var toggleExpandedForAll = require('@nosferatu500/react-sortable-tree').toggleExpandedForAll;
     var changeNodeAtPath = require('@nosferatu500/react-sortable-tree').changeNodeAtPath;
     var walk = require('@nosferatu500/react-sortable-tree').walk;
-    require("./Tree.less");
 
     class Tree extends React.Component {
   

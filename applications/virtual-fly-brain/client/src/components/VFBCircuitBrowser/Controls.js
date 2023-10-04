@@ -26,7 +26,7 @@ import SwapVertIcon from '@material-ui/icons/SwapVert';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import { connect } from "react-redux";
-import { getResultsSOLR } from '../../components/configuration/VFBCircuitBrowser/datasources/SOLRclient'
+import { getResultsSOLR } from '../configuration/SOLRclient'
 
 export const UPDATE_CIRCUIT_QUERY = 'UPDATE_CIRCUIT_QUERY';
 /**
@@ -113,8 +113,8 @@ import { configuration } from '../configuration/VFBCircuitBrowser/circuitBrowser
 import { styling } from '../configuration/VFBCircuitBrowser/circuitBrowserConfiguration';
 import { Neo4jLabels } from '../configuration/VFBCircuitBrowser/circuitBrowserConfiguration';
 
-import { searchConfiguration } from '../configuration/VFBCircuitBrowser/datasources/SOLRclient';
-import { datasourceConfiguration } from '../configuration/VFBCircuitBrowser/datasources/SOLRclient';
+import { searchConfiguration } from '../configuration/SOLRclient';
+import { datasourceConfiguration } from '../configuration/SOLRclient';
 
 
 /**

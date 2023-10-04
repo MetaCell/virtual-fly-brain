@@ -17,7 +17,7 @@ module.exports = function webpacking(envVariables) {
   }
 
   const API_URL = {
-    production: JSON.stringify('https://vfb.dev.metacell.us/'),
+    production: JSON.stringify('http://localhost:8080/'),
     development: JSON.stringify('http://localhost:8080/')
   }
   
@@ -50,8 +50,9 @@ module.exports = function webpacking(envVariables) {
         loader: 'babel-loader'
       },
       {
-        test: /\.ts|tsx?$/,
-        loader: "awesome-typescript-loader"
+          test: /\.tsx?$/,
+          loader: 'ts-loader',
+          exclude: /node_modules/,
       },
       {
         test: /\.(css)$/,

@@ -12,7 +12,7 @@ import { RecentSearch } from './RecentSearch';
 import { QueriesSelection } from './QueriesSelection';
 import { NarrowSearchFilter } from './NarrowSearchFilter';
 import { ResultSelectionOptions } from './ResultSelectionOptions';
-import  { getResultsSOLR } from '../../components/configuration/VFBSearchBuilder/SOLRclient'
+import  { getResultsSOLR } from '../../components/configuration/SOLRclient'
 import { DatasourceTypes } from '@metacell/geppetto-meta-ui/search/datasources/datasources';
 import { get_queries } from "../../network/query"
 import { getInstanceByID } from './../../reducers/actions/instances';
@@ -225,11 +225,11 @@ export default function SearchBuilder(props) {
     if ( searchWord?.length > 3 ){
       setRetrievingResults(true);
       setIsOpen(true)
-      getResultsSOLR(searchWord,
-        handleResults,
-        searchConfiguration.sorter,
-        datasourceConfiguration,
-        setGroupedOptions);
+      // getResultsSOLR(searchWord,
+      //   handleResults,
+      //   searchConfiguration.sorter,
+      //   datasourceConfiguration,
+      //   setGroupedOptions);
     }
   }
 

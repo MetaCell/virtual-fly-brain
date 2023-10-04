@@ -6,6 +6,7 @@ import ThreeDCanvas from "./ThreeDCanvas"
 import TermInfo from "./TermInfo"
 import Images from "./Images";
 import StackViewer from './StackViewer';
+import ROIBrowser from './ROIBrowser/ROIBrowser';
 import vars from "../theme/variables";
 import SideBar from "../shared/sidebar";
 import Circuit from "./Circuit";
@@ -21,8 +22,8 @@ const {
 const tabsArr = [
   { id: 0, name: 'Term Info' },
   { id: 1, name: 'Images' },
-  { id: 2, name: 'Circuits' },
-  // { id: 3, name: 'Stack Viewer' }
+  { id: 2, name: 'Stack Viewers' },
+  { id: 3, name: 'ROI Browser' }
 ]
 
 const MainLayout = ({ bottomNav, setBottomNav }) => {
@@ -30,7 +31,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const desktopScreen = useMediaQuery(theme.breakpoints.up('lg'));
-  const defaultActiveTab = desktopScreen ? [0, 1, 2] : [0];
+  const defaultActiveTab = desktopScreen ? [0, 1, 2, 3] : [0];
   const [tab, setTab] = useState([]);
 
   useEffect(() => {
@@ -87,7 +88,14 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
           <StackViewer 
             id="NewStackViewer"
             defHeight={600}
-            defWidth={600}
+            defWidth={300}
+          />
+        )}
+
+      {tab.includes(3) && (
+          <ROIBrowser 
+            id="roiBrowser"
+            size={{ height: 600, width: 300 }}
           />
         )}
     </>

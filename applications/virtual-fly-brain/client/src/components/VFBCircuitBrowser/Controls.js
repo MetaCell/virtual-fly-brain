@@ -437,7 +437,7 @@ class Controls extends Component {
         entry.id === this.props.circuitQuerySelected[i] || entry.id === this.props.circuitQuerySelected?.[i]?.id
       );
 
-      if ( !fieldExists) { 
+      if ( !fieldExists ) { 
         const emptyIndex = neuronFields.findIndex( field => field.id === "");
         if ( emptyIndex >= 0 ) {
           neuronFields[emptyIndex] = { id : this.props.circuitQuerySelected[i].id ? this.props.circuitQuerySelected[i].id : this.props.circuitQuerySelected[i], label : this.props.circuitQuerySelected[i].label ? this.props.circuitQuerySelected[i].label : this.props.circuitQuerySelected[i] };

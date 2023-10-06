@@ -4,7 +4,7 @@ export const initialStateGraphReducer = {
   instanceOnFocus : undefined
 };
 
-const GraphReducer = (state = initialStateCircuitReducer, action) => {
+const GraphReducer = (state = initialStateGraphReducer, action) => {
   return state;
 }
 export default GraphReducer;

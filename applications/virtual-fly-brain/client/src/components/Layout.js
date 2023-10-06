@@ -11,6 +11,8 @@ import vars from "../theme/variables";
 import SideBar from "../shared/sidebar";
 import Circuit from "./Circuit";
 import StackViewerComponent from "./StackViewerComponent";
+import VFBDownloadContents from "./VFBDownloadContents/VFBDownloadContents";
+import VFBUploader from "./VFBUploader/VFBUploader";
 import QueryBuilder from "./queryBuilder";
 const {
   secondaryBg,
@@ -149,6 +151,8 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
         {desktopScreen ? (
           <>
             {tabContent}
+            {bottomNav === 0 && <VFBUploader open={true} setBottomNav={setBottomNav} />}
+            {bottomNav === 1 && <VFBDownloadContents open={true} setBottomNav={setBottomNav} />}
             {bottomNav === 2 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} />}
           </>
         ) : (

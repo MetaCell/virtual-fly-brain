@@ -93,7 +93,9 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
         )}
 
       {tab.includes(3) && (
-          <VFBCircuitBrowser />
+          <div className="flexChildContainer" style={{ position : "fixed", overflow : "scroll" }}>
+            <VFBCircuitBrowser />
+          </div>
         )}
     </>
   )

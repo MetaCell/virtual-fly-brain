@@ -268,7 +268,7 @@ class Controls extends Component {
     this.neuronFields = neurons;
     if ( !this.state.neurons.find( neuron => neuron.id != "") ) {
       // reset configuration of fq to default
-      datasourceConfiguration.query_settings.fq = defaultDatasourceConfiguration.query_settings.fq;
+      datasourceConfiguration.query_settings.fq = datasourceConfiguration.query_settings.fq;
     }
     
     this.forceUpdate();
@@ -296,7 +296,7 @@ class Controls extends Component {
     // User has added the maximum number of neurons allowed in query search
     this.neuronFields = neuronFields;
     this.autocompleteRef[(neuronFields.length - 1).toString()] = React.createRef();
-    datasourceConfiguration.query_settings.fq = defaultDatasourceConfiguration.query_settings.fq;
+    datasourceConfiguration.query_settings.fq = datasourceConfiguration.query_settings.fq;
     this.forceUpdate();
   }
 
@@ -369,7 +369,7 @@ class Controls extends Component {
     if ( !this.neuronFields.find( neuron => neuron.id != "") ) {
       // reset configuration of fq to default
       this.autocompleteRef[this.setInputValue].current.clearResults();
-      datasourceConfiguration.query_settings.fq = defaultDatasourceConfiguration.query_settings.fq;
+      datasourceConfiguration.query_settings.fq = datasourceConfiguration.query_settings.fq;
     }
   }
   
@@ -422,7 +422,7 @@ class Controls extends Component {
   }
   
   clearGraph () {
-    datasourceConfiguration.query_settings.fq = defaultDatasourceConfiguration.query_settings.fq;
+    datasourceConfiguration.query_settings.fq = datasourceConfiguration.query_settings.fq;
     this.props.clearGraph()
   }
   
@@ -431,31 +431,31 @@ class Controls extends Component {
    */
   getUpdatedNeuronFields () {
     let neuronFields = this.neuronFields;
-    let added = false;
-    for ( var i = 0; i < this.props.circuitQuerySelected.length; i++ ){
-      var fieldExists = this.neuronFields.find(entry =>
-        entry.id === this.props.circuitQuerySelected[i] || entry.id === this.props.circuitQuerySelected?.[i]?.id
-      );
+    // let added = false;
+    // for ( var i = 0; i < this.props.circuitQuerySelected.length; i++ ){
+    //   var fieldExists = this.neuronFields.find(entry =>
+    //     entry.id === this.props.circuitQuerySelected[i] || entry.id === this.props.circuitQuerySelected?.[i]?.id
+    //   );
 
-      if ( !fieldExists ) { 
-        const emptyIndex = neuronFields.findIndex( field => field.id === "");
-        if ( emptyIndex >= 0 ) {
-          neuronFields[emptyIndex] = { id : this.props.circuitQuerySelected[i].id ? this.props.circuitQuerySelected[i].id : this.props.circuitQuerySelected[i], label : this.props.circuitQuerySelected[i].label ? this.props.circuitQuerySelected[i].label : this.props.circuitQuerySelected[i] };
-          added = true;
-          fieldExists = true;
-          break;
-        } else {
-          neuronFields.pop();
-          neuronFields.push({ id : this.props.circuitQuerySelected[i].id ? this.props.circuitQuerySelected[i].id : this.props.circuitQuerySelected[i], label : this.props.circuitQuerySelected[i].label ? this.props.circuitQuerySelected[i].label : this.props.circuitQuerySelected[i] })
-        }
+    //   if ( !fieldExists ) { 
+    //     const emptyIndex = neuronFields.findIndex( field => field.id === "");
+    //     if ( emptyIndex >= 0 ) {
+    //       neuronFields[emptyIndex] = { id : this.props.circuitQuerySelected[i].id ? this.props.circuitQuerySelected[i].id : this.props.circuitQuerySelected[i], label : this.props.circuitQuerySelected[i].label ? this.props.circuitQuerySelected[i].label : this.props.circuitQuerySelected[i] };
+    //       added = true;
+    //       fieldExists = true;
+    //       break;
+    //     } else {
+    //       neuronFields.pop();
+    //       neuronFields.push({ id : this.props.circuitQuerySelected[i].id ? this.props.circuitQuerySelected[i].id : this.props.circuitQuerySelected[i], label : this.props.circuitQuerySelected[i].label ? this.props.circuitQuerySelected[i].label : this.props.circuitQuerySelected[i] })
+    //     }
         
-        if ( this.props.circuitQuerySelected.length > neuronFields.length && !fieldExists && this.props.circuitQuerySelected?.[i]?.id != "") {
-          if ( this.props.circuitQuerySelected !== "" ) {
-            neuronFields.push({ id : this.props.circuitQuerySelected[i].id ? this.props.circuitQuerySelected[i].id : this.props.circuitQuerySelected[i], label : this.props.circuitQuerySelected[i].label ? this.props.circuitQuerySelected[i].label : this.props.circuitQuerySelected[i] });
-          } 
-        }
-      }
-    }
+    //     if ( this.props.circuitQuerySelected.length > neuronFields.length && !fieldExists && this.props.circuitQuerySelected?.[i]?.id != "") {
+    //       if ( this.props.circuitQuerySelected !== "" ) {
+    //         neuronFields.push({ id : this.props.circuitQuerySelected[i].id ? this.props.circuitQuerySelected[i].id : this.props.circuitQuerySelected[i], label : this.props.circuitQuerySelected[i].label ? this.props.circuitQuerySelected[i].label : this.props.circuitQuerySelected[i] });
+    //       } 
+    //     }
+    //   }
+    // }
     
     return neuronFields;
   }

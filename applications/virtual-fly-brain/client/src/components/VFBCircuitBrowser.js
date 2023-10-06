@@ -7,20 +7,16 @@ import PropTypes from 'prop-types';
 import Controls from './VFBCircuitBrowser/Controls';
 import { queryParser } from './VFBCircuitBrowser/QueryParser';
 import { connect } from "react-redux";
+import { makeStyles } from '@material-ui/core/styles';
 
-const styles = theme => ({
-  loader: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    top: 0,
-    margin: 'auto',
-    color: "#11bffe",
-    size: "55rem"
+const useStyles = makeStyles((theme) => ({
+  container: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100vh', // Set the height to desired value
   },
-  errorMessage : { textAlign : "center" }
-});
+}));
 
 /**
  * Read configuration from circuitBrowserConfiguration
@@ -367,6 +363,13 @@ class VFBCircuitBrowser extends Component {
   
   render () {
     let self = this;
+
+    const containerStyle = {
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      height: '100vh', // Set the height to desired value
+    };
     
     // Detect when the first load of the Graph component happens
     const { classes, circuitQuerySelected } = this.props;
@@ -378,8 +381,7 @@ class VFBCircuitBrowser extends Component {
     }
     return (
       this.state.loading
-        ? <CircularProgress id= { COMPONENT_ID } classes={{ root : classes?.loader }}
-        />
+        ? <div style={containerStyle}><CircularProgress /></div>
         : this.state.graph.nodes.length == 0
           ? <div>
             <h4 className={classes?.errorMessage}>{errorMessage}</h4>

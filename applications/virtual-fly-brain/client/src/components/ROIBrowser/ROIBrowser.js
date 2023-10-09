@@ -188,7 +188,6 @@ const ROIBrowser = (props) => {
              * var treeData = this.state.dataTree;
              * this.updateSubtitle(treeData, instance.instanceId);
              */
-            console.log("Node selected ", instance)
             setState({ ...state, nodeSelected : instance });
         }
     };
@@ -358,8 +357,7 @@ const ROIBrowser = (props) => {
                         onClick={(e) => {
                             e.stopPropagation();
                             // rowInfo.node.subtitle = rowInfo.node.instanceId;
-                            // TODO : Connect selection handler
-                            //props.selectionHandler(rowInfo.node.instanceId);
+                            termInfoById(rowInfo.node.instanceId);
                             setState({ ...state, nodeSelected : rowInfo.node });
                         }}
                     />
@@ -496,11 +494,9 @@ const ROIBrowser = (props) => {
                                     typeof Instances[rowInfo.node.instanceId].isVisible ===
                                     "function"
                                 ) {
-                                    props.selectionHandler(rowInfo.node.instanceId);
-                                    termInfoById({}, true);
+                                    termInfoById(rowInfo.node.instanceId);
                                 } else {
-                                    props.selectionHandler(rowInfo.node.classId);
-                                    termInfoById({}, true);
+                                    termInfoById(rowInfo.node.classId);
                                 }
                                 setState({ ...state, nodeSelected : rowInfo.node });
                             }}
@@ -573,7 +569,8 @@ const ROIBrowser = (props) => {
             {state?.loading === true || state?.dataTree?.length < 1 ? (
                 <CircularProgress
                     style={{
-                        position: "absolute",
+                        position: "relative",
+                        display : "flex",
                         left: 0,
                         right: 0,
                         bottom: 0,

@@ -8,7 +8,7 @@ import Images from "./Images";
 import StackViewer from './StackViewer';
 import vars from "../theme/variables";
 import SideBar from "../shared/sidebar";
-import Circuit from "./Circuit";
+import VFBCircuitBrowser from "./VFBCircuitBrowser";
 import StackViewerComponent from "./StackViewerComponent";
 import QueryBuilder from "./queryBuilder";
 const {
@@ -22,7 +22,7 @@ const tabsArr = [
   { id: 0, name: 'Term Info' },
   { id: 1, name: 'Images' },
   { id: 2, name: 'Circuits' },
-  // { id: 3, name: 'Stack Viewer' }
+  { id: 3, name: 'Circuit Browser' }
 ]
 
 const MainLayout = ({ bottomNav, setBottomNav }) => {
@@ -84,11 +84,18 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
       )}
 
       {tab.includes(2) && (
-          <StackViewer 
-            id="NewStackViewer"
-            defHeight={600}
-            defWidth={600}
-          />
+          // <StackViewer 
+          //   id="NewStackViewer"
+          //   defHeight={600}
+          //   defWidth={600}
+          // />
+          <VFBCircuitBrowser />
+        )}
+
+      {tab.includes(3) && (
+          <div className="flexChildContainer" style={{ position : "fixed", overflow : "scroll" }}>
+            <VFBCircuitBrowser />
+          </div>
         )}
     </>
   )

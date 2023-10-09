@@ -185,7 +185,7 @@ function refineResults(e) {
     self.close();
 }
 
-export const datasourceConfiguration = {
+export const defaultDatasourceConfiguration = {
   "url": "https://solr.virtualflybrain.org/solr/ontology/select",
   "query_settings":
     {

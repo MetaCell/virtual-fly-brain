@@ -18,6 +18,9 @@ export const layout = {
       size: 100,
       children: [],
       barSize: 35,
+      config: {
+        isMinimizedPanel: true
+      }
     },
   ],
   "layout": {

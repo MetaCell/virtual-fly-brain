@@ -16,6 +16,8 @@ const INIT_STATE = {
   globalInfo: initialStateGlobalReducer
 };
 
+const isMinimizeEnabled = true;
+
 const reducers = {
   termInfo: TermInfoReducer,
   instances: InstancesReducer,
@@ -27,7 +29,7 @@ const store = createStore(
   reducers,
   INIT_STATE,
   [],
-  { baseLayout, componentMap }
+  { baseLayout, componentMap, isMinimizeEnabled }
 )
 
 export default store; 

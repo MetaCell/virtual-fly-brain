@@ -1,3 +1,5 @@
+import SideBar from '../../shared/sidebar';
+import ROIBrowser from '../ROIBrowser/ROIBrowser';
 import StackViewer from '../StackViewer';
 import ThreeDCanvas from '../ThreeDCanvas';
 /**
@@ -7,7 +9,9 @@ import ThreeDCanvas from '../ThreeDCanvas';
  */
 const componentMap = {
     'stackViewer': StackViewer,
-    'threeDCanvas': ThreeDCanvas
+    'threeDCanvas': ThreeDCanvas,
+    'sideBar': SideBar,
+    'roiBrowser': ROIBrowser
 };
 
 export default componentMap

@@ -83,10 +83,9 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
   }, [store])
 
   useEffect(() => {
-    //dispatch(addWidget(threeDCanvasWidget));
-    //dispatch(addWidget(stackViewerWidget));
-    //dispatch(addWidget(sideBarWidget(sidebarOpen, setSidebarOpen)));
-    //dispatch(addWidget(roiBrowserWidget));
+    dispatch(addWidget(threeDCanvasWidget));
+    dispatch(addWidget(stackViewerWidget));
+    dispatch(addWidget(sideBarWidget(sidebarOpen, setSidebarOpen)));
   }, [sidebarOpen, setSidebarOpen])
 
 

@@ -1,68 +1,39 @@
-/**
- * The default layout of the application.
- * 
- * Will be loaded by FlexLayout.
- * https://github.com/caplin/FlexLayout
- */
-export const layout = {
+
+export default {
   global: {
-    tabEnableClose: true,
-    tabSetHeaderHeight: 26,
-    tabSetTabStripHeight: 26,
+    sideBorders: 8,
+    tabSetHeaderHeight: 28,
+    tabSetTabStripHeight: 28,
     enableEdgeDock: false,
   },
   borders: [
     {
       type: 'border',
-      location: 'bottom',
-      size: 100,
+      location: 'top',
       children: [],
-      barSize: 35,
+      config: {
+        isMinimizedPanel: true
+      }
     },
   ],
-  "layout": {
-    "type": "tabset",
-    "weight": 100,
-    "id": "root",
-    "children": [
-      {
-        "type": "row",
-        "weight": 69,
-        "id": "headerBar",
-        "children": []
-      },
-      {
-        "type": "row",
-        "weight": 69,
-        "children": [
-          {
-            "type": "tabset",
-            "weight": 100,
-            "id": "mainPanel",
-            "enableDeleteWhenEmpty": false,
-            "children": [
-              {
-                type: "tab",
-                name: "left",
-                id: "leftPanel",
-                component: "panel",
-              }
-              ,{
-                type: "tab",
-                name: "center",
-                id: "centerPanel", 
-                component: "panel",
-              }
-              ,{
-                type: "tab",
-                name: "right",
-                id: "rightPanel", 
-                component: "panel",
-              }
-            ]
-          }
-        ]
-      }
-    ]
+  layout: {
+    type: "row",
+    id: "root",
+    weight: 100,
+    children: [{
+      "type": "tab",
+      "id": "left",
+      "component": "panel"
+    }
+    ,{
+      "type": "tab",
+      "id": "center",
+      "component": "panel"
+    }
+  ,{
+    "type": "tab",
+    "id": "right",
+    "component": "panel"
+  }]
   }
 };

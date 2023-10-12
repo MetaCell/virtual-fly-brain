@@ -7,7 +7,7 @@ import ThreeDCanvasReducer, { initialStateThreeDCanvas } from './reducers/ThreeD
 import GlobalReducer, { initialStateGlobalReducer } from './reducers/GlobalReducer';
 import InstancesReducer from './reducers/InstancesReducer';
 import QueriesReducer from './reducers/QueriesReducer';
-import { layout as baseLayout } from './components/layout/layout'; 
+import layout from './components/layout/layout'; 
 import componentMap from './components/layout/componentMap'; 
 
 const INIT_STATE = {
@@ -29,7 +29,7 @@ const store = createStore(
   reducers,
   INIT_STATE,
   [],
-  { baseLayout, componentMap, isMinimizeEnabled }
+  { layout, componentMap, isMinimizeEnabled }
 )
 
 export default store; 

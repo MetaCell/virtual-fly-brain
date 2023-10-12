@@ -119,11 +119,12 @@ const VFBStackViewer = (props) => {
       return sliceInstances
     }
   }
-
+  
   // FIXME
   useEffect( () => {
     let instances = stackData.instances;
-    if (!instances.find( i => i?.Id === stackViewerData?.Id) && stackViewerData?.Images) {
+    console.log("stackViewerData ", stackViewerData)
+    if (!instances.find( i => i?.Id === stackViewerData?.Id) && stackViewerData?.Images && stackViewerData?.IsTemplate) {
       let keys = Object.keys(stackViewerData.Images);
 
       const instancespec = {
@@ -152,9 +153,11 @@ const VFBStackViewer = (props) => {
       slices.parent = parent;
       parent[stackViewerData.Id + "_slices"] = slices;
       instances.push(slices);
+
+      const newData = {...stackData , instances : instances };
+      setStackData(newData);
     }
-    const newData = {...stackData , instances : instances };
-    setStackData(newData);
+    
   },[stackViewerData]);
 
   // Update height and width of the stackwidget, happens when flex layout resizes tabs

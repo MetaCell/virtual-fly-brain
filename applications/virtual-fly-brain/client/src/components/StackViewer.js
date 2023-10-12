@@ -123,7 +123,6 @@ const VFBStackViewer = (props) => {
   // FIXME
   useEffect( () => {
     let instances = stackData.instances;
-    console.log("stackViewerData ", stackViewerData)
     if (!instances.find( i => i?.Id === stackViewerData?.Id) && stackViewerData?.Images && stackViewerData?.IsTemplate) {
       let keys = Object.keys(stackViewerData.Images);
 

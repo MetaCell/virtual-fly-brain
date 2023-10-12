@@ -240,13 +240,11 @@ const ROIBrowser = (props) => {
         if ( instance === undefined ) return
         let queryCypher = treeCypherQuery(instance.Id);
         restPost(queryCypher).then((data) => {
-            console.log("Tree data ", data)
             /*
              * we take the data provided by the cypher query and consume the until we obtain the treeData that can be given
              * to the react-sortable-tree since it understands this data structure
              */
             if (data.errors.length > 0) {
-                console.log("-- ERROR TREE COMPONENT --");
                 console.log(data.errors);
                 setState({ ...state, errors : "Error retrieving the data - check the console for additional information"});
             }
@@ -265,7 +263,6 @@ const ROIBrowser = (props) => {
                     "from",
                     defaultComparator
                 );
-                console.log("Nodes ", nodes)
                 let treeData = convertDataForTree(nodes, edges, vertix, imagesMap);
                 setState({ 
                     ...state,
@@ -496,7 +493,6 @@ const ROIBrowser = (props) => {
                                 } else {
                                     termInfoById(rowInfo.node.classId);
                                 }
-                                console.log("NOde info ", rowInfo.node)
                                 setState({ ...state, nodeSelected : rowInfo.node });
                             }}
                         >

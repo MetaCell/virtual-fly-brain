@@ -30,7 +30,7 @@ const CustomTableContainer = styled(TableContainer)(
   position: relative;
   min-width: 31rem;
   max-width: 43rem;
-  overflow-x: hidden;
+  overflow-x: scroll;
   border-radius: 0.5rem;
   box-shadow: 0px 2px 4px -2px rgba(16, 24, 40, 0.06), 0px 4px 8px -2px rgba(16, 24, 40, 0.10);
   &:after {
@@ -400,7 +400,7 @@ const SideBar = ({ open, setOpen }) => {
 
             <Box mx={-1.5} px={1.5} sx={{
               overflow: {
-                lg: 'hidden'
+                lg: 'auto'
               },
               maxHeight: {
                 lg: 'calc(100% - 4.0625rem)'

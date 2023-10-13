@@ -28,9 +28,8 @@ const {
 const CustomTableContainer = styled(TableContainer)(
   ({ theme }) => `
   position: relative;
-  min-width: 31rem;
+  min-width: 35rem;
   max-width: 43rem;
-  overflow-x: scroll;
   border-radius: 0.5rem;
   box-shadow: 0px 2px 4px -2px rgba(16, 24, 40, 0.06), 0px 4px 8px -2px rgba(16, 24, 40, 0.10);
   &:after {

@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
-import MediaQuery from 'react-responsive';
 import { useDispatch, useStore } from 'react-redux';
-import { Box, Button, useMediaQuery, useTheme, CircularProgress } from "@mui/material";
+import MediaQuery from 'react-responsive';
+import { Box, Button, useMediaQuery, useTheme, CircularProgress  } from "@mui/material";
 import vars from "../theme/variables";
+import { getLayoutManagerInstance } from "@metacell/geppetto-meta-client/common/layout/LayoutManager";
 import VFBDownloadContents from "./VFBDownloadContents/VFBDownloadContents";
 import VFBUploader from "./VFBUploader/VFBUploader";
-import QueryBuilder from "./queryBuilder";
-import { getLayoutManagerInstance } from "@metacell/geppetto-meta-client/common/layout/LayoutManager";
+import { threeDCanvasWidget, stackViewerWidget, roiBrowserWidget } from "./layout/widgets";
 import { addWidget } from '@metacell/geppetto-meta-client/common/layout/actions';
-import { threeDCanvasWidget, stackViewerWidget, sideBarWidget, roiBrowserWidget } from "./layout/widgets";
+import QueryBuilder from "./queryBuilder";
 import store from "../store";
 
 const {
@@ -26,6 +26,38 @@ const tabsArr = [
 ]
 
 const MainLayout = ({ bottomNav, setBottomNav }) => {
+  const theme = useTheme();
+
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const desktopScreen = useMediaQuery(theme.breakpoints.up('lg'));
+  const defaultActiveTab = desktopScreen ? [0, 1, 2, 3] : [0];
+  const [tab, setTab] = useState([]);
+  const [LayoutComponent, setLayoutComponent] = useState(undefined);
+  const dispatch = useDispatch();
+
+
+  useEffect(() => {
+    if (LayoutComponent === undefined) {
+      const myManager = getLayoutManagerInstance();
+      if (myManager) {
+        myManager.enableMinimize = true
+        setLayoutComponent(myManager.getComponent());
+      }
+    }
+  }, [store])
+
+  useEffect(() => {
+    dispatch(addWidget(threeDCanvasWidget));
+    dispatch(addWidget(stackViewerWidget));
+    dispatch(addWidget(roiBrowserWidget));
+  })
+
+  useEffect(() => {
+    setTab(defaultActiveTab)
+    if (!desktopScreen) {
+      setBottomNav(2)
+    }
+  }, [desktopScreen])
 
   const classes = {
     tabs: {
@@ -59,39 +91,24 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
     },
   }
 
-  const theme = useTheme();
-
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const desktopScreen = useMediaQuery(theme.breakpoints.up('lg'));
-  const defaultActiveTab = desktopScreen ? [0, 1, 2, 3] : [0];
-  const [tab, setTab] = useState([]);
-  const [LayoutComponent, setLayoutComponent] = useState(undefined);
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    setTab(defaultActiveTab)
-  }, [desktopScreen])
-
-  useEffect(() => {
-    if (LayoutComponent === undefined) {
-      const myManager = getLayoutManagerInstance();
-      if (myManager) {
-        myManager.enableMinimize = true
-        setLayoutComponent(myManager.getComponent());
-      }
-    }
-  }, [store])
-
-  useEffect(() => {
-    dispatch(addWidget(threeDCanvasWidget));
-    dispatch(addWidget(stackViewerWidget));
-    dispatch(addWidget(sideBarWidget(sidebarOpen, setSidebarOpen)));
-  }, [sidebarOpen, setSidebarOpen])
-
-
   const handleTabSelect = (id) => {
     setTab([id])
   }
+
+  const mainContent = (
+    <>
+      <>
+        <Box p={2} sx={{
+          display: 'flex',
+          position: 'relative',
+          width: '100%',
+          height: '90vh',
+        }}>
+          {LayoutComponent === undefined ? <CircularProgress/> : <LayoutComponent/>}
+        </Box>
+      </>
+    </>
+  )
 
   return (
     <>
@@ -107,24 +124,57 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
         ) : null}
       </MediaQuery>
 
+      <Box
+        display='flex'
+        flexWrap='wrap'
+        alignItems='flex-start'
+        gap={1}
+        sx={{
+          ...classes.tabContent,
+          position: {
+            lg: 'relative'
+          },
+          paddingTop: {
+            lg: 1
+          },
+          paddingRight: {
+            lg: 1
+          },
+          pb: {
+            xs: 7,
+            sm: 9,
+            lg: 0
+          },
+          overflow: {
+            xs: 'auto',
+            md: 'visible'
+          },
+          height: {
+            xs: !bottomNav ? 'calc(100vh - 8.8125rem)' : 'calc(100vh - 6.0625rem)',
+            lg: 'calc(100vh - 6rem)'
+          },
+        }}
+      >
         {desktopScreen ? (
           <>
-            <Box p={2} sx={{
-              display: 'flex',
-              position: 'relative',
-              width: '100%',
-              height: '90vh',
-            }}>
-              {LayoutComponent === undefined ? <CircularProgress/> : <LayoutComponent/>}
-            </Box>
+            {mainContent}
+            {bottomNav === 0 && <VFBUploader open={true} setBottomNav={setBottomNav} />}
+            {bottomNav === 1 && <VFBDownloadContents open={true} setBottomNav={setBottomNav} />}
+            {bottomNav === 2 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} />}
           </>
-          ) : (
-              <>
-                <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} />
-              </>
-          )}
-      </>
-    )
+        ) : (
+          <>
+            {
+              bottomNav != 2 && mainContent
+            }
+            {bottomNav === 0 && <VFBUploader open={true} setBottomNav={setBottomNav} />}
+            {bottomNav === 1 && <VFBDownloadContents open={true} setBottomNav={setBottomNav} />}
+            {bottomNav === 2 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} />}
+          </>
+        )}
+      </Box>
+    </>
+  )
 };
 
 export default MainLayout;

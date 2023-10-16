@@ -24,22 +24,6 @@ export const stackViewerWidget = {
     }
 };
 
-export const sideBarWidget = (sidebarOpen, setSidebarOpen) => {
-  return { 
-    id: 'sideBar',
-    name: "Side Bar Widget",
-    component: "sideBar",
-    panelName: "left",
-    enableClose: false,
-    hideOnClose: false,
-    status: WidgetStatus.ACTIVE,
-    props:{
-      open: sidebarOpen,
-      setOpen: setSidebarOpen
-    }
-  }
-};
-
 export const roiBrowserWidget = {
   id: 'roiBrowser',
   name: "ROI Browser",

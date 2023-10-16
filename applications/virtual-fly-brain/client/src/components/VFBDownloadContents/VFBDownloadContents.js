@@ -125,7 +125,7 @@ const theme = createMuiTheme({
 const VFBDownloadContents = (props) => {
 
   const [state,setState] = React.useState({
-    open: props.open,
+    open: props?.open,
     typesChecked: [],
     downloadError: false,
     downloading: false,
@@ -139,7 +139,7 @@ const VFBDownloadContents = (props) => {
   const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances)
 
   const handleCloseDialog = () => {
-    props.setBottomNav('');
+    props?.setBottomNav('');
     setState({ ...state, open: false });
   }
 
@@ -170,7 +170,19 @@ const VFBDownloadContents = (props) => {
       json.entries = json.entries.concat(filemeta);
     });
 
-    json.entries.length > 0 ? requestZipDownload(json) : setState({ downloadError : true, errorMessage : configuration.text.noEntriesFound });
+    json.entries.length > 0 ? requestZipDownload(json) : setState({...state, open: true, downloadError : true, errorMessage : configuration.text.noEntriesFound });
+  }
+
+  const handleReset = () => {
+    props?.setBottomNav('');
+    setState({
+      ...state, 
+      open: true,
+      variables : getAllLoadedVariables(),
+      downloadError : false,
+      downloading : false, 
+      errorMessage : "" 
+    })
   }
 
   /**
@@ -229,7 +241,7 @@ const VFBDownloadContents = (props) => {
         link.click();
         setTimeout(
           () =>{
-            props.setBottomNav('');
+            props?.setBottomNav('');
             setState({
               ...state,
               downloading: false,
@@ -240,11 +252,14 @@ const VFBDownloadContents = (props) => {
         );
       })
       .catch((error) => {
+        props?.setBottomNav('');
         setState({
           ...state,
           downloadError: true,
           downloading: false,
-          errorMessage : props.classes.errorMessage
+          downloadEnabled : true,
+          open : true,
+          errorMessage : props?.classes.errorMessage
         });
       });
   }
@@ -311,7 +326,7 @@ const VFBDownloadContents = (props) => {
           open={state.open}
           onClose={handleCloseDialog}
           aria-labelledby="max-width-dialog-title"
-          classes={{ root: props.classes.dialog }}
+          classes={{ root: props?.classes.dialog }}
           id="downloadContents"
         >
           <DialogTitle
@@ -321,7 +336,7 @@ const VFBDownloadContents = (props) => {
           >
             <Typography variant="h2">{configuration.text.title}</Typography>
           </DialogTitle>
-          <DialogContent key="dialog-contents" classes={{ root: props.classes.dialogContent }}>
+          <DialogContent key="dialog-contents" classes={{ root: props?.classes.dialogContent }}>
             { !state.downloadError ? (
               <Grid container textAlign="center" spacing={2}>
                 <Grid item xs={12}>
@@ -340,7 +355,7 @@ const VFBDownloadContents = (props) => {
                             textAlign="center"
                             className={
                               state.typesChecked.indexOf(key) !== -1
-                                ? props.classes.checkedBox
+                                ? props?.classes.checkedBox
                                 : null
                             }
                             p={2}
@@ -362,7 +377,7 @@ const VFBDownloadContents = (props) => {
                               inputProps={{ "aria-labelledby": labelId }}
                               disabled={state.downloading}
                               disableRipple
-                              className={props.classes.checked}
+                              className={props?.classes.checked}
                               id={option.id}
                             />
                           </Box>
@@ -400,7 +415,7 @@ const VFBDownloadContents = (props) => {
                                       )
                                     }
                                     disableRipple
-                                    className={props.classes.checked}
+                                    className={props?.classes.checked}
                                     id={ALL_INSTANCES.id}
                                   />
                                 }
@@ -431,7 +446,7 @@ const VFBDownloadContents = (props) => {
                                             node
                                           )
                                         }
-                                        className={props.classes.checked}
+                                        className={props?.classes.checked}
                                         id={"Download_" + node.id}
                                       />
                                     }
@@ -458,12 +473,12 @@ const VFBDownloadContents = (props) => {
               </Grid>
             )
               : (
-                <Grid className={props.classes.error} container textAlign="center" spacing={4}>
+                <Grid className={props?.classes.error} container textAlign="center" spacing={4}>
                   <Grid align="center" item xs={12}>
                     <i className="fa fa-info-circle"/>
                   </Grid>  
                   <Grid item xs={12}>
-                    <Typography className={props.classes.errorMessage} align="left" variant="error">
+                    <Typography className={props?.classes.errorMessage} align="left" variant="error">
                       {state.errorMessage}
                     </Typography>
                   </Grid>
@@ -477,14 +492,14 @@ const VFBDownloadContents = (props) => {
               autoFocus
               onClick={handleCloseDialog}
               color="primary"
-              className={props.classes.customizedButton}
+              className={props?.classes.customizedButton}
             >
               <CloseIcon />
             </IconButton>
             { !state.downloadError ? (
               <Grid
                 container
-                classes={{ root: props.classes.footer }}
+                classes={{ root: props?.classes.footer }}
                 spacing={2}
               >
                 <Grid item xs={6}>
@@ -499,7 +514,7 @@ const VFBDownloadContents = (props) => {
                 <Grid item xs={6}>
                   <Button
                     fullWidth
-                    classes={{ root: props.classes.downloadButton }}
+                    classes={{ root: props?.classes.downloadButton }}
                     disabled={!state.downloadEnabled}
                     onClick={handleDownload}
                     variant="contained"
@@ -509,7 +524,7 @@ const VFBDownloadContents = (props) => {
                       <CircularProgress size={18} />
                     ) : (
                       <Typography
-                        classes={{ root: props.classes.downloadButtonText }}
+                        classes={{ root: props?.classes.downloadButtonText }}
                         variant="button"
                       >
                         {configuration.text.downloadButton}
@@ -522,17 +537,17 @@ const VFBDownloadContents = (props) => {
               : ( 
                 <Grid
                   container
-                  classes={{ root: props.classes.errorFooter }}
+                  classes={{ root: props?.classes.errorFooter }}
                   spacing={12}
                 >
                   <Grid item xs={12}>
                     <Button
                       fullWidth
-                      classes={{ root: props.classes.downloadErrorButton }}
-                      onClick={() => setState({ downloadError : false })}
+                      classes={{ root: props?.classes.downloadErrorButton }}
+                      onClick={handleReset}
                       color="primary"
                     >
-                      <Typography classes={{ root: props.classes.error }} variant="button"><i className="fa fa-refresh"/>  {configuration.text.tryAgainButton}</Typography>
+                      <Typography classes={{ root: props?.classes.error }} variant="button"><i className="fa fa-refresh"/>  {configuration.text.tryAgainButton}</Typography>
                     </Button>
                   </Grid>
                 </Grid>

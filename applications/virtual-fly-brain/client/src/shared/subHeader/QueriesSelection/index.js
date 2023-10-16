@@ -7,7 +7,7 @@ const queryBuilderDatasourceConfig = require('../../../components/configuration/
 
 const { searchHeadingColor, searchBoxBg, primaryBg, whiteColor, queryBorderColor } = vars;
 
-export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSearch }) => {
+export const QueriesSelection = ({ checkResults, handleChipDelete, recentSearch }) => {
   const [searchQueries, setSearchQueries] = React.useState([]);
   const [popoverAnchorEl, setPopoverAnchorEl] = React.useState(null);
   const [selectedOption, setSelectedOption] = React.useState({ count : 0});
@@ -17,12 +17,13 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
   }, [recentSearch])
 
   const deleteQuery = (event) => {
-    let queries = searchQueries.filter( q => event.currentTarget.id !== q.label);
-    setSearchQueries(queries);
-    handleQueryDeletion(event.currentTarget.id);
-    delete selectedOption[event.currentTarget.id];
-    let updateSelection = selectedOption;
-    setSelectedOption(updateSelection)
+    let updateSelection = {...selectedOption};
+    let updateCount = selectedOption.count - 
+      selectedOption[event.currentTarget.id]?.count ? selectedOption[event.currentTarget.id]?.count : 0 ;
+    delete updateSelection[event.currentTarget.id];
+    updateSelection.count = updateCount;
+    handleChipDelete(event.currentTarget.id)
+    setSelectedOption(updateSelection);
   }
   const popoverHandleClick = (event) => {
     setSelectedQueryIndex(event.target.parentElement.id || event.target.id)
@@ -31,8 +32,8 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
 
   const handleSelect = (option, query) => {
     let count = 0;
-    if ( query.queries?.Examples && !selectedOption[query.short_form]) {
-      count = Object.keys(query.queries?.Examples)?.length;
+    if ( query?.queries?.Examples && !selectedOption[query?.short_form]) {
+      count = Object.keys(query?.queries?.Examples)?.length;
     }
     Object.keys(selectedOption)?.forEach( o => {
       if ( typeof selectedOption[o] === 'object' ) {
@@ -119,7 +120,7 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
               }
             }}
             key={option.short_form}
-            id={option.label}
+            id={option.short_form}
             onClick={deleteQuery}
           >
             <Delete size={12} />

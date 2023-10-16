@@ -183,7 +183,7 @@ export default function SearchBuilder(props) {
 
   const handleChipDelete = (label) => {
     handleQueryDeletion(label)
-    let filtered = value.filter((chip) => chip.label !== label);
+    let filtered = value.filter((chip) => chip.short_form !== label);
     setValue(filtered);
     if ( filtered.length == 0 || ( filtered.length === 1 && value.find( v => v.label === QUERIES ))){
       setGroupedOptions([]);
@@ -191,7 +191,7 @@ export default function SearchBuilder(props) {
   }
 
   const handleQueryDeletion = (label) => {
-    let option = value.find((chip) => chip.label === label);
+    let option = value.find((chip) => chip.short_form === label);
     deleteQuery(option);
   }
 
@@ -297,7 +297,7 @@ export default function SearchBuilder(props) {
           className='scrollbar'
           {...getListboxProps()}
         >
-          { value.find( v => v.label === QUERIES ) && queries.length >= 1 ? (<QueriesSelection checkResults={checkResults} handleQueryDeletion={handleQueryDeletion} recentSearch={queries}/>) : null }
+          { value.find( v => v.label === QUERIES ) && queries.length >= 1 ? (<QueriesSelection checkResults={checkResults} handleChipDelete={handleChipDelete} recentSearch={queries}/>) : null }
 
           {/* { groupedOptions.length >=1 ? <NarrowSearchFilter chipColors={chipColors} groupedOptions={groupedOptions}/> :null } */}
 

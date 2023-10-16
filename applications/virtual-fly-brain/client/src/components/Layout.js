@@ -38,6 +38,9 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
 
   useEffect(() => {
     setTab(defaultActiveTab)
+    if (!desktopScreen) {
+      setBottomNav(2)
+    }
   }, [desktopScreen])
 
   const classes = {
@@ -87,19 +90,19 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
       )}
 
       {tab.includes(2) && (
-          <StackViewer 
-            id="NewStackViewer"
-            defHeight={600}
-            defWidth={300}
-          />
-        )}
+        <StackViewer
+          id="NewStackViewer"
+          defHeight={600}
+          defWidth={300}
+        />
+      )}
 
       {tab.includes(3) && (
-          <ROIBrowser 
-            id="roiBrowser"
-            size={{ height: 600, width: 300 }}
-          />
-        )}
+        <ROIBrowser
+          id="roiBrowser"
+          size={{ height: 600, width: 300 }}
+        />
+      )}
     </>
   )
 
@@ -156,9 +159,14 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
             {bottomNav === 2 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} />}
           </>
         ) : (
-            <>
-              <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} />
-            </>
+          <>
+            {
+              bottomNav != 2 && tabContent
+            }
+            {bottomNav === 0 && <VFBUploader open={true} setBottomNav={setBottomNav} />}
+            {bottomNav === 1 && <VFBDownloadContents open={true} setBottomNav={setBottomNav} />}
+            {bottomNav === 2 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} />}
+          </>
         )}
       </Box>
     </>

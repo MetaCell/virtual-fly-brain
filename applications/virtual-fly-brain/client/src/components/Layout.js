@@ -111,7 +111,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
 
       {tab.includes(1) && (
         // TODO the styling is just temporary, needs to be fixed
-        <Box sx={{ height: '900px'}}>
+        <Box>
           {LayoutComponent === undefined ? <CircularProgress/> : <LayoutComponent/>}
         </Box>
       )}

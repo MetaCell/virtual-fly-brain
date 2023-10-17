@@ -8,7 +8,6 @@ import Images from "./Images";
 import StackViewer from './StackViewer';
 import ROIBrowser from './ROIBrowser/ROIBrowser';
 import vars from "../theme/variables";
-import SideBar from "../shared/sidebar";
 import Circuit from "./Circuit";
 import StackViewerComponent from "./StackViewerComponent";
 import VFBDownloadContents from "./VFBDownloadContents/VFBDownloadContents";
@@ -82,7 +81,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
   const tabContent = (
     <>
       {tab.includes(0) && (
-        <SideBar open={sidebarOpen} setOpen={setSidebarOpen} />
+        <TermInfo open={sidebarOpen} setOpen={setSidebarOpen} />
       )}
 
       {tab.includes(1) && (

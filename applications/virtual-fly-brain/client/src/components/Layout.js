@@ -1,8 +1,8 @@
 
 import React, { useEffect, useState } from "react";
+import { useDispatch, useStore } from 'react-redux';
 import MediaQuery from 'react-responsive';
-import { Box, Button, useMediaQuery, useTheme } from "@mui/material";
-import ThreeDCanvas from "./ThreeDCanvas"
+import { Box, Button, useMediaQuery, useTheme, CircularProgress } from "@mui/material";import ThreeDCanvas from "./ThreeDCanvas"
 import TermInfo from "./TermInfo"
 import Images from "./Images";
 import StackViewer from './StackViewer';
@@ -14,6 +14,10 @@ import StackViewerComponent from "./StackViewerComponent";
 import VFBDownloadContents from "./VFBDownloadContents/VFBDownloadContents";
 import VFBUploader from "./VFBUploader/VFBUploader";
 import QueryBuilder from "./queryBuilder";
+import { getLayoutManagerInstance } from "@metacell/geppetto-meta-client/common/layout/LayoutManager";
+import { addWidget } from '@metacell/geppetto-meta-client/common/layout/actions';
+import { threeDCanvasWidget, stackViewerWidget, sideBarWidget, roiBrowserWidget } from "./layout/widgets";
+import store from "../store";
 const {
   secondaryBg,
   headerBorderColor,
@@ -35,6 +39,8 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
   const desktopScreen = useMediaQuery(theme.breakpoints.up('lg'));
   const defaultActiveTab = desktopScreen ? [0, 1, 2, 3] : [0];
   const [tab, setTab] = useState([]);
+  const [LayoutComponent, setLayoutComponent] = useState(undefined);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     setTab(defaultActiveTab)
@@ -42,6 +48,24 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
       setBottomNav(2)
     }
   }, [desktopScreen])
+
+  useEffect(() => {
+    if (LayoutComponent === undefined) {
+      const myManager = getLayoutManagerInstance();
+      if (myManager) {
+        myManager.enableMinimize = true
+        setLayoutComponent(myManager.getComponent());
+      }
+    }
+  }, [store])
+
+  useEffect(() => {
+    dispatch(addWidget(threeDCanvasWidget));
+    // TODO: fix stack viewer
+    // dispatch(addWidget(stackViewerWidget));
+    //dispatch(addWidget(sideBarWidget(sidebarOpen, setSidebarOpen)));
+    dispatch(addWidget(roiBrowserWidget));
+  }, [sidebarOpen, setSidebarOpen])
 
   const classes = {
     tabs: {
@@ -86,22 +110,10 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
       )}
 
       {tab.includes(1) && (
-        <ThreeDCanvas />
-      )}
-
-      {tab.includes(2) && (
-        <StackViewer
-          id="NewStackViewer"
-          defHeight={600}
-          defWidth={300}
-        />
-      )}
-
-      {tab.includes(3) && (
-        <ROIBrowser
-          id="roiBrowser"
-          size={{ height: 600, width: 300 }}
-        />
+        // TODO the styling is just temporary, needs to be fixed
+        <Box>
+          {LayoutComponent === undefined ? <CircularProgress/> : <LayoutComponent/>}
+        </Box>
       )}
     </>
   )

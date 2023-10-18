@@ -17,8 +17,8 @@ module.exports = function webpacking(envVariables) {
   }
 
   const API_URL = {
-    production: JSON.stringify('http://localhost:8080/'),
-    development: JSON.stringify('http://localhost:8080/')
+    production: JSON.stringify('https://vfb.dev.metacell.us/'),
+    development: JSON.stringify('https://vfb.dev.metacell.us/')
   }
   
   // check environment mode

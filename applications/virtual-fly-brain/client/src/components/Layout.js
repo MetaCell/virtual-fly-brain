@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import MediaQuery from 'react-responsive';
 import { Box, Button, useMediaQuery, useTheme } from "@mui/material";
 import ThreeDCanvas from "./ThreeDCanvas"
+import VFBGraph from "./VFBGraph";
 import TermInfo from "./TermInfo"
 import Images from "./Images";
 import StackViewer from './StackViewer';
@@ -89,7 +90,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
           //   defHeight={600}
           //   defWidth={600}
           // />
-          <VFBCircuitBrowser />
+          <VFBGraph />
         )}
 
       {tab.includes(3) && (

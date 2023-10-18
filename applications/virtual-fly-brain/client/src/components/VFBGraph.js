@@ -33,7 +33,7 @@ class VFBGraph extends Component {
     super(props);
     this.state = {
       graph : { nodes : [], links : [] },
-      currentQuery : this.props.instance != null ? this.props.instance : { id : "" , name : "" },
+      currentQuery : this.props.instance != null ? this.props.instance : { id : "VFB_00102107" , name : "VFB_00102107" },
       dropDownAnchorEl : null,
       optionsIconColor : stylingConfiguration.defaultRefreshIconColor,
       reload : false
@@ -341,16 +341,16 @@ class VFBGraph extends Component {
    * Re-render graph with a new instance
    */
   updateGraph () {
-    var idToSearch = this.focusedInstance.id;
-    var instanceName = this.focusedInstance.name;
+    var idToSearch = 'VFB_00102107'; //this.focusedInstance.id;
+    var instanceName = 'VFB_00102107'; //this.focusedInstance.name;
     /*
      * function handler called by the VFBMain whenever there is an update of the instance on focus,
      * this will reflect and move to the node (if it exists) that we have on focus.
      */
-    if (this.focusedInstance?.getParent() !== null) {
-      idToSearch = this.focusedInstance?.getParent()?.id;
-      instanceName = this.focusedInstance?.getParent()?.name;
-    }
+    // if (this.focusedInstance?.getParent() !== null) {
+    //   idToSearch = this.focusedInstance?.getParent()?.id;
+    //   instanceName = this.focusedInstance?.getParent()?.name;
+    // }
 
     if (this.__isMounted){
       // Show loading spinner while cypher query search occurs
@@ -365,9 +365,9 @@ class VFBGraph extends Component {
    * Perform a cypher query to retrieve graph for instance
    */
   queryResults (requestQuery, instance) {
-    if ( this.queryRequests.includes(instance.id) ) {
-      return;
-    }
+    // if ( this.queryRequests.includes(instance.id) ) {
+    //   return;
+    // }
 
     var url = restPostConfig.url;
 
@@ -383,56 +383,37 @@ class VFBGraph extends Component {
     let self = this;
 
     // Axios HTTP Post request with cypher query
-    axios({
-      method: 'post',
-      url: url,
-      headers: { 'content-type': contentType },
-      data: request,
-    }).then( (response) => {
-      var blob = new Blob(["onmessage = " + queryParser ]);
-      var blobUrl = window.URL.createObjectURL(blob);
+    // axios({
+    //   method: 'post',
+    //   url: url,
+    //   headers: { 'content-type': contentType },
+    //   data: request,
+    // })
+    // .then((response) => {
+    //   if (response.data?.results?.length > 0) {
+    //     self.loading = false;
+    //     self.firstLoad = false;
+    //     // const query = { id: response.data.params.instance.id, name: response.data.params.instance.name };
+    //     // const index = self.queryRequests.indexOf(instance.id);
 
-      var worker = new Worker(blobUrl);
-      worker.onmessage = function (e) {
-        switch (e.data.resultMessage) {
-        case "OK":
-          self.loading = false;
-          self.firstLoad = false;
-          var query = query = { id : e.data.params.instance.id , name : e.data.params.instance.name };
-          var index = self.queryRequests.indexOf(instance.id);
-          // Remove ID from list of requests, needs to be reset
-          if ( index != -1 ){
-            self.queryRequests.splice(index, 1);
-          }
-          // Update state with results and current query
-          self.setState( { graph : e.data.params.results, currentQuery : query });
-          self.objectsLoaded = e.data.params.results.nodes.length;
-          // Reset camera after loading new graph
-          setTimeout( () => {
-            self.resetCamera();
-            if ( self.graphRef.current !== null ) {
-              self.graphRef.current.ggv.current.d3Force('charge').strength(-(self.objectsLoaded * 100 ))
-            }
-          }, 0);
-          break;
-        }
-      };
-      // Add ID to list of query requests made
-      self.queryRequests.push(instance.id);
-      
-      let params = {
-        results: response.data,
-        value: instance,
-        configuration : configuration,
-        NODE_WIDTH : NODE_WIDTH,
-        NODE_HEIGHT : NODE_HEIGHT
-      }
-      // Invoke web worker to perform conversion of graph data into format
-      worker.postMessage({ message: "refine", params: params });
-    })
-      .catch( (error)=> {
-        self.loading = false;
-      })
+    //     // if (index !== -1) {
+    //     //   self.queryRequests.splice(index, 1);
+    //     // }
+
+    //     self.setState({ graph: response.data.results[0].data[0].graph, currentQuery: {} });
+    //     self.objectsLoaded = response.data.results[0].data[0].graph.nodes.length;
+
+    //     setTimeout(() => {
+    //       self.resetCamera();
+    //       if (self.graphRef.current !== null) {
+    //         self.graphRef.current.ggv.current.d3Force('charge').strength(-(self.objectsLoaded * 100));
+    //       }
+    //     }, 0);
+    //   }
+    // })
+    // .catch((error) => {
+    //   self.loading = false;
+    // });
   }
 
   /**
@@ -687,8 +668,9 @@ class VFBGraph extends Component {
 function mapStateToProps (state) {
   return {
     graphQueryIndex : state.graph.graphQueryIndex,
+    currentQuery: { id: 'VFB_00102107' },
     sync : state.graph.sync,
-    instanceOnFocus : state.graph.instanceOnFocus
+    instanceOnFocus : { id: 'VFB_00102107' }, //state.graph.instanceOnFocus
   }
 }
 

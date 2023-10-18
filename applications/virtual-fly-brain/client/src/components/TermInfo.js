@@ -13,7 +13,8 @@ import TreeView from '@mui/lab/TreeView';
 import { TreeItem } from "@mui/lab";
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import GeneralInformation from "./TermInfo/GeneralInformation";
-import RIBBON from '../assets/ribbon.png';
+import Ribbon from '@flybase/react-ontology-ribbon';
+import '@flybase/react-ontology-ribbon/dist/style.css';
 
 const {
   whiteColor,
@@ -24,6 +25,17 @@ const {
   headerBorderColor,
   primaryBg
 } = vars;
+
+const goData = [
+  { id: 'GO:12345',
+  name: 'a_go_slim_term_name',
+  descendant_terms: [
+    { id: 'GO:33333', name:'a_descendant_term_1'},
+    { id: 'GO:33334', name:'a_descendant_term_2'},
+    { id: 'GO:33335', name:'a_descendant_term_3'},
+  ]
+  }
+]; 
 
 const CustomTableContainer = styled(TableContainer)(
   ({ theme }) => `
@@ -181,7 +193,7 @@ const TermInfo = ({ open, setOpen }) => {
   }
 
   const [termInfoData, setTermInfoData] = useState(data);
-
+  console.log("termInfoData ", termInfoData)
   const termInfoHeading = (
     <>
       <Typography
@@ -222,6 +234,7 @@ const TermInfo = ({ open, setOpen }) => {
 
   // FIXME
   useEffect(() => {
+    console.log("Data ", data)
     setTermInfoData(data)
   }, [data]);
 
@@ -424,36 +437,27 @@ const TermInfo = ({ open, setOpen }) => {
                   aria-controls="panel2a-content"
                   id="panel2a-header"
                 >
-                  <Typography>Queries (28)</Typography>
+                  <Typography>Queries ({termInfoData?.Queries?.length}) </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                   <TreeView
                     aria-label="customized"
                     defaultParentIcon={<ArrowRight />}
-                    // defaultCollapseIcon={<ArrowRight />}
-                    // defaultExpandIcon={<ArrowRight />}
                     defaultEndIcon={<Line />}
                   >
                     <TreeItem nodeId="1" label={
                       <CustomBox display='flex' flexWrap='wrap'>
-                        <Typography>Neurons with postsynaptic terminals in posterior ventrolateral protocerebrum</Typography>
+                        <Typography>Types of neurons with...</Typography>
                         <Box display='flex' sx={{ zIndex: 1000 }} pl={0.5}>
                           <Typography sx={{ pr: 0.5 }}>71</Typography>
                           <ListAltIcon sx={{ fontSize: '1.25rem', color: '#A0A0A0' }} />
                         </Box>
                       </CustomBox>
                     }>
-                      <TreeItem nodeId="2" label="Hello" />
-                      <TreeItem nodeId="3" label="Subtree with children dfsf">
+                    { termInfoData?.Queries?.map( query => (
+                      <TreeItem nodeId="3" label={query.label} key={query.id}>
+                        { query.output_format === "table"?
                         <TreeItem nodeId="6" label={
-                          <>
-                            <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
-                              <Tab label="Result" {...a11yProps(0)} />
-                              <Tab label="Ribbon" {...a11yProps(1)} />
-                            </Tabs>
-
-                            <CustomTabPanel value={value} index={0}>
-                              <CustomTableContainer component={Paper}>
                                 <Table aria-label="simple table">
                                   <TableHead>
                                     <TableRow>
@@ -464,7 +468,7 @@ const TermInfo = ({ open, setOpen }) => {
                                     </TableRow>
                                   </TableHead>
                                   <TableBody>
-                                    {rows.map((row) => (
+                                  { query?.preview_results?.rows.map( row => (
                                       <TableRow
                                         key={row.name}
                                         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -473,7 +477,8 @@ const TermInfo = ({ open, setOpen }) => {
                                           <Button
                                             disableRipple
                                             variant="text"
-                                            color="info"
+                                            color="in                          <>
+                                            fo"
                                             sx={{
                                               padding: 0,
                                               minWidth: '0.0625rem',
@@ -492,8 +497,8 @@ const TermInfo = ({ open, setOpen }) => {
                                             {row.name}
                                           </Button>
                                         </TableCell>
-                                        <TableCell>{row.calories}</TableCell>
-                                        <TableCell>{row.fat}</TableCell>
+                                        <TableCell>{row.id}</TableCell>
+                                        <TableCell>{row.score}</TableCell>
                                         <TableCell>
                                           <Button variant="text" color="error">Delete</Button>
                                           {/* <Button variant="outlined" color="info">Add</Button> */}
@@ -502,56 +507,10 @@ const TermInfo = ({ open, setOpen }) => {
                                     ))}
                                   </TableBody>
                                 </Table>
-                              </CustomTableContainer>
-                            </CustomTabPanel>
-                            <CustomTabPanel value={value} index={1}>
-                              <img src={RIBBON} alt="" style={{ width: '100%' }} />
-                            </CustomTabPanel>
-                          </>
-                        } />
-                        <TreeItem nodeId="7" label="Sub-subtree with children">
-                          <TreeItem nodeId="9" label="Child 1" />
-                          <TreeItem nodeId="10" label="Child 2" />
-                          <TreeItem nodeId="11" label="Child 3" />
-                        </TreeItem>
-                        <TreeItem nodeId="8" label="Hello" />
+                         } /> : <Ribbon data={goData} /> }
                       </TreeItem>
-                      <TreeItem nodeId="3" label="Subtree with children">
-                        <TreeItem nodeId="6" label="Hello" />
-                        <TreeItem nodeId="7" label="Sub-subtree with children">
-                          <TreeItem nodeId="9" label="Child 1" />
-                          <TreeItem nodeId="10" label="Child 2" />
-                          <TreeItem nodeId="11" label="Child 3" />
-                        </TreeItem>
-                        <TreeItem nodeId="8" label="Hello" />
-                      </TreeItem>
-                      <TreeItem nodeId="4" label="World" />
-                      <TreeItem nodeId="5" label="Something something" />
-                    </TreeItem>
-
-                    <TreeItem nodeId="111" label="Main">
-                      <TreeItem nodeId="2222" label="Hello" />
-                      <TreeItem nodeId="3333" label="Subtree with children">
-                        <TreeItem nodeId="6666" label="Hello" />
-                        <TreeItem nodeId="711" label="Sub-subtree with children">
-                          <TreeItem nodeId="911" label="Child 1" />
-                          <TreeItem nodeId="1011" label="Child 2" />
-                          <TreeItem nodeId="1111" label="Child 3" />
-                        </TreeItem>
-                        <TreeItem nodeId="811" label="Hello" />
-                      </TreeItem>
-                      <TreeItem nodeId="311" label="Subtree with children">
-                        <TreeItem nodeId="611" label="Hello" />
-                        <TreeItem nodeId="7111" label="Sub-subtree with children">
-                          <TreeItem nodeId="9111" label="Child 1" />
-                          <TreeItem nodeId="10111" label="Child 2" />
-                          <TreeItem nodeId="11111" label="Child 3" />
-                        </TreeItem>
-                        <TreeItem nodeId="81111" label="Hello" />
-                      </TreeItem>
-                      <TreeItem nodeId="41111" label="World" />
-                      <TreeItem nodeId="51111" label="Something something" />
-
+                    ))
+                  }
                     </TreeItem>
                   </TreeView>
                 </AccordionDetails>

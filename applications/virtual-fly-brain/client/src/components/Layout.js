@@ -7,6 +7,7 @@ import TermInfo from "./TermInfo"
 import Images from "./Images";
 import StackViewer from './StackViewer';
 import vars from "../theme/variables";
+import VFBGraph from "./VFBGraph";
 import SideBar from "../shared/sidebar";
 import VFBCircuitBrowser from "./VFBCircuitBrowser";
 import StackViewerComponent from "./StackViewerComponent";
@@ -89,7 +90,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
           //   defHeight={600}
           //   defWidth={600}
           // />
-          <VFBCircuitBrowser />
+          <VFBGraph />
         )}
 
       {tab.includes(3) && (

@@ -122,7 +122,7 @@ class VFBGraph extends Component {
     let self = this;
 
     // Hanles the case of the first load of the graph, when is not yet visible
-    if (this.loading && this.firstLoad) {
+    if (this.firstLoad) {
       if (this.state.currentQuery.id === undefined || this.state.currentQuery.id === "" || this.state.currentQuery.id === null){
         if (this.props.instance !== null && this.props.instance !== undefined) {
           if (this.props.instance?.getParent() !== null) {
@@ -133,7 +133,7 @@ class VFBGraph extends Component {
           this.firstLoad = false;
           this.updateGraph();
         } else if (this.props.instanceOnFocus !== null && this.props.instanceOnFocus !== undefined) {
-          if (this.props.instanceOnFocus?.getParent() !== null) {
+          if (this.props.instanceOnFocus?.getParent && this.props.instanceOnFocus?.getParent() !== null) {
             this.focusedInstance = this.props.instanceOnFocus?.getParent();
           } else {
             this.focusedInstance = this.props.instanceOnFocus;
@@ -157,7 +157,7 @@ class VFBGraph extends Component {
             self.loading = true;
             let idToSearch = self.props.instanceOnFocus.id;
             let instanceName = self.props.instanceOnFocus.name;
-            if (self.props.instanceOnFocus?.getParent() !== null) {
+            if (self.props.instanceOnFocus?.getParent && self.props.instanceOnFocus?.getParent() !== null) {
               idToSearch = self.props.instanceOnFocus?.getParent().id;
               instanceName = this.focusedInstance?.getParent().name;
             }
@@ -347,7 +347,7 @@ class VFBGraph extends Component {
      * function handler called by the VFBMain whenever there is an update of the instance on focus,
      * this will reflect and move to the node (if it exists) that we have on focus.
      */
-    if (this.focusedInstance?.getParent() !== null) {
+    if (this.focusedInstance?.getParent && this.focusedInstance?.getParent() !== null) {
       idToSearch = this.focusedInstance?.getParent()?.id;
       instanceName = this.focusedInstance?.getParent()?.name;
     }
@@ -365,9 +365,9 @@ class VFBGraph extends Component {
    * Perform a cypher query to retrieve graph for instance
    */
   queryResults (requestQuery, instance) {
-    if ( this.queryRequests.includes(instance.id) ) {
-      return;
-    }
+    // if ( this.queryRequests.includes(instance.id) ) {
+    //   return;
+    // }
 
     var url = restPostConfig.url;
 
@@ -685,11 +685,25 @@ class VFBGraph extends Component {
 }
 
 function mapStateToProps (state) {
-  return {
+  let instanceOnFocus = undefined ;
+  if (state.termInfo.termInfoData !== undefined && state.termInfo.termInfoData !== null && !state.instanceOnFocus) {
+    instanceOnFocus = { id: state.termInfo.termInfoData.Id, name: state.termInfo.termInfoData.Name };
+  }
+  instanceOnFocus = state.instanceOnFocus || instanceOnFocus;
+
+  const newProps = {
     graphQueryIndex : state.graph.graphQueryIndex,
     sync : state.graph.sync,
-    instanceOnFocus : state.graph.instanceOnFocus
+    instanceOnFocus,
+    loading: instanceOnFocus !== undefined
   }
+
+  if (JSON.stringify(instanceOnFocus) !== JSON.stringify(state.graph.instanceOnFocus))
+    return newProps ;
 }
 
-export default connect(mapStateToProps, null, null)(VFBGraph);
+function mapDispatchToProps (dispatch) {
+  return { vfbGraph: (type, path, index, visible, sync) => dispatch ( { type : type, data : { instance : path, queryIndex : index, visible : visible, sync : sync } } ) }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps, null, { forwardRef : true } )(VFBGraph);

@@ -20,6 +20,20 @@ const getInstancesFailure = error => ({
   }
 });
 
+const removeInstancesSuccess = query => ({
+  type: getInstancesTypes.REMOVE_INSTANCES_SUCCESS,
+  payload: {
+    query
+  }
+});
+
+const removeInstancesFailure = error => ({
+  type: getInstancesTypes.REMOVE_INSTANCES_FAILURE,
+  payload: {
+    error
+  }
+});
+
 export const getInstanceByID = async (queryId) => {
 
   store.dispatch(getInstancesStarted())
@@ -34,4 +48,13 @@ export const getInstanceByID = async (queryId) => {
   }
 
   store.dispatch(getInstancesSuccess(response))
+}
+
+export const removeInstanceByID = async (queryId) => {
+  try {
+    store.dispatch(removeInstancesSuccess(queryId))
+  } catch (error) {
+    store.dispatch(removeInstancesFailure(error.message))
+    return
+  }
 }

@@ -22,6 +22,11 @@ const InstancesReducer = (state = initialState, response) => {
         return Object.assign({}, state, {
           error: true
         })
+      case getInstancesTypes.REMOVE_INSTANCES_SUCCESS:
+          return Object.assign({}, state, {
+            allLoadedInstances: state.allLoadedInstances?.find( i => i.Id === response.payload.query ) ? [...state.allLoadedInstances.filter(i => i.Id !== response.payload.query)] : [...state.allLoadedInstances],
+            isLoading: false
+          })
      default:
         return state;
   }

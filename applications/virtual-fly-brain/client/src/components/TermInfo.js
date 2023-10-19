@@ -1,4 +1,4 @@
-import { Box, Button, ButtonGroup, Grid, IconButton, Menu, MenuItem, Paper, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tabs, Typography } from "@mui/material";
+import { Box, Button, ButtonGroup, Grid, IconButton, Menu, MenuItem, Table, TableBody, TableCell, Paper, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from 'react-redux'
 import { styled } from '@mui/material/styles';
@@ -13,6 +13,8 @@ import TreeView from '@mui/lab/TreeView';
 import { TreeItem } from "@mui/lab";
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import GeneralInformation from "./TermInfo/GeneralInformation";
+import { getInstanceByID, removeInstanceByID } from './../reducers/actions/instances';
+import { termInfoById } from "./../reducers/actions/termInfo";
 import Ribbon from '@flybase/react-ontology-ribbon';
 import '@flybase/react-ontology-ribbon/dist/style.css';
 
@@ -26,16 +28,16 @@ const {
   primaryBg
 } = vars;
 
-const goData = [
-  { id: 'GO:12345',
-  name: 'a_go_slim_term_name',
-  descendant_terms: [
-    { id: 'GO:33333', name:'a_descendant_term_1'},
-    { id: 'GO:33334', name:'a_descendant_term_2'},
-    { id: 'GO:33335', name:'a_descendant_term_3'},
-  ]
-  }
-]; 
+const getRibbonData = (query) => {
+  let terms = query?.preview_results?.rows?.map( row => (
+    { id: row.Neurotransmitter,
+      name: row.Neurotransmitter,
+      descendant_terms: [row.Weight]
+    }
+  ));
+  console.log("Terms ", terms)
+  return terms; 
+}
 
 const CustomTableContainer = styled(TableContainer)(
   ({ theme }) => `
@@ -116,6 +118,7 @@ const TermInfo = ({ open, setOpen }) => {
 
   const data = useSelector(state => state.termInfo.termInfoData)
   const error = useSelector(state => state.termInfo.error)
+  const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances)
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -126,6 +129,20 @@ const TermInfo = ({ open, setOpen }) => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  const deleteId = (id) => {
+    removeInstanceByID(id)
+  }
+  const addId = (id) => {
+    getInstanceByID(id);
+  }
+
+  const handleTermClick = (term, evt) => {
+    const regExp = /\(([^)]+)\)/g;
+    const matches = [...term.id.matchAll(regExp)].flat();
+    termInfoById(matches[0]);
+  }
+
   const classes = {
     root: {
       // transition: 'all ease-in-out .3s',
@@ -193,7 +210,6 @@ const TermInfo = ({ open, setOpen }) => {
   }
 
   const [termInfoData, setTermInfoData] = useState(data);
-  console.log("termInfoData ", termInfoData)
   const termInfoHeading = (
     <>
       <Typography
@@ -222,21 +238,14 @@ const TermInfo = ({ open, setOpen }) => {
     return { name, calories, fat, carbs, protein };
   }
 
-  const rows = [
-    createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-    createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-    createData('Eclair', 262, 16.0, 24, 6.0),
-    createData('Cupcake', 305, 3.7, 67, 4.3),
-    createData('Gingerbread', 356, 16.0, 49, 3.9),
-  ];
-
-  const MAX_LENGTH = 40;
-
   // FIXME
   useEffect(() => {
-    console.log("Data ", data)
     setTermInfoData(data)
   }, [data]);
+
+  useEffect(() => {
+    setTermInfoData(data)
+  }, [allLoadedInstances])
 
   return (
     <Box
@@ -449,15 +458,26 @@ const TermInfo = ({ open, setOpen }) => {
                       <CustomBox display='flex' flexWrap='wrap'>
                         <Typography>Types of neurons with...</Typography>
                         <Box display='flex' sx={{ zIndex: 1000 }} pl={0.5}>
-                          <Typography sx={{ pr: 0.5 }}>71</Typography>
+                          <Typography sx={{ pr: 0.5 }}>{termInfoData?.Queries?.reduce((n, {count}) => n + count, 0)}</Typography>
                           <ListAltIcon sx={{ fontSize: '1.25rem', color: '#A0A0A0' }} />
                         </Box>
                       </CustomBox>
                     }>
                     { termInfoData?.Queries?.map( query => (
-                      <TreeItem nodeId="3" label={query.label} key={query.id}>
-                        { query.output_format === "table"?
-                        <TreeItem nodeId="6" label={
+                         query.output_format === "table"?
+                        (
+                          <TreeItem nodeId={query.label} label={
+                            <CustomBox display='flex' flexWrap='wrap'>
+                              <Typography>{query.label}</Typography>
+                              <Box display='flex' sx={{ zIndex: 1000 }} pl={0.5}>
+                                <Typography sx={{ pr: 0.5 }}>{query.count}</Typography>
+                                <ListAltIcon sx={{ fontSize: '1.25rem', color: '#A0A0A0' }} />
+                              </Box>
+                            </CustomBox>
+                          }>
+                          <TreeItem label={
+                                <>
+                                <TableContainer component={Paper}>
                                 <Table aria-label="simple table">
                                   <TableHead>
                                     <TableRow>
@@ -477,8 +497,7 @@ const TermInfo = ({ open, setOpen }) => {
                                           <Button
                                             disableRipple
                                             variant="text"
-                                            color="in                          <>
-                                            fo"
+                                            color="info"
                                             sx={{
                                               padding: 0,
                                               minWidth: '0.0625rem',
@@ -494,21 +513,37 @@ const TermInfo = ({ open, setOpen }) => {
                                               }
                                             }}
                                           >
-                                            {row.name}
+                                            {row.id}
                                           </Button>
                                         </TableCell>
-                                        <TableCell>{row.id}</TableCell>
+                                        <TableCell>{row.name}</TableCell>
                                         <TableCell>{row.score}</TableCell>
                                         <TableCell>
-                                          <Button variant="text" color="error">Delete</Button>
-                                          {/* <Button variant="outlined" color="info">Add</Button> */}
+                                          { allLoadedInstances?.find( instance => instance.Id === row.id) ?
+                                            <Button variant="text" onClick={() => deleteId(row.id)} color="error">Delete</Button>
+                                            :
+                                            <Button variant="text" onClick={() => addId(row.id)} color="success">Add</Button>
+                                          }
                                         </TableCell>
                                       </TableRow>
                                     ))}
                                   </TableBody>
                                 </Table>
-                         } /> : <Ribbon data={goData} /> }
-                      </TreeItem>
+                                </TableContainer>
+                                </>
+                         } /></TreeItem>) 
+                         : 
+                         (<TreeItem nodeId={query.label} label={
+                            <CustomBox display='flex' flexWrap='wrap'>
+                              <Typography>{query.label}</Typography>
+                              <Box display='flex' sx={{ zIndex: 1000 }} pl={0.5}>
+                                <Typography sx={{ pr: 0.5 }}>{query.count}</Typography>
+                                <ListAltIcon sx={{ fontSize: '1.25rem', color: '#A0A0A0' }} />
+                              </Box>
+                            </CustomBox>
+                          }>
+                            <Ribbon onTermClick={handleTermClick} data={getRibbonData(query)} />
+                          </TreeItem>)
                     ))
                   }
                     </TreeItem>

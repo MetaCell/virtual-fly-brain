@@ -4,12 +4,14 @@ import { ChromePicker } from "react-color";
 import { MuiThemeProvider } from "@material-ui/core/styles";
 import Tree from "./Tree";
 import CircularProgress from "@mui/material/CircularProgress";
+import IconButton from "@mui/material/IconButton";
 import Box from "@mui/material/Box";
 import Tooltip from "@mui/material/Tooltip";
 import axios from 'axios';
 import vars from "../../theme/variables";
 import { useSelector, connect } from "react-redux";
 import { termInfoById } from "../../reducers/actions/termInfo";
+import { getInstanceByID } from '../../reducers/actions/instances';
 import theme from "../../theme/index";
 const {
     secondaryBg,
@@ -79,6 +81,7 @@ const ROIBrowser = (props) => {
                 }
               })
               .then((response) => {
+                console.log("Response data ", response.data)
                 resolve(response.data);
               })
               .catch((error) => {
@@ -188,7 +191,6 @@ const ROIBrowser = (props) => {
              * var treeData = this.state.dataTree;
              * this.updateSubtitle(treeData, instance.instanceId);
              */
-            console.log("Node selected ", instance)
             setState({ ...state, nodeSelected : instance });
         }
     };
@@ -243,7 +245,6 @@ const ROIBrowser = (props) => {
              * to the react-sortable-tree since it understands this data structure
              */
             if (data.errors.length > 0) {
-                console.log("-- ERROR TREE COMPONENT --");
                 console.log(data.errors);
                 setState({ ...state, errors : "Error retrieving the data - check the console for additional information"});
             }
@@ -329,14 +330,8 @@ const ROIBrowser = (props) => {
             rowInfo.node.instanceId.indexOf("VFB_") > -1
         ) {
             fillCondition = "3dAvailable";
-            for (let i = 1; i < Instances.length; i++) {
-                if (
-                    Instances[i].id !== undefined &&
-                    Instances[i].id === rowInfo.node.instanceId
-                ) {
-                    instanceLoaded = true;
-                    break;
-                }
+            if (Instances[rowInfo.node.instanceId]) {
+                instanceLoaded = true;
             }
             if (!instanceLoaded) {
                 fillCondition = "3dToLoad";
@@ -355,52 +350,52 @@ const ROIBrowser = (props) => {
         switch (fillCondition) {
             case "3dToLoad":
                 buttons.push(
+                    <IconButton color="primary" aria-label="delete" size="small" onClick={(e) => {
+                        e.stopPropagation();
+                        termInfoById(rowInfo.node.instanceId);
+                        getInstanceByID(rowInfo.node.instanceId);
+                        setState({ ...state, nodeSelected : rowInfo.node });
+                    }}>
                     <i
                         className="fa fa-eye-slash"
                         aria-hidden="true"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            // rowInfo.node.subtitle = rowInfo.node.instanceId;
-                            // TODO : Connect selection handler
-                            //props.selectionHandler(rowInfo.node.instanceId);
-                            setState({ ...state, nodeSelected : rowInfo.node });
-                        }}
                     />
+                    </IconButton>
                 );
                 break;
             case "3dHidden":
                 buttons.push(
-                    <i
-                        className="fa fa-eye-slash"
+                    <IconButton aria-label="delete" size="small" onClick={(e) => {
+                        e.stopPropagation();
+                        if (Instances[rowInfo.node.instanceId]?.getParent() !== null) {
+                            Instances[rowInfo.node.instanceId]?.getParent().show();
+                        } else {
+                            Instances[rowInfo.node.instanceId]?.show();
+                        }
+                        setState({ ...state, nodeSelected : rowInfo.node });
+                    }}>
+                     <i className="fa fa-eye-slash"
                         aria-hidden="true"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            if (Instances[rowInfo.node.instanceId]?.getParent() !== null) {
-                                Instances[rowInfo.node.instanceId]?.getParent().show();
-                            } else {
-                                Instances[rowInfo.node.instanceId]?.show();
-                            }
-                            setState({ ...state, nodeSelected : rowInfo.node });
-                        }}
                     />
+                    </IconButton>
                 );
                 break;
             case "3dVisible":
                 var color = Instances[rowInfo.node.instanceId].getColor();
                 buttons.push(
-                    <i
-                        className="fa fa-eye"
-                        aria-hidden="true"
-                        onClick={(e) => {
-                            e.stopPropagation();
+                    <IconButton aria-label="delete" size="small" onClick={(e) => {
+                        e.stopPropagation();
                             if (Instances[rowInfo.node.instanceId]?.getParent() !== null) {
                                 Instances[rowInfo.node.instanceId]?.getParent().hide();
                             } else {
                                 Instances[rowInfo.node.instanceId].hide();
                             }
                             setState({ ...state, nodeSelected : rowInfo.node });
-                        }}
+                    }}>
+                     <i className="fa fa-eye-slash"
+                        aria-hidden="true"
                     />
+                    </IconButton>
                 );
                 buttons.push(
                     <span
@@ -488,22 +483,18 @@ const ROIBrowser = (props) => {
                                 e.stopPropagation();
                                 colorPickerContainer = undefined;
                                 let instanceFound = false;
-                                for (let i = 0; i < Instances.length; i++) {
-                                    if (Instances[i]?.getId() === rowInfo.node.instanceId) {
-                                        instanceFound = true;
-                                        break;
-                                    }
+                                if (Instances[rowInfo.node.instanceId]) {
+                                    instanceFound = true;
                                 }
+                                
                                 if (
                                     instanceFound &&
                                     typeof Instances[rowInfo.node.instanceId].isVisible ===
                                     "function"
                                 ) {
-                                    props.selectionHandler(rowInfo.node.instanceId);
-                                    termInfoById({}, true);
+                                    termInfoById(rowInfo.node.instanceId);
                                 } else {
-                                    props.selectionHandler(rowInfo.node.classId);
-                                    termInfoById({}, true);
+                                    termInfoById(rowInfo.node.classId);
                                 }
                                 setState({ ...state, nodeSelected : rowInfo.node });
                             }}
@@ -576,7 +567,8 @@ const ROIBrowser = (props) => {
             {state?.loading === true ? (
                 <CircularProgress
                     style={{
-                        position: "absolute",
+                        position: "relative",
+                        display : "flex",
                         left: 0,
                         right: 0,
                         bottom: 0,

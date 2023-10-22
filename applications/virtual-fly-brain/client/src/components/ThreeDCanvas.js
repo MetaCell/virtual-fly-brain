@@ -23,17 +23,18 @@ const {
 function loadInstances (instance){
   ModelFactory.cleanModel();
   const instance1 = new SimpleInstance(instance)
+  instance1.visible = true;
   let instances = window.Instances;
   if ( instances === undefined ){
     instances = [];
   }
-  window.Instances = [...instances, instance1]
+  window.Instances?.find( i => i.wrappedObj?.id === instance.id ) ? null : window.Instances = [...instances, instance1]
   augmentInstancesArray(window.Instances);
 }
 
 function getProxyInstances () {
   return window.Instances.map(i => (
-    { instancePath: i.getId(), color: { r: Math.random(), g:1, b: Math.random(), a:1 } }))
+    { instancePath: i.getId(), color: { r: Math.random(), g:1, b: Math.random(), a:1 }, visible : true}))
 }
 
 const styles = () => ({
@@ -87,27 +88,44 @@ class ThreeDCanvas extends Component {
     let that = this;
     let allLoadedInstances = this.props.allLoadedInstances;
     allLoadedInstances?.forEach ( inst => {
-      if ( that.state.mappedCanvasData?.find( i => inst.Id === i.instancePath ) === undefined ){
-        let instanceCopy = inst;
-        fetch(inst.Images?.[Object.keys(inst.Images)[0]][0].obj)
-          .then(response => response.text())
-          .then(base64Content => {
-            const instance = {
-              "eClass": "SimpleInstance",
-              "id": instanceCopy.Id,
-              "name": instanceCopy.Name,
-              "type": { "eClass": "SimpleType" },
-              "visualValue": {
-                "eClass": Resources.OBJ,
-                'obj': base64Content
+      if ( inst.visible ) {
+        if ( that.state.mappedCanvasData?.find( i => inst.Id === i.instancePath ) === undefined ){
+          let instanceCopy = inst;
+          fetch(inst.Images?.[Object.keys(inst.Images)[0]][0].obj)
+            .then(response => response.text())
+            .then(base64Content => {
+              const instance = {
+                "eClass": "SimpleInstance",
+                "id": instanceCopy.Id,
+                "name": instanceCopy.Name,
+                "type": { "eClass": "SimpleType" },
+                "visualValue": {
+                  "eClass": Resources.OBJ,
+                  'obj': base64Content
+                }
               }
-            }
-
-            loadInstances(instance)
-            const data = getProxyInstances();
-            const mappedCanvasData = mapToCanvasData(data)
+              loadInstances(instance)
+              const data = getProxyInstances();
+              let mappedCanvasData = mapToCanvasData(data)
+              let match = mappedCanvasData?.find( m => instance.id === m.instancePath )
+              match.visible = true;
+              that.setState({ ...that.state, mappedCanvasData : mappedCanvasData})
+            });
+        } else {
+          let mappedCanvasData = [...that.state.mappedCanvasData]
+          let match = mappedCanvasData?.find( m => m.instancePath === inst.Id )
+          if ( !match?.visible ){
+            match.visible = true;
             that.setState({ ...that.state, mappedCanvasData : mappedCanvasData})
-          });
+          }
+        }
+      } else {
+        let mappedCanvasData = [...that.state.mappedCanvasData]
+        let match = mappedCanvasData?.find( m => m.instancePath === inst.Id )
+        if ( match?.visible ){
+          match.visible = false;
+          that.setState({ ...that.state, mappedCanvasData : mappedCanvasData})
+        }
       }
     });
   }
@@ -203,7 +221,7 @@ class ThreeDCanvas extends Component {
           <>
             <Canvas
               ref={this.canvasRef}
-              data={this.state.mappedCanvasData}
+              data={this.state.mappedCanvasData?.filter(d => d?.visible )}
               cameraOptions={cameraOptions}
               // captureOptions={captureOptions}
               backgroundColor={blackColor}

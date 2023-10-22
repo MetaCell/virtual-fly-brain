@@ -27,6 +27,20 @@ const removeInstancesSuccess = query => ({
   }
 });
 
+const showInstanceMessage = id => ({
+  type: getInstancesTypes.SHOW_INSTANCE,
+  payload: {
+    id
+  }
+});
+
+const hideInstanceMessage = id => ({
+  type: getInstancesTypes.HIDE_INSTANCE,
+  payload: {
+    id
+  }
+});
+
 const removeInstancesFailure = error => ({
   type: getInstancesTypes.REMOVE_INSTANCES_FAILURE,
   payload: {
@@ -57,4 +71,12 @@ export const removeInstanceByID = async (queryId) => {
     store.dispatch(removeInstancesFailure(error.message))
     return
   }
+}
+
+export const showInstance = async (id) => {
+  store.dispatch(showInstanceMessage(id))
+}
+
+export const hideInstance = async (id) => {
+  store.dispatch(hideInstanceMessage(id))
 }

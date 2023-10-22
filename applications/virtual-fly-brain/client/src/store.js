@@ -20,7 +20,8 @@ const reducers = {
   termInfo: TermInfoReducer,
   instances: InstancesReducer,
   queries: QueriesReducer,
-  globalInfo : GlobalReducer
+  globalInfo : GlobalReducer,
+  threeDReducer : ThreeDCanvasReducer
 };
 
 const store = createStore(

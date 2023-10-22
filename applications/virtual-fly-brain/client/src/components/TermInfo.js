@@ -466,7 +466,7 @@ const TermInfo = ({ open, setOpen }) => {
                     { termInfoData?.Queries?.map( query => (
                          query.output_format === "table"?
                         (
-                          <TreeItem nodeId={query.label} label={
+                          <TreeItem key={query.label} nodeId={query.label} label={
                             <CustomBox display='flex' flexWrap='wrap'>
                               <Typography>{query.label}</Typography>
                               <Box display='flex' sx={{ zIndex: 1000 }} pl={0.5}>
@@ -533,7 +533,7 @@ const TermInfo = ({ open, setOpen }) => {
                                 </>
                          } /></TreeItem>) 
                          : 
-                         (<TreeItem nodeId={query.label} label={
+                         (<TreeItem key={query.label} nodeId={query.label} label={
                             <CustomBox display='flex' flexWrap='wrap'>
                               <Typography>{query.label}</Typography>
                               <Box display='flex' sx={{ zIndex: 1000 }} pl={0.5}>

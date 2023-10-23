@@ -30,3 +30,25 @@ export const roiBrowserWidget = {
     status: WidgetStatus.ACTIVE,
     props: { size: { height: 600, width: 300 } }
 };
+
+export const termContextWidget = {
+    id: 'termContext',
+    name: "Term Context",
+    component: "termContext",
+    panelName: "left",
+    enableClose: false,
+    hideOnClose: false,
+    status: WidgetStatus.ACTIVE,
+    props: { size: { height: 600, width: 300 } }
+};
+
+export const circuitBrowserWidget = {
+    id: 'circuitBrowser',
+    name: "Circuit Browser",
+    component: "circuitBrowser",
+    panelName: "left",
+    enableClose: false,
+    hideOnClose: false,
+    status: WidgetStatus.ACTIVE,
+    props: { size: { height: 600, width: 300 } }
+};

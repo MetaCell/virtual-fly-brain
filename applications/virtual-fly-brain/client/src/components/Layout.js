@@ -17,7 +17,7 @@ import VFBUploader from "./VFBUploader/VFBUploader";
 import QueryBuilder from "./queryBuilder";
 import { getLayoutManagerInstance } from "@metacell/geppetto-meta-client/common/layout/LayoutManager";
 import { addWidget } from '@metacell/geppetto-meta-client/common/layout/actions';
-import { threeDCanvasWidget, stackViewerWidget, sideBarWidget, roiBrowserWidget } from "./layout/widgets";
+import { threeDCanvasWidget, stackViewerWidget, roiBrowserWidget, termContextWidget, circuitBrowserWidget } from "./layout/widgets";
 import store from "../store";
 const {
   secondaryBg,
@@ -38,7 +38,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const desktopScreen = useMediaQuery(theme.breakpoints.up('lg'));
-  const defaultActiveTab = desktopScreen ? [0, 1, 2, 3] : [0];
+  const defaultActiveTab = desktopScreen ? [0, 1, 2, 3, 4] : [0];
   const [tab, setTab] = useState([]);
   const [LayoutComponent, setLayoutComponent] = useState(undefined);
   const dispatch = useDispatch();
@@ -65,7 +65,9 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
     // TODO: fix stack viewer
     // dispatch(addWidget(stackViewerWidget));
     //dispatch(addWidget(sideBarWidget(sidebarOpen, setSidebarOpen)));
+    dispatch(addWidget(circuitBrowserWidget));
     dispatch(addWidget(roiBrowserWidget));
+    dispatch(addWidget(termContextWidget));
   }, [sidebarOpen, setSidebarOpen])
 
   const classes = {

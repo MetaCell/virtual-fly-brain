@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import axios from 'axios';
 import GeppettoGraphVisualization from '@metacell/geppetto-meta-ui/graph-visualization/Graph';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import Box from '@material-ui/core/Box';
 import { queryParser } from './VFBGraph/QueryParser';
 import DropDownQueries from './VFBGraph/DropDownQueries';
 import Tooltip from '@material-ui/core/Tooltip';
@@ -266,7 +267,7 @@ class VFBGraph extends Component {
    * Handle Left click on Nodes
    */
   handleNodeLeftClick (node, event) {
-    window.addVfbId(node.title);
+    this.graphRef.current.ggv.current.zoomToFit()
   }
 
   /**
@@ -488,7 +489,7 @@ class VFBGraph extends Component {
     }
 
     // Out of sync if instanceOnFocus is not what's on display
-    if ( !this.props.instanceOnFocus?.id.includes(this.focusedInstance.id) ) {
+    if ( !this.props.instanceOnFocus?.id?.includes(this?.focusedInstance?.id) ) {
       syncColor = stylingConfiguration.outOfSyncIconColor;
     }
 
@@ -508,7 +509,7 @@ class VFBGraph extends Component {
         />
         : this.state.graph.nodes.length == 0
           ? <div>
-            <div style={ { position: "absolute", width: "2vh", height: "100px",zIndex: "100" } }>
+            <div style={ { position: "absolute", width: "2vh", height: "100px",zIndex: "2" } }>
               <DropDownQueries
                 handleMenuClick={selection => self.handleMenuClick(selection)}
                 currentQuery = { self.state.currentQuery }
@@ -520,12 +521,22 @@ class VFBGraph extends Component {
             </div>
             <p style={{ float : "right", width : "80%", paddingTop : "2vh" }}>No graph available for {this.getErrorLabel()}</p>
           </div>
-          : <GeppettoGraphVisualization
+          : <Box sx={{
+            width: 600,
+            height: 800,
+            backgroundColor: 'primary.dark',
+            '&:hover': {
+              backgroundColor: 'primary.main',
+              opacity: [0.9, 0.8, 0.7],
+            },
+          }}><GeppettoGraphVisualization
             id= { COMPONENT_ID }
             // Graph data with Nodes and Links to populate
             data={this.state.graph}
             // Create the Graph as 2 Dimensional
             d2={true}
+            onEngineStop={this.resetCamera}
+            cooldownTicks={10}
             // Node label, used in tooltip when hovering over Node
             nodeLabel={node => node.path}
             nodeRelSize={20}
@@ -591,47 +602,47 @@ class VFBGraph extends Component {
             // Width of links
             linkWidth={1.25}
             controls = {
-              <div style={ { position: "absolute", width: "2vh", height: "100px",zIndex: "100" } }>
+              <div style={ { position: "absolute", width: "2vh", height: "100px",zIndex: "2", color : "white" } }>
                 <Tooltip title={<h6>Reset View</h6>}>
                   <i
                     style={
                       {
-                        zIndex : "1000",
+                        zIndex : "2",
                         cursor : "pointer",
                         top : "10px",
                         left : "10px"
                       }
                     }
                     className={stylingConfiguration.icons.home}
-                    onClick={self.resetCamera }>
+                    onClick={this.resetCamera }>
                   </i>
                 </Tooltip>
                 <Tooltip title={<h6>Zoom In</h6>}>
                   <i
                     style={
                       {
-                        zIndex : "1000",
+                        zIndex : "2",
                         cursor : "pointer",
                         marginTop : "20px",
                         left : "10px"
                       }
                     }
                     className={stylingConfiguration.icons.zoomIn}
-                    onClick={self.zoomIn }>
+                    onClick={this.zoomIn }>
                   </i>
                 </Tooltip>
                 <Tooltip title={<h6>Zoom Out</h6>}>
                   <i
                     style={
                       {
-                        zIndex : "1000",
+                        zIndex : "2",
                         cursor : "pointer",
                         marginTop : "5px",
                         left : "10px"
                       }
                     }
                     className={stylingConfiguration.icons.zoomOut}
-                    onClick={self.zoomOut }>
+                    onClick={this.zoomOut }>
                   </i>
                 </Tooltip>
                 <DropDownQueries
@@ -679,7 +690,7 @@ class VFBGraph extends Component {
               }
             }
             }
-          />
+          /></Box>
     )
   }
 }

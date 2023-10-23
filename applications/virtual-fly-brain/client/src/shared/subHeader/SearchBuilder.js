@@ -222,7 +222,7 @@ export default function SearchBuilder(props) {
   const datasourceConfiguration = require('../../components/configuration/VFBSearchBuilder/searchConfiguration').datasourceConfiguration;
 
   const handleSearch = (searchWord) => {
-    if ( searchWord?.length > 3 ){
+    if ( searchWord?.length >= 1 ){
       setRetrievingResults(true);
       setIsOpen(true)
       getResultsSOLR(searchWord,

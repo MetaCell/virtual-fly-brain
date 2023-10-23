@@ -233,9 +233,7 @@ const SideBar = ({ open, setOpen }) => {
           xs: '100%',
           lg: open ? '34rem' : '2.75rem'
         },
-        flex: {
-          lg: open ? 1 : 'none !important'
-        },
+        flex: 'none !important',
         p: {
           xs: 1.5,
           lg: 0

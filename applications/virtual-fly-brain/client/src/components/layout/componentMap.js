@@ -1,8 +1,5 @@
-import ROIBrowser from '../ROIBrowser/ROIBrowser';
 import StackViewer from '../StackViewer';
 import ThreeDCanvas from '../ThreeDCanvas';
-import VFBCircuitBrowser from '../VFBCircuitBrowser';
-import VFBGraph from '../VFBGraph';
 /**
  * Key of the component is the `component` attribute of the widgetConfiguration.
  * 
@@ -10,10 +7,7 @@ import VFBGraph from '../VFBGraph';
  */
 const componentMap = {
     'stackViewer': StackViewer,
-    'threeDCanvas': ThreeDCanvas,
-    'roiBrowser': ROIBrowser,
-    'termContext' : VFBGraph,
-    'circuitBrowser' : VFBCircuitBrowser
+    'threeDCanvas': ThreeDCanvas
 };
 
 export default componentMap

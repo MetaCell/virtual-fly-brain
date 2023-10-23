@@ -124,7 +124,7 @@ const QueryBuilder = ({ fullWidth, bottomNav, setBottomNav }) => {
 
         }}>
           <Button
-            onClick={() => setBottomNav(undefined)}
+            onClick={() => setBottomNav('')}
             sx={{
               height: 'auto',
               borderRight: `0.0625rem solid ${primaryBg}`,

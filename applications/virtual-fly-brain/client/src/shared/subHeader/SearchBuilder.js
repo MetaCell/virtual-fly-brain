@@ -49,7 +49,7 @@ const InputWrapper = styled('div')(
     color: ${outlinedBtnTextColor};
     font-size: 0.875rem;
     line-height: 129%;
-    height: 1.75rem;
+    height: 2rem;
     box-sizing: border-box;
     padding: 0;
     width: 0;
@@ -258,7 +258,7 @@ export default function SearchBuilder(props) {
             <Box
               flexWrap='wrap'
               display='flex'
-              padding={1}
+              paddingRight={1}
               gap={1}
             >
               {value.map((option, index) => (

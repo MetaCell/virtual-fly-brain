@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Canvas from "@metacell/geppetto-meta-ui/3d-canvas/Canvas";
 // import CameraControls from "@metacell/geppetto-meta-ui/camera-controls/CameraControls";
-import SimpleInstance from "@metacell/geppetto-meta-core/model/SimpleInstance";
+import SimpleInstance from "@metacell/geppetto-meta-core/model/Instance";
 import { withStyles } from '@material-ui/core';
 import Button from "@material-ui/core/Button";
 import { applySelection, mapToCanvasData } from "@metacell/geppetto-meta-ui/3d-canvas/utils/SelectionUtils"

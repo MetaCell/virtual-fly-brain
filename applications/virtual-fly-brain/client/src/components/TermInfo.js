@@ -13,7 +13,7 @@ import TreeView from '@mui/lab/TreeView';
 import { TreeItem } from "@mui/lab";
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import GeneralInformation from "./TermInfo/GeneralInformation";
-import { getInstanceByID, removeInstanceByID, showInstance, hideInstance } from './../reducers/actions/instances';
+import { getInstanceByID, removeInstanceByID } from './../reducers/actions/instances';
 import { termInfoById } from "./../reducers/actions/termInfo";
 import Ribbon from '@flybase/react-ontology-ribbon';
 import '@flybase/react-ontology-ribbon/dist/style.css';
@@ -135,22 +135,6 @@ const TermInfo = ({ open, setOpen }) => {
   }
   const addId = (id) => {
     getInstanceByID(id);
-  }
-
-  const handleToggleVisibility = (id) => {
-    if ( allLoadedInstances.find( instance => instance.Id == termInfoData.Id )?.visible ) {
-      hideInstance(termInfoData.Id)
-    } else {
-      showInstance(termInfoData.Id)
-    }
-  }
-
-  const handleFocusID = (id) => {
-
-  }
-
-  const handleDeleteID = (id) => {
-
   }
 
   const handleTermClick = (term, evt) => {
@@ -416,16 +400,16 @@ const TermInfo = ({ open, setOpen }) => {
 
                     <Box>
                       <ButtonGroup color="secondary" sx={classes.buttonGroup} variant="contained">
-                        <Button onClick={handleToggleVisibility}>
+                        <Button>
                           <Eye />
                         </Button>
-                        <Button onClick={handleFocusID}>
+                        <Button>
                           <Focus />
                         </Button>
                         <Button>
                           <ArView />
                         </Button>
-                        <Button onClick={handleDeleteID}>
+                        <Button>
                           <Delete />
                         </Button>
                       </ButtonGroup>
@@ -482,7 +466,7 @@ const TermInfo = ({ open, setOpen }) => {
                     { termInfoData?.Queries?.map( query => (
                          query.output_format === "table"?
                         (
-                          <TreeItem nodeId={query.label} key={query.label} label={
+                          <TreeItem key={query.label} nodeId={query.label} label={
                             <CustomBox display='flex' flexWrap='wrap'>
                               <Typography>{query.label}</Typography>
                               <Box display='flex' sx={{ zIndex: 1000 }} pl={0.5}>
@@ -549,7 +533,7 @@ const TermInfo = ({ open, setOpen }) => {
                                 </>
                          } /></TreeItem>) 
                          : 
-                         (<TreeItem nodeId={query.label} key={query.label} label={
+                         (<TreeItem key={query.label} nodeId={query.label} label={
                             <CustomBox display='flex' flexWrap='wrap'>
                               <Typography>{query.label}</Typography>
                               <Box display='flex' sx={{ zIndex: 1000 }} pl={0.5}>

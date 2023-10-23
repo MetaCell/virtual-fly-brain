@@ -41,6 +41,14 @@ const hideInstanceMessage = id => ({
   }
 });
 
+const changeColorMessage = (id, color) => ({
+  type: getInstancesTypes.CHANGE_COLOR,
+  payload: {
+    id,
+    color
+  }
+});
+
 const removeInstancesFailure = error => ({
   type: getInstancesTypes.REMOVE_INSTANCES_FAILURE,
   payload: {
@@ -79,4 +87,8 @@ export const showInstance = async (id) => {
 
 export const hideInstance = async (id) => {
   store.dispatch(hideInstanceMessage(id))
+}
+
+export const changeColor = async (id, color) => {
+  store.dispatch(changeColorMessage(id, color))
 }

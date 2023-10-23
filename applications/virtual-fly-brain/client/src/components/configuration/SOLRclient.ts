@@ -46,10 +46,20 @@ export function getResultsSOLR ( searchString: string, returnResults: Function, 
 
     axios.get(`${url}`, tempConfig)
     .then(function(response) {
-        if(response.status == 200) {
-          returnResults("OK", response.data.response.docs, searchString);
+      var blob = new Blob(["onmessage = " + refineResults]);
+      var blobUrl = window.URL.createObjectURL(blob);
+
+      var worker = new Worker(blobUrl);
+      worker.onmessage = function (e) {
+        console.log("Message ", e);
+        switch(e.data.resultMessage) {
+          case "OK":
+            returnResults("OK", e.data.params.results, searchString);
+            window.URL.revokeObjectURL(blobUrl);
+            break;
         }
-        // refineResults(searchString, response.data.response.docs, returnResults);
+      };
+      worker.postMessage({message: "refine", params: {results: response.data.response.docs, value: searchString}});
     })
     .catch(function(error) {
       console.log('%c --- SOLR datasource error --- ', 'background: black; color: red');
@@ -106,7 +116,7 @@ function refineResults(e) {
         }
         // if not found in one then advance the other
         if (a.label.toLowerCase().indexOf(InputString.toLowerCase()) < 0 && b.label.toLowerCase().indexOf(InputString.toLowerCase()) > -1) {
-            return 1;
+            return 1;refineResults
         }
         if (b.label.toLowerCase().indexOf(InputString.toLowerCase()) < 0 && a.label.toLowerCase().indexOf(InputString.toLowerCase()) > -1) {
             return -1;
@@ -181,7 +191,7 @@ function refineResults(e) {
     });
 
     var sortedResults: Array<any> = refinedResults.sort(sorter);
-    //TODO Check THis this.postMessage({resultMessage: "OK", params: {results: sortedResults}});
+    self.postMessage({resultMessage: "OK", params: {results: sortedResults}});
     self.close();
 }
 

@@ -12,7 +12,7 @@ import { RecentSearch } from './RecentSearch';
 import { QueriesSelection } from './QueriesSelection';
 import { NarrowSearchFilter } from './NarrowSearchFilter';
 import { ResultSelectionOptions } from './ResultSelectionOptions';
-import  { getResultsSOLR } from '../../components/configuration/VFBSearchBuilder/SOLRclient'
+import  { getResultsSOLR } from '../../components/configuration/SOLRclient'
 import { DatasourceTypes } from '@metacell/geppetto-meta-ui/search/datasources/datasources';
 import { get_queries } from "../../network/query"
 import { getInstanceByID } from './../../reducers/actions/instances';
@@ -297,7 +297,7 @@ export default function SearchBuilder(props) {
           className='scrollbar'
           {...getListboxProps()}
         >
-          { value.find( v => v.label === QUERIES ) && queries.length >= 1 ? (<QueriesSelection checkResults={checkResults} handleQueryDeletion={handleQueryDeletion} recentSearch={queries}/>) : null }
+          { value.find( v => v.label === QUERIES ) && queries?.length >= 1 ? (<QueriesSelection checkResults={checkResults} handleQueryDeletion={handleQueryDeletion} recentSearch={queries}/>) : null }
 
           {/* { groupedOptions.length >=1 ? <NarrowSearchFilter chipColors={chipColors} groupedOptions={groupedOptions}/> :null } */}
 

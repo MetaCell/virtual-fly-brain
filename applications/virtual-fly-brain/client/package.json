@@ -40,6 +40,8 @@
     "react": "^18.2.0",
     "react-color" : "2.19.3",
     "react-dom": "^18.2.0",
+    "react-force-graph-2d": "^1.25.1",
+    "react-force-graph-3d": "^1.23.1",
     "react-redux": "^8.0.2",
     "react-resize-detector": "^7.1.2",
     "react-responsive": "^9.0.2",
@@ -50,6 +52,7 @@
     "sass": "^1.54.4",
     "three": "0.111.0",
     "three-render-objects": ">=1.13.3",
+    "ts-loader": "^9.4.4",
     "typescript": "^5.0.4",
     "web-vitals": "^2.1.4"
   },

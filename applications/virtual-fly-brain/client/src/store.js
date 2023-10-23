@@ -17,7 +17,6 @@ const INIT_STATE = {
   threeD: initialStateThreeDCanvas,
   globalInfo: initialStateGlobalReducer,
   instances: initialStateInstancesReducer,
-  queries: initialStateGraphReducer,
   graph: initialStateGraphReducer,
   circuit: initialStateCircuitReducer
 };

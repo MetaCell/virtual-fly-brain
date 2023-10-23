@@ -6,6 +6,7 @@ import ThreeDCanvas from "./ThreeDCanvas"
 import TermInfo from "./TermInfo"
 import Images from "./Images";
 import StackViewer from './StackViewer';
+import ROIBrowser from './ROIBrowser/ROIBrowser';
 import vars from "../theme/variables";
 import VFBGraph from "./VFBGraph";
 import SideBar from "../shared/sidebar";
@@ -22,8 +23,9 @@ const {
 const tabsArr = [
   { id: 0, name: 'Term Info' },
   { id: 1, name: 'Images' },
-  { id: 2, name: 'Circuits' },
-  { id: 3, name: 'Circuit Browser' }
+  { id: 2, name: 'VFB Graph' },
+  { id: 3, name: 'ROI Browser' },
+  { id: 4, name: 'Circuit Browser' }
 ]
 
 const MainLayout = ({ bottomNav, setBottomNav }) => {
@@ -31,7 +33,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const desktopScreen = useMediaQuery(theme.breakpoints.up('lg'));
-  const defaultActiveTab = desktopScreen ? [0, 1, 2] : [0];
+  const defaultActiveTab = desktopScreen ? [0, 1, 2, 3, 4] : [0];
   const [tab, setTab] = useState([]);
 
   useEffect(() => {
@@ -85,20 +87,20 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
       )}
 
       {tab.includes(2) && (
-          // <StackViewer 
-          //   id="NewStackViewer"
-          //   defHeight={600}
-          //   defWidth={600}
-          // />
           <VFBGraph />
         )}
 
       {tab.includes(3) && (
-          <div className="flexChildContainer" style={{ position : "fixed", overflow : "scroll" }}>
-            <VFBCircuitBrowser />
-          </div>
+          <ROIBrowser 
+            id="roiBrowser"
+            size={{ height: 600, width: 300 }}
+          />
         )}
-    </>
+
+      {tab.includes(4) && (
+          <VFBCircuitBrowser />
+      )}
+  </>
   )
 
   return (

@@ -81,7 +81,7 @@ const SubHeader = ({ setBottomNav, bottomNav }) => {
       ...classes.root,
       py: {
         // xs: 1,
-        lg: 0.5
+        lg: 0.75
       },
       px: {
         lg: 1.5
@@ -122,7 +122,7 @@ const SubHeader = ({ setBottomNav, bottomNav }) => {
           },
           py: {
             xs: 1,
-            lg: 0.25
+            lg: 0.5
           },
           pr: {
             xs: 1.5,

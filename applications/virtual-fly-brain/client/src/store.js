@@ -7,7 +7,7 @@ import ThreeDCanvasReducer, { initialStateThreeDCanvas } from './reducers/ThreeD
 import GlobalReducer, { initialStateGlobalReducer } from './reducers/GlobalReducer';
 import InstancesReducer, { initialStateInstancesReducer }  from './reducers/InstancesReducer';
 import QueriesReducer from './reducers/QueriesReducer';
-import { layout as baseLayout } from './components/layout/layout'; 
+import layout from './components/layout/layout'; 
 import componentMap from './components/layout/componentMap'; 
 import CircuitReducer, { initialStateCircuitReducer} from './reducers/CircuitReducer';
 import GraphReducer, { initialStateGraphReducer} from './reducers/GraphReducer';
@@ -32,11 +32,13 @@ const reducers = {
   circuit: CircuitReducer
 };
 
+const isMinimizeEnabled = true;
+
 const store = createStore(
   reducers,
   INIT_STATE,
   [],
-  { baseLayout, componentMap }
+  { layout, componentMap, isMinimizeEnabled }
 )
 
 export default store; 

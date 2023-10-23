@@ -2,7 +2,7 @@ export const datasourceConfiguration = {
   "url": "https://solr.virtualflybrain.org/solr/ontology/select",
   "query_settings":
     {
-      "q": "$SEARCH_TERM$",
+      "q": "$SEARCH_TERM$ OR $SEARCH_TERM$* OR *$SEARCH_TERM$*",
       "q.op": "OR",
       "defType": "edismax",
       "mm": "45%",

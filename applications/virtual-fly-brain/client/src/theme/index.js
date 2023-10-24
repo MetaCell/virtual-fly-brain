@@ -1,5 +1,9 @@
 import vars from "./variables";
 import { createTheme } from "@mui/material/styles";
+import windowMinimizeIcon from "../assets/viewer/window_minimize_icon.svg";
+import maximizeIcon from "../assets/viewer/maximize_icon.svg";
+import minimizeIcon from "../assets/viewer/minimize_icon.svg";
+import closeIcon from "../assets/viewer/close_icon.svg";
 
 const {
   primaryFont,
@@ -37,6 +41,78 @@ theme = createTheme({
         *, body {
           font-family: ${primaryFont};
           box-sizing: border-box
+        }
+        .flexlayout__tab_button--selected {
+          padding: 0.5rem;
+          background-color: ${blackColor};
+          border-radius: 8px 8px 0px 0px;
+        }
+        .flexlayout__tab_button--selected:hover {
+          background-color: ${blackColor};
+        }
+        .flexlayout__tab_button_content {
+          font-size: 0.875rem;
+          line-height: 1.125rem;
+          color: ${outlinedBtnTextColor};
+          font-weight: 400;
+          padding: 0;
+          font-family: ${primaryFont};
+        }
+        .flexlayout__tab_button {
+          margin: 0;
+        }
+        .flexlayout__tabset_tabbar_inner_tab_container_top {
+          border-top: none;
+        }
+        .flexlayout__tabset_tabbar_outer {
+          background-color: transparent;
+        }
+        .flexlayout__tabset_tabbar_outer_top {
+          border-bottom: none;
+          height: 2.125rem !important;
+        }
+        .flexlayout__layout {
+          border-top: none;
+        }
+        .flexlayout__tabset {
+          background-color: transparent;
+        }
+        .flexlayout__tab {
+          border-radius: 0px 8px 8px 8px;
+          background-color: ${blackColor};
+        }
+        .flexlayout__tab_toolbar {
+          gap: 0.25rem;
+          margin-bottom: 0.25rem;
+        }
+        .flexlayout__tab_toolbar_button-min {
+          background: transparent url(${maximizeIcon}) no-repeat center;
+          cursor: pointer;
+        }
+        .flexlayout__tab_toolbar_button-max {
+          background: transparent url(${minimizeIcon}) no-repeat center;
+          cursor: pointer;
+        }
+        .flexlayout__tab_button_trailing {
+          background: transparent url(${closeIcon}) no-repeat center !important;
+          min-width: 1rem;
+          min-height: 1rem;
+          margin-left: 0.5rem;
+        }
+        .customIconFlexLayout:hover {
+          color: #c0c0c0;
+        }
+        .flexlayout__tab_toolbar_button-min:before {
+          content: "";
+        }
+        .flexlayout__tab_toolbar_button-max:before {
+          content: "";
+        }
+        .flexlayout__tab_button_trailing:before {
+          content: "";
+        }
+        .flexlayout__splitter {
+          background: transparent;
         }
       `,
     },

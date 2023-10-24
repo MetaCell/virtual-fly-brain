@@ -100,9 +100,8 @@ def init_webapp_routes(app):
             return error
         return index()
 
-app = app = flask.Flask(__name__)
-
 def main():
+  app = app = flask.Flask(__name__)
   CORS(app, support_credentials=True)
   init_webapp_routes(app)
   app.run(host='0.0.0.0', port=8080)

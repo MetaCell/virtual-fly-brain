@@ -2,7 +2,8 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useStore } from 'react-redux';
 import MediaQuery from 'react-responsive';
-import { Box, Button, useMediaQuery, useTheme, CircularProgress } from "@mui/material";import ThreeDCanvas from "./ThreeDCanvas"
+import { Box, Button, useMediaQuery, useTheme, CircularProgress } from "@mui/material";
+import ThreeDCanvas from "./ThreeDCanvas"
 import TermInfo from "./TermInfo"
 import Images from "./Images";
 import StackViewer from './StackViewer';

@@ -27,7 +27,7 @@ const ROIBrowser = (props) => {
     const classes = {
         root: {
           height: 'calc(100% - 0.5rem)',
-          width : '400px',
+          width : '100%',
           color: whiteColor
         }
     }
@@ -542,21 +542,8 @@ const ROIBrowser = (props) => {
         },
         p: {
           xs: 2,
-          lg: 0
-        },
-        borderColor: {
-          lg: secondaryBg
-        },
-        borderStyle: {
-          lg: 'solid'
-        },
-        borderRadius: {
           lg: 2
         },
-        borderWidth: {
-          xs: 0,
-          lg: '0.0625rem 0.0625rem 0 0'
-        }
       }}
     >
       ROI Browser

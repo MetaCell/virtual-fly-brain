@@ -1,6 +1,6 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import useAutocomplete from '@mui/base/useAutocomplete';
+import { useAutocomplete } from '@mui/base/useAutocomplete';
 import CircularProgress from '@mui/material/CircularProgress';
 import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
@@ -12,7 +12,7 @@ import { RecentSearch } from './RecentSearch';
 import { QueriesSelection } from './QueriesSelection';
 import { NarrowSearchFilter } from './NarrowSearchFilter';
 import { ResultSelectionOptions } from './ResultSelectionOptions';
-import  { getResultsSOLR } from '../../components/configuration/SOLRclient'
+import { getResultsSOLR } from '../../components/configuration/SOLRclient'
 import { DatasourceTypes } from '@metacell/geppetto-meta-ui/search/datasources/datasources';
 import { get_queries } from "../../network/query"
 import { getInstanceByID } from './../../reducers/actions/instances';
@@ -152,30 +152,30 @@ export default function SearchBuilder(props) {
   const [groupedOptions, setGroupedOptions] = React.useState([]);
   const [isOpen, setIsOpen] = React.useState(true);
 
-  const addQueryTag = () => { 
-    if ( !value.find( v => v.label === QUERIES )){
-      setValue((prevValue) => [{label: 'Queries', tags: []}, ...prevValue])
+  const addQueryTag = () => {
+    if (!value.find(v => v.label === QUERIES)) {
+      setValue((prevValue) => [{ label: 'Queries', tags: [] }, ...prevValue])
     }
   };
-  const checkResults = () => {props.setBottomNav(2)}
+  const checkResults = () => { props.setBottomNav(2) }
   const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances);
   const queries = useSelector(state => state.queries.queries);
 
   const loadResults = () => {
-    value.forEach( (v, index) => {
+    value.forEach((v, index) => {
       let id = v.id?.split("/");
       id = id?.[id?.length - 1];
-      if ( !allLoadedInstances?.find( i => i.id === id) && index <= value.length - 1){
+      if (!allLoadedInstances?.find(i => i.id === id) && index <= value.length - 1) {
         getInstanceByID(id);
       }
     })
-    termInfoById(value[value.length -1 ].short_form);
+    termInfoById(value[value.length - 1].short_form);
     setIsOpen(false)
   }
 
-  const handleResultSelection = async(option) => {
-    const doesOptionExist =  obj => obj.label === option.label
-    if(!value.some(doesOptionExist)){
+  const handleResultSelection = async (option) => {
+    const doesOptionExist = obj => obj.label === option.label
+    if (!value.some(doesOptionExist)) {
       getQueries(option);
       setValue([...value, option])
     }
@@ -185,7 +185,7 @@ export default function SearchBuilder(props) {
     handleQueryDeletion(label)
     let filtered = value.filter((chip) => chip.label !== label);
     setValue(filtered);
-    if ( filtered.length == 0 || ( filtered.length === 1 && value.find( v => v.label === QUERIES ))){
+    if (filtered.length == 0 || (filtered.length === 1 && value.find(v => v.label === QUERIES))) {
       setGroupedOptions([]);
     }
   }
@@ -201,19 +201,19 @@ export default function SearchBuilder(props) {
   };
 
   const handleResults = (status, data, v) => {
-    switch(status) {
+    switch (status) {
 
       case "OK":
-          if (v !== value) {
-            setGroupedOptions(data)
-            setRetrievingResults(false);
-          }
-          break;
+        if (v !== value) {
+          setGroupedOptions(data)
+          setRetrievingResults(false);
+        }
+        break;
       case "ERROR":
-        setRetrievingResults(false);    
-      break;
+        setRetrievingResults(false);
+        break;
       default:
-          console.log("This is a case not considered");
+        console.log("This is a case not considered");
     }
 
   }
@@ -222,7 +222,7 @@ export default function SearchBuilder(props) {
   const datasourceConfiguration = require('../../components/configuration/VFBSearchBuilder/searchConfiguration').datasourceConfiguration;
 
   const handleSearch = (searchWord) => {
-    if ( searchWord?.length >= 1 ){
+    if (searchWord?.length >= 1) {
       setRetrievingResults(true);
       setIsOpen(true)
       getResultsSOLR(searchWord,
@@ -231,6 +231,10 @@ export default function SearchBuilder(props) {
         datasourceConfiguration,
         setGroupedOptions);
     }
+  }
+
+  const handleFocused = (focused) => {
+    props.setFocused(focused);
   }
 
   const {
@@ -247,8 +251,12 @@ export default function SearchBuilder(props) {
     open: isOpen,
     options: searchResults,
     getOptionLabel: (option) => option?.label,
-    onInputChange : event => handleSearch(event.target.value)
+    onInputChange: event => handleSearch(event.target.value)
   });
+
+  React.useEffect(() => {
+    handleFocused(focused);
+  }, [focused])
 
   return (
     <Box flexGrow={1}>
@@ -258,7 +266,7 @@ export default function SearchBuilder(props) {
             <Box
               flexWrap='wrap'
               display='flex'
-              padding={1}
+              paddingRight={1}
               gap={1}
             >
               {value.map((option, index) => (
@@ -283,40 +291,34 @@ export default function SearchBuilder(props) {
               ))}
             </Box>
           )}
-          <input placeholder='Find something...' {...getInputProps()}/>
+          <input placeholder='Find something...' {...getInputProps()} />
         </InputWrapper>
       </Box>
       {focused && isOpen ? (
         <Listbox
-          sx={{
-            top: {
-              xs: '2.875rem',
-              lg: '2.125rem'
-            }
-          }}
           className='scrollbar'
           {...getListboxProps()}
         >
-          { value.find( v => v.label === QUERIES ) && queries?.length >= 1 ? (<QueriesSelection checkResults={checkResults} handleQueryDeletion={handleQueryDeletion} recentSearch={queries}/>) : null }
+          {value.find(v => v.label === QUERIES) && queries?.length >= 1 ? (<QueriesSelection checkResults={checkResults} handleQueryDeletion={handleQueryDeletion} recentSearch={queries} />) : null}
 
           {/* { groupedOptions.length >=1 ? <NarrowSearchFilter chipColors={chipColors} groupedOptions={groupedOptions}/> :null } */}
 
-          { (value.length >= 1 && !value.find( v => v.label === QUERIES )) ? (<ResultSelectionOptions
+          {(value.length >= 1 && !value.find(v => v.label === QUERIES)) ? (<ResultSelectionOptions
             addQueryTag={addQueryTag}
             loadResults={loadResults}
-          />) : null }
+          />) : null}
 
-          { recentSearch.length >= 1 ? (<RecentSearch
+          {recentSearch.length >= 1 ? (<RecentSearch
             chipColors={chipColors}
             recentSearch={recentSearch}
-          />) : null }
+          />) : null}
 
-          { !retrievingResults ? (<SearchResult
+          {!retrievingResults ? (<SearchResult
             groupedOptions={groupedOptions}
             getOptionProps={getOptionProps}
             chipColors={chipColors}
             handleResultSelection={handleResultSelection}
-          />) : <CircularProgress sx={{left: '50%', marginTop : '10%', position : 'relative'}}/> }
+          />) : <CircularProgress sx={{ left: '50%', marginTop: '10%', position: 'relative' }} />}
         </Listbox>
       ) : null}
     </Box>

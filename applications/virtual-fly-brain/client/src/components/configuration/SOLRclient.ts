@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const globalConfiguration = {
+const globalConfiguration:any = {
     "url": "https://solr.virtualflybrain.org/solr/ontology/select",
     "query_settings":
     {
@@ -22,7 +22,7 @@ export const globalConfiguration = {
     }
 };
 
-let solrConfiguration = {
+let solrConfiguration:any = {
     params: {
         json: {
           params: globalConfiguration.query_settings
@@ -30,8 +30,8 @@ let solrConfiguration = {
     }
 }
 
-export function getResultsSOLR ( searchString, returnResults, sorter, configuration) {
-    var url = configuration.url;
+export function getResultsSOLR ( searchString: string, returnResults: Function, sorter: Function, configuration?: any) {
+    var url:string = configuration.url;
 
     if (configuration.url === undefined) {
         url = globalConfiguration.url;
@@ -41,36 +41,36 @@ export function getResultsSOLR ( searchString, returnResults, sorter, configurat
     }
 
     // hack to clone the object
-    let tempConfig = JSON.parse(JSON.stringify(solrConfiguration));
+    let tempConfig:any = JSON.parse(JSON.stringify(solrConfiguration));
     tempConfig.params.json.params.q = solrConfiguration.params.json.params.q.replace(/\$SEARCH_TERM\$/g, searchString);
 
     axios.get(`${url}`, tempConfig)
-        .then((response) => {
-            var blob = new Blob(["onmessage = " + refineResults]);
-            var blobUrl = window.URL.createObjectURL(blob);
+    .then(function(response) {
+      var blob = new Blob(["onmessage = " + refineResults]);
+      var blobUrl = window.URL.createObjectURL(blob);
 
-            var worker = new Worker(blobUrl);
-            worker.onmessage = function (e) {
-              console.log("Message ", e);
-              switch(e.data.resultMessage) {
-                    case "OK":
-                        returnResults("OK", e.data.params.results, searchString);
-                        window.URL.revokeObjectURL(blobUrl);
-                        break;
-                }
-            };
-            worker.postMessage({message: "refine", params: {results: response.data.response.docs, value: searchString}});
-        })
-        .catch((error) => {
-            console.log('%c --- SOLR datasource error --- ', 'background: black; color: red');
-            console.log(error);
-            returnResults("ERROR", undefined, searchString);
-        })
-}
+      var worker = new Worker(blobUrl);
+      worker.onmessage = function (e) {
+        console.log("Message ", e);
+        switch(e.data.resultMessage) {
+          case "OK":
+            returnResults("OK", e.data.params.results, searchString);
+            window.URL.revokeObjectURL(blobUrl);
+            break;
+        }
+      };
+      worker.postMessage({message: "refine", params: {results: response.data.response.docs, value: searchString}});
+    })
+    .catch(function(error) {
+      console.log('%c --- SOLR datasource error --- ', 'background: black; color: red');
+      console.log(error);
+      returnResults("ERROR", undefined, searchString);
+    })
+};
 
 function refineResults(e) {
     const sorter = function (a, b) {
-        var InputString = self.spotlightString;
+        var InputString = self['spotlightString'];
 
         // move exact matches to top
         if (InputString == a.label) {
@@ -116,7 +116,7 @@ function refineResults(e) {
         }
         // if not found in one then advance the other
         if (a.label.toLowerCase().indexOf(InputString.toLowerCase()) < 0 && b.label.toLowerCase().indexOf(InputString.toLowerCase()) > -1) {
-            return 1;
+            return 1;refineResults
         }
         if (b.label.toLowerCase().indexOf(InputString.toLowerCase()) < 0 && a.label.toLowerCase().indexOf(InputString.toLowerCase()) > -1) {
             return -1;
@@ -145,12 +145,12 @@ function refineResults(e) {
         } // if nothing found then do nothing.
     };
 
-    self.spotlightString = e.data.params.value;
-    var refinedResults = [];
+    self['spotlightString'] = e.data.params.value;
+    var refinedResults:Array<any> = [];
     e.data.params.results.map(item => {
         if (item.hasOwnProperty("synonym")) {
             item.synonym.map(innerItem => {
-                let newRecord = {}
+                let newRecord:any = {}
                 if (innerItem !== item.label) {
                     Object.keys(item).map(key => {
                         switch(key) {
@@ -166,7 +166,7 @@ function refineResults(e) {
                     refinedResults.push(newRecord);
                 }
             });
-            let newRecord = {}
+            let newRecord:any = {}
             Object.keys(item).map(key => {
                 if (key !== "synonym") {
                     if (key === "label") {
@@ -178,7 +178,7 @@ function refineResults(e) {
             });
             refinedResults.push(newRecord);
         } else {
-            let newRecord = {}
+            let newRecord:any = {}
             Object.keys(item).map(key => {
                 if (key === "label") {
                     newRecord[key] = item[key] + " (" + item["short_form"] + ")";
@@ -190,12 +190,12 @@ function refineResults(e) {
         }
     });
 
-    var sortedResults = refinedResults.sort(sorter);
-    this.postMessage({resultMessage: "OK", params: {results: sortedResults}});
+    var sortedResults: Array<any> = refinedResults.sort(sorter);
+    self.postMessage({resultMessage: "OK", params: {results: sortedResults}});
     self.close();
 }
 
-export const datasourceConfiguration = {
+export const defaultDatasourceConfiguration = {
   "url": "https://solr.virtualflybrain.org/solr/ontology/select",
   "query_settings":
     {
@@ -310,7 +310,7 @@ export const searchConfiguration = {
     },
   ],
   "sorter": function (a, b) {
-    var InputString = window.spotlightString;
+    var InputString = window['spotlightString'];
     // move exact matches to top
     if (InputString == a.label) {
       return -1;
@@ -353,13 +353,12 @@ export const searchConfiguration = {
     if (b.label.toLowerCase().split(/\W+/).join(' ').replace('_', ' ').indexOf(InputString.toLowerCase().split(/\W+/).join(' ').replace('_', ' ')) < 0 && a.label.toLowerCase().split(/\W+/).join(' ').replace('_', ' ').indexOf(InputString.toLowerCase().split(/\W+/).join(' ').replace('_', ' ')) > -1) {
       return -1;
     }
-    let lcInputStingFac, compare, cA, cB;
     // find all matching spaced words
     if (InputString.toLowerCase().indexOf(' ') > -1) {
-      lcInputStingFac = InputString.toLowerCase().split(' ');
-      compare = (a1, a2) => a1.filter(v => a2.includes(v)).length;
-      cA = compare(lcInputStingFac, a.label.toLowerCase().split(' '));
-      cB = compare(lcInputStingFac, b.label.toLowerCase().split(' '));
+      var lcInputStingFac = InputString.toLowerCase().split(' ');
+      var compare = (a1, a2) => a1.filter(v => a2.includes(v)).length;
+      var cA = compare(lcInputStingFac, a.label.toLowerCase().split(' '));
+      var cB = compare(lcInputStingFac, b.label.toLowerCase().split(' '));
       if (cA > 0 || cB > 0) {
         if (cA > cB) {
           return -1;
@@ -371,10 +370,10 @@ export const searchConfiguration = {
     }
     // find all tokenised word matches
     if (InputString.split(/\W+/).length > 1) {
-      lcInputStingFac = InputString.toLowerCase().split(/\W+/);
-      compare = (a1, a2) => a1.filter(v => a2.includes(v)).length;
-      cA = compare(lcInputStingFac, a.label.toLowerCase().split(/\W+/));
-      cB = compare(lcInputStingFac, b.label.toLowerCase().split(/\W+/));
+      var lcInputStingFac = InputString.toLowerCase().split(/\W+/);
+      var compare = (a1, a2) => a1.filter(v => a2.includes(v)).length;
+      var cA = compare(lcInputStingFac, a.label.toLowerCase().split(/\W+/));
+      var cB = compare(lcInputStingFac, b.label.toLowerCase().split(/\W+/));
       if (cA > 0 || cB > 0) {
         if (cA > cB) {
           return -1;
@@ -386,16 +385,16 @@ export const searchConfiguration = {
     }
     // prioritise matches in the primary label
     if (InputString.split(/\W+/).length > 1) {
-      lcInputStingFac = InputString.toLowerCase().split(/\W+/);
-      compare = (a1, a2) => a1.filter(v => a2.includes(v)).length;
+      var lcInputStingFac = InputString.toLowerCase().split(/\W+/);
+      var compare = (a1, a2) => a1.filter(v => a2.includes(v)).length;
       var aLabel = a.label.split(' (');
       var aEnd = aLabel.pop(aLabel.length);
       aLabel = aLabel.join(' (');
       var bLabel = b.label.split(' (');
       var bEnd = bLabel.pop(bLabel.length);
       bLabel = bLabel.join(' (');
-      cA = compare(lcInputStingFac, aLabel.toLowerCase().split(/\W+/));
-      cB = compare(lcInputStingFac, bLabel.toLowerCase().split(/\W+/));
+      var cA = compare(lcInputStingFac, aLabel.toLowerCase().split(/\W+/));
+      var cB = compare(lcInputStingFac, bLabel.toLowerCase().split(/\W+/));
       if (cA > 0 || cB > 0) {
         if (cA > cB) {
           return -1;
@@ -436,3 +435,4 @@ export const searchConfiguration = {
     } // if nothing found then do nothing.
   }
 };
+

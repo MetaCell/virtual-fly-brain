@@ -199,21 +199,8 @@ class ThreeDCanvas extends Component {
         },
         p: {
           xs: 2,
-          lg: 0
-        },
-        borderColor: {
-          lg: secondaryBg
-        },
-        borderStyle: {
-          lg: 'solid'
-        },
-        borderRadius: {
           lg: 2
         },
-        borderWidth: {
-          xs: 0,
-          lg: '0.0625rem 0.0625rem 0 0'
-        }
       }}
     >
       {this.state.mappedCanvasData?.length > 0 ? (

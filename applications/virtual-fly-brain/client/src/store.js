@@ -5,30 +5,39 @@ import './index.css';
 import TermInfoReducer, { initialStateTermInfo } from './reducers/TermInfoReducer';
 import ThreeDCanvasReducer, { initialStateThreeDCanvas } from './reducers/ThreeDCanvasReducer';
 import GlobalReducer, { initialStateGlobalReducer } from './reducers/GlobalReducer';
-import InstancesReducer from './reducers/InstancesReducer';
+import InstancesReducer, { initialStateInstancesReducer }  from './reducers/InstancesReducer';
 import QueriesReducer from './reducers/QueriesReducer';
-import { layout as baseLayout } from './components/layout/layout'; 
+import layout from './components/layout/layout'; 
 import componentMap from './components/layout/componentMap'; 
+import CircuitReducer, { initialStateCircuitReducer} from './reducers/CircuitReducer';
+import GraphReducer, { initialStateGraphReducer} from './reducers/GraphReducer';
 
 const INIT_STATE = {
   termInfo: initialStateTermInfo,
   threeD: initialStateThreeDCanvas,
-  globalInfo: initialStateGlobalReducer
+  globalInfo: initialStateGlobalReducer,
+  instances: initialStateInstancesReducer,
+  graph: initialStateGraphReducer,
+  circuit: initialStateCircuitReducer
 };
 
 const reducers = {
   termInfo: TermInfoReducer,
+  threeD: ThreeDCanvasReducer,
+  globalInfo: GlobalReducer,
   instances: InstancesReducer,
   queries: QueriesReducer,
-  globalInfo : GlobalReducer,
-  threeDReducer : ThreeDCanvasReducer
+  graph: GraphReducer,
+  circuit: CircuitReducer
 };
+
+const isMinimizeEnabled = true;
 
 const store = createStore(
   reducers,
   INIT_STATE,
   [],
-  { baseLayout, componentMap }
+  { layout, componentMap, isMinimizeEnabled }
 )
 
 export default store; 

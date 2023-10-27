@@ -1,12 +1,12 @@
 import { getQueriesTypes } from './actions/types/getQueriesTypes';
 
-const initialState = {
+export const initialStateQueriesReducer = {
   queries : [],
   isLoading: false,
   error: false
 };
 
-const QueriesReducer = (state = initialState, response) => {
+const QueriesReducer = (state = initialStateQueriesReducer, response) => {
   switch (response.type) {
      case getQueriesTypes.GET_QUERIES_STARTED:
         return Object.assign({}, state, {

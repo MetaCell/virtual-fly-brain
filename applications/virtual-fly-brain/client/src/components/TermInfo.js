@@ -35,7 +35,6 @@ const getRibbonData = (query) => {
       descendant_terms: [row.Weight]
     }
   ));
-  console.log("Terms ", terms)
   return terms; 
 }
 
@@ -110,6 +109,7 @@ function a11yProps(index) {
     'aria-controls': `simple-tabpanel-${index}`,
   };
 }
+const ribbonConfiguration = require("../components/configuration/TermInfo/TermInfo").ribbonConfiguration;
 
 const TermInfo = ({ open, setOpen }) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -141,6 +141,11 @@ const TermInfo = ({ open, setOpen }) => {
     const regExp = /\(([^)]+)\)/g;
     const matches = [...term.id.matchAll(regExp)].flat();
     termInfoById(matches[0]);
+  }
+
+  const customColorCalculation = ({numTerms, baseRGB, heatLevels, itemData }) => {
+    let color = [baseRGB[0], heatLevels * itemData.descendant_terms[0], baseRGB[2]]
+    return color;
   }
 
   const classes = {
@@ -542,7 +547,16 @@ const TermInfo = ({ open, setOpen }) => {
                               </Box>
                             </CustomBox>
                           }>
-                            <Ribbon onTermClick={handleTermClick} data={getRibbonData(query)} />
+                            
+                          <Box display='flex' justifyContent="center">
+                            <Ribbon
+                              onTermClick={handleTermClick}
+                              data={getRibbonData(query)}
+                              calcHeatColor={customColorCalculation}
+                              baseRGB={ribbonConfiguration.rgbColor}
+                              heatLevels={ribbonConfiguration.heatLevels}
+                            />
+                          </Box>
                           </TreeItem>)
                     ))
                   }

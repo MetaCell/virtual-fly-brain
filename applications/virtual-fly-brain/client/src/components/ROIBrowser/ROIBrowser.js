@@ -551,7 +551,7 @@ const ROIBrowser = (props) => {
         <div id="treeError">{state?.errors}</div>
     ) : (
         <div>
-            {state?.loading === true || state?.dataTree?.length < 1 | state?.dataTree === undefined ? (
+            {state?.loading === true || state?.dataTree?.length < 1 || state?.dataTree === undefined ? (
                 <CircularProgress
                     style={{
                         position: "relative",

@@ -39,7 +39,7 @@ export const configuration = {
 
 export const stylingConfiguration = {
   // Background color for canvas
-  canvasColor : "black",
+  canvasColor : "tranparent",
   // Color for links between nodes
   linkColor : "white",
   // Color apply to links while hovering over them 
@@ -59,11 +59,11 @@ export const stylingConfiguration = {
   // Description area (in node) background color
   nodeDescriptionBackgroundColor : "white",
   icons : {
-    home : "fa fa-home",
-    zoomIn : "fa fa-search-plus",
-    zoomOut : "fa fa-search-minus",
-    sync : "fa fa-refresh",
-    dropdown : "fa fa-bars",
+    home : "../../../assets/viewer/home.svg",
+    zoomIn : "../../../assets/viewer/zoom_in.svg",
+    zoomOut : "../../../assets/viewer/zoom_out.svg",
+    sync : "../../../assets/viewer/refresh_icon.svg",
+    dropdown : "../../../assets/viewer/layers.svg",
   },
   defaultRefreshIconColor : "white",
   outOfSyncIconColor : "red",

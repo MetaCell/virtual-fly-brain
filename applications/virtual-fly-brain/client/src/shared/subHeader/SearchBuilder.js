@@ -1,6 +1,6 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import useAutocomplete from '@mui/base/useAutocomplete';
+import { useAutocomplete } from '@mui/base/useAutocomplete';
 import CircularProgress from '@mui/material/CircularProgress';
 import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
@@ -94,7 +94,7 @@ const Listbox = styled('div')(
   padding: 0;
   position: absolute;
   list-style: none;
-  background-color: ${bottomNavBg};
+  background-color: ${primaryBg};
   overflow: auto;
   border-top: 0.0625rem solid ${primaryBg};
   max-height: 17.375rem;

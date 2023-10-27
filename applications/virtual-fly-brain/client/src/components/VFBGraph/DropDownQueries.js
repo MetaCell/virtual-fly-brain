@@ -23,32 +23,36 @@ class DropDownQueries extends Component {
     let self = this;
     return (
       <div>
-        <Tooltip title={<h6>Refresh for {self.props.focusedInstance.name} </h6>}>
-          <i style={ 
+        <Tooltip placement="right" title={`Refresh for ${self.props.focusedInstance.name}`}>
+          <div style={ 
             { 
               zIndex : "1000",
               cursor : "pointer",
               marginTop : "20px",
               left : "10px",
-              color : self.props.syncColor
+              color : self.props.syncColor,
+              width: "1.3rem",
+              height: "1.3rem",
+              backgroundImage: `url(${self.props.stylingConfiguration.icons.sync})`
             }
           }
-          className={self.props.stylingConfiguration.icons.sync}
           key="tooltip-icon"
           onClick={self.props.sync}>
-          </i>
+          </div>
         </Tooltip>
-        <Tooltip title={<h6>Options</h6>}>
-          <i 
+        <Tooltip placement="right" title="Options">
+          <div
             style={ 
               { 
                 zIndex : "1000" ,
                 cursor : "pointer",
                 marginTop : "5px",
-                left : "10px"
+                left : "10px",
+                width: "1.3rem",
+                height: "1.3rem",
+                backgroundImage: `url(${self.props.stylingConfiguration.icons.dropdown})`
               }
             }
-            className={self.props.stylingConfiguration.icons.dropdown}
             aria-label="more"
             aria-controls="dropdown-menu"
             aria-haspopup="true"

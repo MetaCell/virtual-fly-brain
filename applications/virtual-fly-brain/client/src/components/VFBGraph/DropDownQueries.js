@@ -8,51 +8,58 @@ import PropTypes from "prop-types";
  * Shows the data value as a link
  */
 class DropDownQueries extends Component {
-  constructor (props) {
+  constructor(props) {
     super(props);
     this.state = { dropDownAnchorEl: null };
     this.handleMenuClick = this.handleMenuClick.bind(this);
   }
 
-  handleMenuClick (selection) {
-    this.setState( { dropDownAnchorEl: null } );
+  handleMenuClick(selection) {
+    this.setState({ dropDownAnchorEl: null });
     this.props.handleMenuClick(selection);
   }
 
-  render () {
+  render() {
     let self = this;
     return (
       <div>
-        <Tooltip title={<h6>Refresh for {self.props.focusedInstance.name} </h6>}>
-          <i style={ 
-            { 
-              zIndex : "1000",
-              cursor : "pointer",
-              marginTop : "20px",
-              left : "10px",
-              color : self.props.syncColor
+        <Tooltip
+          placement='right'
+          title={`Refresh for ${self.props.focusedInstance.name}`}
+        >
+          <div style={
+            {
+              zIndex: "1000",
+              cursor: "pointer",
+              marginTop: "20px",
+              left: "10px",
+              color: self.props.syncColor,
+              width: '1.3rem',
+              height: '1.3rem',
+              backgroundImage: `url(${self.props.stylingConfiguration.icons.sync})`
             }
           }
-          className={self.props.stylingConfiguration.icons.sync}
-          key="tooltip-icon"
-          onClick={self.props.sync}>
-          </i>
+            key="tooltip-icon"
+            onClick={self.props.sync}>
+          </div>
         </Tooltip>
-        <Tooltip title={<h6>Options</h6>}>
-          <i 
-            style={ 
-              { 
-                zIndex : "1000" ,
-                cursor : "pointer",
-                marginTop : "5px",
-                left : "10px"
+        <Tooltip placement='right' title="Options">
+          <div
+            style={
+              {
+                zIndex: "1000",
+                cursor: "pointer",
+                marginTop: "5px",
+                left: "10px",
+                width: '1.3rem',
+                height: '1.3rem',
+                backgroundImage: `url(${self.props.stylingConfiguration.icons.dropdown})`
               }
             }
-            className={self.props.stylingConfiguration.icons.dropdown}
             aria-label="more"
             aria-controls="dropdown-menu"
             aria-haspopup="true"
-            onClick={ event => self.setState( { dropDownAnchorEl : event.currentTarget } )}
+            onClick={event => self.setState({ dropDownAnchorEl: event.currentTarget })}
           />
         </Tooltip>
         <Menu
@@ -60,7 +67,7 @@ class DropDownQueries extends Component {
           anchorEl={self.state.dropDownAnchorEl}
           keepMounted
           open={Boolean(self.state.dropDownAnchorEl)}
-          onClose={ event => self.setState( { dropDownAnchorEl : null } )}
+          onClose={event => self.setState({ dropDownAnchorEl: null })}
           PaperProps={{
             style: {
               marginTop: '32px',
@@ -73,11 +80,11 @@ class DropDownQueries extends Component {
           }}
         >
           {self.props.stylingConfiguration.dropDownQueries.map(item => (
-            <MenuItem 
-              key={item.label(self.props.currentQuery.id)} 
+            <MenuItem
+              key={item.label(self.props.currentQuery.id)}
               onClick={() => self.handleMenuClick(item)}
               style={{
-                fontSize : "14px",
+                fontSize: "14px",
                 fontFamily: "Barlow Condensed",
               }}
               onMouseEnter={e => {

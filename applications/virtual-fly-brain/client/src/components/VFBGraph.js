@@ -509,7 +509,7 @@ class VFBGraph extends Component {
         />
         : this.state.graph.nodes.length == 0
           ? <div>
-            <div style={ { position: "absolute", width: "2vh", height: "100px",zIndex: "2" } }>
+            <div style={ { position: "absolute", padding: '1rem', width: "5vh", height: "100px",zIndex: "2" } }>
               <DropDownQueries
                 handleMenuClick={selection => self.handleMenuClick(selection)}
                 currentQuery = { self.state.currentQuery }
@@ -524,6 +524,7 @@ class VFBGraph extends Component {
           : <Box sx={{
             width: 600,
             height: 800,
+            padding: '1rem',
             backgroundColor: 'primary.dark',
             '&:hover': {
               backgroundColor: 'primary.main',
@@ -602,48 +603,54 @@ class VFBGraph extends Component {
             // Width of links
             linkWidth={1.25}
             controls = {
-              <div style={ { position: "absolute", width: "2vh", height: "100px",zIndex: "2", color : "white" } }>
-                <Tooltip title={<h6>Reset View</h6>}>
-                  <i
+              <div style={ { position: "absolute", width: "5vh", height: "100px",zIndex: "2", color : "white" } }>
+                <Tooltip placement='right' title="Reset View">
+                  <div
                     style={
                       {
                         zIndex : "2",
                         cursor : "pointer",
                         top : "10px",
-                        left : "10px"
+                        left : "10px",
+                        width: '1.3rem',
+                        height: '1.3rem',
+                        backgroundImage: `url(${stylingConfiguration.icons.home})`
                       }
                     }
-                    className={stylingConfiguration.icons.home}
-                    onClick={this.resetCamera }>
-                  </i>
+                    onClick={this.resetCamera}>
+                  </div>
                 </Tooltip>
-                <Tooltip title={<h6>Zoom In</h6>}>
-                  <i
+                <Tooltip placement='right' title="Zoom In">
+                  <div
                     style={
                       {
                         zIndex : "2",
                         cursor : "pointer",
                         marginTop : "20px",
-                        left : "10px"
+                        left : "10px",
+                        width: '1.3rem',
+                        height: '1.3rem',
+                        backgroundImage: `url(${stylingConfiguration.icons.zoomIn})`
                       }
                     }
-                    className={stylingConfiguration.icons.zoomIn}
-                    onClick={this.zoomIn }>
-                  </i>
+                    onClick={this.zoomIn}>
+                  </div>
                 </Tooltip>
-                <Tooltip title={<h6>Zoom Out</h6>}>
-                  <i
+                <Tooltip placement='right' title="Zoom Out">
+                  <div
                     style={
                       {
                         zIndex : "2",
                         cursor : "pointer",
                         marginTop : "5px",
-                        left : "10px"
+                        left : "10px",
+                        width: '1.3rem',
+                        height: '1.3rem',
+                        backgroundImage: `url(${stylingConfiguration.icons.zoomOut})`
                       }
                     }
-                    className={stylingConfiguration.icons.zoomOut}
-                    onClick={this.zoomOut }>
-                  </i>
+                    onClick={this.zoomOut}>
+                  </div>
                 </Tooltip>
                 <DropDownQueries
                   handleMenuClick={selection => self.handleMenuClick(selection)}

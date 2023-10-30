@@ -144,8 +144,8 @@ const TermInfo = ({ open, setOpen }) => {
   }
 
   const customColorCalculation = ({numTerms, baseRGB, heatLevels, itemData }) => {
-    let red = 1 * itemData.descendant_terms[0];
-    let green = baseRGB[1] * (1 - (itemData.descendant_terms[0]/100));
+    let red = baseRGB[0] * itemData.descendant_terms[0];
+    let green = (baseRGB[1] )* (1 - (itemData.descendant_terms[0]/100));
 
     return[red, green, baseRGB[2]];
   }

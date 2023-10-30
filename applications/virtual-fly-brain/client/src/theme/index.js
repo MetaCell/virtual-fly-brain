@@ -42,13 +42,26 @@ theme = createTheme({
           font-family: ${primaryFont};
           box-sizing: border-box
         }
-        .flexlayout__tab_button--selected {
-          padding: 0.5rem;
-          background-color: ${blackColor};
+        .flexlayout__tab_button {
+          margin: 0;
           border-radius: 8px 8px 0px 0px;
+          padding: 0.5rem;
+        }
+        .flexlayout__tab_button--selected {
+          background-color: ${blackColor};
         }
         .flexlayout__tab_button--selected:hover {
           background-color: ${blackColor};
+        }
+        .flexlayout__tab_button--unselected {
+          background-color: transparent;
+          border-top: 1px solid ${secondaryBg};
+          border-right: 1px solid ${secondaryBg};
+          border-left: 1px solid ${secondaryBg};
+          border-bottom: 0;
+        }
+        .flexlayout__tab_button--unselected:hover {
+          background-color: transparent;
         }
         .flexlayout__tab_button_content {
           font-size: 0.875rem;
@@ -58,18 +71,15 @@ theme = createTheme({
           padding: 0;
           font-family: ${primaryFont};
         }
-        .flexlayout__tab_button {
-          margin: 0;
-        }
         .flexlayout__tabset_tabbar_inner_tab_container_top {
           border-top: none;
+          gap: 0.25rem;
         }
         .flexlayout__tabset_tabbar_outer {
           background-color: transparent;
         }
         .flexlayout__tabset_tabbar_outer_top {
           border-bottom: none;
-          height: 2.125rem !important;
         }
         .flexlayout__layout {
           border-top: none;

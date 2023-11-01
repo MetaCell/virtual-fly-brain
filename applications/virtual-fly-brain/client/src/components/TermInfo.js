@@ -12,10 +12,13 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import TreeView from '@mui/lab/TreeView';
 import { TreeItem } from "@mui/lab";
 import ListAltIcon from '@mui/icons-material/ListAlt';
+import ColorLensIcon from '@mui/icons-material/ColorLens';
 import GeneralInformation from "./TermInfo/GeneralInformation";
-import { getInstanceByID, removeInstanceByID } from './../reducers/actions/instances';
+import { getInstanceByID, removeInstanceByID, showInstance, hideInstance, changeColor } from './../reducers/actions/instances';
 import { termInfoById } from "./../reducers/actions/termInfo";
 import Ribbon from '@flybase/react-ontology-ribbon';
+import { ChromePicker } from 'react-color';
+
 import '@flybase/react-ontology-ribbon/dist/style.css';
 
 const {
@@ -111,14 +114,83 @@ function a11yProps(index) {
 }
 const ribbonConfiguration = require("../components/configuration/TermInfo/TermInfo").ribbonConfiguration;
 
-const TermInfo = ({ open, setOpen }) => {
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const openMenu = Boolean(anchorEl);
-  const [value, setValue] = React.useState(0);
+const classes = {
+  root: {
+    // transition: 'all ease-in-out .3s',
+    height: {
+      lg: '100%'
+    },
+    color: whiteColor,
+    display: 'flex',
+    flexDirection: 'column',
+  },
 
+  header: {
+    top: 0,
+    background: {
+      xs: headerBorderColor,
+      md: 'transparent'
+    },
+    borderBottom: {
+      lg: '0.0625rem solid #3A3A3A'
+    },
+    zIndex: 9,
+    position: {
+      xs: 'sticky',
+      md: 'static',
+    },
+    mx: {
+      xs: -1.5,
+      md: 0
+    },
+    px: {
+      xs: 1.5,
+      md: 0
+    }
+  },
+
+  heading: {
+    fontWeight: 400,
+    fontSize: '0.875rem',
+    lineHeight: '1.125rem',
+    color: listHeadingColor
+  },
+
+  footer: {
+    height: '3.75rem',
+    background: '#1A1A1A',
+    borderTop: `0.0625rem solid ${secondaryBg}`,
+    zIndex: 9,
+    '& p': {
+      fontWeight: 400,
+      fontSize: '1rem',
+      lineHeight: 1,
+      color: outlinedBtnTextColor,
+    }
+  },
+
+  buttonGroup: {
+    '& .MuiButton-root': {
+      height: '1.875rem',
+      background: {
+        xs: primaryBg,
+        lg: secondaryBg
+      }
+    }
+  }
+}
+
+const TermInfo = ({ open, setOpen }) => {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const openMenu = Boolean(anchorEl);
+  const [value, setValue] = useState(0);
+  const [ displayColorPicker, setDisplayColorPicker ] = useState(false);
+  const [expanded, setExpanded] = useState({ "General Information" : false, "Queries" : false, "Graphs" : false});
+  const [sections, setSections] = useState(["General Information", "Queries", "Graphs"])
   const data = useSelector(state => state.termInfo.termInfoData)
   const error = useSelector(state => state.termInfo.error)
   const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances)
+  const [termInfoData, setTermInfoData] = useState(data);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -130,11 +202,45 @@ const TermInfo = ({ open, setOpen }) => {
     setAnchorEl(null);
   };
 
+  const handleSection = (event) => {
+    handleClose();
+    let newState = {};
+    sections?.forEach( section => {
+      newState[section] = false
+    })
+    setExpanded({ ...newState, [event.target.id] : true })
+  }
+
+  const handleExpandAll = (expanded) => {
+    let newState = {};
+    sections?.forEach( section => {
+      newState[section] = expanded
+    })
+    setExpanded(newState)
+  }
+
   const deleteId = (id) => {
     removeInstanceByID(id)
   }
+
   const addId = (id) => {
     getInstanceByID(id);
+  }
+
+  const handleVisibility = () => {
+    if ( allLoadedInstances.find( instance => instance.Id == termInfoData.Id )?.visible ) {
+      hideInstance(termInfoData.Id)
+    } else {
+      showInstance(termInfoData.Id)
+    }
+  }
+
+  const handleFocus = () => {
+    
+  }
+
+  const handle3DVolume = () => {
+    
   }
 
   const handleTermClick = (term, evt) => {
@@ -150,73 +256,6 @@ const TermInfo = ({ open, setOpen }) => {
     return[red, green, baseRGB[2]];
   }
 
-  const classes = {
-    root: {
-      // transition: 'all ease-in-out .3s',
-      height: {
-        lg: '100%'
-      },
-      color: whiteColor,
-      display: 'flex',
-      flexDirection: 'column',
-    },
-
-    header: {
-      top: 0,
-      background: {
-        xs: headerBorderColor,
-        md: 'transparent'
-      },
-      borderBottom: {
-        lg: '0.0625rem solid #3A3A3A'
-      },
-      zIndex: 9,
-      position: {
-        xs: 'sticky',
-        md: 'static',
-      },
-      mx: {
-        xs: -1.5,
-        md: 0
-      },
-      px: {
-        xs: 1.5,
-        md: 0
-      }
-    },
-
-    heading: {
-      fontWeight: 400,
-      fontSize: '0.875rem',
-      lineHeight: '1.125rem',
-      color: listHeadingColor
-    },
-
-    footer: {
-      height: '3.75rem',
-      background: '#1A1A1A',
-      borderTop: `0.0625rem solid ${secondaryBg}`,
-      zIndex: 9,
-      '& p': {
-        fontWeight: 400,
-        fontSize: '1rem',
-        lineHeight: 1,
-        color: outlinedBtnTextColor,
-      }
-    },
-
-    buttonGroup: {
-      '& .MuiButton-root': {
-        height: '1.875rem',
-        background: {
-          xs: primaryBg,
-          lg: secondaryBg
-        }
-      }
-    }
-  }
-
-  const [termInfoData, setTermInfoData] = useState(data);
   const termInfoHeading = (
     <>
       <Typography
@@ -234,16 +273,6 @@ const TermInfo = ({ open, setOpen }) => {
       {data?.Name} [{data?.Id}]
     </>
   )
-
-  function createData(
-    name,
-    calories,
-    fat,
-    carbs,
-    protein,
-  ) {
-    return { name, calories, fat, carbs, protein };
-  }
 
   // FIXME
   useEffect(() => {
@@ -391,32 +420,50 @@ const TermInfo = ({ open, setOpen }) => {
                             'aria-labelledby': 'basic-button',
                           }}
                         >
-                          <MenuItem onClick={handleClose}>General Information</MenuItem>
-                          <MenuItem onClick={handleClose}>Queries</MenuItem>
+                          {sections?.map( section =>
+                            <MenuItem id={section} key={section} onClick={(event) => handleSection(event)}>{section}</MenuItem>
+                          )}
                         </Menu>
                       </Box>
                       <ButtonGroup color="secondary" sx={classes.buttonGroup} variant="contained">
-                        <Button>
+                        <Button onClick={()=> handleExpandAll(true)}>
                           <Expand />
                         </Button>
-                        <Button>
-                          <Remove />
+                        <Button onClick={()=> handleExpandAll(false)}>
+                          <Remove/>
                         </Button>
                       </ButtonGroup>
                     </Box>
 
                     <Box>
                       <ButtonGroup color="secondary" sx={classes.buttonGroup} variant="contained">
-                        <Button>
+                        <div>
+                          <Button onClick={() => setDisplayColorPicker(!displayColorPicker)}><ColorLensIcon/></Button>
+                          { displayColorPicker ?
+                          <ChromePicker
+                            color={termInfoData?.color}
+                            onChangeComplete={ (color, event) => {
+                              let loadedInstances = [...allLoadedInstances];
+                              let instance = loadedInstances?.find( instance => instance.Id === termInfoData.Id);
+                              if ( instance )
+                                instance.color = color.hex;
+                              changeColor(termInfoData.Id, color.rgb)
+                              setDisplayColorPicker(false)
+                            }}
+                            style={{ zIndex: 10 }}/>
+                            : null
+                          }
+                        </div>
+                        <Button onClick={() => handleVisibility()}>
                           <Eye />
                         </Button>
-                        <Button>
+                        <Button onClick={() => handleFocus()}>
                           <Focus />
                         </Button>
-                        <Button>
+                        <Button onClick={() => handle3DVolume()}>
                           <ArView />
                         </Button>
-                        <Button>
+                        <Button onClick={() => deleteID()}>
                           <Delete />
                         </Button>
                       </ButtonGroup>
@@ -434,7 +481,7 @@ const TermInfo = ({ open, setOpen }) => {
                 lg: 'calc(100% - 4.0625rem)'
               }
             }}>
-              <Accordion>
+              <Accordion expanded={expanded[sections[0]]}>
                 <AccordionSummary
                   expandIcon={<ChevronDown />}
                   aria-controls="panel1a-content"
@@ -447,7 +494,7 @@ const TermInfo = ({ open, setOpen }) => {
                 </AccordionDetails>
               </Accordion>
 
-              <Accordion>
+              <Accordion expanded={expanded[sections[1]]}>
                 <AccordionSummary
                   expandIcon={<ChevronDown />}
                   aria-controls="panel2a-content"
@@ -567,7 +614,7 @@ const TermInfo = ({ open, setOpen }) => {
                 </AccordionDetails>
               </Accordion>
 
-              <Accordion>
+              <Accordion expanded={expanded[sections[2]]}>
                 <AccordionSummary
                   expandIcon={<ChevronDown />}
                   aria-controls="panel1a-content"

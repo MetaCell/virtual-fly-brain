@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Canvas from "@metacell/geppetto-meta-ui/3d-canvas/Canvas";
 // import CameraControls from "@metacell/geppetto-meta-ui/camera-controls/CameraControls";
-import SimpleInstance from "@metacell/geppetto-meta-core/model/Instance";
+import SimpleInstance from "@metacell/geppetto-meta-core/model/SimpleInstance";
 import { withStyles } from '@material-ui/core';
 import Button from "@material-ui/core/Button";
 import { applySelection, mapToCanvasData } from "@metacell/geppetto-meta-ui/3d-canvas/utils/SelectionUtils"
@@ -19,23 +19,6 @@ const {
   whiteColor,
   blackColor
 } = vars;
-
-function loadInstances (instance){
-  ModelFactory.cleanModel();
-  const instance1 = new SimpleInstance(instance)
-  instance1.visible = true;
-  let instances = window.Instances;
-  if ( instances === undefined ){
-    instances = [];
-  }
-  window.Instances?.find( i => i.wrappedObj?.id === instance.id ) ? null : window.Instances = [...instances, instance1]
-  augmentInstancesArray(window.Instances);
-}
-
-function getProxyInstances () {
-  return window.Instances.map(i => (
-    { instancePath: i.getId(), color: { r: Math.random(), g:1, b: Math.random(), a:1 }, visible : true}))
-}
 
 const styles = () => ({
   container: {
@@ -84,6 +67,28 @@ class ThreeDCanvas extends Component {
 
   }
 
+  loadInstances (instance){
+    ModelFactory.cleanModel();
+    const instance1 = new SimpleInstance(instance)
+    instance1.visible = true;
+    let instances = window.Instances;
+    if ( instances === undefined ){
+      instances = [];
+    }
+    instances?.find( i => i.wrappedObj?.id === instance.id ) ? null : window.Instances = [...instances, instance1]
+    augmentInstancesArray(window.Instances);
+  }
+  
+  getProxyInstances () {
+    return window.Instances.map(i => (
+      { 
+        instancePath: i.getId(), 
+        color: i.color, 
+        visible : true
+      }
+    ))
+  }
+
   componentDidUpdate(prevProps, prevState) {
     let that = this;
     let allLoadedInstances = this.props.allLoadedInstances;
@@ -101,11 +106,12 @@ class ThreeDCanvas extends Component {
                 "type": { "eClass": "SimpleType" },
                 "visualValue": {
                   "eClass": Resources.OBJ,
-                  'obj': base64Content
+                  'obj': base64Content,
+                  'color' : instanceCopy.color
                 }
               }
-              loadInstances(instance)
-              const data = getProxyInstances();
+              this.loadInstances(instance)
+              const data = this.getProxyInstances();
               let mappedCanvasData = mapToCanvasData(data)
               let match = mappedCanvasData?.find( m => instance.id === m.instancePath )
               match.visible = true;
@@ -114,7 +120,14 @@ class ThreeDCanvas extends Component {
         } else {
           let mappedCanvasData = [...that.state.mappedCanvasData]
           let match = mappedCanvasData?.find( m => m.instancePath === inst.Id )
-          if ( !match?.visible ){
+          if ( match.color != inst.color && !match?.visible){
+            match.color = inst.color;
+            match.visible = true;
+            that.setState({ ...that.state, mappedCanvasData : mappedCanvasData})
+          } else if ( match.color != inst.color && match?.visible){
+            match.color = inst.color;
+            that.setState({ ...that.state, mappedCanvasData : mappedCanvasData})
+          } else if ( !match?.visible ){
             match.visible = true;
             that.setState({ ...that.state, mappedCanvasData : mappedCanvasData})
           }
@@ -122,7 +135,14 @@ class ThreeDCanvas extends Component {
       } else {
         let mappedCanvasData = [...that.state.mappedCanvasData]
         let match = mappedCanvasData?.find( m => m.instancePath === inst.Id )
-        if ( match?.visible ){
+        if ( match.color != inst.color && match?.visible){
+          match.color = inst.color;
+          match.visible = false;
+          that.setState({ ...that.state, mappedCanvasData : mappedCanvasData})
+        } else if ( match.color != inst.color && !match?.visible){
+          match.color = inst.color;
+          that.setState({ ...that.state, mappedCanvasData : mappedCanvasData})
+        } else if ( match?.visible ){
           match.visible = false;
           that.setState({ ...that.state, mappedCanvasData : mappedCanvasData})
         }
@@ -141,8 +161,8 @@ class ThreeDCanvas extends Component {
 
   handleToggle () {
     this.setState({ showLoader: true })
-    loadInstances()
-    this.setState({ showModel: true, showLoader: false, data: getProxyInstances(), cameraOptions: { ...this.state.cameraOptions, } })
+    this.loadInstances()
+    this.setState({ showModel: true, showLoader: false, data: this.getProxyInstances(), cameraOptions: { ...this.state.cameraOptions, } })
   }
 
   handleClickOutside (event) {

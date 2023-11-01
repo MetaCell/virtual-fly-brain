@@ -51,6 +51,15 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
           isLoading: false
         })
       }
+      case getInstancesTypes.CHANGE_COLOR:{
+        const updateInst = [...state.allLoadedInstances]
+        const match = state.allLoadedInstances?.find( i => i.Id === response.payload.id );
+        match.color = response.payload.color;
+        return Object.assign({}, state, {
+          allLoadedInstances: [...updateInst],
+          isLoading: false
+        })
+      }
      default:
         return state;
   }

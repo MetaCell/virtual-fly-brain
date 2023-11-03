@@ -3,6 +3,8 @@ import { getInstancesTypes } from './actions/types/getInstancesTypes';
 export const initialStateInstancesReducer = {
   allPotentialInstances : [],
   allLoadedInstances : [],
+  focusInstance : "",
+  triggerFocus : null,
   isLoading: false,
   error: false
 };
@@ -57,6 +59,14 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         match.color = response.payload.color;
         return Object.assign({}, state, {
           allLoadedInstances: [...updateInst],
+          isLoading: false
+        })
+      }
+      case getInstancesTypes.FOCUS_INSTANCE:{
+        const findInstance = state.allLoadedInstances?.find( i => i.Id === response.payload.id );
+        return Object.assign({}, state, {
+          focusInstance: findInstance,
+          triggerFocus : response.payload.timeStamp,
           isLoading: false
         })
       }

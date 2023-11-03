@@ -1,4 +1,4 @@
-import { Box, Button, ButtonGroup, Grid, IconButton, Menu, MenuItem, Table, TableBody, TableCell, Paper, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
+import { Box, Button,Tooltip, ButtonGroup, Grid, IconButton, Menu, MenuItem, Table, TableBody, TableCell, Paper, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from 'react-redux'
 import { styled } from '@mui/material/styles';
@@ -14,7 +14,7 @@ import { TreeItem } from "@mui/lab";
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import ColorLensIcon from '@mui/icons-material/ColorLens';
 import GeneralInformation from "./TermInfo/GeneralInformation";
-import { getInstanceByID, removeInstanceByID, showInstance, hideInstance, changeColor } from './../reducers/actions/instances';
+import { getInstanceByID, removeInstanceByID, showInstance, hideInstance, changeColor, focusInstance } from './../reducers/actions/instances';
 import { termInfoById } from "./../reducers/actions/termInfo";
 import Ribbon from '@flybase/react-ontology-ribbon';
 import { ChromePicker } from 'react-color';
@@ -40,27 +40,6 @@ const getRibbonData = (query) => {
   ));
   return terms; 
 }
-
-const CustomTableContainer = styled(TableContainer)(
-  ({ theme }) => `
-  position: relative;
-  min-width: 35rem;
-  max-width: 43rem;
-  border-radius: 0.5rem;
-  box-shadow: 0px 2px 4px -2px rgba(16, 24, 40, 0.06), 0px 4px 8px -2px rgba(16, 24, 40, 0.10);
-  &:after {
-    content: '';
-    position: absolute;
-    top: 0;
-    z-index: 999;
-    display: block;
-    height: 100%;
-    width: 100%;
-    pointer-events: none;
-    background: linear-gradient(270deg, #222 0%, rgba(34, 34, 34, 0.00) 26.7%);
-  }
-`,
-);
 
 const CustomBox = styled(Box)(
   ({ theme }) => `
@@ -220,7 +199,7 @@ const TermInfo = ({ open, setOpen }) => {
   }
 
   const deleteId = (id) => {
-    removeInstanceByID(id)
+    setTermInfoData(null)
   }
 
   const addId = (id) => {
@@ -235,12 +214,20 @@ const TermInfo = ({ open, setOpen }) => {
     }
   }
 
-  const handleFocus = () => {
-    
+  const handleFocus = (event, recenter) => {
+    if ( recenter ){
+      focusInstance(null, event.timeStamp)
+    } else {
+      focusInstance(termInfoData.Id, event.timeStamp)
+    }
   }
 
   const handle3DVolume = () => {
-    
+    if ( allLoadedInstances.find( instance => instance.Id == termInfoData.Id )?.visible ) {
+      hideInstance(termInfoData.Id)
+    } else {
+      showInstance(termInfoData.Id)
+    }
   }
 
   const handleTermClick = (term, evt) => {
@@ -426,46 +413,56 @@ const TermInfo = ({ open, setOpen }) => {
                         </Menu>
                       </Box>
                       <ButtonGroup color="secondary" sx={classes.buttonGroup} variant="contained">
+                      <Tooltip title={"Expand all sections"}>
                         <Button onClick={()=> handleExpandAll(true)}>
                           <Expand />
                         </Button>
+                      </Tooltip>
+                      <Tooltip title={"Collapse all sections"}>
                         <Button onClick={()=> handleExpandAll(false)}>
                           <Remove/>
                         </Button>
+                      </Tooltip>
                       </ButtonGroup>
                     </Box>
 
                     <Box>
                       <ButtonGroup color="secondary" sx={classes.buttonGroup} variant="contained">
-                        <div>
-                          <Button onClick={() => setDisplayColorPicker(!displayColorPicker)}><ColorLensIcon/></Button>
+                        <>
+                          <Tooltip title={"Edit 3D Canvas Color"}>
+                            <Button onClick={() => setDisplayColorPicker(!displayColorPicker)}><ColorLensIcon/></Button>
+                          </Tooltip>
                           { displayColorPicker ?
                           <ChromePicker
                             color={termInfoData?.color}
                             onChangeComplete={ (color, event) => {
-                              let loadedInstances = [...allLoadedInstances];
-                              let instance = loadedInstances?.find( instance => instance.Id === termInfoData.Id);
-                              if ( instance )
-                                instance.color = color.hex;
                               changeColor(termInfoData.Id, color.rgb)
                               setDisplayColorPicker(false)
                             }}
                             style={{ zIndex: 10 }}/>
                             : null
                           }
-                        </div>
-                        <Button onClick={() => handleVisibility()}>
-                          <Eye />
-                        </Button>
-                        <Button onClick={() => handleFocus()}>
-                          <Focus />
-                        </Button>
-                        <Button onClick={() => handle3DVolume()}>
-                          <ArView />
-                        </Button>
-                        <Button onClick={() => deleteID()}>
-                          <Delete />
-                        </Button>
+                        </>
+                        <Tooltip title={"Toggle 3D Mesh"}>
+                          <Button onClick={() => handleVisibility()}>
+                            <Eye />
+                          </Button>
+                        </Tooltip>
+                        <Tooltip title={"Center on 3D Canvas"}>
+                          <Button onClick={(event) => handleFocus(event, false)}>
+                            <Focus />
+                          </Button>
+                        </Tooltip>
+                        <Tooltip title={"Full View 3D Canvas"}>
+                          <Button onClick={(event) => handleFocus(event, true)}>
+                            <ArView />
+                          </Button>
+                        </Tooltip>
+                        <Tooltip title={"Delete From Term Info"}>
+                          <Button onClick={() => deleteId()}>
+                            <Delete />
+                          </Button>
+                        </Tooltip>
                       </ButtonGroup>
                     </Box>
                   </Box>

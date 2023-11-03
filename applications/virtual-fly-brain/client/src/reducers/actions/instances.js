@@ -49,6 +49,14 @@ const changeColorMessage = (id, color) => ({
   }
 });
 
+const focusInstanceMessage = (id, timeStamp) => ({
+  type: getInstancesTypes.FOCUS_INSTANCE,
+  payload: {
+    id,
+    timeStamp
+  }
+});
+
 const removeInstancesFailure = error => ({
   type: getInstancesTypes.REMOVE_INSTANCES_FAILURE,
   payload: {
@@ -91,4 +99,8 @@ export const hideInstance = async (id) => {
 
 export const changeColor = async (id, color) => {
   store.dispatch(changeColorMessage(id, color))
+}
+
+export const focusInstance = async (id, timeStamp) => {
+  store.dispatch(focusInstanceMessage(id, timeStamp))
 }

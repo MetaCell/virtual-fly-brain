@@ -46,9 +46,6 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
 
   useEffect(() => {
     setTab(defaultActiveTab)
-    if (!desktopScreen) {
-      setBottomNav(2)
-    }
   }, [desktopScreen])
 
   useEffect(() => {

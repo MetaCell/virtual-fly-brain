@@ -1,21 +1,19 @@
 import React, { Component } from 'react';
-import Canvas from "@metacell/geppetto-meta-ui/3d-canvas/Canvas";
 // import CameraControls from "@metacell/geppetto-meta-ui/camera-controls/CameraControls";
 import SimpleInstance from "@metacell/geppetto-meta-core/model/SimpleInstance";
 import { withStyles } from '@material-ui/core';
-import Button from "@material-ui/core/Button";
 import { applySelection, mapToCanvasData } from "@metacell/geppetto-meta-ui/3d-canvas/utils/SelectionUtils"
-import CaptureControls from "@metacell/geppetto-meta-ui/capture-controls/CaptureControls";
 import Resources from '@metacell/geppetto-meta-core/Resources';
 import ModelFactory from '@metacell/geppetto-meta-core/ModelFactory';
 import { augmentInstancesArray } from '@metacell/geppetto-meta-core/Instances';
 import { connect } from 'react-redux';
-import { Box } from '@mui/material';
 import vars from '../theme/variables';
 import CameraControls from './CameraControls';
+import {cameraControlsActions} from './CameraControls';
+import {Button, Box} from '@mui/material'
+import Canvas from "@metacell/geppetto-meta-ui/3d-canvas/Canvas";
 
 const {
-  secondaryBg,
   whiteColor,
   blackColor
 } = vars;
@@ -52,19 +50,14 @@ class ThreeDCanvas extends Component {
         wireframe: false,
       },
       showModel: false,
-      mappedCanvasData: []
+      mappedCanvasData: [],
     };
 
-    this.hoverHandler = this.hoverHandler.bind(this);
+    this.canvasRef = React.createRef();
     this.handleClickOutside = this.handleClickOutside.bind(this);
     this.handleToggle = this.handleToggle.bind(this);
     this.onSelection = this.onSelection.bind(this)
-    this.onMount = this.onMount.bind(this);
     this.layoutRef = React.createRef();
-  }
-
-  componentDidMount () {
-
   }
 
   loadInstances (instance){
@@ -83,10 +76,49 @@ class ThreeDCanvas extends Component {
     return window.Instances.map(i => (
       { 
         instancePath: i.getId(), 
-        color: i.color, 
+        color: { r: 1, g: 1, b: 0, a: 1 }, 
         visible : true
       }
     ))
+  }
+
+  updateColors ( inst, visible) {
+    let mappedCanvasData = [...this.state.mappedCanvasData]
+    let match = mappedCanvasData?.find( m => m.instancePath === inst.Id )
+    let color = { r : inst.color?.r/255, g : inst.color?.g/255, b : inst.color?.b/255 }
+    let colorMatch = match.color.b === color.b && match.color.r === color.r && match.color.g === color?.g;
+      
+    if ( !colorMatch && inst.color && !match?.visible && ( match.visible != visible )){
+        match.color = color;
+        if ( match.visible != visible ) {
+          match.visible = visible;
+          this.setState({ ...this.state, mappedCanvasData : mappedCanvasData })
+        }
+        this.canvasRef.current.threeDEngine.updateInstances(mappedCanvasData)
+      } else if ( !colorMatch && inst.color && match?.visible ){
+        match.color = color;
+        if ( match.visible != visible ) {
+          match.visible = visible;
+          this.setState({ ...this.state, mappedCanvasData : mappedCanvasData })
+        }
+        this.canvasRef.current.threeDEngine.updateInstances(mappedCanvasData)
+      } else {
+        if ( match.visible != visible ) {
+          match.visible = visible;
+          this.setState({ ...this.state, mappedCanvasData : mappedCanvasData })
+        }
+      }
+  }
+
+  UNSAFE_componentWillReceiveProps(nextProps){
+    if(this.props.triggerFocus !== nextProps.triggerFocus){ 
+      let instance = window.Instances.find( (instance) => instance.wrappedObj.id === nextProps.focusInstance?.Id);
+      if ( instance ){
+        this.canvasRef.current.threeDEngine.cameraManager.zoomTo([instance])
+      } else {
+        this.canvasRef.current.defaultCameraControlsHandler("cameraHome")
+      }
+    }
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -107,7 +139,7 @@ class ThreeDCanvas extends Component {
                 "visualValue": {
                   "eClass": Resources.OBJ,
                   'obj': base64Content,
-                  'color' : instanceCopy.color
+                  'color' : { r: 1, g: 1, b: 0, a: 1 },
                 }
               }
               this.loadInstances(instance)
@@ -118,34 +150,10 @@ class ThreeDCanvas extends Component {
               that.setState({ ...that.state, mappedCanvasData : mappedCanvasData})
             });
         } else {
-          let mappedCanvasData = [...that.state.mappedCanvasData]
-          let match = mappedCanvasData?.find( m => m.instancePath === inst.Id )
-          if ( match.color != inst.color && !match?.visible){
-            match.color = inst.color;
-            match.visible = true;
-            that.setState({ ...that.state, mappedCanvasData : mappedCanvasData})
-          } else if ( match.color != inst.color && match?.visible){
-            match.color = inst.color;
-            that.setState({ ...that.state, mappedCanvasData : mappedCanvasData})
-          } else if ( !match?.visible ){
-            match.visible = true;
-            that.setState({ ...that.state, mappedCanvasData : mappedCanvasData})
-          }
+          this.updateColors(inst, true)
         }
       } else {
-        let mappedCanvasData = [...that.state.mappedCanvasData]
-        let match = mappedCanvasData?.find( m => m.instancePath === inst.Id )
-        if ( match.color != inst.color && match?.visible){
-          match.color = inst.color;
-          match.visible = false;
-          that.setState({ ...that.state, mappedCanvasData : mappedCanvasData})
-        } else if ( match.color != inst.color && !match?.visible){
-          match.color = inst.color;
-          that.setState({ ...that.state, mappedCanvasData : mappedCanvasData})
-        } else if ( match?.visible ){
-          match.visible = false;
-          that.setState({ ...that.state, mappedCanvasData : mappedCanvasData})
-        }
+        this.updateColors(inst, false)
       }
     });
   }
@@ -153,10 +161,6 @@ class ThreeDCanvas extends Component {
   componentWillUnmount () {
     document.removeEventListener('mousedown', this.handleClickOutside);
     console.log("Component unmouted")
-  }
-
-  hoverHandler (objs, canvasX, canvasY) {
-
   }
 
   handleToggle () {
@@ -173,41 +177,13 @@ class ThreeDCanvas extends Component {
     }
   }
 
-  onMount (scene){
-    console.log(scene)
-  }
-
   onSelection (selectedInstances){
     this.setState({ data: applySelection(this.state.data, selectedInstances) })
   }
 
   render () {
-    const { cameraOptions, showModel, showLoader } = this.state
-    let canvasData = undefined ;
-    let data = undefined ;
+    const { cameraOptions } = this.state
     const { classes } = this.props
-
-    const captureOptions = {
-      captureControls: {
-        instance: CaptureControls,
-        props: {}
-      },
-      recorderOptions: {
-        mediaRecorderOptions: { mimeType: 'video/webm', },
-        blobOptions:{ type: 'video/webm' }
-      },
-      screenshotOptions:{
-        resolution:{
-          width: 3840,
-          height: 2160,
-        },
-        quality: 0.95,
-        pixelRatio: 1,
-        filter: () => true
-      },
-    }
-
-    console.log("Rendering data ", this.state.mappedCanvasData)
 
     return <Box
       sx={{
@@ -230,7 +206,6 @@ class ThreeDCanvas extends Component {
               ref={this.canvasRef}
               data={this.state.mappedCanvasData?.filter(d => d?.visible )}
               cameraOptions={cameraOptions}
-              // captureOptions={captureOptions}
               backgroundColor={blackColor}
               onSelection={this.onSelection}
               onMount={this.onMount}
@@ -255,7 +230,9 @@ class ThreeDCanvas extends Component {
 }
 
 const mapStateToProps = state => ({
-  allLoadedInstances : state.instances.allLoadedInstances
+  allLoadedInstances : state.instances.allLoadedInstances,
+  focusInstance : state.instances.focusInstance,
+  triggerFocus : state.instances.triggerFocus
 });
 
 

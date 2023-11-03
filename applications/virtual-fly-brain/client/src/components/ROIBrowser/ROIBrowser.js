@@ -5,13 +5,15 @@ import { MuiThemeProvider } from "@material-ui/core/styles";
 import Tree from "./Tree";
 import CircularProgress from "@mui/material/CircularProgress";
 import IconButton from "@mui/material/IconButton";
+import ColorLensIcon from '@mui/icons-material/ColorLens';
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import axios from 'axios';
 import vars from "../../theme/variables";
 import { useSelector, connect } from "react-redux";
 import { termInfoById } from "../../reducers/actions/termInfo";
-import { getInstanceByID } from '../../reducers/actions/instances';
+import { getInstanceByID, changeColor } from '../../reducers/actions/instances';
 import theme from "../../theme/index";
 const {
     secondaryBg,
@@ -34,6 +36,7 @@ const ROIBrowser = (props) => {
     
     const templateID = useSelector((state) => state.globalInfo.templateID);
     const data = useSelector(state => state.termInfo.termInfoData)
+    const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances)
 
     const styles = {
         left_second_column: 395,
@@ -337,8 +340,8 @@ const ROIBrowser = (props) => {
                 fillCondition = "3dToLoad";
             } else {
                 if (
-                    typeof Instances[rowInfo.node.instanceId].isVisible !== "undefined" &&
-                    Instances[rowInfo.node.instanceId].isVisible()
+                    typeof Instances[rowInfo.node.instanceId].visible !== "undefined" &&
+                    Instances[rowInfo.node.instanceId].visible
                 ) {
                     fillCondition = "3dVisible";
                 } else {
@@ -350,7 +353,7 @@ const ROIBrowser = (props) => {
         switch (fillCondition) {
             case "3dToLoad":
                 buttons.push(
-                    <IconButton color="primary" aria-label="delete" size="small" onClick={(e) => {
+                    <IconButton color="primary" aria-label="3dToLoad" size="small" onClick={(e) => {
                         e.stopPropagation();
                         termInfoById(rowInfo.node.instanceId);
                         getInstanceByID(rowInfo.node.instanceId);
@@ -365,12 +368,12 @@ const ROIBrowser = (props) => {
                 break;
             case "3dHidden":
                 buttons.push(
-                    <IconButton aria-label="delete" size="small" onClick={(e) => {
+                    <IconButton color="primary" aria-label="3dHidden" size="small" onClick={(e) => {
                         e.stopPropagation();
                         if (Instances[rowInfo.node.instanceId]?.getParent() !== null) {
-                            Instances[rowInfo.node.instanceId]?.getParent().show();
+                            Instances[rowInfo.node.instanceId].getParent().visible = true;
                         } else {
-                            Instances[rowInfo.node.instanceId]?.show();
+                            Instances[rowInfo.node.instanceId].visible = true;
                         }
                         setState({ ...state, nodeSelected : rowInfo.node });
                     }}>
@@ -381,59 +384,41 @@ const ROIBrowser = (props) => {
                 );
                 break;
             case "3dVisible":
-                var color = Instances[rowInfo.node.instanceId].getColor();
+                var color = Instances[rowInfo.node.instanceId].color;
                 buttons.push(
-                    <IconButton aria-label="delete" size="small" onClick={(e) => {
+                    <IconButton color="success" aria-label="3dvisible" size="small" onClick={(e) => {
                         e.stopPropagation();
                             if (Instances[rowInfo.node.instanceId]?.getParent() !== null) {
-                                Instances[rowInfo.node.instanceId]?.getParent().hide();
+                                Instances[rowInfo.node.instanceId].getParent().visible = false;
                             } else {
-                                Instances[rowInfo.node.instanceId].hide();
+                                Instances[rowInfo.node.instanceId].visible = false;
                             }
                             setState({ ...state, nodeSelected : rowInfo.node });
                     }}>
-                     <i className="fa fa-eye-slash"
+                     <i className="fa fa-eye"
                         aria-hidden="true"
                     />
                     </IconButton>
                 );
                 buttons.push(
-                    <span
-                        onClick={(e) => {
+                        <IconButton color="success" aria-label="color" size="small" onClick={(e) => {
                             e.stopPropagation();
-                        }}
-                    >
-                        <i
-                            className="fa fa-tint"
-                            style={{
-                                paddingLeft: "6px",
-                                color: color,
-                            }}
-                            aria-hidden="true"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                nodeWithColorPicker = rowInfo.node;
-                                rowInfo.node.showColorPicker = !rowInfo.node.showColorPicker;
-                                setDisplayColorPicker(!displayColorPicker);
-                                setPickerAnchor(!displayColorPicker ? undefined : e);
-                            }}
-                        />
+                            nodeWithColorPicker = rowInfo.node;
+                            rowInfo.node.showColorPicker = true;
+                            setDisplayColorPicker(true);
+                        }}>
+                            <ColorLensIcon/>
                         {displayColorPicker && rowInfo.node.showColorPicker ? (
-                            <div
-                                id="tree-color-picker"
-                                ref={(ref) => (colorPickerContainer = ref)}
-                            >
                                 <ChromePicker
-                                    color={Instances[rowInfo.node.instanceId].getColor()}
+                                    color={Instances[rowInfo.node.instanceId].color}
                                     onChangeComplete={(color, event) => {
-                                        Instances[rowInfo.node.instanceId].setColor(color.hex);
-                                        setDisplayColorPicker(true);
+                                        changeColor(rowInfo.node.instanceId, color.rgb)
+                                        setDisplayColorPicker(false);
                                     }}
                                     style={{ zIndex: 10 }}
                                 />
-                            </div>
                         ) : null}
-                    </span>
+                    </IconButton>
                 );
                 break;
         }
@@ -489,7 +474,7 @@ const ROIBrowser = (props) => {
                                 
                                 if (
                                     instanceFound &&
-                                    typeof Instances[rowInfo.node.instanceId].isVisible ===
+                                    typeof Instances[rowInfo.node.instanceId].visible ===
                                     "function"
                                 ) {
                                     termInfoById(rowInfo.node.instanceId);
@@ -524,6 +509,10 @@ const ROIBrowser = (props) => {
             updateTree(data)
         }
     },[data]);
+
+    React.useEffect(() => {
+        updateTree(data)
+    }, [allLoadedInstances])
 
     React.useEffect(() => {
         document.addEventListener("mousedown", monitorMouseClick, false);

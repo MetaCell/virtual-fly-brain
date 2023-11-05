@@ -6,6 +6,8 @@ import Tree from "./Tree";
 import CircularProgress from "@mui/material/CircularProgress";
 import IconButton from "@mui/material/IconButton";
 import ColorLensIcon from '@mui/icons-material/ColorLens';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
@@ -59,6 +61,7 @@ const ROIBrowser = (props) => {
         root : undefined
     });
 
+    const treeRef = React.useRef();
     let isNumber = require("./helper").isNumber;    
     let sortData = require("./helper").sortData;
     let findRoot = require("./helper").findRoot;
@@ -353,55 +356,52 @@ const ROIBrowser = (props) => {
         switch (fillCondition) {
             case "3dToLoad":
                 buttons.push(
-                    <IconButton color="primary" aria-label="3dToLoad" size="small" onClick={(e) => {
+                    <IconButton style={{ color: 'white' }} aria-label="3dToLoad" size="small" onClick={(e) => {
                         e.stopPropagation();
                         termInfoById(rowInfo.node.instanceId);
                         getInstanceByID(rowInfo.node.instanceId);
                         setState({ ...state, nodeSelected : rowInfo.node });
                     }}>
-                    <i
-                        className="fa fa-eye-slash"
-                        aria-hidden="true"
-                    />
+                    <VisibilityOffIcon/>
                     </IconButton>
                 );
                 break;
             case "3dHidden":
                 buttons.push(
-                    <IconButton color="primary" aria-label="3dHidden" size="small" onClick={(e) => {
+                    <IconButton style={{ color: 'white' }} aria-label="3dHidden" size="small" onClick={(e) => {
                         e.stopPropagation();
                         if (Instances[rowInfo.node.instanceId]?.getParent() !== null) {
                             Instances[rowInfo.node.instanceId].getParent().visible = true;
                         } else {
                             Instances[rowInfo.node.instanceId].visible = true;
                         }
+                        termInfoById(rowInfo.node.instanceId);
+                        getInstanceByID(rowInfo.node.instanceId);
                         setState({ ...state, nodeSelected : rowInfo.node });
                     }}>
-                     <i className="fa fa-eye-slash"
-                        aria-hidden="true"
-                    />
+                     <VisibilityOffIcon/>
                     </IconButton>
                 );
                 break;
             case "3dVisible":
                 var color = Instances[rowInfo.node.instanceId].color;
                 buttons.push(
-                    <IconButton color="success" aria-label="3dvisible" size="small" onClick={(e) => {
+                    <IconButton style={{ color: 'white' }} aria-label="3dvisible" size="small" onClick={(e) => {
                         e.stopPropagation();
                             if (Instances[rowInfo.node.instanceId]?.getParent() !== null) {
                                 Instances[rowInfo.node.instanceId].getParent().visible = false;
                             } else {
                                 Instances[rowInfo.node.instanceId].visible = false;
                             }
+                            termInfoById(rowInfo.node.instanceId);
+                            getInstanceByID(rowInfo.node.instanceId);
                             setState({ ...state, nodeSelected : rowInfo.node });
                     }}>
-                     <i className="fa fa-eye"
-                        aria-hidden="true"
-                    />
+                     <VisibilityIcon />
                     </IconButton>
                 );
                 buttons.push(
-                        <IconButton color="success" aria-label="color" size="small" onClick={(e) => {
+                        <IconButton style={{ color: 'white' }} aria-label="color" size="small" onClick={(e) => {
                             e.stopPropagation();
                             nodeWithColorPicker = rowInfo.node;
                             rowInfo.node.showColorPicker = true;
@@ -412,8 +412,9 @@ const ROIBrowser = (props) => {
                                 <ChromePicker
                                     color={Instances[rowInfo.node.instanceId].color}
                                     onChangeComplete={(color, event) => {
-                                        changeColor(rowInfo.node.instanceId, color.rgb)
                                         setDisplayColorPicker(false);
+                                        rowInfo.node.showColorPicker = false;
+                                        changeColor(rowInfo.node.instanceId, color.rgb)
                                     }}
                                     style={{ zIndex: 10 }}
                                 />
@@ -468,15 +469,11 @@ const ROIBrowser = (props) => {
                                 e.stopPropagation();
                                 colorPickerContainer = undefined;
                                 let instanceFound = false;
-                                if (Instances[rowInfo.node.instanceId]) {
+                                if ( Instances[rowInfo.node.instanceId] ) {
                                     instanceFound = true;
                                 }
                                 
-                                if (
-                                    instanceFound &&
-                                    typeof Instances[rowInfo.node.instanceId].visible ===
-                                    "function"
-                                ) {
+                                if ( instanceFound ) {
                                     termInfoById(rowInfo.node.instanceId);
                                 } else {
                                     termInfoById(rowInfo.node.classId);
@@ -511,7 +508,7 @@ const ROIBrowser = (props) => {
     },[data]);
 
     React.useEffect(() => {
-        updateTree(data)
+        treeRef?.current?.forceUpdate()
     }, [allLoadedInstances])
 
     React.useEffect(() => {
@@ -556,6 +553,7 @@ const ROIBrowser = (props) => {
                 />
             ) : (
                 <Tree
+                    ref={treeRef}
                     id="VFBTree"
                     name={"Tree"}
                     componentType={"TREE"}

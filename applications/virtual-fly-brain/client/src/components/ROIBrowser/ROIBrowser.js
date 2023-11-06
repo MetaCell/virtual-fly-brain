@@ -15,7 +15,7 @@ import axios from 'axios';
 import vars from "../../theme/variables";
 import { useSelector, connect } from "react-redux";
 import { termInfoById } from "../../reducers/actions/termInfo";
-import { getInstanceByID, changeColor } from '../../reducers/actions/instances';
+import { getInstanceByID, changeColor, hideInstance, showInstance } from '../../reducers/actions/instances';
 import theme from "../../theme/index";
 import useClickOutside from "./../useClickOutside";
 
@@ -214,7 +214,7 @@ const ROIBrowser = (props) => {
          * function handler called by the VFBMain whenever there is an update of the instance on focus,
          * this will reflect and move to the node (if it exists) that we have on focus.
          */
-        let idToSearch = instance.Id;
+        let idToSearch = instance?.Id;
 
         if (
             state?.nodeSelected !== undefined &&
@@ -242,8 +242,11 @@ const ROIBrowser = (props) => {
                 i++;
             }
             if (node.length > 0) {
-                selectNode(state?.nodes[node[0]]);
+                selectNode(state?.nodes[node[0]])
+                //selectNode(state?.dataTree[0])
             }
+        } else {
+            state?.dataTree && selectNode(state?.dataTree[0]);
         }
     };
 
@@ -339,20 +342,21 @@ const ROIBrowser = (props) => {
         let buttons = [];
         let fillCondition = "unknown";
         let instanceLoaded = false;
+        let match = allLoadedInstances.find( i => i.Id == rowInfo.node.instanceId);
+
         if (
             rowInfo.node.instanceId != undefined &&
             rowInfo.node.instanceId.indexOf("VFB_") > -1
         ) {
             fillCondition = "3dAvailable";
-            if (Instances[rowInfo.node.instanceId]) {
+            if ( match ) {
                 instanceLoaded = true;
             }
             if (!instanceLoaded) {
                 fillCondition = "3dToLoad";
             } else {
                 if (
-                    typeof Instances[rowInfo.node.instanceId].visible !== "undefined" &&
-                    Instances[rowInfo.node.instanceId].visible
+                    typeof match.visible !== "undefined" && match.visible
                 ) {
                     fillCondition = "3dVisible";
                 } else {
@@ -366,7 +370,7 @@ const ROIBrowser = (props) => {
                 buttons.push(
                     <IconButton style={{ color: 'white' }} aria-label="3dToLoad" size="small" onClick={(e) => {
                         e.stopPropagation();
-                        termInfoById(rowInfo.node.instanceId);
+                        // termInfoById(rowInfo.node.instanceId);
                         getInstanceByID(rowInfo.node.instanceId);
                         setState({ ...state, nodeSelected : rowInfo.node });
                     }}>
@@ -378,31 +382,30 @@ const ROIBrowser = (props) => {
                 buttons.push(
                     <IconButton style={{ color: 'white' }} aria-label="3dHidden" size="small" onClick={(e) => {
                         e.stopPropagation();
-                        if (Instances[rowInfo.node.instanceId]?.getParent() !== null) {
-                            Instances[rowInfo.node.instanceId].getParent().visible = true;
+                        if (match?.getParent) {
+                            match.getParent().visible = true;
                         } else {
-                            Instances[rowInfo.node.instanceId].visible = true;
+                            match.visible = true;
                         }
-                        termInfoById(rowInfo.node.instanceId);
-                        getInstanceByID(rowInfo.node.instanceId);
+                        showInstance(rowInfo.node.instanceId)
                         setState({ ...state, nodeSelected : rowInfo.node });
+                        
                     }}>
                      <VisibilityOffIcon/>
                     </IconButton>
                 );
                 break;
             case "3dVisible":
-                var color = Instances[rowInfo.node.instanceId].color;
+                var color = match.color;
                 buttons.push(
                     <IconButton style={{ color: 'white' }} aria-label="3dvisible" size="small" onClick={(e) => {
                         e.stopPropagation();
-                            if (Instances[rowInfo.node.instanceId]?.getParent() !== null) {
-                                Instances[rowInfo.node.instanceId].getParent().visible = false;
+                            if (match?.getParent) {
+                                match.getParent().visible = false;
                             } else {
-                                Instances[rowInfo.node.instanceId].visible = false;
+                                match.visible = false;
                             }
-                            termInfoById(rowInfo.node.instanceId);
-                            getInstanceByID(rowInfo.node.instanceId);
+                            hideInstance(rowInfo.node.instanceId)
                             setState({ ...state, nodeSelected : rowInfo.node });
                     }}>
                      <VisibilityIcon />
@@ -417,15 +420,13 @@ const ROIBrowser = (props) => {
                         }}>
                             <ColorLensIcon/>
                         {displayColorPicker && rowInfo.node.showColorPicker ? (
-                                <ChromePicker
-                                    color={Instances[rowInfo.node.instanceId].color}
+                                <div style={{ width: '100%' }} ref={popover}><ChromePicker
+                                    color={match.color}
                                     onChangeComplete={(color, event) => {
-                                        setDisplayColorPicker(true);
-                                        rowInfo.node.showColorPicker = false;
                                         changeColor(rowInfo.node.instanceId, color.rgb)
                                     }}
                                     style={{ zIndex: 10 }}
-                                />
+                                /></div>
                         ) : null}
                     </IconButton>
                 );
@@ -516,16 +517,8 @@ const ROIBrowser = (props) => {
     },[data]);
 
     React.useEffect(() => {
-        treeRef?.current?.forceUpdate()
+        updateTree(data)
     }, [allLoadedInstances])
-
-    React.useEffect(() => {
-        document.addEventListener("mousedown", monitorMouseClick, false);
-        // returned function will be called on component unmount
-        return () => {
-            document.removeEventListener("mousedown", monitorMouseClick, false);
-        };
-    }, []);
 
     return( 
         <Box
@@ -586,7 +579,7 @@ const ROIBrowser = (props) => {
                         clear: "both",
                     }}
                     rowHeight={styles.row_height}
-                    getButtons={getButtons}
+                    getButtons={(rowInfo) => getButtons(rowInfo)}
                     getNodesProps={getNodes}
                     searchQuery={
                         state?.nodeSelected?.subtitle

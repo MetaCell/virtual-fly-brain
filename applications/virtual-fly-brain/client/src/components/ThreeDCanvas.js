@@ -76,7 +76,7 @@ class ThreeDCanvas extends Component {
     return window.Instances.map(i => (
       { 
         instancePath: i.getId(), 
-        color: { r: 1, g: 1, b: 0, a: 1 }, 
+        color: { r:1, g: 1, b: 0, a: 1 }, 
         visible : true
       }
     ))
@@ -86,24 +86,24 @@ class ThreeDCanvas extends Component {
     let mappedCanvasData = [...this.state.mappedCanvasData]
     let match = mappedCanvasData?.find( m => m.instancePath === inst.Id )
     let color = { r : inst.color?.r/255, g : inst.color?.g/255, b : inst.color?.b/255 }
-    let colorMatch = match.color.b === color.b && match.color.r === color.r && match.color.g === color?.g;
+    let colorMatch = match?.color?.b === color?.b && match?.color?.r === color?.r && match?.color?.g === color?.g;
       
-    if ( !colorMatch && inst.color && !match?.visible && ( match.visible != visible )){
+    if ( !colorMatch && inst.color && match && !match?.visible && ( match.visible != visible )){
         match.color = color;
         if ( match.visible != visible ) {
           match.visible = visible;
-          this.setState({ ...this.state, mappedCanvasData : mappedCanvasData })
+          //this.setState({ ...this.state, mappedCanvasData : mappedCanvasData })
         }
         this.canvasRef.current.threeDEngine.updateInstances(mappedCanvasData)
-      } else if ( !colorMatch && inst.color && match?.visible ){
+      } else if ( !colorMatch && inst.color && match && match?.visible ){
         match.color = color;
         if ( match.visible != visible ) {
           match.visible = visible;
-          this.setState({ ...this.state, mappedCanvasData : mappedCanvasData })
+          //this.setState({ ...this.state, mappedCanvasData : mappedCanvasData })
         }
         this.canvasRef.current.threeDEngine.updateInstances(mappedCanvasData)
       } else {
-        if ( match.visible != visible ) {
+        if ( match && match?.visible != visible ) {
           match.visible = visible;
           this.setState({ ...this.state, mappedCanvasData : mappedCanvasData })
         }
@@ -139,15 +139,18 @@ class ThreeDCanvas extends Component {
                 "visualValue": {
                   "eClass": Resources.OBJ,
                   'obj': base64Content,
-                  'color' : { r: 1, g: 1, b: 0, a: 1 },
+                  'color' : { r:1, g: 1, b: 0, a: 1 },
                 }
               }
               this.loadInstances(instance)
               const data = this.getProxyInstances();
-              let mappedCanvasData = mapToCanvasData(data)
+              const newData = mapToCanvasData(data)
+              let mappedCanvasData = [...newData]
               let match = mappedCanvasData?.find( m => instance.id === m.instancePath )
-              match.visible = true;
-              that.setState({ ...that.state, mappedCanvasData : mappedCanvasData})
+              if ( match ){
+                match.visible = true;
+                that.setState({ ...that.state, mappedCanvasData : mappedCanvasData})
+              }
             });
         } else {
           this.updateColors(inst, true)
@@ -208,7 +211,6 @@ class ThreeDCanvas extends Component {
               cameraOptions={cameraOptions}
               backgroundColor={blackColor}
               onSelection={this.onSelection}
-              onMount={this.onMount}
               onHoverListeners={{ 'hoverId': this.hoverHandler }}
               dracoDecoderPath={'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/jsm/libs/draco/'}
             />

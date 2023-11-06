@@ -19,8 +19,9 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
      case getInstancesTypes.GET_INSTANCES_SUCCESS:{
       const newInstance = response.payload;
       newInstance.visible = true;
+      let loadedInstances = state.allLoadedInstances?.find( i => i.Id === response.payload.Id ) ? [...state.allLoadedInstances] : [...state.allLoadedInstances, newInstance]
       return Object.assign({}, state, {
-          allLoadedInstances: state.allLoadedInstances?.find( i => i.Id === response.payload.Id ) ? [...state.allLoadedInstances] : [...state.allLoadedInstances, newInstance],
+          allLoadedInstances: loadedInstances,
           isLoading: false
         })
       }
@@ -40,7 +41,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         const instance = state.allLoadedInstances?.find( i => i.Id === response.payload.id );
         instance.visible = true;
         return Object.assign({}, state, {
-          allLoadedInstances: [...updateInstances],
+          allLoadedInstances:updateInstances,
           isLoading: false
         })
       }
@@ -49,7 +50,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         const match = state.allLoadedInstances?.find( i => i.Id === response.payload.id );
         match.visible = false;
         return Object.assign({}, state, {
-          allLoadedInstances: [...updateInst],
+          allLoadedInstances: updateInst,
           isLoading: false
         })
       }
@@ -58,7 +59,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         const match = state.allLoadedInstances?.find( i => i.Id === response.payload.id );
         match.color = response.payload.color;
         return Object.assign({}, state, {
-          allLoadedInstances: [...updateInst],
+          allLoadedInstances: updateInst,
           isLoading: false
         })
       }

@@ -18,6 +18,8 @@ import { getInstanceByID, removeInstanceByID, showInstance, hideInstance, change
 import { termInfoById } from "./../reducers/actions/termInfo";
 import Ribbon from '@flybase/react-ontology-ribbon';
 import { ChromePicker } from 'react-color';
+import Link from '@mui/material/Link';
+import useClickOutside from "./useClickOutside";
 
 import '@flybase/react-ontology-ribbon/dist/style.css';
 
@@ -171,6 +173,11 @@ const TermInfo = ({ open, setOpen }) => {
   const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances)
   const [termInfoData, setTermInfoData] = useState(data);
 
+  const popover = React.useRef();
+
+  const close = React.useCallback(() => setDisplayColorPicker(false), []);
+  useClickOutside(popover, close);
+
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
@@ -179,15 +186,13 @@ const TermInfo = ({ open, setOpen }) => {
   };
   const handleClose = () => {
     setAnchorEl(null);
+    setDisplayColorPicker(false)
   };
 
   const handleSection = (event) => {
     handleClose();
-    let newState = {};
-    sections?.forEach( section => {
-      newState[section] = false
-    })
-    setExpanded({ ...newState, [event.target.id] : true })
+    let newState = expanded;
+    setExpanded({ ...newState, [event] : !newState[event] })
   }
 
   const handleExpandAll = (expanded) => {
@@ -257,7 +262,7 @@ const TermInfo = ({ open, setOpen }) => {
       >
         Term info:
       </Typography>
-      {data?.Name} [{data?.Id}]
+      {termInfoData?.Name} [{termInfoData?.Id}]
     </>
   )
 
@@ -408,7 +413,7 @@ const TermInfo = ({ open, setOpen }) => {
                           }}
                         >
                           {sections?.map( section =>
-                            <MenuItem id={section} key={section} onClick={(event) => handleSection(event)}>{section}</MenuItem>
+                            <MenuItem id={section} key={section} onClick={(event) => handleSection(event.target.id)}>{section}</MenuItem>
                           )}
                         </Menu>
                       </Box>
@@ -427,7 +432,7 @@ const TermInfo = ({ open, setOpen }) => {
                     </Box>
 
                     <Box>
-                      <ButtonGroup color="secondary" sx={classes.buttonGroup} variant="contained">
+                      <ButtonGroup ref={popover} color="secondary" sx={classes.buttonGroup} variant="contained">
                         <>
                           <Tooltip title={"Edit 3D Canvas Color"}>
                             <Button onClick={() => setDisplayColorPicker(!displayColorPicker)}><ColorLensIcon/></Button>
@@ -437,7 +442,8 @@ const TermInfo = ({ open, setOpen }) => {
                             color={termInfoData?.color}
                             onChangeComplete={ (color, event) => {
                               changeColor(termInfoData.Id, color.rgb)
-                              setDisplayColorPicker(false)
+                              termInfoData.color = color.rgb
+                              setDisplayColorPicker(true)
                             }}
                             style={{ zIndex: 10 }}/>
                             : null
@@ -478,7 +484,7 @@ const TermInfo = ({ open, setOpen }) => {
                 lg: 'calc(100% - 4.0625rem)'
               }
             }}>
-              <Accordion expanded={expanded[sections[0]]}>
+              <Accordion expanded={expanded[sections[0]]} onChange={() =>handleSection(sections[0])}>
                 <AccordionSummary
                   expandIcon={<ChevronDown />}
                   aria-controls="panel1a-content"
@@ -491,7 +497,7 @@ const TermInfo = ({ open, setOpen }) => {
                 </AccordionDetails>
               </Accordion>
 
-              <Accordion expanded={expanded[sections[1]]}>
+              <Accordion expanded={expanded[sections[1]]} onChange={() =>handleSection(sections[1])}>
                 <AccordionSummary
                   expandIcon={<ChevronDown />}
                   aria-controls="panel2a-content"
@@ -597,6 +603,7 @@ const TermInfo = ({ open, setOpen }) => {
                           <Box display='flex' justifyContent="center">
                             <Ribbon
                               onTermClick={handleTermClick}
+                              itemTitle={() => {return <Link>Title</Link>}}
                               data={getRibbonData(query)}
                               calcHeatColor={customColorCalculation}
                               baseRGB={ribbonConfiguration.rgbColor}
@@ -611,7 +618,7 @@ const TermInfo = ({ open, setOpen }) => {
                 </AccordionDetails>
               </Accordion>
 
-              <Accordion expanded={expanded[sections[2]]}>
+              <Accordion expanded={expanded[sections[2]]} onChange={() =>handleSection(sections[2])}>
                 <AccordionSummary
                   expandIcon={<ChevronDown />}
                   aria-controls="panel1a-content"

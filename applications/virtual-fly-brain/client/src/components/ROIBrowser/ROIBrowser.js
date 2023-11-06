@@ -17,6 +17,8 @@ import { useSelector, connect } from "react-redux";
 import { termInfoById } from "../../reducers/actions/termInfo";
 import { getInstanceByID, changeColor } from '../../reducers/actions/instances';
 import theme from "../../theme/index";
+import useClickOutside from "./../useClickOutside";
+
 const {
     secondaryBg,
     whiteColor,
@@ -60,6 +62,12 @@ const ROIBrowser = (props) => {
         nodeSelected : undefined,
         root : undefined
     });
+
+    const popover = React.useRef();
+
+    const close = React.useCallback(() => setDisplayColorPicker(false), []);
+    useClickOutside(popover, close);
+
 
     const treeRef = React.useRef();
     let isNumber = require("./helper").isNumber;    
@@ -412,7 +420,7 @@ const ROIBrowser = (props) => {
                                 <ChromePicker
                                     color={Instances[rowInfo.node.instanceId].color}
                                     onChangeComplete={(color, event) => {
-                                        setDisplayColorPicker(false);
+                                        setDisplayColorPicker(true);
                                         rowInfo.node.showColorPicker = false;
                                         changeColor(rowInfo.node.instanceId, color.rgb)
                                     }}

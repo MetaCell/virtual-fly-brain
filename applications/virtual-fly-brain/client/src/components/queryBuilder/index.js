@@ -83,7 +83,7 @@ const QueryBuilder = ({ fullWidth, bottomNav, setBottomNav }) => {
         lg: queryBuilderBg
       },
       boxShadow: {
-        lg: `0 0 5rem 0 rgba(0, 0, 0, 0.60), 0 0.25rem 6.25rem 0 ${blackColor}`
+        lg: `0px 0px 80px 0px rgba(0, 0, 0, 0.60), 0px 4px 100px 0px rgba(0, 0, 0, 0.50)`
       },
       backdropFilter: 'blur(0.625rem)'
     },

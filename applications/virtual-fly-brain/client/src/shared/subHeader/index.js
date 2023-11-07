@@ -104,7 +104,7 @@ const SubHeader = ({ setBottomNav, bottomNav }) => {
       <Box
         sx={{
           position: 'relative',
-          zIndex: 99,
+          zIndex: 100,
           transition: 'all ease-in-out .3s',
           width: {
             lg: focused ? '50rem' : '35rem'

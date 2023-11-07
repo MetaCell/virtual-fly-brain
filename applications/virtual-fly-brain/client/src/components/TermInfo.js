@@ -34,13 +34,20 @@ const {
 } = vars;
 
 const getRibbonData = (query) => {
-  let terms = query?.preview_results?.rows?.map( row => (
-    { id: row.Neurotransmitter,
-      name: row.Neurotransmitter,
+  
+  let terms = query?.preview_results?.rows?.map( row => {
+    const regExp = /\(([^)]+)\)/g;
+    const matches = [...row.Neurotransmitter.matchAll(regExp)].flat();
+    return { id: row.Neurotransmitter,
+      name: <Link underline="none" href={window.location.origin + "/?id=" + matches[0]}>{row.Neurotransmitter}</Link>,
       descendant_terms: [row.Weight]
     }
-  ));
+});
   return terms; 
+}
+
+const ribbonTitle = (data) => {
+  return data.id + "\n" + "Weight : " + data.descendant_terms[0]
 }
 
 const CustomBox = styled(Box)(
@@ -600,11 +607,11 @@ const TermInfo = ({ open, setOpen }) => {
                             </CustomBox>
                           }>
                             
-                          <Box display='flex' justifyContent="center">
+                          <Box display='flex' justifyContent="start">
                             <Ribbon
                               onTermClick={handleTermClick}
-                              itemTitle={() => {return <Link>Title</Link>}}
                               data={getRibbonData(query)}
+                              itemTitle={ribbonTitle}
                               calcHeatColor={customColorCalculation}
                               baseRGB={ribbonConfiguration.rgbColor}
                               heatLevels={ribbonConfiguration.heatLevels}

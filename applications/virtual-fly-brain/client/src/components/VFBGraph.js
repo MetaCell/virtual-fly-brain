@@ -604,7 +604,7 @@ class VFBGraph extends Component {
             linkWidth={1.25}
             controls = {
               <div style={ { position: "absolute", width: "5vh", height: "100px",zIndex: "2", color : "white" } }>
-                <Tooltip placement='right' title="Reset View">
+                <Tooltip placement="right" title="Reset View">
                   <div
                     style={
                       {
@@ -612,15 +612,15 @@ class VFBGraph extends Component {
                         cursor : "pointer",
                         top : "10px",
                         left : "10px",
-                        width: '1.3rem',
-                        height: '1.3rem',
+                        width: "1.3rem",
+                        height: "1.3rem",
                         backgroundImage: `url(${stylingConfiguration.icons.home})`
                       }
                     }
-                    onClick={this.resetCamera}>
+                    onClick={this.resetCamera }>
                   </div>
                 </Tooltip>
-                <Tooltip placement='right' title="Zoom In">
+                <Tooltip placement="right" title="Zoom In">
                   <div
                     style={
                       {
@@ -628,15 +628,15 @@ class VFBGraph extends Component {
                         cursor : "pointer",
                         marginTop : "20px",
                         left : "10px",
-                        width: '1.3rem',
-                        height: '1.3rem',
+                        width: "1.3rem",
+                        height: "1.3rem",
                         backgroundImage: `url(${stylingConfiguration.icons.zoomIn})`
                       }
                     }
-                    onClick={this.zoomIn}>
+                    onClick={this.zoomIn }>
                   </div>
                 </Tooltip>
-                <Tooltip placement='right' title="Zoom Out">
+                <Tooltip placement="right" title="Zoom Out">
                   <div
                     style={
                       {
@@ -644,12 +644,12 @@ class VFBGraph extends Component {
                         cursor : "pointer",
                         marginTop : "5px",
                         left : "10px",
-                        width: '1.3rem',
-                        height: '1.3rem',
+                        width: "1.3rem",
+                        height: "1.3rem",
                         backgroundImage: `url(${stylingConfiguration.icons.zoomOut})`
                       }
                     }
-                    onClick={this.zoomOut}>
+                    onClick={this.zoomOut }>
                   </div>
                 </Tooltip>
                 <DropDownQueries

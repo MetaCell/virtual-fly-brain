@@ -23,36 +23,33 @@ class DropDownQueries extends Component {
     let self = this;
     return (
       <div>
-        <Tooltip
-          placement='right'
-          title={`Refresh for ${self.props.focusedInstance.name}`}
-        >
-          <div style={
-            {
-              zIndex: "1000",
-              cursor: "pointer",
-              marginTop: "20px",
-              left: "10px",
-              color: self.props.syncColor,
-              width: '1.3rem',
-              height: '1.3rem',
+        <Tooltip placement="right" title={`Refresh for ${self.props.focusedInstance.name}`}>
+          <div style={ 
+            { 
+              zIndex : "1000",
+              cursor : "pointer",
+              marginTop : "20px",
+              left : "10px",
+              color : self.props.syncColor,
+              width: "1.3rem",
+              height: "1.3rem",
               backgroundImage: `url(${self.props.stylingConfiguration.icons.sync})`
             }
           }
-            key="tooltip-icon"
-            onClick={self.props.sync}>
+          key="tooltip-icon"
+          onClick={self.props.sync}>
           </div>
         </Tooltip>
-        <Tooltip placement='right' title="Options">
+        <Tooltip placement="right" title="Options">
           <div
-            style={
-              {
-                zIndex: "1000",
-                cursor: "pointer",
-                marginTop: "5px",
-                left: "10px",
-                width: '1.3rem',
-                height: '1.3rem',
+            style={ 
+              { 
+                zIndex : "1000" ,
+                cursor : "pointer",
+                marginTop : "5px",
+                left : "10px",
+                width: "1.3rem",
+                height: "1.3rem",
                 backgroundImage: `url(${self.props.stylingConfiguration.icons.dropdown})`
               }
             }

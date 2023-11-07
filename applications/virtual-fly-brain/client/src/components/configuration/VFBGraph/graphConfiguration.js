@@ -39,7 +39,7 @@ export const configuration = {
 
 export const stylingConfiguration = {
   // Background color for canvas
-  canvasColor : "transparent",
+  canvasColor : "tranparent",
   // Color for links between nodes
   linkColor : "white",
   // Color apply to links while hovering over them 

@@ -63,7 +63,6 @@ class ThreeDCanvas extends Component {
   loadInstances (instance){
     ModelFactory.cleanModel();
     const instance1 = new SimpleInstance(instance)
-    instance1.visible = true;
     let instances = window.Instances;
     if ( instances === undefined ){
       instances = [];
@@ -76,36 +75,30 @@ class ThreeDCanvas extends Component {
     return window.Instances.map(i => (
       { 
         instancePath: i.getId(), 
-        color: { r:1, g: 1, b: 0, a: 1 }, 
-        visible : true
+        color: { r:1, g: 1, b: 0, a: 1 }
       }
     ))
   }
 
-  updateColors ( inst, visible) {
-    let mappedCanvasData = [...this.state.mappedCanvasData]
+  updateColors ( inst, mappedCanvasData, visible) {
     let match = mappedCanvasData?.find( m => m.instancePath === inst.Id )
     let color = { r : inst.color?.r/255, g : inst.color?.g/255, b : inst.color?.b/255 }
     let colorMatch = match?.color?.b === color?.b && match?.color?.r === color?.r && match?.color?.g === color?.g;
-      
     if ( !colorMatch && inst.color && match && !match?.visible && ( match.visible != visible )){
         match.color = color;
         if ( match.visible != visible ) {
           match.visible = visible;
-          //this.setState({ ...this.state, mappedCanvasData : mappedCanvasData })
         }
         this.canvasRef.current.threeDEngine.updateInstances(mappedCanvasData)
       } else if ( !colorMatch && inst.color && match && match?.visible ){
         match.color = color;
         if ( match.visible != visible ) {
           match.visible = visible;
-          //this.setState({ ...this.state, mappedCanvasData : mappedCanvasData })
         }
         this.canvasRef.current.threeDEngine.updateInstances(mappedCanvasData)
       } else {
         if ( match && match?.visible != visible ) {
           match.visible = visible;
-          this.setState({ ...this.state, mappedCanvasData : mappedCanvasData })
         }
       }
   }
@@ -124,6 +117,8 @@ class ThreeDCanvas extends Component {
   componentDidUpdate(prevProps, prevState) {
     let that = this;
     let allLoadedInstances = this.props.allLoadedInstances;
+    let mappedCanvasData = [...this.state.mappedCanvasData]
+    mappedCanvasData = mappedCanvasData?.filter( m => allLoadedInstances?.find( i => i.Id === m.instancePath)?.visible)
     allLoadedInstances?.forEach ( inst => {
       if ( inst.visible ) {
         if ( that.state.mappedCanvasData?.find( i => inst.Id === i.instancePath ) === undefined ){
@@ -139,7 +134,7 @@ class ThreeDCanvas extends Component {
                 "visualValue": {
                   "eClass": Resources.OBJ,
                   'obj': base64Content,
-                  'color' : { r:1, g: 1, b: 0, a: 1 },
+                  'color' : { r:Math.random(), g: Math.random(), b: 0, a: 1 },
                 }
               }
               this.loadInstances(instance)
@@ -153,12 +148,13 @@ class ThreeDCanvas extends Component {
               }
             });
         } else {
-          this.updateColors(inst, true)
+          this.updateColors(inst,mappedCanvasData, true)
         }
       } else {
-        this.updateColors(inst, false)
+        this.updateColors(inst,mappedCanvasData, false)
       }
     });
+    this?.canvasRef?.current?.threeDEngine?.updateInstances(mappedCanvasData)
   }
 
   componentWillUnmount () {

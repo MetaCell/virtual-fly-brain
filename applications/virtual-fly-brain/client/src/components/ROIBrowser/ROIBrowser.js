@@ -51,7 +51,7 @@ const ROIBrowser = (props) => {
         height: props.size.height,
         width: props.size.width,
     };
-    const [displayColorPicker, setDisplayColorPicker] = React.useState(false);
+    const [displayColorPicker, setDisplayColorPicker] = React.useState({});
     const [pickerAnchor, setPickerAnchor] = React.useState(undefined);
     const [state, setState] = React.useState({ 
         errors : undefined, 
@@ -65,7 +65,7 @@ const ROIBrowser = (props) => {
 
     const popover = React.useRef();
 
-    const close = React.useCallback(() => setDisplayColorPicker(false), []);
+    const close = React.useCallback(() => setDisplayColorPicker({}), []);
     useClickOutside(popover, close);
 
 
@@ -332,7 +332,7 @@ const ROIBrowser = (props) => {
                     nodeWithColorPicker = undefined;
                 }
                 colorPickerContainer = undefined;
-                setDisplayColorPicker(false);
+                setDisplayColorPicker({});
                 break;
         }
     };
@@ -416,10 +416,10 @@ const ROIBrowser = (props) => {
                             e.stopPropagation();
                             nodeWithColorPicker = rowInfo.node;
                             rowInfo.node.showColorPicker = true;
-                            setDisplayColorPicker(true);
+                            setDisplayColorPicker({[rowInfo.node.instanceId] : true});
                         }}>
                             <ColorLensIcon/>
-                        {displayColorPicker && rowInfo.node.showColorPicker ? (
+                        {displayColorPicker[rowInfo.node.instanceId] && rowInfo.node.showColorPicker ? (
                                 <div style={{ width: '100%' }} ref={popover}><ChromePicker
                                     color={match.color}
                                     onChangeComplete={(color, event) => {

@@ -1,9 +1,13 @@
-import { Box, Button,Tooltip, ButtonGroup, Grid, IconButton, Menu, MenuItem, Table, TableBody, TableCell, Paper, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
+import { Box, Button,Tooltip, ButtonGroup, Grid, IconButton, Menu, MenuItem, 
+  Table, TableBody, TableCell, Paper, TableContainer, TableHead, TableRow,
+   Typography } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from 'react-redux'
 import { styled } from '@mui/material/styles';
 import MediaQuery from 'react-responsive';
-import { ArView, ArrowDown, ArrowRight, ChevronDown, ChevronLeft, ChevronRight, Delete, Expand, Eye, Focus, Line, Remove, ScatterPlot } from "../icons";
+import { ArView, Target, CylinderOn, ArrowDown, ArrowRight, ChevronDown,
+   ChevronLeft, ChevronRight, Delete, Expand, Eye, Focus, TargetOff, Line, Remove,
+    ScatterPlot, SkeletonOn, SelectOff, SkeletonOff, EyeOff, ArViewOff } from "../icons";
 import PropTypes from 'prop-types';
 import vars from "../theme/variables";
 import Accordion from '@mui/material/Accordion';
@@ -12,9 +16,10 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import TreeView from '@mui/lab/TreeView';
 import { TreeItem } from "@mui/lab";
 import ListAltIcon from '@mui/icons-material/ListAlt';
-import ColorLensIcon from '@mui/icons-material/ColorLens';
+import RectangleIcon from '@mui/icons-material/Rectangle';
 import GeneralInformation from "./TermInfo/GeneralInformation";
-import { getInstanceByID, removeInstanceByID, showInstance, hideInstance, changeColor, focusInstance } from './../reducers/actions/instances';
+import { getInstanceByID, selectInstance, showInstance, hideInstance, 
+  changeColor, focusInstance, selectInstanceSkeleton, selectInstanceCylinder } from './../reducers/actions/instances';
 import { termInfoById } from "./../reducers/actions/termInfo";
 import Ribbon from '@flybase/react-ontology-ribbon';
 import { ChromePicker } from 'react-color';
@@ -32,6 +37,24 @@ const {
   headerBorderColor,
   primaryBg
 } = vars;
+
+const RGBAToHexA = (color) => {
+  let r =  color?.r?.toString(16);
+  let g =  color?.g?.toString(16);
+  let b =  color?.b?.toString(16);
+  let a = Math.round(color?.a * 255).toString(16);
+
+  if (r?.length == 1)
+    r = "0" + r;
+  if (g?.length == 1)
+    g = "0" + g;
+  if (b?.length == 1)
+    b = "0" + b;
+  if (a?.length == 1)
+    a = "0" + a;
+
+  return "#" + r + g + b + a;
+}
 
 const getRibbonData = (query) => {
   
@@ -234,12 +257,16 @@ const TermInfo = ({ open, setOpen }) => {
     }
   }
 
-  const handle3DVolume = () => {
-    if ( allLoadedInstances.find( instance => instance.Id == termInfoData.Id )?.visible ) {
-      hideInstance(termInfoData.Id)
-    } else {
-      showInstance(termInfoData.Id)
-    }
+  const handleSelection = (event) => {
+    selectInstance(termInfoData.Id, event.timeStamp)
+  }
+
+  const handleSkeleton = (event) => {
+    selectInstanceSkeleton(termInfoData.Id, event.timeStamp)
+  }
+
+  const handleCylinder = (event) => {
+    selectInstanceCylinder(termInfoData.Id, event.timeStamp)
   }
 
   const handleTermClick = (term, evt) => {
@@ -442,7 +469,7 @@ const TermInfo = ({ open, setOpen }) => {
                       <ButtonGroup ref={popover} color="secondary" sx={classes.buttonGroup} variant="contained">
                         <>
                           <Tooltip title={"Edit 3D Canvas Color"}>
-                            <Button onClick={() => setDisplayColorPicker(!displayColorPicker)}><ColorLensIcon/></Button>
+                            <Button style={{ width: 75 }} onClick={() => setDisplayColorPicker(!displayColorPicker)}><RectangleIcon sx={{color : RGBAToHexA( termInfoData?.color)}}/>Edit<ArrowDown/></Button>
                           </Tooltip>
                           { displayColorPicker ?
                           <ChromePicker
@@ -458,19 +485,39 @@ const TermInfo = ({ open, setOpen }) => {
                         </>
                         <Tooltip title={"Toggle 3D Mesh"}>
                           <Button onClick={() => handleVisibility()}>
-                            <Eye />
+                            { allLoadedInstances.find( instance => instance.Id == termInfoData?.Id )?.visible ? <EyeOff /> : <Eye /> }
                           </Button>
                         </Tooltip>
-                        <Tooltip title={"Center on 3D Canvas"}>
-                          <Button onClick={(event) => handleFocus(event, false)}>
-                            <Focus />
+                        <Tooltip title={"Select on/off 3D Canvas"}>
+                          <Button onClick={(event) => handleSelection(event, true)}>
+                            { allLoadedInstances.find( instance => instance.Id == termInfoData?.Id )?.selected ? <SelectOff /> : <Focus /> }
+                          </Button>
+                        </Tooltip>
+                        <Tooltip title={"Focus on 3D Mesh"}>
+                          <Button onClick={(event) => handleFocus(event, true)}>
+                            <Target />
                           </Button>
                         </Tooltip>
                         <Tooltip title={"Full View 3D Canvas"}>
-                          <Button onClick={(event) => handleFocus(event, true)}>
-                            <ArView />
+                          <Button onClick={(event) => handleVisibility()}>
+                          { allLoadedInstances.find( instance => instance.Id == termInfoData?.Id )?.visible ? <ArViewOff /> : <ArView /> }                          </Button>
+                        </Tooltip>
+                        { termInfoData?.SuperTypes?.find( s => s === "Neuron") ?
+                        <Tooltip title={"Enable 3D Skeleton"}>
+                          <Button onClick={(event) => handleSkeleton(event, false)}>
+                            <SkeletonOn />
                           </Button>
                         </Tooltip>
+                        :
+                        null}
+                        { termInfoData?.SuperTypes?.find( s => s === "Neuron") ?
+                        <Tooltip title={"Cylinder/Lines 3D Skeleton"}>
+                          <Button onClick={(event) => handleCylinder(event, false)}>
+                            <CylinderOn />
+                          </Button>
+                        </Tooltip>
+                        :
+                        null}
                         <Tooltip title={"Delete From Term Info"}>
                           <Button onClick={() => deleteId()}>
                             <Delete />

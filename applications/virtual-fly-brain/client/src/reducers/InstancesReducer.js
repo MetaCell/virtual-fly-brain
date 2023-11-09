@@ -71,6 +71,14 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
           isLoading: false
         })
       }
+      case getInstancesTypes.SELECT_INSTANCE:{
+        const updateInstances = [...state.allLoadedInstances]
+        updateInstances?.forEach( i => i.Id === response.payload.id ? i.selected = !i.selected : i.selected = false );
+        return Object.assign({}, state, {
+          allLoadedInstances:updateInstances,
+          isLoading: false
+        })
+      }
      default:
         return state;
   }

@@ -18,6 +18,9 @@ const {
   blackColor
 } = vars;
 
+const SELECTED_COLOR = { r : 255 , g : 255, b : 1, a : 1 }
+const DESELECTED_COLOR = { r : 147 , g : 189, b : 1, a : 1 }
+
 const styles = () => ({
   container: {
     height: '100%',
@@ -74,8 +77,7 @@ class ThreeDCanvas extends Component {
   getProxyInstances () {
     return window.Instances.map(i => (
       { 
-        instancePath: i.getId(), 
-        color: { r:1, g: 1, b: 0, a: 1 }
+        instancePath: i.getId()
       }
     ))
   }
@@ -134,7 +136,7 @@ class ThreeDCanvas extends Component {
                 "visualValue": {
                   "eClass": Resources.OBJ,
                   'obj': base64Content,
-                  'color' : { r:Math.random(), g: Math.random(), b: 0, a: 1 },
+                  'color' : DESELECTED_COLOR,
                 }
               }
               this.loadInstances(instance)
@@ -144,9 +146,17 @@ class ThreeDCanvas extends Component {
               let match = mappedCanvasData?.find( m => instance.id === m.instancePath )
               if ( match ){
                 match.visible = true;
+                //match.color = DESELECTED_COLOR;
                 that.setState({ ...that.state, mappedCanvasData : mappedCanvasData})
               }
             });
+        } else if ( inst.selected ) {
+          inst.color = SELECTED_COLOR
+          this.updateColors(inst,mappedCanvasData, true)
+        } else if ( !inst.selected ) {
+          if ( inst.color === SELECTED_COLOR )
+            inst.color = DESELECTED_COLOR
+          this.updateColors(inst,mappedCanvasData, true)
         } else {
           this.updateColors(inst,mappedCanvasData, true)
         }
@@ -177,7 +187,8 @@ class ThreeDCanvas extends Component {
   }
 
   onSelection (selectedInstances){
-    this.setState({ data: applySelection(this.state.data, selectedInstances) })
+    let updatedCanvas = applySelection(this.state.mappedCanvasData, selectedInstances);
+    this.setState({ mappedCanvasData: updatedCanvas })
   }
 
   render () {
@@ -207,7 +218,7 @@ class ThreeDCanvas extends Component {
               cameraOptions={cameraOptions}
               backgroundColor={blackColor}
               onSelection={this.onSelection}
-              onHoverListeners={{ 'hoverId': this.hoverHandler }}
+              // onHoverListeners={{ 'hoverId': this.hoverHandler }}
               dracoDecoderPath={'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/jsm/libs/draco/'}
             />
           </>

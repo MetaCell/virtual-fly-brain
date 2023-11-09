@@ -27,6 +27,27 @@ const removeInstancesSuccess = query => ({
   }
 });
 
+const selectInstanceMessage = id => ({
+  type: getInstancesTypes.SELECT_INSTANCE,
+  payload: {
+    id
+  }
+});
+
+const showInstanceSkeletonMessage = id => ({
+  type: getInstancesTypes.SHOW_SKELETON,
+  payload: {
+    id
+  }
+});
+
+const showInstanceCylinderMessage = id => ({
+  type: getInstancesTypes.SHOW_CYLINDER,
+  payload: {
+    id
+  }
+});
+
 const showInstanceMessage = id => ({
   type: getInstancesTypes.SHOW_INSTANCE,
   payload: {
@@ -87,6 +108,18 @@ export const removeInstanceByID = async (queryId) => {
     store.dispatch(removeInstancesFailure(error.message))
     return
   }
+}
+
+export const selectInstance = async (id) => {
+  store.dispatch(selectInstanceMessage(id))
+}
+
+export const selectInstanceSkeleton = async (id) => {
+  store.dispatch(showInstanceSkeletonMessage(id))
+}
+
+export const selecteInstanceCylinder = async (id) => {
+  store.dispatch(showInstanceCylinderMessage(id))
 }
 
 export const showInstance = async (id) => {

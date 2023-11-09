@@ -94,7 +94,7 @@ const Listbox = styled('div')(
   padding: 0;
   position: absolute;
   list-style: none;
-  background-color: ${bottomNavBg};
+  background-color: ${primaryBg};
   overflow: auto;
   border-top: 0.0625rem solid ${primaryBg};
   max-height: 17.375rem;
@@ -237,6 +237,10 @@ export default function SearchBuilder(props) {
     }
   }
 
+  const handleFocused = (focused) => {
+    props.setFocused(focused);
+  }
+
   const {
     getRootProps,
     getInputProps,
@@ -254,6 +258,10 @@ export default function SearchBuilder(props) {
     onInputChange : event => handleSearch(event.target.value)
   });
 
+  React.useEffect(() => {
+    handleFocused(focused);
+  }, [focused])
+
   return (
     <Box flexGrow={1}>
       <Box {...getRootProps()}>
@@ -262,7 +270,7 @@ export default function SearchBuilder(props) {
             <Box
               flexWrap='wrap'
               display='flex'
-              padding={1}
+              paddingRight={1}
               gap={1}
             >
               {value.map((option, index) => (
@@ -292,12 +300,6 @@ export default function SearchBuilder(props) {
       </Box>
       {focused && isOpen ? (
         <Listbox
-          sx={{
-            top: {
-              xs: '2.875rem',
-              lg: '2.125rem'
-            }
-          }}
           className='scrollbar'
           {...getListboxProps()}
         >

@@ -18,6 +18,7 @@ import { termInfoById } from "../../reducers/actions/termInfo";
 import { getInstanceByID, changeColor, hideInstance, showInstance } from '../../reducers/actions/instances';
 import theme from "../../theme/index";
 import useClickOutside from "./../useClickOutside";
+import { VisibilityOff } from "../../icons";
 
 const {
     secondaryBg,
@@ -37,7 +38,7 @@ const ROIBrowser = (props) => {
           color: whiteColor
         }
     }
-    
+
     const templateID = useSelector((state) => state.globalInfo.templateID);
     const data = useSelector(state => state.termInfo.termInfoData)
     const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances)
@@ -53,8 +54,8 @@ const ROIBrowser = (props) => {
     };
     const [displayColorPicker, setDisplayColorPicker] = React.useState({});
     const [pickerAnchor, setPickerAnchor] = React.useState(undefined);
-    const [state, setState] = React.useState({ 
-        errors : undefined, 
+    const [state, setState] = React.useState({
+        errors : undefined,
         dataTree : undefined,
         loading : false,
         edges : undefined,
@@ -70,7 +71,7 @@ const ROIBrowser = (props) => {
 
 
     const treeRef = React.useRef();
-    let isNumber = require("./helper").isNumber;    
+    let isNumber = require("./helper").isNumber;
     let sortData = require("./helper").sortData;
     let findRoot = require("./helper").findRoot;
     let convertEdges = require("./helper").convertEdges;
@@ -368,19 +369,19 @@ const ROIBrowser = (props) => {
         switch (fillCondition) {
             case "3dToLoad":
                 buttons.push(
-                    <IconButton style={{ color: 'white' }} aria-label="3dToLoad" size="small" onClick={(e) => {
+                    <IconButton disableRipple color="primary" aria-label="delete" size="small" onClick={(e) => {
                         e.stopPropagation();
                         // termInfoById(rowInfo.node.instanceId);
                         getInstanceByID(rowInfo.node.instanceId);
                         setState({ ...state, nodeSelected : rowInfo.node });
                     }}>
-                    <VisibilityOffIcon/>
+                        <VisibilityOff />
                     </IconButton>
                 );
                 break;
             case "3dHidden":
                 buttons.push(
-                    <IconButton style={{ color: 'white' }} aria-label="3dHidden" size="small" onClick={(e) => {
+                    <IconButton disableRipple aria-label="delete" size="small" onClick={(e) => {
                         e.stopPropagation();
                         if (match?.getParent) {
                             match.getParent().visible = true;
@@ -391,14 +392,14 @@ const ROIBrowser = (props) => {
                         setState({ ...state, nodeSelected : rowInfo.node });
                         
                     }}>
-                     <VisibilityOffIcon/>
+                     <VisibilityOff />
                     </IconButton>
                 );
                 break;
             case "3dVisible":
                 var color = match.color;
                 buttons.push(
-                    <IconButton style={{ color: 'white' }} aria-label="3dvisible" size="small" onClick={(e) => {
+                    <IconButton disableRipple aria-label="delete" size="small" onClick={(e) => {
                         e.stopPropagation();
                             if (match?.getParent) {
                                 match.getParent().visible = false;
@@ -408,7 +409,7 @@ const ROIBrowser = (props) => {
                             hideInstance(rowInfo.node.instanceId)
                             setState({ ...state, nodeSelected : rowInfo.node });
                     }}>
-                     <VisibilityIcon />
+                     <VisibilityOff />
                     </IconButton>
                 );
                 buttons.push(
@@ -509,7 +510,7 @@ const ROIBrowser = (props) => {
     }, [templateID]);
 
     React.useEffect( () => {
-        if ( state.dataTree === undefined ) { 
+        if ( state.dataTree === undefined ) {
             initTree(data)
         } else {
             updateTree(data)
@@ -520,7 +521,7 @@ const ROIBrowser = (props) => {
         updateTree(data)
     }, [allLoadedInstances])
 
-    return( 
+    return(
         <Box
       sx={{
         ...classes.root,
@@ -533,25 +534,26 @@ const ROIBrowser = (props) => {
         },
       }}
     >
-      ROI Browser
       { state?.errors !== undefined ? (
         <div id="treeError">{state?.errors}</div>
     ) : (
-        <div>
-            {state?.loading === true || state?.dataTree?.length < 1 || state?.dataTree === undefined ? (
-                <CircularProgress
-                    style={{
-                        position: "relative",
-                        display : "flex",
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        top: 0,
-                        margin: "auto",
-                        color: "#11bffe",
-                        size: "55rem",
-                    }}
-                />
+        <>
+            {state?.loading === true || state?.dataTree?.length < 1 | state?.dataTree === undefined ? (
+                <Box display='flex' alignItems='center' justifyContent='center' style={{height: '100%'}}>
+                    <CircularProgress
+                        style={{
+                            position: "relative",
+                            display : "flex",
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            top: 0,
+                            margin: "auto",
+                            color: "#11bffe",
+                            size: "55rem",
+                        }}
+                    />
+                </Box>
             ) : (
                 <Tree
                     ref={treeRef}
@@ -560,7 +562,7 @@ const ROIBrowser = (props) => {
                     componentType={"TREE"}
                     toggleMode={true}
                     treeData={
-                        state?.dataTree === undefined 
+                        state?.dataTree === undefined
                             ? [
                                 {
                                     title: "No data available.",
@@ -573,10 +575,7 @@ const ROIBrowser = (props) => {
                     activateParentsNodeOnClick={true}
                     handleClick={nodeClick}
                     style={{
-                        width: props.size?.width - 10,
-                        height: props.size?.height,
-                        float: "left",
-                        clear: "both",
+                        height: '100%'
                     }}
                     rowHeight={styles.row_height}
                     getButtons={(rowInfo) => getButtons(rowInfo)}
@@ -587,7 +586,7 @@ const ROIBrowser = (props) => {
                     onlyExpandSearchedNodes={false}
                 />
             )}
-        </div>)
+        </>)
     }
     </Box>
     );

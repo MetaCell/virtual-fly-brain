@@ -48,15 +48,29 @@ const showInstanceCylinderMessage = id => ({
   }
 });
 
-const showInstanceMessage = id => ({
-  type: getInstancesTypes.SHOW_INSTANCE,
+const show3DMeshMessage = id => ({
+  type: getInstancesTypes.SHOW_3D_MESH,
   payload: {
     id
   }
 });
 
-const hideInstanceMessage = id => ({
-  type: getInstancesTypes.HIDE_INSTANCE,
+const hide3DMeshMessage = id => ({
+  type: getInstancesTypes.HIDE_3D_MESH,
+  payload: {
+    id
+  }
+});
+
+const show3DVolumeMessage = id => ({
+  type: getInstancesTypes.SHOW_3D_VOLUME,
+  payload: {
+    id
+  }
+});
+
+const hide3DVolumeMessage = id => ({
+  type: getInstancesTypes.HIDE_3D_VOLUME,
   payload: {
     id
   }
@@ -70,11 +84,10 @@ const changeColorMessage = (id, color) => ({
   }
 });
 
-const focusInstanceMessage = (id, timeStamp) => ({
+const focusInstanceMessage = (id) => ({
   type: getInstancesTypes.FOCUS_INSTANCE,
   payload: {
-    id,
-    timeStamp
+    id
   }
 });
 
@@ -122,18 +135,26 @@ export const selecteInstanceCylinder = async (id) => {
   store.dispatch(showInstanceCylinderMessage(id))
 }
 
-export const showInstance = async (id) => {
-  store.dispatch(showInstanceMessage(id))
+export const show3DMesh = async (id) => {
+  store.dispatch(show3DMeshMessage(id))
 }
 
-export const hideInstance = async (id) => {
-  store.dispatch(hideInstanceMessage(id))
+export const hide3DMesh = async (id) => {
+  store.dispatch(hide3DMeshMessage(id))
+}
+
+export const show3DVolume = async (id) => {
+  store.dispatch(show3DVolumeMessage(id))
+}
+
+export const hide3DVolume = async (id) => {
+  store.dispatch(hide3DVolumeMessage(id))
 }
 
 export const changeColor = async (id, color) => {
   store.dispatch(changeColorMessage(id, color))
 }
 
-export const focusInstance = async (id, timeStamp) => {
-  store.dispatch(focusInstanceMessage(id, timeStamp))
+export const focusInstance = async (id) => {
+  store.dispatch(focusInstanceMessage(id))
 }

@@ -15,7 +15,7 @@ import axios from 'axios';
 import vars from "../../theme/variables";
 import { useSelector, connect } from "react-redux";
 import { termInfoById } from "../../reducers/actions/termInfo";
-import { getInstanceByID, changeColor, hideInstance, showInstance } from '../../reducers/actions/instances';
+import { getInstanceByID, changeColor, hide3DMesh, show3DMesh } from '../../reducers/actions/instances';
 import theme from "../../theme/index";
 import useClickOutside from "./../useClickOutside";
 import { VisibilityOff } from "../../icons";
@@ -388,7 +388,7 @@ const ROIBrowser = (props) => {
                         } else {
                             match.visible = true;
                         }
-                        showInstance(rowInfo.node.instanceId)
+                        show3DMesh(rowInfo.node.instanceId)
                         setState({ ...state, nodeSelected : rowInfo.node });
                         
                     }}>

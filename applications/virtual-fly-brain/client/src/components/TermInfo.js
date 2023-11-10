@@ -18,7 +18,7 @@ import { TreeItem } from "@mui/lab";
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import RectangleIcon from '@mui/icons-material/Rectangle';
 import GeneralInformation from "./TermInfo/GeneralInformation";
-import { getInstanceByID, selectInstance, showInstance, hideInstance, 
+import { getInstanceByID, selectInstance, hide3DMesh, show3DMesh, 
   changeColor, focusInstance, selectInstanceSkeleton, selectInstanceCylinder } from './../reducers/actions/instances';
 import { termInfoById } from "./../reducers/actions/termInfo";
 import Ribbon from '@flybase/react-ontology-ribbon';
@@ -27,6 +27,8 @@ import Link from '@mui/material/Link';
 import useClickOutside from "./useClickOutside";
 
 import '@flybase/react-ontology-ribbon/dist/style.css';
+
+const NEURON = "Neuron";
 
 const {
   whiteColor,
@@ -243,30 +245,36 @@ const TermInfo = ({ open, setOpen }) => {
 
   const handleVisibility = () => {
     if ( allLoadedInstances.find( instance => instance.Id == termInfoData.Id )?.visible ) {
-      hideInstance(termInfoData.Id)
+      hide3DMesh(termInfoData.Id)
+      hide3DVolume(termInfoData.Id)
     } else {
-      showInstance(termInfoData.Id)
+      show3DMesh(termInfoData.Id)
+      show3DVolume(termInfoData.Id)
     }
   }
 
-  const handleFocus = (event, recenter) => {
-    if ( recenter ){
-      focusInstance(null, event.timeStamp)
+  const handleMeshVisibility = () => {
+    if ( allLoadedInstances.find( instance => instance.Id == termInfoData.Id )?.visible ) {
+      hide3DMesh(termInfoData.Id)
     } else {
-      focusInstance(termInfoData.Id, event.timeStamp)
+      show3DMesh(termInfoData.Id)
     }
+  }
+
+  const handleFocus = (event) => {
+    focusInstance(termInfoData.Id)
   }
 
   const handleSelection = (event) => {
-    selectInstance(termInfoData.Id, event.timeStamp)
+    selectInstance(termInfoData.Id)
   }
 
   const handleSkeleton = (event) => {
-    selectInstanceSkeleton(termInfoData.Id, event.timeStamp)
+    selectInstanceSkeleton(termInfoData.Id)
   }
 
   const handleCylinder = (event) => {
-    selectInstanceCylinder(termInfoData.Id, event.timeStamp)
+    selectInstanceCylinder(termInfoData.Id)
   }
 
   const handleTermClick = (term, evt) => {
@@ -309,6 +317,9 @@ const TermInfo = ({ open, setOpen }) => {
     setTermInfoData(data)
   }, [allLoadedInstances])
 
+  const getInstance = () => {
+    return allLoadedInstances.find( instance => instance.Id == termInfoData?.Id );
+  }
   return (
     <Box
       sx={{
@@ -469,7 +480,7 @@ const TermInfo = ({ open, setOpen }) => {
                       <ButtonGroup ref={popover} color="secondary" sx={classes.buttonGroup} variant="contained">
                         <>
                           <Tooltip title={"Edit 3D Canvas Color"}>
-                            <Button style={{ width: 75 }} onClick={() => setDisplayColorPicker(!displayColorPicker)}><RectangleIcon sx={{color : RGBAToHexA( termInfoData?.color)}}/>Edit<ArrowDown/></Button>
+                            <Button style={{ width: 75 }} onClick={() => setDisplayColorPicker(!displayColorPicker)}><RectangleIcon sx={{color : RGBAToHexA( getInstance()?.color)}}/>Edit<ArrowDown/></Button>
                           </Tooltip>
                           { displayColorPicker ?
                           <ChromePicker
@@ -483,14 +494,14 @@ const TermInfo = ({ open, setOpen }) => {
                             : null
                           }
                         </>
-                        <Tooltip title={"Toggle 3D Mesh"}>
+                        <Tooltip title={ getInstance()?.visible ? "Hide" : "Show"}>
                           <Button onClick={() => handleVisibility()}>
-                            { allLoadedInstances.find( instance => instance.Id == termInfoData?.Id )?.visible ? <EyeOff /> : <Eye /> }
+                            {  getInstance()?.visible ? <EyeOff /> : <Eye /> }
                           </Button>
                         </Tooltip>
-                        <Tooltip title={"Select on/off 3D Canvas"}>
-                          <Button onClick={(event) => handleSelection(event, true)}>
-                            { allLoadedInstances.find( instance => instance.Id == termInfoData?.Id )?.selected ? <SelectOff /> : <Focus /> }
+                        <Tooltip title={ getInstance()?.selected ? "Deselect" : "Select"}>
+                          <Button onClick={(event) => handleSelection(event)}>
+                            { getInstance()?.selected ? <SelectOff /> : <Focus /> }
                           </Button>
                         </Tooltip>
                         <Tooltip title={"Focus on 3D Mesh"}>
@@ -498,21 +509,21 @@ const TermInfo = ({ open, setOpen }) => {
                             <Target />
                           </Button>
                         </Tooltip>
-                        <Tooltip title={"Full View 3D Canvas"}>
-                          <Button onClick={(event) => handleVisibility()}>
-                          { allLoadedInstances.find( instance => instance.Id == termInfoData?.Id )?.visible ? <ArViewOff /> : <ArView /> }                          </Button>
+                        <Tooltip title={"Hide/Show 3D Mesh"}>
+                          <Button onClick={(event) => handleMeshVisibility()}>
+                          { getInstance()?.visible ? <ArViewOff /> : <ArView /> }                          </Button>
                         </Tooltip>
-                        { termInfoData?.SuperTypes?.find( s => s === "Neuron") ?
+                        { termInfoData?.SuperTypes?.find( s => s === NEURON) ?
                         <Tooltip title={"Enable 3D Skeleton"}>
-                          <Button onClick={(event) => handleSkeleton(event, false)}>
+                          <Button onClick={(event) => handleSkeleton(event)}>
                             <SkeletonOn />
                           </Button>
                         </Tooltip>
                         :
                         null}
-                        { termInfoData?.SuperTypes?.find( s => s === "Neuron") ?
+                        { termInfoData?.SuperTypes?.find( s => s === NEURON) ?
                         <Tooltip title={"Cylinder/Lines 3D Skeleton"}>
-                          <Button onClick={(event) => handleCylinder(event, false)}>
+                          <Button onClick={(event) => handleCylinder(event)}>
                             <CylinderOn />
                           </Button>
                         </Tooltip>

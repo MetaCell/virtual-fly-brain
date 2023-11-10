@@ -25,7 +25,7 @@ export const roiBrowserWidget = {
     panelName: "left",
     hideOnClose: false,
     status: WidgetStatus.ACTIVE,
-    props: { size: { height: 600, width: 300 } }
+    props: { size: { height: 600, width: 600 } }
 };
 
 export const termContextWidget = {

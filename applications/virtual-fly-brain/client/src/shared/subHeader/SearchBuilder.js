@@ -171,6 +171,7 @@ export default function SearchBuilder(props) {
     })
     termInfoById(value[value.length -1 ].short_form);
     setIsOpen(false)
+    setValue([])
   }
 
   const handleResultSelection = async(option) => {
@@ -187,6 +188,9 @@ export default function SearchBuilder(props) {
     setValue(filtered);
     if ( filtered.length == 0 || ( filtered.length === 1 && value.find( v => v.label === QUERIES ))){
       setGroupedOptions([]);
+    }
+    if ( filtered.length <=1 && filtered.find( c => c.label == QUERIES )){
+      setValue([])
     }
   }
 
@@ -299,7 +303,7 @@ export default function SearchBuilder(props) {
           className='scrollbar'
           {...getListboxProps()}
         >
-          { value.find( v => v.label === QUERIES ) && queries?.length >= 1 ? (<QueriesSelection checkResults={checkResults} handleQueryDeletion={handleQueryDeletion} recentSearch={queries}/>) : null }
+          { value.find( v => v.label === QUERIES ) && queries?.length >= 1 ? (<QueriesSelection checkResults={checkResults} handleQueryDeletion={handleChipDelete} recentSearch={queries}/>) : null }
 
           {/* { groupedOptions.length >=1 ? <NarrowSearchFilter chipColors={chipColors} groupedOptions={groupedOptions}/> :null } */}
 

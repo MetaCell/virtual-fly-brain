@@ -144,6 +144,7 @@ const VFBDownloadContents = (props) => {
   }
 
   const openDialog = () => {
+    props.setBottomNav('');
     setState({...state,
       open: true,
       variables : getAllLoadedVariables(),
@@ -170,7 +171,7 @@ const VFBDownloadContents = (props) => {
       json.entries = json.entries.concat(filemeta);
     });
 
-    json.entries.length > 0 ? requestZipDownload(json) : setState({ downloadError : true, errorMessage : configuration.text.noEntriesFound });
+    json.entries.length > 0 ? requestZipDownload(json) : setState({...state, downloadError : true, errorMessage : configuration.text.noEntriesFound });
   }
 
   /**
@@ -529,7 +530,7 @@ const VFBDownloadContents = (props) => {
                     <Button
                       fullWidth
                       classes={{ root: props.classes.downloadErrorButton }}
-                      onClick={() => setState({ downloadError : false })}
+                      onClick={() => openDialog()}
                       color="primary"
                     >
                       <Typography classes={{ root: props.classes.error }} variant="button"><i className="fa fa-refresh"/>  {configuration.text.tryAgainButton}</Typography>

@@ -95,6 +95,16 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
           isLoading: false
         })
       }
+      case getInstancesTypes.ADD_SKELETON:{
+        const updateInstances = [...state.allLoadedInstances]
+        const instance = state.allLoadedInstances?.find( i => i.Id === response.payload.id );
+        instance.visible = true;
+        return Object.assign({}, state, {
+          allLoadedInstances:updateInstances,
+          event : { action : getInstancesTypes.ADD_SKELETON, id : response.payload.id, trigger : Date.now()},
+          isLoading: false
+        })
+      }
       case getInstancesTypes.SHOW_SKELETON:{
         const updateInstances = [...state.allLoadedInstances]
         const instance = state.allLoadedInstances?.find( i => i.Id === response.payload.id );
@@ -112,6 +122,26 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         return Object.assign({}, state, {
           allLoadedInstances:updateInstances,
           event : { action : getInstancesTypes.HIDE_SKELETON, id : response.payload.id, trigger : Date.now()},
+          isLoading: false
+        })
+      }
+      case getInstancesTypes.SHOW_CYLINDERS:{
+        const updateInstances = [...state.allLoadedInstances]
+        const instance = state.allLoadedInstances?.find( i => i.Id === response.payload.id );
+        instance.visible = true;
+        return Object.assign({}, state, {
+          allLoadedInstances:updateInstances,
+          event : { action : getInstancesTypes.SHOW_CYLINDERS, id : response.payload.id, trigger : Date.now()},
+          isLoading: false
+        })
+      }
+      case getInstancesTypes.SHOW_LINES:{
+        const updateInstances = [...state.allLoadedInstances]
+        const instance = state.allLoadedInstances?.find( i => i.Id === response.payload.id );
+        instance.visible = true;
+        return Object.assign({}, state, {
+          allLoadedInstances:updateInstances,
+          event : { action : getInstancesTypes.SHOW_LINES, id : response.payload.id, trigger : Date.now()},
           isLoading: false
         })
       }

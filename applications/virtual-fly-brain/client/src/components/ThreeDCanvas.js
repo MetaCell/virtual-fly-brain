@@ -11,7 +11,11 @@ import vars from '../theme/variables';
 import CameraControls from './CameraControls';
 import {Button, Box} from '@mui/material'
 import Canvas from "@metacell/geppetto-meta-ui/3d-canvas/Canvas";
+import { add3DSkeleton } from './../reducers/actions/instances';
 import { getInstancesTypes } from '../reducers/actions/types/getInstancesTypes';
+import * as THREE from 'three';
+import SharkViewer, { swcParser } from '@janelia/sharkviewer';
+import { SKELETON, CYLINDERS } from "./../utils/constants"
 
 const {
   whiteColor,
@@ -54,10 +58,6 @@ class ThreeDCanvas extends Component {
     };
 
     this.canvasRef = React.createRef();
-    this.handleClickOutside = this.handleClickOutside.bind(this);
-    this.handleToggle = this.handleToggle.bind(this);
-    this.onSelection = this.onSelection.bind(this)
-    this.layoutRef = React.createRef();
   }
 
   loadInstances (instance){
@@ -170,16 +170,19 @@ class ThreeDCanvas extends Component {
           this.setState({ ...this.state, mappedCanvasData : mappedCanvasData})
           break;
         case getInstancesTypes.SHOW_SKELETON:
-          this.showSkeleton(targetInstance, true)
+          this.showSkeleton(targetInstance, SKELETON, true)
           break;
         case getInstancesTypes.HIDE_SKELETON:
-          this.showSkeleton(targetInstance, false)
+          this.showSkeleton(targetInstance, SKELETON, false)
+          this.showSkeleton(targetInstance, CYLINDERS, false)
           break;
         case getInstancesTypes.SHOW_CYLINDERS:
-          console.log("Show skeleton")
+        this.showSkeleton(targetInstance, SKELETON, false)  
+        this.showCylinders(targetInstance)
           break;
-        case getInstancesTypes.HIDE_CYLINDERS:
-          console.log("Show skeleton")
+        case getInstancesTypes.SHOW_LINES:
+          this.showSkeleton(targetInstance, CYLINDERS, false)
+          this.showSkeleton(targetInstance, SKELETON, true)
           break;
         default:
       }
@@ -210,43 +213,70 @@ class ThreeDCanvas extends Component {
     this.setState({ mappedCanvasData: updatedCanvas })
   }
 
-  showSkeleton (targetInstance, visible) {
+  hoverHandler () {
+
+  }
+
+  showCylinders (targetInstance) {
+    if ( targetInstance?.skeleton?.[CYLINDERS] === undefined ){
+      this.showSkeleton (targetInstance, CYLINDERS, true);
+    } else {
+      this.showSkeleton (targetInstance, CYLINDERS, true);
+    }
+  }
+
+  showLines (targetInstance) {
+    if ( targetInstance?.skeleton?.[SKELETON] === undefined ){
+      this.showSkeleton (targetInstance, SKELETON, true);
+    }else {
+      this.showSkeleton (targetInstance, SKELETON, true);
+    }
+  }
+
+  showSkeleton (targetInstance, mode, visible) {
     let that = this;
     let allLoadedInstances = this.props.allLoadedInstances;
-    let mappedCanvasData = [...this.state.mappedCanvasData]
     let match = allLoadedInstances?.find ( inst => inst.Id === targetInstance?.Id );
-    let matchSWC = allLoadedInstances?.find ( inst => inst.Id === targetInstance?.Id + "_swc" );
-    let canvasMatch = this.state.mappedCanvasData?.find( i => matchSWC?.Id === i.instancePath );
 
-    if ( visible ) {
-      if ( canvasMatch === undefined ){
-        let instanceCopy = match;
-        fetch(match.Images?.[Object.keys(match.Images)[0]][0].obj)
+    if ( targetInstance?.skeleton?.[mode] === undefined ) {
+        // Initialize shark viewer to load SWC
+        let sharkviewer = new SharkViewer({ dom_element: "canvas" });
+        sharkviewer.mode = mode;
+        sharkviewer.three_colors = [];
+        Object.keys(sharkviewer.colors).forEach(color => {
+          sharkviewer.three_colors.push(new THREE.Color(sharkviewer.colors[color]));
+        })
+        sharkviewer.three_materials = [];
+        Object.keys(sharkviewer.colors).forEach(color => {
+          sharkviewer.three_materials.push(
+            new THREE.MeshBasicMaterial({
+              color: sharkviewer.colors[color],
+              wireframe: false
+            })
+          );
+        });
+        fetch(match.Images?.[Object.keys(match.Images)[0]][0].swc)
           .then(response => response.text())
           .then(base64Content => {
-            const instance = {
-              "eClass": "Instance",
-              "id": instanceCopy.Id + "_swc",
-              "name": instanceCopy.Name,
-              "type": { "eClass": "SimpleType" },
-              "visualValue": {
-                "eClass": Resources.OBJ,
-                'obj': base64Content
-              }, 
-            }
-            that.newInstance(instance);
+            const swcJSON = swcParser(base64Content);
+            let neuron = sharkviewer.createNeuron(swcJSON, targetInstance?.Id, that?.canvasRef?.current?.threeDEngine?.renderer);
+            match.skeleton = { ... match.skeleton, visible : true, [mode] : { visible : true, neuron : neuron }};
+            neuron.name = targetInstance?.Id + mode;
+            
+            // add mesh to canvas
+            that?.canvasRef?.current?.threeDEngine?.scene.add(neuron);
+            that.forceUpdate();
+            add3DSkeleton(targetInstance?.Id)
         })
-      } else {
-        if ( !canvasMatch.visible )  {
-          canvasMatch.visible = true
-          this?.canvasRef?.current?.threeDEngine?.updateInstances(mappedCanvasData)
-          this.setState({ ...this.state, mappedCanvasData : mappedCanvasData})
-        }
-      }
     } else {
-      canvasMatch.visible = false
-      this?.canvasRef?.current?.threeDEngine?.updateInstances(mappedCanvasData)
-      this.setState({ ...this.state, mappedCanvasData : mappedCanvasData})
+      match.skeleton.visible = visible;
+      match.skeleton[mode].visible = visible;
+      that?.canvasRef?.current?.threeDEngine?.scene?.children?.forEach( child => {
+        if ( child.name === targetInstance?.Id + mode ) {
+          child.visible = visible;
+        }
+      })
+      that?.canvasRef?.current?.threeDEngine?.animate();
     }
   }
 
@@ -269,7 +299,7 @@ class ThreeDCanvas extends Component {
       }}
     >
       {this.state.mappedCanvasData?.length > 0 ? (
-        <div ref={node => this.node = node} className={classes.container}>
+        <div ref={node => this.node = node} id="canvas" className={classes.container}>
           <>
             <Canvas
               ref={this.canvasRef}
@@ -277,7 +307,7 @@ class ThreeDCanvas extends Component {
               cameraOptions={cameraOptions}
               backgroundColor={blackColor}
               onSelection={this.onSelection}
-              // onHoverListeners={{ 'hoverId': this.hoverHandler }}
+              onHoverListeners={{ 'hoverId': this.hoverHandler }}
               dracoDecoderPath={'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/jsm/libs/draco/'}
             />
           </>

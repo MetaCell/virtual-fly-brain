@@ -41,6 +41,34 @@ const showInstanceSkeletonMessage = id => ({
   }
 });
 
+const addInstanceSkeletonMessage = id => ({
+  type: getInstancesTypes.ADD_SKELETON,
+  payload: {
+    id
+  }
+});
+
+const hideInstanceSkeletonMessage = id => ({
+  type: getInstancesTypes.HIDE_SKELETON,
+  payload: {
+    id
+  }
+});
+
+const show3DSkeletonCylindersMessage = id => ({
+  type: getInstancesTypes.SHOW_CYLINDERS,
+  payload: {
+    id
+  }
+});
+
+const show3DSkeletonLinesMessage = id => ({
+  type: getInstancesTypes.SHOW_LINES,
+  payload: {
+    id
+  }
+});
+
 const showInstanceCylinderMessage = id => ({
   type: getInstancesTypes.SHOW_CYLINDER,
   payload: {
@@ -127,8 +155,24 @@ export const selectInstance = async (id) => {
   store.dispatch(selectInstanceMessage(id))
 }
 
-export const selectInstanceSkeleton = async (id) => {
+export const add3DSkeleton = async (id) => {
+  store.dispatch(addInstanceSkeletonMessage(id))
+}
+
+export const show3DSkeleton = async (id) => {
   store.dispatch(showInstanceSkeletonMessage(id))
+}
+
+export const hide3DSkeleton = async (id) => {
+  store.dispatch(hideInstanceSkeletonMessage(id))
+}
+
+export const show3DSkeletonLines = async (id) => {
+  store.dispatch(show3DSkeletonLinesMessage(id))
+}
+
+export const show3DSkeletonCylinders = async (id) => {
+  store.dispatch(show3DSkeletonCylindersMessage(id))
 }
 
 export const selecteInstanceCylinder = async (id) => {

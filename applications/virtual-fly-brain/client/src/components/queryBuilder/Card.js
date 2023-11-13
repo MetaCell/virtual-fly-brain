@@ -252,7 +252,7 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
 
       {showFullScreen && (
         <FullScreenViewer open={ showFullScreen } onClose={ () => setShowFullScreen( false ) }>
-          <img style={{width: '100%', display: 'block'}} src={QUERY_LARGE} alt="" />
+          <img style={{width: '100%', display: 'block'}} src={query.thumbnail} alt="" />
         </FullScreenViewer>
       )}
     </>

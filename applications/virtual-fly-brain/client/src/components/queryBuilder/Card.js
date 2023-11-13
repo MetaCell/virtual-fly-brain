@@ -1,6 +1,7 @@
 import React from "react";
 import { Box, Button, Card, CardActionArea, CardContent, CardMedia, Chip, IconButton, Tooltip, Typography } from "@mui/material";
-import { FullScreen, Cross, Link as LinkIcon } from "../../icons";
+import { FullScreen, Cross } from "../../icons";
+import LinkIcon from '@mui/icons-material/Link';
 import vars from "../../theme/variables";
 import { useState } from "react";
 import FullScreenViewer from "./FullScreenViewer";
@@ -188,14 +189,12 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
                {query.template_space}
               </Typography>
 
-
-
               <Tooltip
                 placement="right"
                 arrow
-                title="JRC2018U"
+                title={query.template}
               >
-                <Chip className="default-chip" sx={{ backgroundColor: primaryBg }} onClick={() => console.log('Clicked!')} icon={<LinkIcon />} label={query.template} />
+                <Chip className="default-chip" sx={{ backgroundColor: primaryBg, gap: 0.5 }} onClick={() => console.log('Clicked!')} icon={<LinkIcon sx={{fill: '#fff !important', fontSize: '17px', m: '0 !important'}} />} label={query.template} />
               </Tooltip>
             </Box>
 
@@ -207,18 +206,11 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
               justifyContent='flex-end'
               columnGap={1}
             >
-              <Box display='flex' gap={0.5}>
-                {facets_annotation?.map((tag, index) => (
+              <Box display='flex' gap={0.5} flexWrap='wrap'>
+                {facets_annotation?.slice(0, fullWidth ? 3 : 4)?.map((tag, index) => (
                   <Chip
                   onClick={() => null}
-                  onDelete={() => null}
                   key={tag + index}
-                  deleteIcon={
-                    <Cross
-                      size={12}
-                      style={{ marginRight: 0, marginLeft: '0.25rem' }}
-                    />
-                  }
                   sx={{
                     lineHeight: '140%',
                     fontSize: '0.625rem',
@@ -230,18 +222,11 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
                 <Tooltip
                   arrow
                   title={
-                    <Box display='flex' gap={0.5}>
+                    <Box display='flex' py={1} flexWrap='wrap' gap={0.5}>
                       {facets_annotation?.map((tag, index) => (
                         <Chip
                           onClick={() => null}
-                          onDelete={() => null}
                           key={tag + index}
-                          deleteIcon={
-                            <Cross
-                              size={12}
-                              style={{ marginRight: 0, marginLeft: '0.25rem' }}
-                            />
-                          }
                           sx={{
                             lineHeight: '140%',
                             fontSize: '0.625rem',
@@ -255,7 +240,7 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
                   <Chip
                     className="default-chip"
                     sx={{ background: primaryBg }}
-                    label={`+${facets_annotation?.slice(fullWidth ? 2 : 3).length}`}
+                    label={`+${facets_annotation?.slice(fullWidth ? 3 : 4).length}`}
                   />
                 </Tooltip>
 

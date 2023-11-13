@@ -223,7 +223,7 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
                   arrow
                   title={
                     <Box display='flex' py={1} flexWrap='wrap' gap={0.5}>
-                      {facets_annotation?.map((tag, index) => (
+                      {facets_annotation?.slice(fullWidth ? 3 : 4).map((tag, index) => (
                         <Chip
                           onClick={() => null}
                           key={tag + index}

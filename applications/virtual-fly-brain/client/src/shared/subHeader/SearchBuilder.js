@@ -206,6 +206,7 @@ export default function SearchBuilder(props) {
       case "OK":
           if (v !== value) {
             setGroupedOptions(data)
+            props.handleFilters(data);
             setRetrievingResults(false);
           }
           break;
@@ -316,6 +317,7 @@ export default function SearchBuilder(props) {
           { !retrievingResults ? (<SearchResult
             groupedOptions={groupedOptions}
             getOptionProps={getOptionProps}
+            selectedFilters={props.applyFilters}
             chipColors={chipColors}
             handleResultSelection={handleResultSelection}
           />) : <CircularProgress sx={{left: '50%', marginTop : '10%', position : 'relative'}}/> }

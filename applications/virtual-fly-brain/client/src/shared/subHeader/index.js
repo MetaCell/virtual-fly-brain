@@ -54,7 +54,10 @@ const {
 
 const SubHeader = ({ setBottomNav, bottomNav }) => {
   const [focused, setFocused] = useState(false);
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedFilters, setSelectedFilters] = useState({});
+  const [tags, setTags] =useState([]);
+
   const classes = {
     root: {
       position: 'relative',
@@ -75,6 +78,18 @@ const SubHeader = ({ setBottomNav, bottomNav }) => {
       color: whiteColor,
     }
   };
+
+  const handleFilters = (results) => {
+    let updatedTags =[];
+    results?.forEach( option => {
+      option?.facets_annotation?.forEach( annotation => {
+        if( !updatedTags.includes(annotation) ){
+          updatedTags.push(annotation)
+        }
+      })
+    })
+    setTags(updatedTags)
+  }
 
   return (
     <Box sx={{
@@ -139,9 +154,9 @@ const SubHeader = ({ setBottomNav, bottomNav }) => {
         {focused ? <AngleLeft style={{ margin: 0 }} size={20} /> : <Search style={{ margin: 0 }} />}
 
         <Box flexGrow={1} px={1}>
-          <SearchBuilder setFocused={setFocused}  bottomNav={bottomNav} setBottomNav={setBottomNav} />
+          <SearchBuilder handleFilters={handleFilters} applyFilters={selectedFilters} setFocused={setFocused}  bottomNav={bottomNav} setBottomNav={setBottomNav} />
         </Box>
-        <FilterMenu classes={classes} />
+        <FilterMenu classes={classes} tags={tags} setSelectedFilters={setSelectedFilters} />
 
         {/* <MediaQuery minWidth={1200}>
           {!focused && (

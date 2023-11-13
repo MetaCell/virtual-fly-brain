@@ -7,6 +7,17 @@ import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
 const { secondaryBg, searchBoxBg, whiteColor, searchHeadingColor, listHover } = vars;
 const chips_cutoff = 3;
 export const SearchResult = ({ getOptionProps, selectedFilters, groupedOptions, chipColors, handleResultSelection }) => {
+  const hasTag = (facets_annotations) => {
+    let hasTag = false;
+    facets_annotations?.forEach( annotation => {
+      if ( selectedFilters[annotation] !== false ) {
+        hasTag = true;
+      }
+    })
+
+    return hasTag;
+  }
+  
   return (
     <Box sx={{
       py: '1rem',
@@ -22,7 +33,7 @@ export const SearchResult = ({ getOptionProps, selectedFilters, groupedOptions, 
         Suggested results
       </Typography>
       <Box mt={1.5}>
-        {groupedOptions?.map((option, index) => (
+        {groupedOptions?.map((option, index) => ( hasTag(option.facets_annotation)  &&
           <Box key={`groupedOptions-${index}`} {...getOptionProps({ option, index })}>
             <Box onClick={() => handleResultSelection(option)} sx={{
               position: 'relative',
@@ -78,7 +89,6 @@ export const SearchResult = ({ getOptionProps, selectedFilters, groupedOptions, 
                 columnGap: 0.5
               }}>
                 {option?.facets_annotation.slice(0,chips_cutoff).map((tag, index) => {
-                  if ( selectedFilters[tag] === true ) {
                     return <Chip
                       key={tag + index}
                       sx={{
@@ -88,7 +98,6 @@ export const SearchResult = ({ getOptionProps, selectedFilters, groupedOptions, 
                       }}
                       label={tag}
                     />
-                  }
                 }
                 )}
               </Box>

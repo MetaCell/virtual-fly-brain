@@ -15,6 +15,12 @@ export const FilterMenu  = ({ classes, tags, setSelectedFilters }) => {
     setSelectedFilters(selection)
   };
 
+  const cleanAll = (event) => {
+    let updatedSelection = {...selection};
+    Object.keys(updatedSelection)?.forEach( id => updatedSelection[id] = false );
+    setSelection(updatedSelection)
+  };
+
   const filterOpen = Boolean(filterAnchorEl);
   const filterId = filterOpen ? 'simple-popper' : undefined;
 
@@ -27,7 +33,7 @@ export const FilterMenu  = ({ classes, tags, setSelectedFilters }) => {
   React.useEffect( () => {
     let updatedSelection = {};
     tags?.forEach( tag => {
-      updatedSelection[tag] = false;
+      updatedSelection[tag] = true;
     })
     setSelection(updatedSelection)
   }, [tags]);
@@ -132,7 +138,7 @@ export const FilterMenu  = ({ classes, tags, setSelectedFilters }) => {
           display: 'flex'
         }}>
           <Button
-            onClick={filterhandleClick}
+            onClick={cleanAll}
             variant="text"
             sx={{
               px: 0,

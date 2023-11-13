@@ -74,7 +74,7 @@ export const stylingConfiguration = {
     },
     {
       label : instance => "Show classification of " + instance,
-      query : instance => whatCypherQuery(instance)
+      query : instance => cypherQuery(instance)
     }
   ],
   dropDownHoverBackgroundColor : "#11bffe",

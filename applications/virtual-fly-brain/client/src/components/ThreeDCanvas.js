@@ -128,6 +128,9 @@ class ThreeDCanvas extends Component {
           this.updateColors(targetInstance,mappedCanvasData)
           break;
         case getInstancesTypes.ADD_INSTANCE:
+          // Set all existing instances to invisible
+          mappedCanvasData?.forEach(i => i.visible = false);
+
           if ( mappedCanvasData?.find( i => targetInstance?.Id === i.instancePath ) === undefined ){
             fetch(targetInstance.Images?.[Object.keys(targetInstance.Images)[0]][0].obj)
               .then(response => response.text())

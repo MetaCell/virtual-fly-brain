@@ -96,7 +96,7 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
             flexDirection='column'
             rowGap={1}
           >
-            <Box
+            { query?.description && <Box
               display='flex'
               justifyContent='space-between'
               columnGap={1}
@@ -112,7 +112,7 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
                 }}>
                   {toggleReadMore ? "" : `${""?.substr(0, MAX_LENGTH)}...`}
                 </Typography>
-                <Button
+                { query?.description?.length > 0 && <Button
                   onClick={() => setToggleReadMore((prev) => !prev)} disableRipple
                   sx={{
                     fontSize: '0.75rem',
@@ -125,12 +125,12 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
                     }
                   }}>
                   {toggleReadMore ? 'Show Less' : 'Read More'}
-                </Button>
+                </Button>}
               </Box>
 
-            </Box>
+            </Box> }
 
-            <Box
+            { query?.type && <Box
               display='flex'
               justifyContent='space-between'
               columnGap={1}
@@ -153,7 +153,7 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
                    {query.type}
                 </Typography>
               </Tooltip>
-            </Box>
+            </Box> }
 
             <Box
               display='flex'
@@ -180,7 +180,7 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
               </Tooltip>
             </Box>
 
-            <Box
+            {query?.template && ( <Box
               display='flex'
               justifyContent='space-between'
               columnGap={1}
@@ -196,7 +196,7 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
               >
                 <Chip className="default-chip" sx={{ backgroundColor: primaryBg, gap: 0.5 }} onClick={() => console.log('Clicked!')} icon={<LinkIcon sx={{fill: '#fff !important', fontSize: '17px', m: '0 !important'}} />} label={query.template} />
               </Tooltip>
-            </Box>
+            </Box> ) }
 
 
 

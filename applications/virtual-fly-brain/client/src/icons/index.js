@@ -132,7 +132,7 @@ export const ImportExport = () => (
 )
 
 export const FullScreen = (props) => (
-  <svg {...props} width={props.size || "24"} height={props.size || "24"} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg {...props} width={props.size || 24} height={props.size || 24} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <g clipPath="url(#clip0_3864_12578)">
       <path d="M7 14H5V19H10V17H7V14ZM5 10H7V7H10V5H5V10ZM17 17H14V19H19V14H17V17ZM14 5V7H17V10H19V5H14Z" fill="#DCDCDC" />
     </g>
@@ -370,7 +370,7 @@ export const ArrowDown = (props) => (
   </svg>
 );
 
-export const Link = (props) => (
+export const LinkIcon = (props) => (
   <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <g clipPath="url(#clip0_3655_74261)">
       <path d="M12.1801 4.66663H9.51348V5.99996H12.1801C13.2801 5.99996 14.1801 6.89996 14.1801 7.99996C14.1801 9.09996 13.2801 9.99996 12.1801 9.99996H9.51348V11.3333H12.1801C14.0201 11.3333 15.5135 9.83996 15.5135 7.99996C15.5135 6.15996 14.0201 4.66663 12.1801 4.66663ZM8.18014 9.99996H5.51348C4.41348 9.99996 3.51348 9.09996 3.51348 7.99996C3.51348 6.89996 4.41348 5.99996 5.51348 5.99996H8.18014V4.66663H5.51348C3.67348 4.66663 2.18015 6.15996 2.18015 7.99996C2.18015 9.83996 3.67348 11.3333 5.51348 11.3333H8.18014V9.99996ZM6.18015 7.33329H11.5135V8.66663H6.18015V7.33329Z" fill="white" />

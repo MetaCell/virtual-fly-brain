@@ -1,4 +1,4 @@
-import { Box, Button,Tooltip, ButtonGroup, Grid, IconButton, Menu, MenuItem, 
+import { Box, Button,Tooltip, ButtonGroup, Grid, IconButton, Menu, MenuItem,
   Table, TableBody, TableCell, Paper, TableContainer, TableHead, TableRow,
    Typography } from "@mui/material";
 import React, { useState, useEffect } from "react";
@@ -59,7 +59,7 @@ const RGBAToHexA = (color) => {
 }
 
 const getRibbonData = (query) => {
-  
+
   let terms = query?.preview_results?.rows?.map( row => {
     const regExp = /\(([^)]+)\)/g;
     const matches = [...row.Neurotransmitter.matchAll(regExp)].flat();
@@ -68,7 +68,7 @@ const getRibbonData = (query) => {
       descendant_terms: [row.Weight]
     }
 });
-  return terms; 
+  return terms;
 }
 
 const ribbonTitle = (data) => {
@@ -336,7 +336,7 @@ const TermInfo = ({ open, setOpen }) => {
           lg: open ? '34rem' : '2.75rem'
         },
         flex: {
-          lg: open ? 1 : 'none !important'
+          lg: 'none !important'
         },
         p: {
           xs: 1.5,
@@ -660,8 +660,8 @@ const TermInfo = ({ open, setOpen }) => {
                                 </Table>
                                 </TableContainer>
                                 </>
-                         } /></TreeItem>) 
-                         : 
+                         } /></TreeItem>)
+                         :
                          (<TreeItem key={query.label} nodeId={query.label} label={
                             <CustomBox display='flex' flexWrap='wrap'>
                               <Typography>{query.label}</Typography>
@@ -671,7 +671,7 @@ const TermInfo = ({ open, setOpen }) => {
                               </Box>
                             </CustomBox>
                           }>
-                            
+
                           <Box display='flex' justifyContent="start">
                             <Ribbon
                               onTermClick={handleTermClick}

@@ -27,6 +27,7 @@ const chipColors = [chipRed, chipGreen, chipOrange, chipPink, chipYellow];
 const QueryCard = ({ fullWidth, facets_annotation, query }) => {
   const [toggleReadMore, setToggleReadMore] = useState(false);
   const [showFullScreen, setShowFullScreen] = useState(false);
+
   const MAX_LENGTH = 40;
   const classes = {
     heading: {
@@ -112,7 +113,7 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
                 }}>
                   {toggleReadMore ? "" : `${""?.substr(0, MAX_LENGTH)}...`}
                 </Typography>
-                { query?.description?.length > 0 && <Button
+                <Button
                   onClick={() => setToggleReadMore((prev) => !prev)} disableRipple
                   sx={{
                     fontSize: '0.75rem',
@@ -125,7 +126,7 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
                     }
                   }}>
                   {toggleReadMore ? 'Show Less' : 'Read More'}
-                </Button>}
+                </Button>
               </Box>
 
             </Box> }
@@ -155,7 +156,7 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
               </Tooltip>
             </Box> }
 
-            <Box
+            { query?.imaging_tecnique && <Box
               display='flex'
               justifyContent='space-between'
               columnGap={1}
@@ -178,9 +179,9 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
                   {query.confocal}
                 </Typography>
               </Tooltip>
-            </Box>
+            </Box> }
 
-            {query?.template && ( <Box
+            { query?.template_space && <Box
               display='flex'
               justifyContent='space-between'
               columnGap={1}
@@ -196,12 +197,12 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
               >
                 <Chip className="default-chip" sx={{ backgroundColor: primaryBg, gap: 0.5 }} onClick={() => console.log('Clicked!')} icon={<LinkIcon sx={{fill: '#fff !important', fontSize: '17px', m: '0 !important'}} />} label={query.template} />
               </Tooltip>
-            </Box> ) }
+            </Box> }
 
 
 
 
-            <Box
+            {facets_annotation?.length > 0 && <Box
               display='flex'
               justifyContent='flex-end'
               columnGap={1}
@@ -209,7 +210,6 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
               <Box display='flex' gap={0.5} flexWrap='wrap'>
                 {facets_annotation?.slice(0, fullWidth ? 3 : 4)?.map((tag, index) => (
                   <Chip
-                  onClick={() => null}
                   key={tag + index}
                   sx={{
                     lineHeight: '140%',
@@ -225,7 +225,6 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
                     <Box display='flex' py={1} flexWrap='wrap' gap={0.5}>
                       {facets_annotation?.slice(fullWidth ? 3 : 4).map((tag, index) => (
                         <Chip
-                          onClick={() => null}
                           key={tag + index}
                           sx={{
                             lineHeight: '140%',
@@ -245,15 +244,13 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
                 </Tooltip>
 
               </Box>
-            </Box>
+            </Box> }
           </Box>
         </CardContent>
       </Card>
 
       {showFullScreen && (
-        <FullScreenViewer open={ showFullScreen } onClose={ () => setShowFullScreen( false ) }>
-          <img style={{width: '100%', display: 'block'}} src={query.thumbnail} alt="" />
-        </FullScreenViewer>
+        <FullScreenViewer open={ showFullScreen } onClose={ () => setShowFullScreen( false ) } images={[query?.thumbnail]} />
       )}
     </>
   )

@@ -1,12 +1,11 @@
 import React from "react";
-import { Box, Button, Card, CardActionArea, CardContent, CardMedia, Chip, IconButton, Tooltip, Typography } from "@mui/material";
-import { FullScreen, Cross } from "../../icons";
+import { Box, Button, Card, CardContent, CardMedia, Chip, IconButton, Tooltip, Typography } from "@mui/material";
 import LinkIcon from '@mui/icons-material/Link';
 import vars from "../../theme/variables";
 import { useState } from "react";
 import FullScreenViewer from "./FullScreenViewer";
-import QUERY from '../../assets/query.png';
-import QUERY_LARGE from "../../assets/query-large.png";
+import FullscreenIcon from '@mui/icons-material/Fullscreen';
+import { Compare } from "../../icons";
 
 const {
   listHeadingColor,
@@ -19,8 +18,10 @@ const {
   primaryBg,
   chipYellow,
   secondaryBg,
-  outlinedBtnBorderColor
+  outlinedBtnBorderColor,
+  outlinedBtnTextColor
 } = vars;
+
 
 const chipColors = [chipRed, chipGreen, chipOrange, chipPink, chipYellow];
 
@@ -41,6 +42,48 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
       textOverflow: 'ellipsis',
       whiteSpace: 'nowrap',
       overflow: 'hidden'
+    },
+
+    slider: {
+      '& .images-wrap': {
+        '& img': {
+          maxHeight: '30.375rem',
+          borderRadius: '0.5rem',
+          display: 'block',
+        }
+      },
+      '& .react-slideshow-container + ul.indicators': {
+        margin: 0,
+        position: 'absolute',
+        bottom: '1.6875rem',
+        left: 0,
+        width: 'auto',
+        right: 0,
+        padding: 0,
+
+        '& .each-slideshow-indicator': {
+          background: outlinedBtnBorderColor,
+          width: '0.375rem',
+          height: '0.375rem',
+          borderRadius: '50%',
+          padding: 0,
+
+          '&.active': {
+            background: outlinedBtnTextColor
+          },
+
+          '&:before': {
+            display: 'none'
+          }
+        },
+
+        '& li': {
+          display: 'flex',
+          padding: 0,
+          width: 'auto',
+          height: 'auto'
+        }
+      }
     }
   }
   return (
@@ -70,12 +113,9 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
             e.stopPropagation();
             setShowFullScreen(true)
           }}>
-            <FullScreen />
+            <FullscreenIcon sx={{fill: '#fff !important', fontSize: '1.0625rem', m: '0 !important'}} />
           </IconButton>
         </CardMedia>
-        {/* <CardActionArea sx={{ flexGrow: 1 }}>
-
-        </CardActionArea> */}
 
         <CardContent>
           <Tooltip placement="right"
@@ -195,7 +235,7 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
                 arrow
                 title={query.template}
               >
-                <Chip className="default-chip" sx={{ backgroundColor: primaryBg, gap: 0.5 }} onClick={() => console.log('Clicked!')} icon={<LinkIcon sx={{fill: '#fff !important', fontSize: '17px', m: '0 !important'}} />} label={query.template} />
+                <Chip className="default-chip" sx={{ backgroundColor: primaryBg, gap: 0.5 }} onClick={() => console.log('Clicked!')} icon={<LinkIcon sx={{fill: '#fff !important', fontSize: '1.0625rem', m: '0 !important'}} />} label={query.template} />
               </Tooltip>
             </Box> }
 
@@ -250,7 +290,12 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
       </Card>
 
       {showFullScreen && (
-        <FullScreenViewer open={ showFullScreen } onClose={ () => setShowFullScreen( false ) } images={[query?.thumbnail]} />
+        <FullScreenViewer sx={classes.slider} open={ showFullScreen } onClose={ () => setShowFullScreen( false ) } images={[query?.thumbnail]}>
+          <Button sx={ { position: 'absolute', zIndex: 9, gap: '0.25rem', right: '1.75rem', top: '1.75rem' } } variant="contained" color="info">
+            <Compare />
+            Compare images with current
+          </Button>
+        </FullScreenViewer>
       )}
     </>
   )

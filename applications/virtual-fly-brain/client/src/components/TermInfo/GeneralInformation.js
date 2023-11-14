@@ -137,15 +137,11 @@ const GeneralInformation = ({data, classes}) => {
       </Grid>
 
       {fullScreen && (
-        <FullScreenViewer open={ fullScreen } onClose={ () => setFullScreen( false ) }>
+        <FullScreenViewer open={ fullScreen } onClose={ () => setFullScreen( false ) } images={data?.Images}>
           <Button sx={ { position: 'absolute', zIndex: 9, gap: '0.25rem', right: '1.75rem', top: '1.75rem' } } variant="contained" color="info">
             <Compare />
             Compare images with current
           </Button>
-          <TerminfoSlider
-            allowFullscreen={false}
-            examples={data?.Images}
-          />
         </FullScreenViewer>
       )}
     </>

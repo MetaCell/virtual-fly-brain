@@ -13,7 +13,8 @@ const imageStyle =  {
   objectFit: 'cover'
 }
 
-const FullScreenViewer = ({ open, onClose, maxWidth = 'md', images, sx, children }) => {
+const FullScreenViewer = ( { open, onClose, maxWidth = 'md', images, sx, children } ) =>
+{
   return (
     <Dialog
       fullWidth
@@ -35,13 +36,13 @@ const FullScreenViewer = ({ open, onClose, maxWidth = 'md', images, sx, children
       </IconButton>
       {children}
       {images.length > 0 && (
-        <Slide canSwipe slidesToShow={ 1 } slidesToScroll={ 1 } infinite={ false } indicators={ true } prevArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } nextArrow={ <Typography><ChevronRight color={ listHeadingColor } /></Typography> } arrows={ true }>
+        <Slide canSwipe slidesToShow={ 1 } slidesToScroll={ 1 } infinite={ false } indicators={ true } prevArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } nextArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } arrows={ true }>
           <>
             {images?.map((slideImage, index) => (
               <div key={index}>
                 <img
                   style={imageStyle}
-                  src={slideImage}
+                  src={slideImage?.url}
                 />
               </div>
             ))}

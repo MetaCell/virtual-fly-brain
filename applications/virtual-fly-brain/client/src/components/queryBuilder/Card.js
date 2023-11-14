@@ -52,6 +52,21 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
           display: 'block',
         }
       },
+      '& .react-slideshow-container .nav:first-of-type': {
+        transform: 'translateX(-50%)',
+        left: '50%',
+        bottom: '0.5rem',
+        marginLeft: '-1.25rem',
+        display: 'flex',
+      },
+      '& .react-slideshow-container .nav:last-of-type': {
+        transform: 'translateX(-50%) rotate(180deg)',
+        bottom: '0.5rem',
+        left: '50%',
+        right: 'auto',
+        marginLeft: '1.25rem',
+        display: 'flex',
+      },
       '& .react-slideshow-container + ul.indicators': {
         margin: 0,
         position: 'absolute',
@@ -290,7 +305,7 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
       </Card>
 
       {showFullScreen && (
-        <FullScreenViewer sx={classes.slider} open={ showFullScreen } onClose={ () => setShowFullScreen( false ) } images={[query?.thumbnail]}>
+        <FullScreenViewer sx={classes.slider} open={ showFullScreen } onClose={ () => setShowFullScreen( false ) } images={[{ url : query?.thumbnail }]}>
           <Button sx={ { position: 'absolute', zIndex: 9, gap: '0.25rem', right: '1.75rem', top: '1.75rem' } } variant="contained" color="info">
             <Compare />
             Compare images with current

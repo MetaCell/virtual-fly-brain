@@ -128,8 +128,12 @@ class ThreeDCanvas extends Component {
           this.updateColors(targetInstance,mappedCanvasData)
           break;
         case getInstancesTypes.ADD_INSTANCE:
+          // Set all existing instances to invisible
           if ( mappedCanvasData?.find( i => targetInstance?.Id === i.instancePath ) === undefined ){
-            fetch(targetInstance.Images?.[Object.keys(targetInstance.Images)[0]][0].obj)
+            if (targetInstance.Images)
+            {
+              mappedCanvasData?.forEach(i => i.visible = false);
+              fetch(targetInstance.Images?.[Object.keys(targetInstance.Images)[0]][0].obj)
               .then(response => response.text())
               .then(base64Content => {
                 const instance = {
@@ -145,6 +149,7 @@ class ThreeDCanvas extends Component {
                 }
                 that.newInstance(instance);
               });
+            }
           }
           break;
         case getInstancesTypes.SHOW_3D_MESH:

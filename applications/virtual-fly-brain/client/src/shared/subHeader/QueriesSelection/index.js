@@ -224,6 +224,9 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
 
             '&:hover': {
               backgroundColor: primaryBg,
+            },
+            '& svg path': {
+              fill: !(selectedOption?.count > 1) && 'rgba(0, 0, 0, 0.26)'
             }
           }}
         >

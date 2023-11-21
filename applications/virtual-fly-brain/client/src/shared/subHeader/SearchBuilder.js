@@ -10,17 +10,13 @@ import vars from "../../theme/variables";
 import { SearchResult } from './SearchResult';
 import { RecentSearch } from './RecentSearch';
 import { QueriesSelection } from './QueriesSelection';
-import { NarrowSearchFilter } from './NarrowSearchFilter';
 import { ResultSelectionOptions } from './ResultSelectionOptions';
 import  { getResultsSOLR } from '../../components/configuration/SOLRclient'
 import { DatasourceTypes } from '@metacell/geppetto-meta-ui/search/datasources/datasources';
-import { get_queries } from "../../network/query"
 import { getInstanceByID } from './../../reducers/actions/instances';
 import { useSelector } from 'react-redux'
 import { termInfoById } from '../../reducers/actions/termInfo';
 import { getQueries, deleteQuery } from '../../reducers/actions/queries';
-
-import QueryBuilder from "./../../components/queryBuilder";
 
 const QUERIES = "Queries";
 
@@ -210,6 +206,7 @@ export default function SearchBuilder(props) {
       case "OK":
           if (v !== value) {
             setGroupedOptions(data)
+            props.handleFilters(data);
             setRetrievingResults(false);
           }
           break;
@@ -320,6 +317,7 @@ export default function SearchBuilder(props) {
           { !retrievingResults ? (<SearchResult
             groupedOptions={groupedOptions}
             getOptionProps={getOptionProps}
+            selectedFilters={props.applyFilters}
             chipColors={chipColors}
             handleResultSelection={handleResultSelection}
           />) : <CircularProgress sx={{left: '50%', marginTop : '10%', position : 'relative'}}/> }

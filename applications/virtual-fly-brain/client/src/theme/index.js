@@ -45,7 +45,7 @@ theme = createTheme({
         .flexlayout__tab_button {
           margin: 0;
           border-radius: 8px 8px 0px 0px;
-          padding: 0.5rem;
+          padding: 0.25rem 0.5rem;
         }
         .flexlayout__tab_button--selected {
           background-color: ${blackColor};
@@ -892,6 +892,17 @@ theme = createTheme({
           marginLeft: '0.5rem',
           lineHeight: '133%',
           color: outlinedBtnTextColor,
+        }
+      }
+    },
+
+    MuiTooltip: {
+      styleOverrides: {
+        tooltip: {
+          backgroundColor: secondaryBg
+        },
+        arrow: {
+          color: secondaryBg
         }
       }
     },

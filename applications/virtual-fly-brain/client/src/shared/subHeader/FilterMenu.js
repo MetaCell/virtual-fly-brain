@@ -6,15 +6,37 @@ import vars from "../../theme/variables";
 
 const { primaryBg, outlinedBtnTextColor, bottomNavBg, tabActiveColor, whiteColor } = vars;
 
-export const FilterMenu  = ({ classes }) => {
+export const FilterMenu  = ({ classes, tags, setSelectedFilters }) => {
   const [filterAnchorEl, setFilterAnchorEl] = React.useState(null);
+  const [selection, setSelection] = React.useState({})
 
   const filterhandleClick = (event) => {
     setFilterAnchorEl(filterAnchorEl ? null : event.currentTarget);
+    setSelectedFilters(selection)
+  };
+
+  const cleanAll = (event) => {
+    let updatedSelection = {...selection};
+    Object.keys(updatedSelection)?.forEach( id => updatedSelection[id] = false );
+    setSelection(updatedSelection)
   };
 
   const filterOpen = Boolean(filterAnchorEl);
   const filterId = filterOpen ? 'simple-popper' : undefined;
+
+  const handleChange = (event) => {
+    let updatedSelection = {...selection};
+    updatedSelection[event.target.id] = event.target.checked;
+    setSelection(updatedSelection)
+  }
+
+  React.useEffect( () => {
+    let updatedSelection = {};
+    tags?.forEach( tag => {
+      updatedSelection[tag] = true;
+    })
+    setSelection(updatedSelection)
+  }, [tags]);
 
   return (
     <Box
@@ -101,7 +123,9 @@ export const FilterMenu  = ({ classes }) => {
             flexDirection: 'column',
             rowGap: 1.5
           }}>
-            <FormControlLabel control={<Checkbox checkedIcon={<CheckBoxGreen />} icon={<CheckBoxDefault />} />} label="Adult" />
+            {tags?.map( tag => 
+              <FormControlLabel key={tag} control={<Checkbox id={tag} checkedIcon={<CheckBoxGreen />} onChange={handleChange} icon={<CheckBoxDefault />} checked={selection[tag]} />} label={tag} />
+            )}
           </FormGroup>
         </Box>
         <Box sx={{
@@ -114,7 +138,7 @@ export const FilterMenu  = ({ classes }) => {
           display: 'flex'
         }}>
           <Button
-            onClick={filterhandleClick}
+            onClick={cleanAll}
             variant="text"
             sx={{
               px: 0,

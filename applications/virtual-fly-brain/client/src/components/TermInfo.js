@@ -1,12 +1,12 @@
-import { Box, Button,Tooltip, ButtonGroup, Grid, IconButton, Menu, MenuItem, 
+import { Box, Button,Tooltip, ButtonGroup, Grid, IconButton, Menu, MenuItem,
   Table, TableBody, TableCell, Paper, TableContainer, TableHead, TableRow,
    Typography } from "@mui/material";
 import React, { useState, useEffect } from "react";
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { styled } from '@mui/material/styles';
 import MediaQuery from 'react-responsive';
-import { ArView, Target, CylinderOn, ArrowDown, ArrowRight, ChevronDown,
-   ChevronLeft, ChevronRight, Delete, Expand, Eye, Focus, TargetOff, Line, Remove,
+import { ArView, Target, CylinderOn, CylinderOff, ArrowDown, ArrowRight, ChevronDown,
+   ChevronLeft, ChevronRight, Delete, Expand, Eye, Focus,Line, Remove,
     ScatterPlot, SkeletonOn, SelectOff, SkeletonOff, EyeOff, ArViewOff } from "../icons";
 import PropTypes from 'prop-types';
 import vars from "../theme/variables";
@@ -19,13 +19,13 @@ import ListAltIcon from '@mui/icons-material/ListAlt';
 import RectangleIcon from '@mui/icons-material/Rectangle';
 import GeneralInformation from "./TermInfo/GeneralInformation";
 import { getInstanceByID, selectInstance, hide3DMesh, show3DMesh, 
-  changeColor, focusInstance, selectInstanceSkeleton, selectInstanceCylinder } from './../reducers/actions/instances';
+  changeColor, focusInstance, show3DSkeleton, hide3DSkeleton, show3DSkeletonLines, show3DSkeletonCylinders } from './../reducers/actions/instances';
 import { termInfoById } from "./../reducers/actions/termInfo";
 import Ribbon from '@flybase/react-ontology-ribbon';
 import { ChromePicker } from 'react-color';
 import Link from '@mui/material/Link';
 import useClickOutside from "./useClickOutside";
-
+import { SKELETON, CYLINDERS } from "./../utils/constants"
 import '@flybase/react-ontology-ribbon/dist/style.css';
 
 const NEURON = "Neuron";
@@ -59,7 +59,7 @@ const RGBAToHexA = (color) => {
 }
 
 const getRibbonData = (query) => {
-  
+
   let terms = query?.preview_results?.rows?.map( row => {
     const regExp = /\(([^)]+)\)/g;
     const matches = [...row.Neurotransmitter.matchAll(regExp)].flat();
@@ -68,7 +68,7 @@ const getRibbonData = (query) => {
       descendant_terms: [row.Weight]
     }
 });
-  return terms; 
+  return terms;
 }
 
 const ribbonTitle = (data) => {
@@ -246,10 +246,8 @@ const TermInfo = ({ open, setOpen }) => {
   const handleVisibility = () => {
     if ( allLoadedInstances.find( instance => instance.Id == termInfoData.Id )?.visible ) {
       hide3DMesh(termInfoData.Id)
-      hide3DVolume(termInfoData.Id)
     } else {
       show3DMesh(termInfoData.Id)
-      show3DVolume(termInfoData.Id)
     }
   }
 
@@ -270,11 +268,19 @@ const TermInfo = ({ open, setOpen }) => {
   }
 
   const handleSkeleton = (event) => {
-    selectInstanceSkeleton(termInfoData.Id)
+    if ( !allLoadedInstances.find( instance => instance.Id == termInfoData.Id )?.skeleton?.visible ) {
+      show3DSkeleton(termInfoData.Id)
+    } else {
+      hide3DSkeleton(termInfoData.Id)
+    }
   }
 
   const handleCylinder = (event) => {
-    selectInstanceCylinder(termInfoData.Id)
+    if ( allLoadedInstances.find( instance => instance.Id == termInfoData.Id )?.skeleton?.skeleton?.visible ) {
+      show3DSkeletonCylinders(termInfoData.Id)
+    } else {
+      show3DSkeletonLines(termInfoData.Id)
+    }
   }
 
   const handleTermClick = (term, evt) => {
@@ -316,6 +322,7 @@ const TermInfo = ({ open, setOpen }) => {
   useEffect(() => {
     setTermInfoData(data)
   }, [allLoadedInstances])
+  
 
   const getInstance = () => {
     return allLoadedInstances.find( instance => instance.Id == termInfoData?.Id );
@@ -329,7 +336,7 @@ const TermInfo = ({ open, setOpen }) => {
           lg: open ? '34rem' : '2.75rem'
         },
         flex: {
-          lg: open ? 1 : 'none !important'
+          lg: 'none !important'
         },
         p: {
           xs: 1.5,
@@ -509,22 +516,22 @@ const TermInfo = ({ open, setOpen }) => {
                             <Target />
                           </Button>
                         </Tooltip>
-                        <Tooltip title={"Hide/Show 3D Mesh"}>
+                        <Tooltip title={getInstance()?.visible ? "Hide 3D Mesh" : "Show 3D Mesh"}>
                           <Button onClick={(event) => handleMeshVisibility()}>
                           { getInstance()?.visible ? <ArViewOff /> : <ArView /> }                          </Button>
                         </Tooltip>
                         { termInfoData?.SuperTypes?.find( s => s === NEURON) ?
-                        <Tooltip title={"Enable 3D Skeleton"}>
+                        <Tooltip title={getInstance()?.skeleton?.visible ? "Disable 3D Skeleton" : "Enable 3D Skeleton"}>
                           <Button onClick={(event) => handleSkeleton(event)}>
-                            <SkeletonOn />
+                            {getInstance()?.skeleton?.visible ? <SkeletonOff /> : <SkeletonOn /> }
                           </Button>
                         </Tooltip>
                         :
                         null}
                         { termInfoData?.SuperTypes?.find( s => s === NEURON) ?
-                        <Tooltip title={"Cylinder/Lines 3D Skeleton"}>
+                        <Tooltip title={getInstance()?.skeleton?.[SKELETON]?.visible ? "Show 3D Cylinder Skeleton" : "Show 3D Lines Skeleton"}>
                           <Button onClick={(event) => handleCylinder(event)}>
-                            <CylinderOn />
+                          {getInstance()?.skeleton?.[SKELETON]?.visible ? <CylinderOn id={CYLINDERS}/> : <CylinderOff id={SKELETON} /> }
                           </Button>
                         </Tooltip>
                         :
@@ -653,8 +660,8 @@ const TermInfo = ({ open, setOpen }) => {
                                 </Table>
                                 </TableContainer>
                                 </>
-                         } /></TreeItem>) 
-                         : 
+                         } /></TreeItem>)
+                         :
                          (<TreeItem key={query.label} nodeId={query.label} label={
                             <CustomBox display='flex' flexWrap='wrap'>
                               <Typography>{query.label}</Typography>
@@ -664,7 +671,7 @@ const TermInfo = ({ open, setOpen }) => {
                               </Box>
                             </CustomBox>
                           }>
-                            
+
                           <Box display='flex' justifyContent="start">
                             <Ribbon
                               onTermClick={handleTermClick}

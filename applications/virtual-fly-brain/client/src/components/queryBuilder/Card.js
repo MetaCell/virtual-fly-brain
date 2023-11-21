@@ -1,11 +1,11 @@
 import React from "react";
-import { Box, Button, Card, CardActionArea, CardContent, CardMedia, Chip, IconButton, Tooltip, Typography } from "@mui/material";
-import { FullScreen, Cross, Link as LinkIcon } from "../../icons";
+import { Box, Button, Card, CardContent, CardMedia, Chip, IconButton, Tooltip, Typography } from "@mui/material";
+import LinkIcon from '@mui/icons-material/Link';
 import vars from "../../theme/variables";
 import { useState } from "react";
 import FullScreenViewer from "./FullScreenViewer";
-import QUERY from '../../assets/query.png';
-import QUERY_LARGE from "../../assets/query-large.png";
+import FullscreenIcon from '@mui/icons-material/Fullscreen';
+import { Compare } from "../../icons";
 
 const {
   listHeadingColor,
@@ -18,14 +18,17 @@ const {
   primaryBg,
   chipYellow,
   secondaryBg,
-  outlinedBtnBorderColor
+  outlinedBtnBorderColor,
+  outlinedBtnTextColor
 } = vars;
+
 
 const chipColors = [chipRed, chipGreen, chipOrange, chipPink, chipYellow];
 
 const QueryCard = ({ fullWidth, facets_annotation, query }) => {
   const [toggleReadMore, setToggleReadMore] = useState(false);
   const [showFullScreen, setShowFullScreen] = useState(false);
+
   const MAX_LENGTH = 40;
   const classes = {
     heading: {
@@ -39,6 +42,63 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
       textOverflow: 'ellipsis',
       whiteSpace: 'nowrap',
       overflow: 'hidden'
+    },
+
+    slider: {
+      '& .images-wrap': {
+        '& img': {
+          maxHeight: '30.375rem',
+          borderRadius: '0.5rem',
+          display: 'block',
+        }
+      },
+      '& .react-slideshow-container .nav:first-of-type': {
+        transform: 'translateX(-50%)',
+        left: '50%',
+        bottom: '0.5rem',
+        marginLeft: '-1.25rem',
+        display: 'flex',
+      },
+      '& .react-slideshow-container .nav:last-of-type': {
+        transform: 'translateX(-50%) rotate(180deg)',
+        bottom: '0.5rem',
+        left: '50%',
+        right: 'auto',
+        marginLeft: '1.25rem',
+        display: 'flex',
+      },
+      '& .react-slideshow-container + ul.indicators': {
+        margin: 0,
+        position: 'absolute',
+        bottom: '1.6875rem',
+        left: 0,
+        width: 'auto',
+        right: 0,
+        padding: 0,
+
+        '& .each-slideshow-indicator': {
+          background: outlinedBtnBorderColor,
+          width: '0.375rem',
+          height: '0.375rem',
+          borderRadius: '50%',
+          padding: 0,
+
+          '&.active': {
+            background: outlinedBtnTextColor
+          },
+
+          '&:before': {
+            display: 'none'
+          }
+        },
+
+        '& li': {
+          display: 'flex',
+          padding: 0,
+          width: 'auto',
+          height: 'auto'
+        }
+      }
     }
   }
   return (
@@ -68,12 +128,9 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
             e.stopPropagation();
             setShowFullScreen(true)
           }}>
-            <FullScreen />
+            <FullscreenIcon sx={{fill: '#fff !important', fontSize: '1.0625rem', m: '0 !important'}} />
           </IconButton>
         </CardMedia>
-        {/* <CardActionArea sx={{ flexGrow: 1 }}>
-
-        </CardActionArea> */}
 
         <CardContent>
           <Tooltip placement="right"
@@ -95,7 +152,7 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
             flexDirection='column'
             rowGap={1}
           >
-            <Box
+            { query?.description && <Box
               display='flex'
               justifyContent='space-between'
               columnGap={1}
@@ -127,9 +184,9 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
                 </Button>
               </Box>
 
-            </Box>
+            </Box> }
 
-            <Box
+            { query?.type && <Box
               display='flex'
               justifyContent='space-between'
               columnGap={1}
@@ -152,9 +209,9 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
                    {query.type}
                 </Typography>
               </Tooltip>
-            </Box>
+            </Box> }
 
-            <Box
+            { query?.imaging_tecnique && <Box
               display='flex'
               justifyContent='space-between'
               columnGap={1}
@@ -177,9 +234,9 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
                   {query.confocal}
                 </Typography>
               </Tooltip>
-            </Box>
+            </Box> }
 
-            <Box
+            { query?.template_space && <Box
               display='flex'
               justifyContent='space-between'
               columnGap={1}
@@ -188,37 +245,27 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
                {query.template_space}
               </Typography>
 
-
-
               <Tooltip
                 placement="right"
                 arrow
-                title="JRC2018U"
+                title={query.template}
               >
-                <Chip className="default-chip" sx={{ backgroundColor: primaryBg }} onClick={() => console.log('Clicked!')} icon={<LinkIcon />} label={query.template} />
+                <Chip className="default-chip" sx={{ backgroundColor: primaryBg, gap: 0.5 }} onClick={() => console.log('Clicked!')} icon={<LinkIcon sx={{fill: '#fff !important', fontSize: '1.0625rem', m: '0 !important'}} />} label={query.template} />
               </Tooltip>
-            </Box>
+            </Box> }
 
 
 
 
-            <Box
+            {facets_annotation?.length > 0 && <Box
               display='flex'
               justifyContent='flex-end'
               columnGap={1}
             >
-              <Box display='flex' gap={0.5}>
-                {facets_annotation?.map((tag, index) => (
+              <Box display='flex' gap={0.5} flexWrap='wrap'>
+                {facets_annotation?.slice(0, fullWidth ? 3 : 4)?.map((tag, index) => (
                   <Chip
-                  onClick={() => null}
-                  onDelete={() => null}
                   key={tag + index}
-                  deleteIcon={
-                    <Cross
-                      size={12}
-                      style={{ marginRight: 0, marginLeft: '0.25rem' }}
-                    />
-                  }
                   sx={{
                     lineHeight: '140%',
                     fontSize: '0.625rem',
@@ -230,18 +277,10 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
                 <Tooltip
                   arrow
                   title={
-                    <Box display='flex' gap={0.5}>
-                      {facets_annotation?.map((tag, index) => (
+                    <Box display='flex' py={1} flexWrap='wrap' gap={0.5}>
+                      {facets_annotation?.slice(fullWidth ? 3 : 4).map((tag, index) => (
                         <Chip
-                          onClick={() => null}
-                          onDelete={() => null}
                           key={tag + index}
-                          deleteIcon={
-                            <Cross
-                              size={12}
-                              style={{ marginRight: 0, marginLeft: '0.25rem' }}
-                            />
-                          }
                           sx={{
                             lineHeight: '140%',
                             fontSize: '0.625rem',
@@ -255,19 +294,22 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
                   <Chip
                     className="default-chip"
                     sx={{ background: primaryBg }}
-                    label={`+${facets_annotation?.slice(fullWidth ? 2 : 3).length}`}
+                    label={`+${facets_annotation?.slice(fullWidth ? 3 : 4).length}`}
                   />
                 </Tooltip>
 
               </Box>
-            </Box>
+            </Box> }
           </Box>
         </CardContent>
       </Card>
 
       {showFullScreen && (
-        <FullScreenViewer open={ showFullScreen } onClose={ () => setShowFullScreen( false ) }>
-          <img style={{width: '100%', display: 'block'}} src={QUERY_LARGE} alt="" />
+        <FullScreenViewer sx={classes.slider} open={ showFullScreen } onClose={ () => setShowFullScreen( false ) } images={[{ url : query?.thumbnail }]}>
+          <Button sx={ { position: 'absolute', zIndex: 9, gap: '0.25rem', right: '1.75rem', top: '1.75rem' } } variant="contained" color="info">
+            <Compare />
+            Compare images with current
+          </Button>
         </FullScreenViewer>
       )}
     </>

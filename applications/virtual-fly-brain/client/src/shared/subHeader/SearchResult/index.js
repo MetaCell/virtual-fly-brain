@@ -6,7 +6,18 @@ import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
 
 const { secondaryBg, searchBoxBg, whiteColor, searchHeadingColor, listHover } = vars;
 const chips_cutoff = 3;
-export const SearchResult = ({ getOptionProps, groupedOptions, chipColors, handleResultSelection }) => {
+export const SearchResult = ({ getOptionProps, selectedFilters, groupedOptions, chipColors, handleResultSelection }) => {
+  const hasTag = (facets_annotations) => {
+    let hasTag = false;
+    facets_annotations?.forEach( annotation => {
+      if ( selectedFilters[annotation] !== false ) {
+        hasTag = true;
+      }
+    })
+
+    return hasTag;
+  }
+  
   return (
     <Box sx={{
       py: '1rem',
@@ -22,7 +33,7 @@ export const SearchResult = ({ getOptionProps, groupedOptions, chipColors, handl
         Suggested results
       </Typography>
       <Box mt={1.5}>
-        {groupedOptions?.map((option, index) => (
+        {groupedOptions?.map((option, index) => ( hasTag(option.facets_annotation)  &&
           <Box key={`groupedOptions-${index}`} {...getOptionProps({ option, index })}>
             <Box onClick={() => handleResultSelection(option)} sx={{
               position: 'relative',
@@ -77,15 +88,18 @@ export const SearchResult = ({ getOptionProps, groupedOptions, chipColors, handl
                 width: '30%',
                 columnGap: 0.5
               }}>
-                {option?.facets_annotation.slice(0,chips_cutoff).map((tag, index) => <Chip
-                  key={tag + index}
-                  sx={{
-                    lineHeight: '140%',
-                    fontSize: '0.625rem',
-                    backgroundColor: chipColors[index] || chipColors[0]
-                  }}
-                  label={tag}
-                />)}
+                {option?.facets_annotation.slice(0,chips_cutoff).map((tag, index) => {
+                    return <Chip
+                      key={tag + index}
+                      sx={{
+                        lineHeight: '140%',
+                        fontSize: '0.625rem',
+                        backgroundColor: chipColors[index] || chipColors[0]
+                      }}
+                      label={tag}
+                    />
+                }
+                )}
               </Box>
 
               <Button sx={{
@@ -102,7 +116,7 @@ export const SearchResult = ({ getOptionProps, groupedOptions, chipColors, handl
                 right: 0,
                 top: 0
               }} variant='text'>
-                +{option?.facets_annotation?.length - chips_cutoff}
+                {option?.facets_annotation?.length - chips_cutoff}
                 <ArrowOutwardIcon sx={{
                   fontSize: '0.75rem',
                   m: 0,

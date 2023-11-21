@@ -10,17 +10,13 @@ import vars from "../../theme/variables";
 import { SearchResult } from './SearchResult';
 import { RecentSearch } from './RecentSearch';
 import { QueriesSelection } from './QueriesSelection';
-import { NarrowSearchFilter } from './NarrowSearchFilter';
 import { ResultSelectionOptions } from './ResultSelectionOptions';
 import { getResultsSOLR } from '../../components/configuration/SOLRclient'
 import { DatasourceTypes } from '@metacell/geppetto-meta-ui/search/datasources/datasources';
-import { get_queries } from "../../network/query"
 import { getInstanceByID } from './../../reducers/actions/instances';
 import { useSelector } from 'react-redux'
 import { termInfoById } from '../../reducers/actions/termInfo';
 import { getQueries, deleteQuery } from '../../reducers/actions/queries';
-
-import QueryBuilder from "./../../components/queryBuilder";
 
 const QUERIES = "Queries";
 
@@ -171,6 +167,7 @@ export default function SearchBuilder(props) {
     })
     termInfoById(value[value.length - 1].short_form);
     setIsOpen(false)
+    setValue([])
   }
 
   const handleResultSelection = async (option) => {
@@ -188,6 +185,9 @@ export default function SearchBuilder(props) {
     if (filtered.length == 0 || (filtered.length === 1 && value.find(v => v.label === QUERIES))) {
       setGroupedOptions([]);
     }
+    if ( filtered.length <=1 && filtered.find( c => c.label == QUERIES )){
+      setValue([])
+    }
   }
 
   const handleQueryDeletion = (label) => {
@@ -204,11 +204,12 @@ export default function SearchBuilder(props) {
     switch (status) {
 
       case "OK":
-        if (v !== value) {
-          setGroupedOptions(data)
-          setRetrievingResults(false);
-        }
-        break;
+          if (v !== value) {
+            setGroupedOptions(data)
+            props.handleFilters(data);
+            setRetrievingResults(false);
+          }
+          break;
       case "ERROR":
         setRetrievingResults(false);
         break;
@@ -299,7 +300,7 @@ export default function SearchBuilder(props) {
           className='scrollbar'
           {...getListboxProps()}
         >
-          {value.find(v => v.label === QUERIES) && queries?.length >= 1 ? (<QueriesSelection checkResults={checkResults} handleQueryDeletion={handleQueryDeletion} recentSearch={queries} />) : null}
+          { value.find( v => v.label === QUERIES ) && queries?.length >= 1 ? (<QueriesSelection checkResults={checkResults} handleQueryDeletion={handleChipDelete} recentSearch={queries}/>) : null }
 
           {/* { groupedOptions.length >=1 ? <NarrowSearchFilter chipColors={chipColors} groupedOptions={groupedOptions}/> :null } */}
 
@@ -316,6 +317,7 @@ export default function SearchBuilder(props) {
           {!retrievingResults ? (<SearchResult
             groupedOptions={groupedOptions}
             getOptionProps={getOptionProps}
+            selectedFilters={props.applyFilters}
             chipColors={chipColors}
             handleResultSelection={handleResultSelection}
           />) : <CircularProgress sx={{ left: '50%', marginTop: '10%', position: 'relative' }} />}

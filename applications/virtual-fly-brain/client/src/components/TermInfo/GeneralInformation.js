@@ -1,7 +1,7 @@
 import { Box, Button, Chip, Grid, Typography } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import {useSelector} from 'react-redux'
-import { Compare, Link } from "../../icons";
+import { Compare, LinkIcon } from "../../icons";
 import vars from "../../theme/variables";
 import TerminfoSlider from "./TerminfoSlider";
 import FullScreenViewer from "../queryBuilder/FullScreenViewer";
@@ -116,7 +116,7 @@ const GeneralInformation = ({data, classes}) => {
 
             <Box display='flex' justifyContent='space-between' columnGap={1}>
               <Typography sx={classes.heading}>Source</Typography>
-              <Chip icon={<Link />} label='JRC2018Unisex' />
+              <Chip icon={<LinkIcon />} label='JRC2018Unisex' />
             </Box>
 
             <Box display='flex' justifyContent='space-between' columnGap={1}>
@@ -130,22 +130,18 @@ const GeneralInformation = ({data, classes}) => {
 
             <Box display='flex' justifyContent='space-between' columnGap={1}>
               <Typography sx={classes.heading}>Aligned To</Typography>
-              <Chip icon={<Link />} label='JRC2018Unisex' />
+              <Chip icon={<LinkIcon />} label='JRC2018Unisex' />
             </Box>
           </Box>
         </Grid>
       </Grid>
 
       {fullScreen && (
-        <FullScreenViewer open={ fullScreen } onClose={ () => setFullScreen( false ) }>
+        <FullScreenViewer open={ fullScreen } onClose={ () => setFullScreen( false ) } images={data?.Images}>
           <Button sx={ { position: 'absolute', zIndex: 9, gap: '0.25rem', right: '1.75rem', top: '1.75rem' } } variant="contained" color="info">
             <Compare />
             Compare images with current
           </Button>
-          <TerminfoSlider
-            allowFullscreen={false}
-            examples={data?.Images}
-          />
         </FullScreenViewer>
       )}
     </>

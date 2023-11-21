@@ -12,6 +12,8 @@ import { configuration } from './configuration/VFBGraph/graphConfiguration';
 import { restPostConfig } from './configuration/VFBGraph/graphConfiguration';
 import { cypherQuery } from './configuration/VFBGraph/graphConfiguration';
 import { stylingConfiguration } from './configuration/VFBGraph/graphConfiguration';
+import { termInfoById } from '../reducers/actions/termInfo';
+import { getInstanceByID } from '../reducers/actions/instances';
 
 const UPDATE_GRAPH = 'UPDATE_GRAPH';
 
@@ -268,6 +270,9 @@ class VFBGraph extends Component {
    */
   handleNodeLeftClick (node, event) {
     this.graphRef.current.ggv.current.zoomToFit()
+    const title = node.title ; 
+    getInstanceByID(title);
+    termInfoById(title);
   }
 
   /**
@@ -314,7 +319,7 @@ class VFBGraph extends Component {
 
   selectedNodeLoaded (instance) {
     var loadedId = instance.id;
-    if (instance.getParent() !== null) {
+    if (instance.getParent) {
       loadedId = instance.getParent()?.id;
     }
 
@@ -331,7 +336,7 @@ class VFBGraph extends Component {
    * Gets notified every time the instance focused changes
    */
   instanceFocusChange (instance) {    
-    if (instance.getParent() !== null) {
+    if (instance.getParent) {
       this.focusedInstance = instance.getParent();
     } else {
       this.focusedInstance = instance;

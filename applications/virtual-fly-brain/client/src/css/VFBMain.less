@@ -26,7 +26,7 @@
 	top: 0;
 	right: 0;
 	bottom: 0;
-  height: 88vh;
+  height: calc(100vh - (6rem + 0.5rem));
 	position: absolute;
 	overflow:hidden;
 	border-top: 7px solid @background_color_body_0;
@@ -1007,14 +1007,14 @@
     border-top: 4px solid white;
     animation: arrow-pulse 1s infinite linear both;
   }
-  
+
   .rst__rtl.rst__highlightLineVertical::after {
     margin-left: initial;
     margin-right: -4px;
     right: 50%;
     left: initial;
   }
-  
+
   /**
    * +-----+
    * |     |
@@ -1035,14 +1035,14 @@
     right: 0;
     width: calc(50% + 4px);
   }
-  
+
   .rst__rtl.rst__highlightTopLeftCorner::before {
     border-right: solid 8px #36c2f6;
     border-left: none;
     left: 0;
     right: initial;
   }
-  
+
   /**
    * +--+--+
    * |  |  |
@@ -1064,14 +1064,14 @@
     right: 12px;
     width: calc(50% - 8px);
   }
-  
+
   .rst__rtl.rst__highlightBottomLeftCorner::before {
     border-right: solid 8px #36c2f6;
     border-left: none;
     left: 12px;
     right: initial;
   }
-  
+
   .rst__highlightBottomLeftCorner::after {
     content: '';
     position: absolute;
@@ -1083,24 +1083,24 @@
     border-bottom: 12px solid transparent;
     border-left: 12px solid #36c2f6;
   }
-  
+
   .rst__rtl.rst__highlightBottomLeftCorner::after {
     left: 0;
     right: initial;
     border-right: 12px solid #36c2f6;
     border-left: none;
   }
-  
+
   .rst__rowWrapper {
-    padding: 3px 3px 3px 0;
+    padding: 0;
     height: 100%;
     box-sizing: border-box;
   }
-  
+
   .rst__rtl.rst__rowWrapper {
-    padding: 3px 0 3px 3px;
+    padding: 0;
   }
-  
+
   .rst__row {
     height: 100%;
     white-space: nowrap;
@@ -1109,7 +1109,7 @@
   .rst__row > * {
     box-sizing: border-box;
   }
-  
+
   /**
    * The outline of where the element will go if dropped, displayed while dragging
    */
@@ -1135,27 +1135,27 @@
     left: 0;
     z-index: -1;
   }
-  
+
   /**
    * Alternate appearance of the landing pad when the dragged location is invalid
    */
   .rst__rowCancelPad::before {
     background-color: #e6a8ad;
   }
-  
+
   /**
    * Nodes matching the search conditions are highlighted
    */
   .rst__rowSearchMatch {
   }
-  
+
   /**
    * The node that matches the search conditions and is currently focused
    */
   .rst__rowSearchFocus {
     outline: solid 3px #fc6421;
   }
-  
+
   .rst__rowContents,
   .rst__rowLabel,
   .rst__rowToolbar,
@@ -1164,14 +1164,14 @@
     display: inline-block;
     vertical-align: middle;
   }
-  
+
   .rst__rowContents {
     position: relative;
     height: 100%;
     border-left: none;
-    box-shadow: 0 2px 2px -2px;
-    padding: 0 5px 0 10px;
-    border-radius: 2px;
+    box-shadow: none;
+    padding: 0;
+    border-radius: 0;
     min-width: 80px;
     flex: 1 0 auto;
     display: flex;
@@ -1179,18 +1179,17 @@
     justify-content: space-between;
     background-color: white;
   }
-  
+
   .rst__rtl.rst__rowContents {
     border-right: none;
     padding: 0 10px 0 5px;
   }
-  
-  .rst__rowContentsDragDisabled {
+
+  .rst__rowContents:hover svg path {
+    fill: #0AB7FE;
+  fill-opacity: 1;
   }
-  
-  .rst__rtl.rst__rowContentsDragDisabled {
-  }
-  
+
   .rst__rowLabel {
     flex: 0 1 auto;
     padding-right: 10px;
@@ -1199,12 +1198,12 @@
     padding-left: 20px;
     padding-right: inherit;
   }
-  
+
   .rst__rowToolbar {
     flex: 0 1 auto;
     display: flex;
   }
-  
+
   .rst__moveHandle,
   .rst__loadingHandle {
     height: 100%;
@@ -1218,12 +1217,12 @@
     border-radius: 1px;
     z-index: 1;
   }
-  
+
   .rst__loadingHandle {
     cursor: default;
     background: #d9d9d9;
   }
-  
+
   @keyframes pointFade {
     0%,
     19.999%,
@@ -1234,14 +1233,14 @@
       opacity: 1;
     }
   }
-  
+
   .rst__loadingCircle {
     width: 80%;
     height: 80%;
     margin: 10%;
     position: relative;
   }
-  
+
   .rst__loadingCirclePoint {
     width: 100%;
     height: 100%;
@@ -1249,12 +1248,12 @@
     left: 0;
     top: 0;
   }
-  
+
   .rst__rtl.rst__loadingCirclePoint {
     right: 0;
     left: initial;
   }
-  
+
   .rst__loadingCirclePoint::before {
     content: '';
     display: block;
@@ -1335,29 +1334,29 @@
   .rst__loadingCirclePoint:nth-of-type(13)::before {
     animation-delay: 0ms;
   }
-  
-  .rst__rowTitle {
-    font-weight: bold;
-  }
-  
+
+  // .rst__rowTitle {
+  //   font-weight: bold;
+  // }
+
   .rst__rowTitleWithSubtitle {
-    font-size: 85%;
+    // font-size: 85%;
     display: block;
-    padding-top: 8px;
+    // padding-top: 8px;
   }
-  
+
   .rst__rowSubtitle {
     font-size: 70%;
     line-height: 3;
   }
-  
+
   .rst__collapseButton,
   .rst__expandButton {
     appearance: none;
     border: none;
     position: absolute;
     border-radius: 100%;
-    box-shadow: 0 0 0 1px #000;
+    // box-shadow: 0 0 0 1px #000;
     width: 14px;
     height: 14px;
     padding: 0;
@@ -1374,25 +1373,25 @@
     outline: none;
     box-shadow: none;
   }
-  .rst__collapseButton:hover:not(:active),
-  .rst__expandButton:hover:not(:active) {
-    background-size: 24px;
-    height: 20px;
-    width: 20px;
-  }
-  
-  .rst__collapseButton {
-    background: #fff
-      url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCI+PGNpcmNsZSBjeD0iOSIgY3k9IjkiIHI9IjgiIGZpbGw9IiNGRkYiLz48ZyBzdHJva2U9IiM5ODk4OTgiIHN0cm9rZS13aWR0aD0iMS45IiA+PHBhdGggZD0iTTQuNSA5aDkiLz48L2c+Cjwvc3ZnPg==')
-      no-repeat center;
-  }
-  
-  .rst__expandButton {
-    background: #fff
-      url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCI+PGNpcmNsZSBjeD0iOSIgY3k9IjkiIHI9IjgiIGZpbGw9IiNGRkYiLz48ZyBzdHJva2U9IiM5ODk4OTgiIHN0cm9rZS13aWR0aD0iMS45IiA+PHBhdGggZD0iTTQuNSA5aDkiLz48cGF0aCBkPSJNOSA0LjV2OSIvPjwvZz4KPC9zdmc+')
-      no-repeat center;
-  }
-  
+  // .rst__collapseButton:hover:not(:active),
+  // .rst__expandButton:hover:not(:active) {
+  //   background-size: 24px;
+  //   height: 20px;
+  //   width: 20px;
+  // }
+
+  // .rst__collapseButton {
+  //   background: #fff
+  //     url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCI+PGNpcmNsZSBjeD0iOSIgY3k9IjkiIHI9IjgiIGZpbGw9IiNGRkYiLz48ZyBzdHJva2U9IiM5ODk4OTgiIHN0cm9rZS13aWR0aD0iMS45IiA+PHBhdGggZD0iTTQuNSA5aDkiLz48L2c+Cjwvc3ZnPg==')
+  //     no-repeat center;
+  // }
+
+  // .rst__expandButton {
+  //   background: #fff
+  //     url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCI+PGNpcmNsZSBjeD0iOSIgY3k9IjkiIHI9IjgiIGZpbGw9IiNGRkYiLz48ZyBzdHJva2U9IiM5ODk4OTgiIHN0cm9rZS13aWR0aD0iMS45IiA+PHBhdGggZD0iTTQuNSA5aDkiLz48cGF0aCBkPSJNOSA0LjV2OSIvPjwvZz4KPC9zdmc+')
+  //     no-repeat center;
+  // }
+
   /**
    * Line for under a node with children
    */
@@ -1403,6 +1402,7 @@
   }
   .rst__lineChildren::after {
     content: '';
+    display: none;
     position: absolute;
     background-color: black;
     width: 1px;
@@ -1410,12 +1410,12 @@
     bottom: 0;
     height: 10px;
   }
-  
+
   .rst__rtl.rst__lineChildren::after {
     right: 50%;
     left: initial;
   }
-  
+
   .rst__placeholder {
     position: relative;
     height: 68px;
@@ -1436,7 +1436,7 @@
     left: 5px;
     z-index: -1;
   }
-  
+
   /**
    * The outline of where the element will go if dropped, displayed while dragging
    */
@@ -1455,38 +1455,38 @@
     background-color: lightblue;
     border-color: white;
   }
-  
+
   /**
    * Alternate appearance of the landing pad when the dragged location is invalid
    */
   .rst__placeholderCancelPad::before {
     background-color: #e6a8ad;
   }
-  
+
   /* Collection default theme */
-  
+
   .ReactVirtualized__Collection {
   }
-  
+
   .ReactVirtualized__Collection__innerScrollContainer {
   }
-  
+
   /* Grid default theme */
-  
+
   .ReactVirtualized__Grid {
   }
-  
+
   .ReactVirtualized__Grid__innerScrollContainer {
   }
-  
+
   /* Table default theme */
-  
+
   .ReactVirtualized__Table {
   }
-  
+
   .ReactVirtualized__Table__Grid {
   }
-  
+
   .ReactVirtualized__Table__headerRow {
     font-weight: 700;
     text-transform: uppercase;
@@ -1513,7 +1513,7 @@
         -ms-flex-align: center;
             align-items: center;
   }
-  
+
   .ReactVirtualized__Table__headerTruncatedText {
     display: inline-block;
     max-width: 100%;
@@ -1521,7 +1521,7 @@
     text-overflow: ellipsis;
     overflow: hidden;
   }
-  
+
   .ReactVirtualized__Table__headerColumn,
   .ReactVirtualized__Table__rowColumn {
     margin-right: 10px;
@@ -1531,7 +1531,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  
+
   .ReactVirtualized__Table__headerColumn:first-of-type,
   .ReactVirtualized__Table__rowColumn:first-of-type {
     margin-left: 10px;
@@ -1539,7 +1539,7 @@
   .ReactVirtualized__Table__sortableHeaderColumn {
     cursor: pointer;
   }
-  
+
   .ReactVirtualized__Table__sortableHeaderIconContainer {
     display: -webkit-box;
     display: -ms-flexbox;
@@ -1556,9 +1556,9 @@
     width: 1em;
     fill: currentColor;
   }
-  
+
   /* List default theme */
-  
+
   .ReactVirtualized__List {
   }
 
@@ -1578,7 +1578,7 @@
 }
 
 .rst__rowSubtitle {
-    display: block;
+    display: none;
     white-space: pre-wrap;
     font-size:0px;
     font-family: 'Barlow', 'Khand', sans-serif;
@@ -1589,9 +1589,9 @@
   color: #11bffe !important;
 }
 
-.rst__rowTitle {
-  font-weight: 500;
-}
+// .rst__rowTitle {
+//   font-weight: 500;
+// }
 
 .rst__rowSubtitle{
   font-weight:400;
@@ -1599,37 +1599,46 @@
 
 // Copy-pasted the css from the library
 
+// .rst__toolbarButton .MuiIconButton-root svg {
+//   display: none;
+// }
+
+.rst__toolbarButton .MuiIconButton-root {
+  padding: 0;
+}
+
 .rst__expandButton {
-    background: black
-      url("images/collapse.png")
+    background: transparent
+      url("images/collapse.svg")
       no-repeat center;
-    border-color: black;
-    padding-right: 2px;
+    // border-color: black;
+    padding-right: 0;
 }
 
 .rst__collapseButton {
-    background: black
-      url('images/expand.png')
+    background: transparent
+      url('images/expand.svg')
       no-repeat center;
-    border-color: black;
-    padding-right: 2px;
+    // border-color: black;
+    padding-right: 0;
   }
 
 .nodeSelected {
-  color: #ffffff;
+  color: rgba(255, 255, 255, 0.8);
   font-size: 14px;
-  font-family: 'Barlow', 'Khand', sans-serif;
+  font-weight: 400;
+  line-height: 128.571%;
+  // font-family: 'Barlow', 'Khand', sans-serif;
   border: 0px solid;
   background: transparent;
 }
 
 .nodeSelected:hover {
-  color: #11bffe;
+  color: #0AB7FE;
 }
 
 .nodeFound {
-  color: #11bffe;
-
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .chrome-picker {
@@ -1683,4 +1692,18 @@ img[class^="VFBQuickHelp-image-"] {
 
 .position-relative {
   position: relative;
+}
+
+._ribbonBlock_lfxw8_1 {
+  width : 2rem !important;
+  display: table-cell;
+}
+
+._ribbonBlockTitleTerm_lfxw8_13 {
+  font-family: 'Inter',sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 12px;
+  letter-spacing: normal;
+  color : rgba(255, 255, 255, 0.8);
 }

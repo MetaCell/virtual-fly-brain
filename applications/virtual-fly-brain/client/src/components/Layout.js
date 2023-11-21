@@ -46,9 +46,6 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
 
   useEffect(() => {
     setTab(defaultActiveTab)
-    if (!desktopScreen) {
-      setBottomNav(2)
-    }
   }, [desktopScreen])
 
   useEffect(() => {
@@ -110,7 +107,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
   const tabContent = (
     <>
       {tab.includes(0) && (
-        <SideBar open={sidebarOpen} setOpen={setSidebarOpen} />
+        <TermInfo open={sidebarOpen} setOpen={setSidebarOpen} />
       )}
 
       {tab.includes(1) && (

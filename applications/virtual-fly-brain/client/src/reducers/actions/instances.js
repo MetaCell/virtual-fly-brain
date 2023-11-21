@@ -20,6 +20,112 @@ const getInstancesFailure = error => ({
   }
 });
 
+const removeInstancesSuccess = query => ({
+  type: getInstancesTypes.REMOVE_INSTANCES_SUCCESS,
+  payload: {
+    query
+  }
+});
+
+const selectInstanceMessage = id => ({
+  type: getInstancesTypes.SELECT_INSTANCE,
+  payload: {
+    id
+  }
+});
+
+const showInstanceSkeletonMessage = id => ({
+  type: getInstancesTypes.SHOW_SKELETON,
+  payload: {
+    id
+  }
+});
+
+const addInstanceSkeletonMessage = id => ({
+  type: getInstancesTypes.ADD_SKELETON,
+  payload: {
+    id
+  }
+});
+
+const hideInstanceSkeletonMessage = id => ({
+  type: getInstancesTypes.HIDE_SKELETON,
+  payload: {
+    id
+  }
+});
+
+const show3DSkeletonCylindersMessage = id => ({
+  type: getInstancesTypes.SHOW_CYLINDERS,
+  payload: {
+    id
+  }
+});
+
+const show3DSkeletonLinesMessage = id => ({
+  type: getInstancesTypes.SHOW_LINES,
+  payload: {
+    id
+  }
+});
+
+const showInstanceCylinderMessage = id => ({
+  type: getInstancesTypes.SHOW_CYLINDER,
+  payload: {
+    id
+  }
+});
+
+const show3DMeshMessage = id => ({
+  type: getInstancesTypes.SHOW_3D_MESH,
+  payload: {
+    id
+  }
+});
+
+const hide3DMeshMessage = id => ({
+  type: getInstancesTypes.HIDE_3D_MESH,
+  payload: {
+    id
+  }
+});
+
+const show3DVolumeMessage = id => ({
+  type: getInstancesTypes.SHOW_3D_VOLUME,
+  payload: {
+    id
+  }
+});
+
+const hide3DVolumeMessage = id => ({
+  type: getInstancesTypes.HIDE_3D_VOLUME,
+  payload: {
+    id
+  }
+});
+
+const changeColorMessage = (id, color) => ({
+  type: getInstancesTypes.CHANGE_COLOR,
+  payload: {
+    id,
+    color
+  }
+});
+
+const focusInstanceMessage = (id) => ({
+  type: getInstancesTypes.FOCUS_INSTANCE,
+  payload: {
+    id
+  }
+});
+
+const removeInstancesFailure = error => ({
+  type: getInstancesTypes.REMOVE_INSTANCES_FAILURE,
+  payload: {
+    error
+  }
+});
+
 export const getInstanceByID = async (queryId) => {
 
   store.dispatch(getInstancesStarted())
@@ -34,4 +140,65 @@ export const getInstanceByID = async (queryId) => {
   }
 
   store.dispatch(getInstancesSuccess(response))
+}
+
+export const removeInstanceByID = async (queryId) => {
+  try {
+    store.dispatch(removeInstancesSuccess(queryId))
+  } catch (error) {
+    store.dispatch(removeInstancesFailure(error.message))
+    return
+  }
+}
+
+export const selectInstance = async (id) => {
+  store.dispatch(selectInstanceMessage(id))
+}
+
+export const add3DSkeleton = async (id) => {
+  store.dispatch(addInstanceSkeletonMessage(id))
+}
+
+export const show3DSkeleton = async (id) => {
+  store.dispatch(showInstanceSkeletonMessage(id))
+}
+
+export const hide3DSkeleton = async (id) => {
+  store.dispatch(hideInstanceSkeletonMessage(id))
+}
+
+export const show3DSkeletonLines = async (id) => {
+  store.dispatch(show3DSkeletonLinesMessage(id))
+}
+
+export const show3DSkeletonCylinders = async (id) => {
+  store.dispatch(show3DSkeletonCylindersMessage(id))
+}
+
+export const selecteInstanceCylinder = async (id) => {
+  store.dispatch(showInstanceCylinderMessage(id))
+}
+
+export const show3DMesh = async (id) => {
+  store.dispatch(show3DMeshMessage(id))
+}
+
+export const hide3DMesh = async (id) => {
+  store.dispatch(hide3DMeshMessage(id))
+}
+
+export const show3DVolume = async (id) => {
+  store.dispatch(show3DVolumeMessage(id))
+}
+
+export const hide3DVolume = async (id) => {
+  store.dispatch(hide3DVolumeMessage(id))
+}
+
+export const changeColor = async (id, color) => {
+  store.dispatch(changeColorMessage(id, color))
+}
+
+export const focusInstance = async (id) => {
+  store.dispatch(focusInstanceMessage(id))
 }

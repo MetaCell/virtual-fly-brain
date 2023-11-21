@@ -1362,6 +1362,11 @@
   resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.40.0.tgz#3ba73359e11f5a7bd3e407f70b3528abfae69cec"
   integrity sha512-ElyB54bJIhXQYVKjDSvCkPO1iU1tSAeVQJbllWJq1XQSmmA4dgFk8CbiBGpiOPxleE48vDogxCtmMYku4HSVLA==
 
+"@flybase/react-ontology-ribbon@0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@flybase/react-ontology-ribbon/-/react-ontology-ribbon-0.3.0.tgz#f4d472758bd8c0855b322655e49a6d001a2475a4"
+  integrity sha512-GbOx6KXaFNvOAflQziGSNL+FnE4r/z22FBd5R0TbLCT3GV7QGJHrOwa6a8fTPEKFp/faWWchyBQ1KrbdeoRGJw==
+
 "@fortawesome/fontawesome-common-types@^0.2.36":
   version "0.2.36"
   resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-common-types/-/fontawesome-common-types-0.2.36.tgz#b44e52db3b6b20523e0c57ef8c42d315532cb903"

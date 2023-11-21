@@ -1,12 +1,12 @@
 import React from "react";
-import { Box, Button, Chip, Divider, Grid } from "@mui/material";
+import { Box, Button, Chip, Divider, Grid, Tooltip } from "@mui/material";
 import QueryCard from "./Card";
 import { Cross } from "../../icons";
 import QueryHeader from "./QueryHeader";
 import vars from "../../theme/variables";
 import Filter from "./Filter";
 
-const { chipOrange, chipGreen, chipRed, chipPink, chipYellow, headerBorderColor, searchHeadingColor, secondaryBg, listHeadingColor } = vars;
+const { chipOrange, chipGreen, chipRed, chipPink, chipYellow, headerBorderColor, searchHeadingColor, secondaryBg, listHeadingColor, primaryBg } = vars;
 const chipColors = [chipRed, chipGreen, chipOrange, chipPink, chipYellow];
 
 const chipsArr = [
@@ -65,7 +65,7 @@ const Query = ({ fullWidth, queries }) => {
       >
         <Box flex={1}>
           <Box display='flex' gap={0.5}>
-            {tags?.map( (tag, index) => (
+            {tags?.slice(0, fullWidth ? 7 : 10)?.map( (tag, index) => (
               <Chip
                 onClick={() => null}
                 onDelete={() => null}
@@ -87,6 +87,40 @@ const Query = ({ fullWidth, queries }) => {
                 }}
                 label={tag} />
             ))}
+            {tags?.slice(fullWidth ? 7 : 10).length > 0 ? (
+              <Tooltip
+                arrow
+                title={
+                  <Box display='flex' py={1} flexWrap='wrap' gap={0.5}>
+                    {tags?.slice(fullWidth ? 7 : 10).map((tag, index) => (
+                      <Chip
+                        onClick={() => null}
+                        onDelete={() => null}
+                        key={tag + index}
+                        deleteIcon={
+                          <Cross
+                            size={12}
+                            style={{ marginRight: 0, marginLeft: '0.25rem' }}
+                          />
+                        }
+                        sx={{
+                          lineHeight: '140%',
+                          fontSize: '0.625rem',
+                          backgroundColor: chipColors[index%(chipColors.length-1)] || chipColors[0]
+                        }}
+                        label={tag} />
+                    ))}
+                  </Box>
+                }
+              >
+                <Chip
+                  className="default-chip"
+                  sx={{ background: primaryBg }}
+                  label={`+${tags?.slice(fullWidth ? 7 : 10).length}`}
+                />
+              </Tooltip>
+            ) : null}
+
           </Box>
         </Box>
 

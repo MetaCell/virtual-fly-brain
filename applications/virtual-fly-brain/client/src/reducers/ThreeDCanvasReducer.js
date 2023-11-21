@@ -3,6 +3,7 @@ import { loadFileType } from './actions/readFile';
 
 export const initialStateThreeDCanvas = {
   modelUrl: undefined,
+  visibleInstances : [],
   isLoading: false,
   error: false
 };
@@ -20,6 +21,7 @@ const ThreeDCanvasReducer = (state = initialStateThreeDCanvas, response) => {
     case getOBJ3DTypes.GET_3D_OBJ_TYPE_SUCCESS:
       return Object.assign({}, state, {
         termInfoData: response.payload,
+        allLoadedInstances: state.visibleInstances?.find( i => i.Id === response.payload.Id ) ? [...state.visibleInstances] : [...state.visibleInstances, response.payload],
         isLoading: false
       })
     case getOBJ3DTypes.GET_3D_OBJ_TYPE_FAILURE:

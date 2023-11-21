@@ -589,7 +589,6 @@ theme = createTheme({
         },
         grouped: {
           minWidth: '1.75rem',
-          borderRadius: '0.25rem',
           padding: 0,
           [theme.breakpoints.down('lg')]: {
             height: '100%',

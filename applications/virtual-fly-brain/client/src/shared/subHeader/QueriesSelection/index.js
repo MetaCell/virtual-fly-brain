@@ -5,7 +5,7 @@ import vars from "../../../theme/variables";
 
 const queryBuilderDatasourceConfig = require('../../../components/configuration/VFBSearchBuilder/queryBuilderConfiguration').queryBuilderDatasourceConfig;
 
-const { searchHeadingColor, searchBoxBg, primaryBg, whiteColor, queryBorderColor } = vars;
+const { searchHeadingColor, searchBoxBg, primaryBg, whiteColor, queryBorderColor, btnDisabledColor } = vars;
 
 export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSearch }) => {
   const [searchQueries, setSearchQueries] = React.useState([]);
@@ -44,6 +44,11 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
     setSelectedOption(updatedSelectedOption)
     setPopoverAnchorEl(null);
   };
+
+  const goBackToInitialState = () => {
+    setSelectedOption({count: 0})
+    setPopoverAnchorEl(null);
+  }
 
   const popoverOpen = Boolean(popoverAnchorEl);
   const id = popoverOpen ? 'simple-popover' : undefined;
@@ -196,7 +201,12 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
               >
 
                 <List>
-                  { option.queries?.Queries?.map((query, index) => (selectedQueryIndex === option.short_form || selectedQueryIndex === "" )&& (<ListItem sx={{ top : '1.5rem' }} key={query.short_form+index}>
+                  <ListItem>
+                    <ListItemButton onClick={goBackToInitialState}>
+                      <ListItemText primary={`Select query for ${option.label}`}/>
+                    </ListItemButton>
+                  </ListItem>
+                  { option.queries?.Queries?.map((query, index) => (selectedQueryIndex === option.short_form || selectedQueryIndex === "" )&& (<ListItem key={query.short_form+index}>
                     <ListItemButton onClick={() => handleSelect(query, option)}>
                       <ListItemText primary={query.label} />
                     </ListItemButton>
@@ -226,7 +236,10 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
               backgroundColor: primaryBg,
             },
             '& svg path': {
-              fill: !(selectedOption?.count > 1) && 'rgba(0, 0, 0, 0.26)'
+              fill: !(selectedOption?.count > 1) && btnDisabledColor
+            },
+            '&.Mui-disabled': {
+              color: btnDisabledColor
             }
           }}
         >

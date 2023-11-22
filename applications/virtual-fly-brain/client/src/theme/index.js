@@ -46,6 +46,7 @@ theme = createTheme({
           margin: 0;
           border-radius: 8px 8px 0px 0px;
           padding: 0.25rem 0.5rem;
+          margin-right: 0.25rem;
         }
         .flexlayout__tab_button--selected {
           background-color: ${blackColor};
@@ -190,7 +191,8 @@ theme = createTheme({
         root: {
           padding: '0.25rem 0.5rem',
           '&:hover': {
-            backgroundColor: secondaryBg
+            backgroundColor: secondaryBg,
+            color: whiteColor
           }
         }
       }

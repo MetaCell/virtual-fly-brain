@@ -1,6 +1,6 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { useAutocomplete } from '@mui/base/useAutocomplete';
+import useAutocomplete from '@mui/base/useAutocomplete';
 import CircularProgress from '@mui/material/CircularProgress';
 import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
@@ -139,12 +139,31 @@ const chipColors = [chipRed, chipGreen, chipOrange, chipPink, chipYellow];
 const searchResults = [
 
 ];
+const recentSearch = [
+  {
+    title: 'CDF0 (anlage in statu nascendi)',
+    tags: [
+      { id: 0, label: "Anatomy" },
+      { id: 1, label: 'Nervous system' },
+      { id: 2, label: 'Neuron' },
+      { id: 3, label: 'Nervous projection bundle' },
+      { id: 4, label: 'Larva' }
+    ]
+  },
+  {
+    title: 'a00c_a41 (a00c_a4 (L1EM:2511238))',
+    tags: [
+      { id: 0, label: "Anatomy" },
+      { id: 1, label: 'Nervous system' },
+    ]
+  },
+];
 
 export default function SearchBuilder(props) {
 
   const [value, setValue] = React.useState([]);
   const [retrievingResults, setRetrievingResults] = React.useState(false)
-  const [recentSearch, setRecentSearch] = React.useState([]);
+  // const [recentSearch, setRecentSearch] = React.useState([]);
   const [groupedOptions, setGroupedOptions] = React.useState([]);
   const [isOpen, setIsOpen] = React.useState(true);
 
@@ -153,7 +172,11 @@ export default function SearchBuilder(props) {
       setValue((prevValue) => [{label: 'Queries', tags: []}, ...prevValue])
     }
   };
-  const checkResults = () => {props.setBottomNav(2)}
+  const checkResults = () => {
+    props.setBottomNav(2)
+    setIsOpen(false)
+    props.setFocused(false)
+  }
   const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances);
   const queries = useSelector(state => state.queries.queries);
 

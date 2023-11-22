@@ -86,7 +86,8 @@ export const SearchResult = ({ getOptionProps, selectedFilters, groupedOptions, 
                 display: 'flex',
                 alignItems: 'center',
                 width: '30%',
-                columnGap: 0.5
+                columnGap: 0.5,
+                justifyContent: 'end'
               }}>
                 {option?.facets_annotation.slice(0,chips_cutoff).map((tag, index) => {
                     return <Chip

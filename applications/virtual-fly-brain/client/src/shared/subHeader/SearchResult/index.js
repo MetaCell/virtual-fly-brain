@@ -115,9 +115,11 @@ export const SearchResult = ({ getOptionProps, selectedFilters, groupedOptions, 
                 height: '100%',
                 position: 'absolute',
                 right: 0,
-                top: 0
+                top: 0,
+                '&:hover': {
+                  background: listHover
+                }
               }} variant='text'>
-                {option?.facets_annotation?.length - chips_cutoff}
                 <ArrowOutwardIcon sx={{
                   fontSize: '0.75rem',
                   m: 0,

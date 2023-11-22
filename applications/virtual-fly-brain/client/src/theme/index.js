@@ -192,7 +192,9 @@ theme = createTheme({
           padding: '0.25rem 0.5rem',
           '&:hover': {
             backgroundColor: secondaryBg,
-            color: whiteColor
+            '& .MuiTypography-root': {
+              color: whiteColor
+            }
           }
         }
       }

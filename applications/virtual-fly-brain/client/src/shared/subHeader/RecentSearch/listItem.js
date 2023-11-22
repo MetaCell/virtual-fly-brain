@@ -53,7 +53,7 @@ export const Item = ({
         color: searchHeadingColor,
         px: 1
       }}>
-        {search?.title}
+        {search?.label}
       </Typography>
 
       <Box sx={{
@@ -62,11 +62,11 @@ export const Item = ({
         alignItems: 'center',
         columnGap: 0.5
       }}>
-        {search?.tags?.slice(0, 2)?.map((tag, index) => <Chip key={`search-tag-${index}`} sx={{
+        {search?.facet_annotations?.slice(0, 2)?.map((tag, index) => <Chip key={`search-tag-${index}`} sx={{
           lineHeight: '140%',
           fontSize: '0.625rem', backgroundColor: chipColors[tag.id]
         }} label={tag.label} />)}
-        {search?.tags?.length > 2 ? (
+        {search?.facet_annotations?.length > 2 ? (
           <Tooltip
             placement="bottom-end"
             arrow
@@ -76,7 +76,7 @@ export const Item = ({
                 alignItems: 'center',
                 columnGap: 0.5
               }}>
-                {search?.tags?.slice(2)?.map((tag, index) => <Chip key={`remaining-tag-${index}`} sx={{
+                {search?.facet_annotations?.slice(2)?.map((tag, index) => <Chip key={`remaining-tag-${index}`} sx={{
                   lineHeight: '140%',
                   fontSize: '0.625rem', backgroundColor: chipColors[tag.id]
                 }} label={tag.label} />)}
@@ -87,7 +87,7 @@ export const Item = ({
               lineHeight: '140%',
               fontSize: '0.625rem',
               backgroundColor: searchBoxBg
-            }} label={`+${search?.tags?.slice(2).length}`} />
+            }} label={`+${search?.facet_annotations?.slice(2).length}`} />
           </Tooltip>) : null
         }
         <IconButton

@@ -296,11 +296,7 @@ class ThreeDCanvas extends Component {
         overflow: 'hidden',
         background: {
           lg: blackColor
-        },
-        p: {
-          xs: 2,
-          lg: 2
-        },
+        }
       }}
     >
       {this.state.mappedCanvasData?.length > 0 ? (
@@ -318,7 +314,7 @@ class ThreeDCanvas extends Component {
           </>
         </div>
       ) : (
-        <Box p={2}>
+        <Box>
           <Button
             variant="outlined"
             color="primary"

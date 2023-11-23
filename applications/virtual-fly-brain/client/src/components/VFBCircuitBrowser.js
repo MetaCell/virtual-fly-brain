@@ -384,7 +384,7 @@ class VFBCircuitBrowser extends Component {
         ? <div style={containerStyle}><CircularProgress /></div>
         : this.state.graph.nodes.length == 0
           ? <div>
-            <h4 className={classes?.errorMessage}>{errorMessage}</h4>
+            <h4 className={classes?.errorMessage} style={{margin: 0, textAlign: 'center'}}>{errorMessage}</h4>
             <Controls
               updateGraph={self.updateGraph}
               updatePaths={self.updatePaths}

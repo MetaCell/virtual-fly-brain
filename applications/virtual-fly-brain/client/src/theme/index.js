@@ -91,6 +91,7 @@ theme = createTheme({
         .flexlayout__tab {
           border-radius: 0px 8px 8px 8px;
           background-color: ${blackColor};
+          padding: 1rem;
         }
         .flexlayout__tab_toolbar {
           gap: 0.25rem;

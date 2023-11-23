@@ -39,6 +39,7 @@ const vars = {
   btnTextHoverColor: 'rgba(255, 255, 255, 0.04)',
   queryChipBg: 'rgba(10, 183, 254, 0.8)',
   queryBuilderBg: 'rgba(34, 34, 34, 0.80)',
+  btnDisabledColor: 'rgba(255, 255, 255, 0.4)'
 };
 
 export default vars;

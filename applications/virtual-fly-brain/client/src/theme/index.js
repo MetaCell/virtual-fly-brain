@@ -46,6 +46,7 @@ theme = createTheme({
           margin: 0;
           border-radius: 8px 8px 0px 0px;
           padding: 0.25rem 0.5rem;
+          margin-right: 0.25rem;
         }
         .flexlayout__tab_button--selected {
           background-color: ${blackColor};
@@ -190,7 +191,10 @@ theme = createTheme({
         root: {
           padding: '0.25rem 0.5rem',
           '&:hover': {
-            backgroundColor: secondaryBg
+            backgroundColor: secondaryBg,
+            '& .MuiTypography-root': {
+              color: whiteColor
+            }
           }
         }
       }
@@ -589,7 +593,6 @@ theme = createTheme({
         },
         grouped: {
           minWidth: '1.75rem',
-          borderRadius: '0.25rem',
           padding: 0,
           [theme.breakpoints.down('lg')]: {
             height: '100%',

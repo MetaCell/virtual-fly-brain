@@ -90,7 +90,7 @@ const Listbox = styled('div')(
   padding: 0;
   position: absolute;
   list-style: none;
-  background-color: ${primaryBg};
+  background-color: ${bottomNavBg};
   overflow: auto;
   border-top: 0.0625rem solid ${primaryBg};
   max-height: 17.375rem;
@@ -153,7 +153,11 @@ export default function SearchBuilder(props) {
       setValue((prevValue) => [{label: 'Queries', tags: []}, ...prevValue])
     }
   };
-  const checkResults = () => {props.setBottomNav(2)}
+  const checkResults = () => {
+    props.setBottomNav(2)
+    setIsOpen(false)
+    props.setFocused(false)
+  }
   const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances);
   const queries = useSelector(state => state.queries.queries);
 

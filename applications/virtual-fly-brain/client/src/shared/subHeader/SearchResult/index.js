@@ -86,7 +86,8 @@ export const SearchResult = ({ getOptionProps, selectedFilters, groupedOptions, 
                 display: 'flex',
                 alignItems: 'center',
                 width: '30%',
-                columnGap: 0.5
+                columnGap: 0.5,
+                justifyContent: 'end'
               }}>
                 {option?.facets_annotation.slice(0,chips_cutoff).map((tag, index) => {
                     return <Chip
@@ -100,6 +101,12 @@ export const SearchResult = ({ getOptionProps, selectedFilters, groupedOptions, 
                     />
                 }
                 )}
+                <Chip sx={{
+                  lineHeight: '140%',
+                  fontSize: '0.625rem',
+                  backgroundColor: searchBoxBg
+                }} label={`+${option?.facets_annotation?.length - chips_cutoff}`}
+                />
               </Box>
 
               <Button sx={{
@@ -114,9 +121,11 @@ export const SearchResult = ({ getOptionProps, selectedFilters, groupedOptions, 
                 height: '100%',
                 position: 'absolute',
                 right: 0,
-                top: 0
+                top: 0,
+                '&:hover': {
+                  background: listHover
+                }
               }} variant='text'>
-                {option?.facets_annotation?.length - chips_cutoff}
                 <ArrowOutwardIcon sx={{
                   fontSize: '0.75rem',
                   m: 0,

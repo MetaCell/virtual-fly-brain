@@ -90,7 +90,7 @@ class VFBGraph extends Component {
           this.focusedInstance = this.props.instance;
         }
       }
-      
+
       // If there's a graphQueryIndex set, it is used to retrieve the corresponding option from the DropDownQueries options
       if ( parseInt(self.props.graphQueryIndex) >= 0 ){
         stylingConfiguration.dropDownQueries.map((item, index) => {
@@ -154,7 +154,7 @@ class VFBGraph extends Component {
        * Update graph with selected query index from configuration dropdown selection
        */
       stylingConfiguration.dropDownQueries.map((item, index) => {
-        if ( parseInt(self.props.graphQueryIndex) >= 0 && self.firstLoad ) { 
+        if ( parseInt(self.props.graphQueryIndex) >= 0 && self.firstLoad ) {
           if ( parseInt(self.props.graphQueryIndex) === index ) {
             self.selectedDropDownQuery = index;
             self.loading = true;
@@ -176,7 +176,7 @@ class VFBGraph extends Component {
         this.props.vfbGraph(UPDATE_GRAPH, this.focusedInstance, -1, true, false);
       }
       this.firstLoad = true;
-      
+
       // Reset camera view after graph component becomes visible
       this.updateCameraAtStart();
     } else if ( this.props.visible && this.focused) {
@@ -208,7 +208,7 @@ class VFBGraph extends Component {
           });
         }
       }
-      
+
       this.updateCameraAtStart();
     }
   }
@@ -270,7 +270,7 @@ class VFBGraph extends Component {
    */
   handleNodeLeftClick (node, event) {
     this.graphRef.current.ggv.current.zoomToFit()
-    const title = node.title ; 
+    const title = node.title ;
     getInstanceByID(title);
     termInfoById(title);
   }
@@ -335,7 +335,7 @@ class VFBGraph extends Component {
   /**
    * Gets notified every time the instance focused changes
    */
-  instanceFocusChange (instance) {    
+  instanceFocusChange (instance) {
     if (instance.getParent) {
       this.focusedInstance = instance.getParent();
     } else {
@@ -425,7 +425,7 @@ class VFBGraph extends Component {
       };
       // Add ID to list of query requests made
       self.queryRequests.push(instance.id);
-      
+
       let params = {
         results: response.data,
         value: instance,
@@ -462,7 +462,7 @@ class VFBGraph extends Component {
     }
     context.fillText(line, x, y);
   }
-  
+
   getErrorLabel () {
     let self = this;
     if ( this.selectedDropDownQuery == -1 ) {
@@ -619,6 +619,7 @@ class VFBGraph extends Component {
                         left : "10px",
                         width: "1.3rem",
                         height: "1.3rem",
+                        backgroundPosition: 'center',
                         backgroundImage: `url(${stylingConfiguration.icons.home})`
                       }
                     }
@@ -635,6 +636,7 @@ class VFBGraph extends Component {
                         left : "10px",
                         width: "1.3rem",
                         height: "1.3rem",
+                        backgroundPosition: 'center',
                         backgroundImage: `url(${stylingConfiguration.icons.zoomIn})`
                       }
                     }
@@ -651,6 +653,7 @@ class VFBGraph extends Component {
                         left : "10px",
                         width: "1.3rem",
                         height: "1.3rem",
+                        backgroundPosition: 'center',
                         backgroundImage: `url(${stylingConfiguration.icons.zoomOut})`
                       }
                     }

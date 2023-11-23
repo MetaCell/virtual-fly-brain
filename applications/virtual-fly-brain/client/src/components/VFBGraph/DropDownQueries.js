@@ -3,6 +3,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import PropTypes from "prop-types";
+import LoopIcon from '@material-ui/icons/Loop';
 
 /**
  * Shows the data value as a link
@@ -21,35 +22,28 @@ class DropDownQueries extends Component {
 
   render () {
     let self = this;
+
     return (
       <div>
         <Tooltip placement="right" title={`Refresh for ${self.props.focusedInstance.name}`}>
-          <div style={ 
-            { 
-              zIndex : "1000",
+          <LoopIcon key="tooltip-icon"
+            onClick={ self.props.sync } style={{fontSize: '1.3rem', zIndex : "1000",
               cursor : "pointer",
               marginTop : "20px",
               left : "10px",
-              color : self.props.syncColor,
-              width: "1.3rem",
-              height: "1.3rem",
-              backgroundImage: `url(${self.props.stylingConfiguration.icons.sync})`
-            }
-          }
-          key="tooltip-icon"
-          onClick={self.props.sync}>
-          </div>
+              color : self.props.syncColor,}} />
         </Tooltip>
         <Tooltip placement="right" title="Options">
           <div
-            style={ 
-              { 
+            style={
+              {
                 zIndex : "1000" ,
                 cursor : "pointer",
                 marginTop : "5px",
                 left : "10px",
                 width: "1.3rem",
                 height: "1.3rem",
+                backgroundPosition: "center",
                 backgroundImage: `url(${self.props.stylingConfiguration.icons.dropdown})`
               }
             }
@@ -77,8 +71,8 @@ class DropDownQueries extends Component {
           }}
         >
           {self.props.stylingConfiguration.dropDownQueries.map(item => (
-            <MenuItem 
-              key={item.label(self.props.currentQuery.id)} 
+            <MenuItem
+              key={item.label(self.props.currentQuery.id)}
               onClick={() => self.handleMenuClick(item)}
               style={{
                 fontSize : "14px",

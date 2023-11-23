@@ -482,10 +482,10 @@ class Controls extends Component {
     return (
       <ThemeProvider theme={theme}>
         <div>
-          <div style={ { position: "absolute", width: ".75vh", height: "10vh",zIndex: "100" } }>
-            <i style={ { zIndex : "1000" , cursor : "pointer", top : "10px", left : "10px" } } className={styling.controlIcons.home} onClick={self.props.resetCamera }></i>
-            <i style={ { zIndex : "1000" , cursor : "pointer", marginTop : "20px", left : "10px" } } className={styling.controlIcons.zoomIn} onClick={self.props.zoomIn }></i>
-            <i style={ { zIndex : "1000" , cursor : "pointer", marginTop : "5px", left : "10px" } } className={styling.controlIcons.zoomOut} onClick={self.props.clear }></i>
+          <div style={{ position: "absolute", width: "5vh", height: "100%", zIndex: "100", marginTop: "0.5rem" }}>
+            <div style={{ zIndex : "1000" , cursor : "pointer", backgroundImage: `url(${styling.controlIcons.home})`, width: "1.25rem", height: "1.25rem" }} onClick={self.props.resetCamera }></div>
+            <div style={{ zIndex : "1000" , cursor : "pointer", marginTop: "1rem", backgroundImage: `url(${styling.controlIcons.zoomIn})`, width: "1.25rem", height: "1.25rem" }} onClick={self.props.zoomIn }></div>
+            <div style={{ zIndex : "1000" , cursor : "pointer", marginTop : "5px", backgroundImage: `url(${styling.controlIcons.zoomOut})`, width: "1.25rem", height: "1.25rem" }} onClick={self.props.clear }></div>
           </div>
           { this.props.resultsAvailable()
             ? <ul className={classes.legend} id="circuitBrowserLegend">

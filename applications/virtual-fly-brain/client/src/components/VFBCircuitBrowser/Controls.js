@@ -5,19 +5,15 @@ import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionActions from '@material-ui/core/AccordionActions';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import Typography from '@material-ui/core/Typography';
-import Chip from '@material-ui/core/Chip';
+import Box from '@material-ui/core/Box';
 import Divider from '@material-ui/core/Divider';
 import { withStyles } from '@material-ui/styles';
 import PropTypes from 'prop-types';
-import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
 import Input from '@material-ui/core/Input';
 import Slider from '@material-ui/core/Slider';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
-import ImportExportIcon from '@material-ui/icons/ImportExport';
-import RoomIcon from '@material-ui/icons/Room';
-import AdjustIcon from '@material-ui/icons/Adjust';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
@@ -27,20 +23,29 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import { connect } from "react-redux";
 import { getResultsSOLR } from '../configuration/SOLRclient'
+import ADJUST_ICON from "../../assets/viewer/adjust_icon.svg";
+import LOCATION_ICON from "../../assets/viewer/location_icon.svg";
+import vars from '../../theme/variables';
 
 export const UPDATE_CIRCUIT_QUERY = 'UPDATE_CIRCUIT_QUERY';
+
+const {
+  whiteColor,
+  secondaryBg,
+  primaryBg,
+  secondaryBtnColor
+} = vars;
 /**
  * Create a local theme to override some default values in material-ui components
  */
 const theme = createMuiTheme({
-  props: { MuiSvgIcon: { htmlColor: 'white', } },
+  props: { MuiSvgIcon: { htmlColor: whiteColor, } },
   overrides : {
     MuiSlider: {
-      markLabelActive: { color: 'white' },
-      markLabel: { color: 'white' }
+      markLabelActive: { color: whiteColor },
+      markLabel: { color: whiteColor }
     }
   },
-  typography: { body1: { fontFamily : ['Barlow Condensed', 'Khand', "sans-serif"] } }
 });
 
 /**
@@ -49,19 +54,81 @@ const theme = createMuiTheme({
 const styles = theme => ({
   root: { 
     position: "absolute",
-    bottom: "0",
-    zIndex: "100",
-    width : "30rem",
-    background: "#413C3C",
-    color : "white"
+    bottom: 0,
+    zIndex: 100,
+    maxWidth : "16.25rem",
+    background: secondaryBg,
+    color : "white",
+    "&.MuiAccordion-rounded:last-child": {
+      borderRadius: "0.375rem"
+    },
+    "& .MuiAccordionSummary-root": {
+      padding: "0.75rem 1rem",
+      minHeight: "2.625rem"
+    },
+    "& .MuiAccordionSummary-content": {
+      margin: 0
+    },
+    "& .MuiAccordionDetails-root": {
+      padding: "0 1rem 0.75rem 1rem"
+    },
+    "& .MuiInput-underline:before": {
+      borderBottom: "none"
+    },
+    "& .MuiInput-underline:before": {
+      borderBottom: "none"
+    },
+    "& .MuiInput-underline:after": {
+      borderBottom: "none"
+    },
+    "& .MuiInputBase-input": {
+      borderRadius: "0.25rem",
+      fontSize: "0.75rem"
+    },
+    "& .MuiInput-underline:hover:not(.Mui-disabled):before": {
+      borderBottom: "none"
+    },
+    "& .MuiAutocomplete-inputRoot": {
+      paddingBottom: "0 !important"
+    },
+    "& .MuiDivider-root": {
+      backgroundColor: primaryBg,
+      margin: "0 1rem"
+    },
+    "& .MuiAccordionActions-root": {
+      padding: "0.75rem 1rem"
+    },
+    "& .MuiSlider-root": {
+      padding: "0.313rem 0"
+    },
+    "& .MuiSlider-marked": {
+      marginBottom: 0 
+    },
+    "& .MuiSlider-markLabel": {
+      fontSize: "0.625rem",
+      top: "0.625rem",
+      transform: "none"
+    },
+    "& .MuiButton-root": {
+      padding: "0.5rem 1rem",
+      lineHeight: "1rem",
+      fontWeight: 500,
+      fontSize: "0.75rem",
+      boxShadow: "none",
+      textTransform: "none"
+    },
+    "& #neuronFieldsGrid> :first-child": {
+      paddingBottom: "0.75rem"
+    },
+    boxShadow: "none"
   },
   expanded: { minHeight : "15px !important", margin : "0px !important" },
   // Override default padding in Add Neuron button
-  addNeuron : { padding : "0px" },
+  addNeuron : { padding : 0 },
   reverseNeurons : { padding : "0 !important" },
   // Override default padding in Delete Neuron button
   deleteNeuron : { padding : "2vh 0px 0px 4px" },
-  dottedIcon : { margin : "1rem 0 1rem 0 " },
+  dottedIcon : { margin : "0.25rem 0 0.25rem 0 " },
   legend : {
     padding: "2vh",
     listStyleType : "none",
@@ -69,7 +136,7 @@ const styles = theme => ({
     right : "1rem",
     backgroundColor : "#413C3C",
     fontFamily : "'Barlow Condensed', 'Khand', sans-serif",
-    zIndex: "100"
+    zIndex: 100
   },
   legendItem :{
     position: "relative",
@@ -89,21 +156,20 @@ const styles = theme => ({
   },
   weightInputDiv : { width : "100% !important" },
   refreshButton : {
-    backgroundColor : "#0AB7FE",
-    flexBasis: "100%",
-    fontWeight : 600,
-    fontSize: '12px',
-    fontFamily: ['Barlow Condensed', 'Khand', "sans-serif"]
+    backgroundColor : secondaryBtnColor,
+    "&:hover": {
+      backgroundColor: secondaryBtnColor
+    }
   },
   clearButton : {
-    backgroundColor : "#E53935",
-    flexBasis: "100%",
-    fontWeight : 600,
-    fontSize: '12px',
-    fontFamily: ['Barlow Condensed', 'Khand', "sans-serif"]
+    color : secondaryBtnColor,
+    backgroundColor: "transparent",
+    "&:hover": {
+      backgroundColor: "transparent"
+    }
   },
-  slider : { color: '#0AB7FE' },
-  typography : { fontSize : "15px" }
+  slider : { color: secondaryBtnColor },
+  typography : { fontSize : "0.75rem", lineHeight: "1rem" }
 });
 
 /**
@@ -188,13 +254,13 @@ class AutocompleteResults extends Component {
         renderInput={params => (
           <TextField
             {...params}
-            label={label}
             key={this.props.field.id}
             className={label.replace(/ +/g, "").toLowerCase()}
             onChange={this.props.neuronTextfieldModified}
             onDelete={this.props.neuronTextfieldModified}
-            inputProps={{ ...params.inputProps, id: this.props.index, style: { height : "20px", color: "white" ,paddingLeft : "10px", fontSize: "15px", border : "none", backgroundColor: "#80808040" } }}
-            InputLabelProps={{ ...params.inputProps,style: { color: "white", paddingLeft : "10px", fontSize: "15px" } }}
+            placeholder={label}
+            inputProps={{ ...params.inputProps, id: this.props.index, style: { height : "1rem", color: "white" ,padding : "8px 7px", fontSize: "0.875rem", border : "none", backgroundColor: primaryBg } }}
+            InputLabelProps={{ ...params.inputProps,style: { color: "white", fontSize: "0.875rem" } }}
           />
         )}
       />
@@ -499,27 +565,27 @@ class Controls extends Component {
           }
           <Accordion key={this.state.key} className={classes.root} defaultExpanded={expanded} >
             <AccordionSummary
-              expandIcon={<ExpandMoreIcon fontSize="large" />}
+              expandIcon={<ExpandMoreIcon fontSize="small" />}
               onClick={() => self.setState({ expanded : !expanded })}
               classes={{ expanded: classes.expanded }}
-              IconButtonProps={{ style: { padding : "0px", margin : "0px" } }}
+              IconButtonProps={{ style: { padding : 0, margin : 0 } }}
             >
               <div className={classes.column}>
-                <Typography classes={{ root : classes.typography }}>Connectivity query</Typography>
+                <Typography variant="body2">Connectivity query</Typography>
               </div>
             </AccordionSummary>
             <AccordionDetails classes={{ root : classes.details }}>
-              <Grid container justify="space-between" alignItems="center">
-                <Grid item sm={1} justify="center" alignItems="center">
-                  <div>
-                    <AdjustIcon />
-                    <MoreVertIcon classes={{ root : classes.dottedIcon }}/>
-                    <RoomIcon />
+              <Grid container justifyContent="space-between" alignItems="center">
+                <Grid item>
+                  <div style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
+                    <img src={ADJUST_ICON} alt='' style={{width: "0.75rem", height: "0.75rem"}}/>
+                    <MoreVertIcon classes={{ root : classes.dottedIcon }} fontSize="small"/>
+                    <img src={LOCATION_ICON} alt='' style={{width: "0.75rem", height: "0.75rem"}}/>
                   </div>
                 </Grid>
-                <Grid style={ { marginRight : "1vh !important" } } id="neuronFieldsGrid" item sm={9}>
+                <Grid item id="neuronFieldsGrid" sm={9}>
                   { neuronFields.map((field, index) => (
-                    <Grid container alignItems="center" justify="center" key={"TextFieldContainer" + index}>
+                    <Grid container alignItems="center" justifyContent="center" key={"TextFieldContainer" + index}>
                       <Grid item sm={neuronColumnSize} key={"TextFieldItem" + index}>
                         <AutocompleteResults
                           field={field}
@@ -545,7 +611,7 @@ class Controls extends Component {
                     </Grid>
                   ))}
                 </Grid>
-                <Grid item justify="space-between" alignItems="center" sm={1}>
+                <Grid item justifyContent="space-between" alignItems="center" sm={1}>
                   <IconButton
                     id="reverseNeurons"
                     color="inherit"
@@ -554,12 +620,12 @@ class Controls extends Component {
                     onClick={this.reverseNeurons}
                     style={ { paddingLeft : "1vh" } }
                   >
-                    <SwapVertIcon fontSize="large" />
+                    <SwapVertIcon fontSize="small" />
                   </IconButton>
                 </Grid>
                 { addNeuronDisabled 
                   ? null
-                  : <Grid container style={ { marginTop : "1vh" } } justify="space-between" alignItems="center">
+                  : <Grid container style={ { marginTop : "1vh" } } justifyContent="space-between" alignItems="center">
                     <Grid item sm={2} classes={{ root : classes.addNeuron }}>
                       <IconButton
                         id="addNeuron"
@@ -579,8 +645,8 @@ class Controls extends Component {
             </AccordionDetails>
             <Divider />
             <AccordionActions>
-              <Grid container justify="space-between" alignItems="center" >
-                <Grid container spacing={1}>
+              <Grid container justifyContent="space-between" alignItems="center">
+                <Grid container alignItems="center">
                   <Grid item sm={3}>
                     <Typography classes={{ root : classes.typography }}># Paths</Typography>
                   </Grid>
@@ -598,32 +664,32 @@ class Controls extends Component {
                     />  
                   </Grid>
                 </Grid>
-                <Grid container spacing={1} alignItems="flex-end">
+                <Grid container alignItems="center" style={{marginTop: "0.75rem"}}>
                   <Grid item sm={3}>
                     <Typography classes={{ root : classes.typography }}>Min Weight</Typography>
                   </Grid>
                   <Grid item sm={9}>
                     <Input className={classes.weightInputDiv} label="Graph weight" defaultValue={this.weight} onChange={this.weightChange} inputProps={{ 'aria-label': 'description', id : "weightField", className : classes.weightInput }} />
                   </Grid>
-                  <Grid item container justify="flex-end" sm={6}>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      classes={{ root : classes.refreshButton }}
-                      id="refreshCircuitBrowser"
-                      onClick={() => this.props.updateGraph(this.neuronFields, this.paths, this.weight)}
-                    >Run Query</Button>  
-                  </Grid>
-                  <Grid item container justify="flex-end" sm={6}>
-                    <Button
-                      variant="contained"
-                      color="secondary"
-                      classes={{ root : classes.clearButton }}
-                      id="clearCircuitBrowser"
-                      onClick={this.clearGraph.bind(this)}
-                    >Clear</Button>  
-                  </Grid>
                 </Grid>
+                <Box display="flex" justifyContent="space-between" width={1} mt={1.5}>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    classes={{ root : classes.clearButton }}
+                    id="clearCircuitBrowser"
+                    onClick={this.clearGraph.bind(this)}>
+                      Clear
+                  </Button> 
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    classes={{ root : classes.refreshButton }}
+                    id="refreshCircuitBrowser"
+                    onClick={() => this.props.updateGraph(this.neuronFields, this.paths, this.weight)}>
+                      Run Query
+                  </Button> 
+                </Box>
               </Grid>
             </AccordionActions>
           </Accordion>

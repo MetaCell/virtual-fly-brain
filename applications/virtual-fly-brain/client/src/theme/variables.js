@@ -5,6 +5,7 @@ const vars = {
   outlinedBtnBorderColor: '#707070',
   outlinedBtnTextColor: 'rgba(255, 255, 255, 0.8)',
   secondaryBg: '#3A3A3A',
+  secondaryBtnColor: '#0AB7FE',
   searchBoxBg: '#505050',
   listBg: 'rgba(58, 58, 58, 1)',
   shortcutBg: 'rgba(255, 255, 255, 0.1)',

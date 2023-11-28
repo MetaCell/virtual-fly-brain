@@ -156,7 +156,7 @@ steps:
     description: Approve build release and tagging
     timeout:
       duration: 168
-      finalState: denied
+      finalState: approved
   publish:
     type: parallel
     stage: publish

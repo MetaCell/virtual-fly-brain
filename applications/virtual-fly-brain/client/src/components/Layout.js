@@ -31,7 +31,7 @@ const tabsArr = [
   { id: 0, name: 'Term Info' },
   { id: 1, name: 'Images' },
   { id: 2, name: 'Stack Viewers' },
-  { id: 3, name: 'ROI Browser' }
+  { id: 3, name: 'Template ROI Browser' }
 ]
 
 const MainLayout = ({ bottomNav, setBottomNav }) => {

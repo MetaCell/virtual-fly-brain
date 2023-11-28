@@ -171,6 +171,7 @@ export default function SearchBuilder(props) {
     })
     termInfoById(value[value.length -1 ].short_form);
     setIsOpen(false)
+    value.forEach( v => deleteQuery(v))
     setValue([])
   }
 

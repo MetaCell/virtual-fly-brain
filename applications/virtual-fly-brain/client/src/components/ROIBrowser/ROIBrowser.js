@@ -246,8 +246,6 @@ const ROIBrowser = (props) => {
                 selectNode(state?.nodes[node[0]])
                 //selectNode(state?.dataTree[0])
             }
-        } else {
-            state?.dataTree && selectNode(state?.dataTree[0]);
         }
     };
 

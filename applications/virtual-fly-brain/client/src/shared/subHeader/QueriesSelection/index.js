@@ -1,6 +1,6 @@
 import { Box, Typography, Button, Popper, List, ListItem, ListItemButton, ListItemText } from "@mui/material";
 import React from "react";
-import { AngleRight, ChevronDown, CleaningServices, Delete } from "../../../icons";
+import { AngleRight, ChevronDown, CleaningServices, Delete, ChevronUp } from "../../../icons";
 import vars from "../../../theme/variables";
 
 const queryBuilderDatasourceConfig = require('../../../components/configuration/VFBSearchBuilder/queryBuilderConfiguration').queryBuilderDatasourceConfig;
@@ -44,11 +44,6 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
     setSelectedOption(updatedSelectedOption)
     setPopoverAnchorEl(null);
   };
-
-  const goBackToInitialState = () => {
-    setSelectedOption({count: 0})
-    setPopoverAnchorEl(null);
-  }
 
   const popoverOpen = Boolean(popoverAnchorEl);
   const id = popoverOpen ? 'simple-popover' : undefined;
@@ -136,6 +131,7 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
             sx={{
               width: 'calc(100% - 2rem)',
               background: searchBoxBg,
+              border: popoverOpen ? "1px solid #0AB7FE" : "none"
             }}
           >
             <Box
@@ -190,7 +186,7 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
                   }
                 }}
               >
-                <ChevronDown />
+                {popoverOpen ? <ChevronUp/> : <ChevronDown/>}
               </Button>
 
               <Popper
@@ -198,14 +194,18 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
                 id={id}
                 open={popoverOpen}
                 anchorEl={popoverAnchorEl}
+                sx={{
+                  marginTop: "0.5px !important"
+                }}
               >
 
                 <List>
-                  <ListItem>
-                    <ListItemButton onClick={goBackToInitialState}>
-                      <ListItemText primary={`Select query for ${option.label}`}/>
+                  {!option.queries.Queries.length && <ListItem>
+                    <ListItemButton>
+                      <ListItemText primary={`No query for ${option.label}`}/>
                     </ListItemButton>
                   </ListItem>
+                  }
                   { option.queries?.Queries?.map((query, index) => (selectedQueryIndex === option.short_form || selectedQueryIndex === "" )&& (<ListItem key={query.short_form+index}>
                     <ListItemButton onClick={() => handleSelect(query, option)}>
                       <ListItemText primary={query.label} />
@@ -218,34 +218,34 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
         </Box>
         )}
         <Box
-        display='flex'
-        justifyContent='flex-end'
-      >
-      <Button
-          onClick={checkResults}
-          disabled={!(selectedOption?.count > 1)}
-          sx={{
-            px: '0.5rem',
-            py: '0.25rem',
-            backgroundColor: primaryBg,
-            borderRadius: 1,
-            fontSize: '0.75rem',
-            height: '1.5rem',
-            '& svg path': {
-              fill: !(selectedOption?.count > 1) && btnDisabledColor
-            },
-            '&.Mui-disabled': {
-              color: btnDisabledColor
-            },
-            '&:hover': {
-              backgroundColor: primaryBg,
-            }
-          }}
+          display='flex'
+          justifyContent='flex-end'
         >
-          Check { selectedOption.count } results
-          <AngleRight style={{ marginLeft: '0.5rem' }} />
-        </Button>
-      </Box>
+          <Button
+              onClick={checkResults}
+              disabled={!(selectedOption?.count > 1)}
+              sx={{
+                px: '0.5rem',
+                py: '0.25rem',
+                backgroundColor: primaryBg,
+                borderRadius: 1,
+                fontSize: '0.75rem',
+                height: '1.5rem',
+                '& svg path': {
+                  fill: !(selectedOption?.count > 1) && btnDisabledColor
+                },
+                '&.Mui-disabled': {
+                  color: btnDisabledColor
+                },
+                '&:hover': {
+                  backgroundColor: primaryBg,
+                }
+              }}
+            >
+              Check { selectedOption.count } results
+              <AngleRight style={{ marginLeft: '0.5rem' }} />
+          </Button>
+        </Box>
       </Box>
     </Box>
   )

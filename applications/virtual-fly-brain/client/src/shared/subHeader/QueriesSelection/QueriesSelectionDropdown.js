@@ -28,11 +28,6 @@ export const QueriesSelectionDropdown = ({option, selectedOption, setSelectedOpt
     setSelectedOption(updatedSelectedOption)
     setPopoverAnchorEl(null);
   }; 
-
-  const goBackToInitialState = () => {
-    setSelectedOption({count: 0})
-    setPopoverAnchorEl(null);
-  }
   
   const popoverOpen = Boolean(popoverAnchorEl);
   const id = popoverOpen ? 'simple-popover' : undefined;
@@ -139,7 +134,7 @@ export const QueriesSelectionDropdown = ({option, selectedOption, setSelectedOpt
               >
                 <List>
                   {!option.queries.Queries.length && <ListItem>
-                    <ListItemButton onClick={goBackToInitialState}>
+                    <ListItemButton onClick={() => setPopoverAnchorEl(null)}>
                       <ListItemText primary={`No query for ${option.label}`}/>
                     </ListItemButton>
                   </ListItem>

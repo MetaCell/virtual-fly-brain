@@ -33,7 +33,8 @@ const {
   whiteColor,
   secondaryBg,
   primaryBg,
-  secondaryBtnColor
+  secondaryBtnColor,
+  primaryFont
 } = vars;
 /**
  * Create a local theme to override some default values in material-ui components
@@ -46,6 +47,7 @@ const theme = createMuiTheme({
       markLabel: { color: whiteColor }
     }
   },
+  typography: { fontFamily : [primaryFont, "sans-serif"] }
 });
 
 /**

@@ -53,21 +53,21 @@ class VFBListViewer extends Component {
           meta_instance = Instances.getInstance(id)[id + "_meta"];
 
           // Retrieve the HTML type from the Instance, it's in the form of an HTML element saved as a string
-          html = meta_instance.getTypes().map(function (t) {
+          html = meta_instance.getTypes().map((t) => {
             return t.type.getInitialValue().value
           })[0].html;
 
-          htmlLabels = meta_instance.getTypes().map(function (t) {
+          htmlLabels = meta_instance.getTypes().map((t) => {
             return t.label.getInitialValue().value
           })[0].html;
           
           // Extract HTML element anchor text from html string
-          visuals[id].types = html?.match(/<a[^>]*>(.*?)<\/a>/g)?.map(function (val){
+          visuals[id].types = html?.match(/<a[^>]*>(.*?)<\/a>/g)?.map((val) =>{
             return val?.replace(/<a[^>]*>/g, '').replace(/<\/?a>/g,'');
           }).join();
           
           // Extract HTML element anchor text from html string
-          visuals[id].tags = htmlLabels?.match(/<span[^>]*>(.*?)<\/span>/g)?.map(function (val){
+          visuals[id].tags = htmlLabels?.match(/<span[^>]*>(.*?)<\/span>/g)?.map((val) =>{
             return val?.replace(/<span[^>]*>/g, '')?.replace(/<\/?span>/g,'');
           }).join();
         }
@@ -96,7 +96,7 @@ class VFBListViewer extends Component {
 function mapStateToProps (state) {
   return { 
     instanceDeleted : state.generals.ui.canvas.instanceDeleted,
-    instanceOnFocus : state.generals.instanceOnFocus,
+    instanceOnFocus : state.instances.focusInstance,
     idsMap : state.generals.idsMap,
     idsList : state.generals.idsList
   }

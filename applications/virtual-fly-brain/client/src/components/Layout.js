@@ -19,6 +19,7 @@ import QueryBuilder from "./queryBuilder";
 import { getLayoutManagerInstance } from "@metacell/geppetto-meta-client/common/layout/LayoutManager";
 import { addWidget } from '@metacell/geppetto-meta-client/common/layout/actions';
 import { threeDCanvasWidget, stackViewerWidget, roiBrowserWidget, termContextWidget, circuitBrowserWidget } from "./layout/widgets";
+import VFBListViewer from "./VFBListViewer/VFBListViewer";
 import store from "../store";
 const {
   secondaryBg,
@@ -167,7 +168,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
         {desktopScreen ? (
           <>
             {tabContent}
-            {bottomNav === 0 && <VFBUploader open={true} setBottomNav={setBottomNav} />}
+            {bottomNav === 0 && <VFBListViewer  />}
             {bottomNav === 1 && <VFBDownloadContents open={true} setBottomNav={setBottomNav} />}
             {bottomNav === 2 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} />}
           </>
@@ -176,7 +177,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
             {
               bottomNav != 2 && tabContent
             }
-            {bottomNav === 0 && <VFBUploader open={true} setBottomNav={setBottomNav} />}
+            {bottomNav === 0 && <VFBListViewer  />}
             {bottomNav === 1 && <VFBDownloadContents open={true} setBottomNav={setBottomNav} />}
             {bottomNav === 2 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} />}
           </>

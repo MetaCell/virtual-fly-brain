@@ -89,8 +89,8 @@ class ListViewerControlsMenu extends Component {
         instance = this.props.instance.getType()[this.props.instance.getId() + "_obj"];
       }
       if (instance.getType().getMetaType() == GEPPETTO.Resources.IMPORT_TYPE) {
-        var self = this;
-        instance.getType().resolve(function () {
+        self = this;
+        instance.getType().resolve(() => {
           self.props.instance.setColor(color);
           if ( instance.getInstancePath !== undefined ) {
             GEPPETTO.trigger('experiment:visibility_changed', instance);
@@ -106,18 +106,18 @@ class ListViewerControlsMenu extends Component {
       }
       break;
     case ACTIONS.HIDE_VOLUME:
-      var instance = this.props.instance[this.props.instance.getId() + "_obj"];
+      instance = this.props.instance[this.props.instance.getId() + "_obj"];
       if ( instance === undefined ) {
         instance = this.props.instance.getType()[this.props.instance.getId() + "_obj"];
       }
       instance.hide();
       break;
     case ACTIONS.SHOW_SKELETON:
-      var color = this.props.instance.getColor();
-      var instance = this.props.instance[this.props.instance.getId() + "_swc"];
+      color = this.props.instance.getColor();
+      instance = this.props.instance[this.props.instance.getId() + "_swc"];
       if (instance.getType().getMetaType() == GEPPETTO.Resources.IMPORT_TYPE) {
         var col = instance.getParent().getColor();
-        instance.getType().resolve( function () { 
+        instance.getType().resolve( () => { 
           instance.setColor(col);
           GEPPETTO.trigger('experiment:visibility_changed', instance);
           GEPPETTO.ControlPanel.refresh();

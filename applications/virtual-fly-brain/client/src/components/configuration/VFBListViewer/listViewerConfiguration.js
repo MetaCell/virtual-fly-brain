@@ -1,6 +1,6 @@
 import React from 'react';
 import Tooltip from '@material-ui/core/Tooltip';
-import ListViewerControlsMenu from '../../interface/VFBListViewer/ListViewerControlsMenu';
+import ListViewerControlsMenu from '../../VFBListViewer/ListViewerControlsMenu';
 
 /**
  * Create component to display controls
@@ -71,11 +71,11 @@ const conf = [
       }
 
       // Retrieve the HTML type from the Instance, it's in the form of an HTML element saved as a string
-      let html = instance.getTypes().map(function (t) {
+      let html = instance.getTypes().map((t) => {
         return t.type.getInitialValue().value
       })[0].html;
 
-      let htmlLabels = instance.getTypes().map(function (t) {
+      let htmlLabels = instance.getTypes().map((t) => {
         return t.label.getInitialValue().value
       })[0].html;
 
@@ -87,8 +87,8 @@ const conf = [
       var matchSpan = /<span[^>]*>([\s\S]*?)<\/span>/g
         , tags = htmlLabels.match(matchSpan);
 
-      var matchID = /data-instancepath\=\"([A-Za-z0-9 _]*)\"/
-        , classID = type[0].match(matchID)[1];
+      var matchID = /data-instancepath="([A-Za-z0-9 _]*)"/;
+      var classID = type[0].match(matchID)[1];
 
       var matchText = /<a [^>]+>(.*?)<\/a>/
         , newText = type[0].match(matchText)[1]

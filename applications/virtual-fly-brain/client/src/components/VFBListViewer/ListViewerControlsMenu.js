@@ -1,10 +1,19 @@
 import React, { Component } from "react";
-import Menu from "@geppettoengine/geppetto-ui/menu/Menu";
+import Menu from "@metacell/geppetto-meta-ui/menu/Menu";
 import { connect } from 'react-redux';
 import { ChromePicker } from 'react-color';
-import { setTermInfo, SHOW_LIST_VIEWER, INSTANCE_DELETED } from './../../../actions/generals';
 
-const controlsConfiguration = require('../../configuration/VFBListViewer/controlsMenuConfiguration').default;
+export const VFB_LOAD_TERM_INFO = 'VFB_LOAD_TERM_INFO';
+
+export const setTermInfo = ( instance, visible ) => ({
+  type: VFB_LOAD_TERM_INFO,
+  data : {
+    instance : instance,
+    visible : visible
+  }
+});
+
+const controlsConfiguration = require('../configuration/VFBListViewer/controlsMenuConfiguration').default;
 const ACTIONS = controlsConfiguration.actions;
 
 /**

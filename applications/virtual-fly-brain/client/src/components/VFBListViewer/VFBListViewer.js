@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import ListViewer from "@geppettoengine/geppetto-ui/list-viewer/ListViewer";
+import ListViewer from "@metacell/geppetto-meta-ui/list-viewer/ListViewer"
 import listViewerConf from '../configuration/VFBListViewer/listViewerConfiguration';
 import { connect } from 'react-redux';
 

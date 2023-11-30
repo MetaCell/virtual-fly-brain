@@ -45,8 +45,10 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
     setPopoverAnchorEl(null);
   };
 
-  const goBackToInitialState = () => {
-    setSelectedOption({count: 0})
+  const goBackToInitialState = (short_form) => {
+    setSelectedQueryIndex("")
+    let updatedSelectedOption = {...selectedOption, [short_form]: true, count : selectedOption.count - selectedOption[short_form].count};
+    setSelectedOption(updatedSelectedOption)
     setPopoverAnchorEl(null);
   }
 
@@ -202,8 +204,10 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
 
                 <List>
                   <ListItem>
-                    <ListItemButton onClick={goBackToInitialState}>
-                      <ListItemText primary={`Select query for ${option.label}`}/>
+                    <ListItemButton onClick={() => goBackToInitialState(option.short_form )}>
+                    { selectedQueryIndex === option.short_form || selectedQueryIndex === "" ?
+                     <ListItemText primary={`Select query for ${option.label}`}/>
+                     : null }
                     </ListItemButton>
                   </ListItem>
                   { option.queries?.Queries?.map((query, index) => (selectedQueryIndex === option.short_form || selectedQueryIndex === "" )&& (<ListItem key={query.short_form+index}>

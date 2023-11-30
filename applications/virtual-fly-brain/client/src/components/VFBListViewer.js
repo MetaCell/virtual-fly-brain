@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import ListViewer from "@metacell/geppetto-meta-ui/list-viewer/ListViewer"
-import listViewerConf from '../configuration/VFBListViewer/listViewerConfiguration';
+import listViewerConf from './configuration/VFBListViewer/listViewerConfiguration';
 import { connect } from 'react-redux';
 
-require('../../css/VFBListViewer.less');
+require('../css/VFBListViewer.less');
 
 const VISUAL_TYPE = "VisualType";
 const COMPOSITE_VISUAL_TYPE = "CompositeVisualType";

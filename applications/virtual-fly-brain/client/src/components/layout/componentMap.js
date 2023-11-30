@@ -3,7 +3,7 @@ import StackViewer from '../StackViewer';
 import ThreeDCanvas from '../ThreeDCanvas';
 import VFBCircuitBrowser from '../VFBCircuitBrowser';
 import VFBGraph from '../VFBGraph';
-import VFBListViewer from '../VFBListViewer/VFBListViewer';
+import VFBListViewer from '../VFBListViewer';
 /**
  * Key of the component is the `component` attribute of the widgetConfiguration.
  * 

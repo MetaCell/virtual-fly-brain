@@ -19,8 +19,8 @@ import QueryBuilder from "./queryBuilder";
 import { getLayoutManagerInstance } from "@metacell/geppetto-meta-client/common/layout/LayoutManager";
 import { addWidget } from '@metacell/geppetto-meta-client/common/layout/actions';
 import { threeDCanvasWidget, stackViewerWidget, roiBrowserWidget, termContextWidget, circuitBrowserWidget } from "./layout/widgets";
-import VFBListViewer from "./VFBListViewer/VFBListViewer";
 import store from "../store";
+import VFBStackViewer from "./StackViewer";
 const {
   secondaryBg,
   headerBorderColor,
@@ -168,7 +168,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
         {desktopScreen ? (
           <>
             {tabContent}
-            {bottomNav === 0 && <VFBListViewer  />}
+            {bottomNav === 0 && <VFBStackViewer  />}
             {bottomNav === 1 && <VFBDownloadContents open={true} setBottomNav={setBottomNav} />}
             {bottomNav === 2 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} />}
           </>
@@ -177,7 +177,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
             {
               bottomNav != 2 && tabContent
             }
-            {bottomNav === 0 && <VFBListViewer  />}
+            {bottomNav === 0 && <VFBStackViewer  />}
             {bottomNav === 1 && <VFBDownloadContents open={true} setBottomNav={setBottomNav} />}
             {bottomNav === 2 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} />}
           </>

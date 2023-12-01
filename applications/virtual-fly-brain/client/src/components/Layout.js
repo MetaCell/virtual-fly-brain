@@ -18,9 +18,11 @@ import VFBUploader from "./VFBUploader/VFBUploader";
 import QueryBuilder from "./queryBuilder";
 import { getLayoutManagerInstance } from "@metacell/geppetto-meta-client/common/layout/LayoutManager";
 import { addWidget } from '@metacell/geppetto-meta-client/common/layout/actions';
-import { threeDCanvasWidget, stackViewerWidget, roiBrowserWidget, termContextWidget, circuitBrowserWidget } from "./layout/widgets";
+import { threeDCanvasWidget, stackViewerWidget, roiBrowserWidget, termContextWidget, circuitBrowserWidget, listViewerWidget } from "./layout/widgets";
 import store from "../store";
 import VFBStackViewer from "./StackViewer";
+import VFBListViewer from "./VFBListViewer"
+
 const {
   secondaryBg,
   headerBorderColor,
@@ -67,6 +69,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
     dispatch(addWidget(circuitBrowserWidget));
     dispatch(addWidget(roiBrowserWidget));
     dispatch(addWidget(termContextWidget));
+    dispatch(addWidget(listViewerWidget));
   }, [sidebarOpen, setSidebarOpen])
 
   const classes = {

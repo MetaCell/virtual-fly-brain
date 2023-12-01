@@ -35,14 +35,14 @@ class VFBListViewer extends Component {
    */
   getInstances () {
     // Retrieve all instances from the ModelFactory
-    let entities = GEPPETTO.ModelFactory.allPaths;
+    let entities = window.GEPPETTO?.ModelFactory.allPaths;
     var visuals = {};
     
     const { instanceDeleted, idsMap, idsList } = this.props;
     
     let id = "", instance = "", meta_instance = "", html = "", htmlLabels = "", matchAnchor = "", matchSpan = "", type, tags;
     // Match Visual Types from ModelFactory
-    for (var i = 0; i < entities.length; i++) {
+    for (var i = 0; i < entities?.length; i++) {
       if (entities[i].metaType === VISUAL_TYPE || entities[i].metaType === COMPOSITE_VISUAL_TYPE ) {
         id = entities[i].path.split(".")[0];
         if (idsList.includes(id) && visuals[entities[i].path] === undefined ){
@@ -94,12 +94,13 @@ class VFBListViewer extends Component {
 
 
 function mapStateToProps (state) {
-  return { 
-    instanceDeleted : state.generals.ui.canvas.instanceDeleted,
-    instanceOnFocus : state.instances.focusInstance,
-    idsMap : state.generals.idsMap,
-    idsList : state.generals.idsList
-  }
+  // return { 
+  //   instanceDeleted : state.generals.ui.canvas.instanceDeleted,
+  //   instanceOnFocus : state.instances.focusInstance,
+  //   idsMap : state.generals.idsMap,
+  //   idsList : state.generals.idsList
+  // }
+  return {}
 }
 
 export default connect(mapStateToProps)(VFBListViewer);

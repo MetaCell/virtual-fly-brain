@@ -73,7 +73,7 @@ class ListViewerControlsMenu extends Component {
       this.props.instance.deselect();
       break;
     case ACTIONS.ZOOM_TO:
-      GEPPETTO.SceneController.zoomTo([this.props.instance]);
+      window.GEPPETTO?.SceneController.zoomTo([this.props.instance]);
       break;
     case ACTIONS.DELETE:
       this.props.instance.delete();   
@@ -102,15 +102,15 @@ class ListViewerControlsMenu extends Component {
         instance.getType().resolve(() => {
           self.props.instance.setColor(color);
           if ( instance.getInstancePath !== undefined ) {
-            GEPPETTO.trigger('experiment:visibility_changed', instance);
-            GEPPETTO.ControlPanel.refresh();
+            window.GEPPETTO?.trigger('experiment:visibility_changed', instance);
+            window.GEPPETTO?.ControlPanel.refresh();
           }
         });
       } else { 
-        if (GEPPETTO.SceneController.isInstancePresent(instance)) { 
-          GEPPETTO.SceneController.show([instance]);
+        if (window.GEPPETTO?.SceneController.isInstancePresent(instance)) { 
+          window.GEPPETTO?.SceneController.show([instance]);
         } else { 
-          GEPPETTO.SceneController.display(instance); instance.setColor(color);
+          window.GEPPETTO?.SceneController.display(instance); instance.setColor(color);
         }
       }
       break;
@@ -128,20 +128,20 @@ class ListViewerControlsMenu extends Component {
         var col = instance.getParent().getColor();
         instance.getType().resolve( () => { 
           instance.setColor(col);
-          GEPPETTO.trigger('experiment:visibility_changed', instance);
-          GEPPETTO.ControlPanel.refresh();
+          window.GEPPETTO?.trigger('experiment:visibility_changed', instance);
+          window.GEPPETTO?.ControlPanel.refresh();
         });
       } else {
-        if (GEPPETTO.SceneController.isInstancePresent(instance)) {
-          GEPPETTO.SceneController.show([instance]);
+        if (window.GEPPETTO?.SceneController.isInstancePresent(instance)) {
+          window.GEPPETTO?.SceneController.show([instance]);
         } else {
-          GEPPETTO.SceneController.display(instance);
+          window.GEPPETTO?.SceneController.display(instance);
           instance.setColor(color);
         }
       }
       break;
     case ACTIONS.HIDE_SKELETON:
-      GEPPETTO.SceneController.hide([this.props.instance[this.props.instance.getId() + "_swc"]]);
+      window.GEPPETTO?.SceneController.hide([this.props.instance[this.props.instance.getId() + "_swc"]]);
       break;
     }
   }

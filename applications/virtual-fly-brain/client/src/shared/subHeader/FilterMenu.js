@@ -35,6 +35,7 @@ export const FilterMenu  = ({ classes, tags, setSelectedFilters }) => {
     tags?.forEach( tag => {
       updatedSelection[tag] = true;
     })
+    console.log("updatedSelection",updatedSelection)
     setSelection(updatedSelection)
   }, [tags]);
 

@@ -81,10 +81,10 @@ class ThreeDCanvas extends Component {
   }
 
   updateColors ( inst, mappedCanvasData) {
-    let match = mappedCanvasData?.find( m => m.instancePath === inst.Id )
-    let color = { r : inst.color?.r/255, g : inst.color?.g/255, b : inst.color?.b/255 }
+    let match = mappedCanvasData?.find( m => m.instancePath === inst?.Id )
+    let color = { r : inst?.color?.r/255, g : inst?.color?.g/255, b : inst?.color?.b/255 }
     let colorMatch = match?.color?.b === color?.b && match?.color?.r === color?.r && match?.color?.g === color?.g;
-    if ( !colorMatch && inst.color && match ){
+    if ( !colorMatch && inst?.color && match ){
         match.color = color;
         this.canvasRef.current.threeDEngine.updateInstances(mappedCanvasData)
     }
@@ -132,7 +132,6 @@ class ThreeDCanvas extends Component {
           if ( mappedCanvasData?.find( i => targetInstance?.Id === i.instancePath ) === undefined ){
             if (targetInstance.Images)
             {
-              mappedCanvasData?.forEach(i => i.visible = false);
               fetch(targetInstance.Images?.[Object.keys(targetInstance.Images)[0]][0].obj)
               .then(response => response.text())
               .then(base64Content => {

@@ -18,7 +18,7 @@ import { TreeItem } from "@mui/lab";
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import RectangleIcon from '@mui/icons-material/Rectangle';
 import GeneralInformation from "./TermInfo/GeneralInformation";
-import { getInstanceByID, selectInstance, hide3DMesh, show3DMesh, 
+import { getInstanceByID, selectInstance, hide3DMesh, show3DMesh, removeInstanceByID,
   changeColor, focusInstance, show3DSkeleton, hide3DSkeleton, show3DSkeletonLines, show3DSkeletonCylinders } from './../reducers/actions/instances';
 import { termInfoById } from "./../reducers/actions/termInfo";
 import Ribbon from '@flybase/react-ontology-ribbon';
@@ -185,11 +185,13 @@ const classes = {
   buttonGroup: {
     '& .MuiButton-root': {
       height: '1.875rem',
+      width : "2rem",
       background: {
         xs: primaryBg,
         lg: secondaryBg
       }
-    }
+    },
+    width : "100%"
   }
 }
 
@@ -236,6 +238,8 @@ const TermInfo = ({ open, setOpen }) => {
   }
 
   const deleteId = (id) => {
+    hide3DMesh(termInfoData.Id)
+    removeInstanceByID(termInfoData.Id)
     setTermInfoData(null)
   }
 
@@ -296,6 +300,17 @@ const TermInfo = ({ open, setOpen }) => {
     return[red, green, baseRGB[2]];
   }
 
+  const getQueriesLength = (queries) => {
+    let queriesCount = 0;
+    queries?.forEach( query => {
+      if ( query?.preview_results?.rows?.length > 0 ) {
+        queriesCount = queriesCount + 1;
+      }
+    });
+
+    return queriesCount;
+  }
+
   const termInfoHeading = (
     <>
       <Typography
@@ -316,16 +331,22 @@ const TermInfo = ({ open, setOpen }) => {
 
   // FIXME
   useEffect(() => {
-    setTermInfoData(data)
+    if (  allLoadedInstances?.find( instance => instance.Id == data?.Id ) ) {
+      setTermInfoData(data)
+    }
   }, [data]);
 
   useEffect(() => {
-    setTermInfoData(data)
+    if (  allLoadedInstances?.find( instance => instance.Id == data?.Id ) ) {
+      setTermInfoData(data)
+    }
   }, [allLoadedInstances])
   
 
   const getInstance = () => {
-    return allLoadedInstances.find( instance => instance.Id == termInfoData?.Id );
+    let instance = allLoadedInstances.find( instance => instance.Id == termInfoData?.Id );
+    console.log("Instance ", instance)
+    return instance;
   }
   return (
     <Box
@@ -483,11 +504,16 @@ const TermInfo = ({ open, setOpen }) => {
                       </ButtonGroup>
                     </Box>
 
-                    <Box>
+                    <Box sx={{ width : '100%'}}>
                       <ButtonGroup ref={popover} color="secondary" sx={classes.buttonGroup} variant="contained">
                         <>
                           <Tooltip title={"Edit 3D Canvas Color"}>
-                            <Button style={{ width: 75 }} onClick={() => setDisplayColorPicker(!displayColorPicker)}><RectangleIcon sx={{color : RGBAToHexA( getInstance()?.color)}}/>Edit<ArrowDown/></Button>
+                            <Button
+                            disabled={getInstance()?.Images == undefined}
+                            sx={{ width: 75 }} 
+                            onClick={() => setDisplayColorPicker(!displayColorPicker)}>
+                            <RectangleIcon sx={{color : RGBAToHexA( getInstance()?.color)}}/><ArrowDown/>
+                          </Button>
                           </Tooltip>
                           { displayColorPicker ?
                           <ChromePicker
@@ -502,27 +528,27 @@ const TermInfo = ({ open, setOpen }) => {
                           }
                         </>
                         <Tooltip title={ getInstance()?.visible ? "Hide" : "Show"}>
-                          <Button onClick={() => handleVisibility()}>
+                          <Button disabled={getInstance()?.Images == undefined} onClick={() => handleVisibility()}>
                             {  getInstance()?.visible ? <EyeOff /> : <Eye /> }
                           </Button>
                         </Tooltip>
                         <Tooltip title={ getInstance()?.selected ? "Deselect" : "Select"}>
-                          <Button onClick={(event) => handleSelection(event)}>
+                          <Button disabled={getInstance()?.Images == undefined} onClick={(event) => handleSelection(event)}>
                             { getInstance()?.selected ? <SelectOff /> : <Focus /> }
                           </Button>
                         </Tooltip>
                         <Tooltip title={"Focus on 3D Mesh"}>
-                          <Button onClick={(event) => handleFocus(event, true)}>
+                          <Button disabled={getInstance()?.Images == undefined} onClick={(event) => handleFocus(event, true)}>
                             <Target />
                           </Button>
                         </Tooltip>
                         <Tooltip title={getInstance()?.visible ? "Hide 3D Mesh" : "Show 3D Mesh"}>
-                          <Button onClick={(event) => handleMeshVisibility()}>
+                          <Button disabled={getInstance()?.Images == undefined} onClick={(event) => handleMeshVisibility()}>
                           { getInstance()?.visible ? <ArViewOff /> : <ArView /> }                          </Button>
                         </Tooltip>
                         { termInfoData?.SuperTypes?.find( s => s === NEURON) ?
                         <Tooltip title={getInstance()?.skeleton?.visible ? "Disable 3D Skeleton" : "Enable 3D Skeleton"}>
-                          <Button onClick={(event) => handleSkeleton(event)}>
+                          <Button disabled={getInstance()?.Images == undefined} onClick={(event) => handleSkeleton(event)}>
                             {getInstance()?.skeleton?.visible ? <SkeletonOff /> : <SkeletonOn /> }
                           </Button>
                         </Tooltip>
@@ -530,7 +556,7 @@ const TermInfo = ({ open, setOpen }) => {
                         null}
                         { termInfoData?.SuperTypes?.find( s => s === NEURON) ?
                         <Tooltip title={getInstance()?.skeleton?.[SKELETON]?.visible ? "Show 3D Cylinder Skeleton" : "Show 3D Lines Skeleton"}>
-                          <Button onClick={(event) => handleCylinder(event)}>
+                          <Button disabled={getInstance()?.Images == undefined} onClick={(event) => handleCylinder(event)}>
                           {getInstance()?.skeleton?.[SKELETON]?.visible ? <CylinderOn id={CYLINDERS}/> : <CylinderOff id={SKELETON} /> }
                           </Button>
                         </Tooltip>
@@ -575,7 +601,7 @@ const TermInfo = ({ open, setOpen }) => {
                   aria-controls="panel2a-content"
                   id="panel2a-header"
                 >
-                  <Typography>Queries ({termInfoData?.Queries?.length}) </Typography>
+                  <Typography>Queries ({getQueriesLength(termInfoData?.Queries)}) </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                   <TreeView
@@ -583,23 +609,23 @@ const TermInfo = ({ open, setOpen }) => {
                     defaultParentIcon={<ArrowRight />}
                     defaultEndIcon={<Line />}
                   >
-                    <TreeItem nodeId="1" label={
+                    { getQueriesLength(termInfoData?.Queries) > 0 ? <TreeItem nodeId="1" label={
                       <CustomBox display='flex' flexWrap='wrap'>
                         <Typography>Types of neurons with...</Typography>
                         <Box display='flex' sx={{ zIndex: 1000 }} pl={0.5}>
-                          <Typography sx={{ pr: 0.5 }}>{termInfoData?.Queries?.reduce((n, {count}) => n + count, 0)}</Typography>
+                          <Typography sx={{ pr: 0.5 }}>{termInfoData?.Queries?.reduce((n, {preview_results}) => n + preview_results?.rows?.length, 0)}</Typography>
                           <ListAltIcon sx={{ fontSize: '1.25rem', color: '#A0A0A0' }} />
                         </Box>
                       </CustomBox>
-                    }>
+                    }> 
                     { termInfoData?.Queries?.map( query => (
-                         query.output_format === "table"?
+                         query.output_format === "table" && query?.preview_results?.rows?.length > 0 ?
                         (
                           <TreeItem key={query.label} nodeId={query.label} label={
                             <CustomBox display='flex' flexWrap='wrap'>
                               <Typography>{query.label}</Typography>
                               <Box display='flex' sx={{ zIndex: 1000 }} pl={0.5}>
-                                <Typography sx={{ pr: 0.5 }}>{query.count}</Typography>
+                                <Typography sx={{ pr: 0.5 }}>{query?.preview_results?.rows?.length}</Typography>
                                 <ListAltIcon sx={{ fontSize: '1.25rem', color: '#A0A0A0' }} />
                               </Box>
                             </CustomBox>
@@ -607,7 +633,7 @@ const TermInfo = ({ open, setOpen }) => {
                           <TreeItem label={
                                 <>
                                 <TableContainer component={Paper}>
-                                <Table aria-label="simple table">
+                                <Table stickyHeader aria-label="simple table">
                                   <TableHead>
                                     <TableRow>
                                       <TableCell>Name</TableCell>
@@ -662,11 +688,11 @@ const TermInfo = ({ open, setOpen }) => {
                                 </>
                          } /></TreeItem>)
                          :
-                         (<TreeItem key={query.label} nodeId={query.label} label={
+                         ( query?.preview_results?.rows?.length > 0  ? <TreeItem key={query.label} nodeId={query.label} label={
                             <CustomBox display='flex' flexWrap='wrap'>
                               <Typography>{query.label}</Typography>
                               <Box display='flex' sx={{ zIndex: 1000 }} pl={0.5}>
-                                <Typography sx={{ pr: 0.5 }}>{query.count}</Typography>
+                                <Typography sx={{ pr: 0.5 }}>{query?.preview_results?.rows?.length}</Typography>
                                 <ListAltIcon sx={{ fontSize: '1.25rem', color: '#A0A0A0' }} />
                               </Box>
                             </CustomBox>
@@ -682,10 +708,10 @@ const TermInfo = ({ open, setOpen }) => {
                               heatLevels={ribbonConfiguration.heatLevels}
                             />
                           </Box>
-                          </TreeItem>)
+                          </TreeItem> : null)
                     ))
                   }
-                    </TreeItem>
+                    </TreeItem> : null }
                   </TreeView>
                 </AccordionDetails>
               </Accordion>

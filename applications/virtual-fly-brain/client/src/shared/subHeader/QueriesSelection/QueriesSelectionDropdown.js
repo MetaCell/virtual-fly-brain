@@ -5,13 +5,18 @@ import vars from "../../../theme/variables";
 
 const { searchBoxBg, whiteColor, queryBorderColor } = vars;
 
-export const QueriesSelectionDropdown = ({option, selectedOption, setSelectedOption, selectedQueryIndex, setSelectedQueryIndex, deleteQuery}) => {
+export const QueriesSelectionDropdown = ({option, selectedOption, goBackToInitialState,  setSelectedOption, selectedQueryIndex, setSelectedQueryIndex, deleteQuery}) => {
   const [popoverAnchorEl, setPopoverAnchorEl] = React.useState(null);
 
   const popoverHandleClick = (event) => {
     setSelectedQueryIndex(event.target.parentElement.id || event.target.id)
     setPopoverAnchorEl(popoverAnchorEl ? null : event.target.parentElement.parentElement);
   };
+
+  const goBack = (short_form) => {
+    goBackToInitialState(short_form);
+    setPopoverAnchorEl(null);
+  }
 
   const handleSelect = (option, query) => {
     let count = 0;
@@ -134,10 +139,12 @@ export const QueriesSelectionDropdown = ({option, selectedOption, setSelectedOpt
               >
                 <List>
                   {!option.queries.Queries.length && <ListItem>
-                    <ListItemButton onClick={() => setPopoverAnchorEl(null)}>
-                      <ListItemText primary={`No query for ${option.label}`}/>
-                    </ListItemButton>
-                  </ListItem>
+                      <ListItemButton onClick={() => goBack(option.short_form )}>
+                      { selectedQueryIndex === option.short_form || selectedQueryIndex === "" ?
+                      <ListItemText primary={`Select query for ${option.label}`}/>
+                      : null }
+                      </ListItemButton>
+                    </ListItem>
                   }
                   { option.queries?.Queries?.map((query, index) => (selectedQueryIndex === option.short_form || selectedQueryIndex === "" )&& (<ListItem key={query.short_form+index}>
                     <ListItemButton onClick={() => handleSelect(query, option)}>

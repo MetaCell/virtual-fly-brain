@@ -1,15 +1,15 @@
-import { Box, Typography, Button, Popper, List, ListItem, ListItemButton, ListItemText } from "@mui/material";
 import React from "react";
-import { AngleRight, ChevronDown, CleaningServices, Delete } from "../../../icons";
+import { Box, Typography, Button } from "@mui/material";
+import { AngleRight, CleaningServices } from "../../../icons";
+import { QueriesSelectionDropdown } from "./QueriesSelectionDropdown";
 import vars from "../../../theme/variables";
 
 const queryBuilderDatasourceConfig = require('../../../components/configuration/VFBSearchBuilder/queryBuilderConfiguration').queryBuilderDatasourceConfig;
 
-const { searchHeadingColor, searchBoxBg, primaryBg, whiteColor, queryBorderColor, btnDisabledColor } = vars;
+const { searchHeadingColor, primaryBg, btnDisabledColor } = vars;
 
 export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSearch }) => {
   const [searchQueries, setSearchQueries] = React.useState([]);
-  const [popoverAnchorEl, setPopoverAnchorEl] = React.useState(null);
   const [selectedOption, setSelectedOption] = React.useState({ count : 0});
   const [selectedQueryIndex, setSelectedQueryIndex] = React.useState("");
   React.useEffect(() => {
@@ -24,10 +24,6 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
     let updateSelection = selectedOption;
     setSelectedOption(updateSelection)
   }
-  const popoverHandleClick = (event) => {
-    setSelectedQueryIndex(event.target.parentElement.id || event.target.id)
-    setPopoverAnchorEl(popoverAnchorEl ? null : event.target.parentElement.parentElement);
-  };
 
   const handleSelect = (option, query) => {
     let count = 0;
@@ -49,11 +45,8 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
     setSelectedQueryIndex("")
     let updatedSelectedOption = {...selectedOption, [short_form]: true, count : selectedOption.count - selectedOption[short_form].count};
     setSelectedOption(updatedSelectedOption)
-    setPopoverAnchorEl(null);
   }
 
-  const popoverOpen = Boolean(popoverAnchorEl);
-  const id = popoverOpen ? 'simple-popover' : undefined;
   return (
     <Box sx={{
       py: '1rem',
@@ -103,153 +96,46 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
         rowGap={2}
       >
         { searchQueries?.map((option, index) =>
-        <Box
-          display='flex'
-          key={option.label}
-          columnGap={1}
-        >
-          <Button
-            sx={{
-              flexShrink: 0,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '1.5rem',
-              height: '1.5rem',
-              p: 0,
-              borderRadius: 1,
-              background: searchBoxBg,
-              minWidth: '0.0625rem',
-
-              '&:hover': {
-                background: searchBoxBg,
-              }
-            }}
-            key={option.short_form}
-            id={option.label}
-            onClick={deleteQuery}
-          >
-            <Delete size={12} />
-          </Button>
-
-          <Box
-            borderRadius={1}
-            display='flex'
-            sx={{
-              width: 'calc(100% - 2rem)',
-              background: searchBoxBg,
-            }}
-          >
-            <Box
-              width={1}
-              flexGrow={1}
-              display='flex'
-            >
-              
-              {selectedOption[option.short_form] ? 
-              (<Typography sx={{
-                width: 'calc(100% - 1.875rem)',
-                px: 1,
-                alignSelf: 'center',
-                flexGrow: 1,
-                fontSize: '0.75rem',
-                lineHeight: '133%',
-                color: whiteColor,
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis'
-              }}>
-                { selectedOption[option.short_form].label }
-              </Typography>)
-              :
-              (<Typography sx={{
-                width: 'calc(100% - 1.875rem)',
-                px: 1,
-                alignSelf: 'center',
-                flexGrow: 1,
-                fontSize: '0.75rem',
-                lineHeight: '133%',
-                color: whiteColor,
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis'
-              }}>
-               Select query for { option.label }
-              </Typography>) }
-              <Button
-                aria-describedby={id}
-                id={option.short_form}
-                onClick={popoverHandleClick}
-                sx={{
-                  borderLeft: `0.0625rem solid ${queryBorderColor}`,
-                  minWidth: '0.0625rem',
-                  width: '1.875rem',
-                  height: '100%',
-                  p: 0,
-
-                  '&:hover': {
-                    background: 'transparent'
-                  }
-                }}
-              >
-                <ChevronDown />
-              </Button>
-
-              <Popper
-                placement='bottom-start'
-                id={id}
-                open={popoverOpen}
-                anchorEl={popoverAnchorEl}
-              >
-
-                <List>
-                  <ListItem>
-                    <ListItemButton onClick={() => goBackToInitialState(option.short_form )}>
-                    { selectedQueryIndex === option.short_form || selectedQueryIndex === "" ?
-                     <ListItemText primary={`Select query for ${option.label}`}/>
-                     : null }
-                    </ListItemButton>
-                  </ListItem>
-                  { option.queries?.Queries?.map((query, index) => (selectedQueryIndex === option.short_form || selectedQueryIndex === "" )&& (<ListItem key={query.short_form+index}>
-                    <ListItemButton onClick={() => handleSelect(query, option)}>
-                      <ListItemText primary={query.label} />
-                    </ListItemButton>
-                  </ListItem>) )}
-                </List>
-              </Popper>
-            </Box>
-          </Box>
-        </Box>
+        <QueriesSelectionDropdown
+          key={index}
+          option={option}
+          selectedOption={selectedOption}
+          setSelectedOption={setSelectedOption}
+          selectedQueryIndex={selectedQueryIndex}
+          setSelectedQueryIndex={setSelectedQueryIndex}
+          deleteQuery={deleteQuery}
+          goBackToInitialState={goBackToInitialState}
+        />
         )}
         <Box
-        display='flex'
-        justifyContent='flex-end'
-      >
-      <Button
-          onClick={checkResults}
-          disabled={!(selectedOption?.count > 1)}
-          sx={{
-            px: '0.5rem',
-            py: '0.25rem',
-            backgroundColor: primaryBg,
-            borderRadius: 1,
-            fontSize: '0.75rem',
-            height: '1.5rem',
-            '& svg path': {
-              fill: !(selectedOption?.count > 1) && btnDisabledColor
-            },
-            '&.Mui-disabled': {
-              color: btnDisabledColor
-            },
-            '&:hover': {
-              backgroundColor: primaryBg,
-            }
-          }}
+          display='flex'
+          justifyContent='flex-end'
         >
-          Check { selectedOption.count } results
-          <AngleRight style={{ marginLeft: '0.5rem' }} />
-        </Button>
-      </Box>
+          <Button
+              onClick={checkResults}
+              disabled={!(selectedOption?.count > 1)}
+              sx={{
+                px: '0.5rem',
+                py: '0.25rem',
+                backgroundColor: primaryBg,
+                borderRadius: 1,
+                fontSize: '0.75rem',
+                height: '1.5rem',
+                '& svg path': {
+                  fill: !(selectedOption?.count > 1) && btnDisabledColor
+                },
+                '&.Mui-disabled': {
+                  color: btnDisabledColor
+                },
+                '&:hover': {
+                  backgroundColor: primaryBg,
+                }
+              }}
+            >
+              Check { selectedOption.count } results
+              <AngleRight style={{ marginLeft: '0.5rem' }} />
+          </Button>
+        </Box>
       </Box>
     </Box>
   )

@@ -17,7 +17,7 @@ export const SearchResult = ({ getOptionProps, selectedFilters, groupedOptions, 
 
     return hasTag;
   }
-  
+
   return (
     <Box sx={{
       py: '1rem',
@@ -101,12 +101,15 @@ export const SearchResult = ({ getOptionProps, selectedFilters, groupedOptions, 
                     />
                 }
                 )}
-                <Chip sx={{
-                  lineHeight: '140%',
-                  fontSize: '0.625rem',
-                  backgroundColor: searchBoxBg
-                }} label={`+${option?.facets_annotation?.length - chips_cutoff}`}
-                />
+                {
+                  option?.facets_annotation?.length > 3 && <Chip sx={{
+                    lineHeight: '140%',
+                    fontSize: '0.625rem',
+                    backgroundColor: searchBoxBg
+                  }} 
+                  label={`+${option?.facets_annotation?.length - chips_cutoff}`}
+                  />
+                }
               </Box>
 
               <Button sx={{

@@ -34,7 +34,8 @@ const {
   secondaryBg,
   primaryBg,
   secondaryBtnColor,
-  primaryFont
+  primaryFont,
+  sliderRailBgColor
 } = vars;
 /**
  * Create a local theme to override some default values in material-ui components
@@ -61,6 +62,7 @@ const styles = theme => ({
     maxWidth : "16.25rem",
     background: secondaryBg,
     color : "white",
+    marginBottom: "1rem !important",
     "&.MuiAccordion-rounded:last-child": {
       borderRadius: "0.375rem"
     },
@@ -103,8 +105,17 @@ const styles = theme => ({
     "& .MuiSlider-root": {
       padding: "0.313rem 0"
     },
+    "& .MuiSlider-rail": {
+      backgroundColor: sliderRailBgColor,
+      borderRadius: "unset"
+    },
     "& .MuiSlider-marked": {
       marginBottom: 0 
+    },
+    "& .MuiSlider-mark": {
+      width: "1px",
+      backgroundColor: whiteColor,
+      borderRadius: "unset"
     },
     "& .MuiSlider-markLabel": {
       fontSize: "0.625rem",
@@ -117,7 +128,8 @@ const styles = theme => ({
       fontWeight: 500,
       fontSize: "0.75rem",
       boxShadow: "none",
-      textTransform: "none"
+      textTransform: "none",
+      minWidth: "6.813rem"
     },
     "& #neuronFieldsGrid> :first-child": {
       paddingBottom: "0.75rem"
@@ -261,8 +273,8 @@ class AutocompleteResults extends Component {
             onChange={this.props.neuronTextfieldModified}
             onDelete={this.props.neuronTextfieldModified}
             placeholder={label}
-            inputProps={{ ...params.inputProps, id: this.props.index, style: { height : "1rem", color: "white" ,padding : "8px 7px", fontSize: "0.875rem", border : "none", backgroundColor: primaryBg } }}
-            InputLabelProps={{ ...params.inputProps,style: { color: "white", fontSize: "0.875rem" } }}
+            inputProps={{ ...params.inputProps, id: this.props.index, style: { height : "1rem", color: "white" ,padding : "8px 7px", fontSize: "0.75rem", border : "none", backgroundColor: primaryBg } }}
+            InputLabelProps={{ ...params.inputProps,style: { color: "white", fontSize: "0.75rem" } }}
           />
         )}
       />
@@ -649,10 +661,10 @@ class Controls extends Component {
             <AccordionActions>
               <Grid container justifyContent="space-between" alignItems="center">
                 <Grid container alignItems="center">
-                  <Grid item sm={3}>
+                  <Grid item sm={4}>
                     <Typography classes={{ root : classes.typography }}># Paths</Typography>
                   </Grid>
-                  <Grid item sm={9}>
+                  <Grid item sm={8}>
                     <Slider
                       aria-labelledby="discrete-slider-always"
                       defaultValue={this.paths}
@@ -667,10 +679,10 @@ class Controls extends Component {
                   </Grid>
                 </Grid>
                 <Grid container alignItems="center" style={{marginTop: "0.75rem"}}>
-                  <Grid item sm={3}>
+                  <Grid item sm={4}>
                     <Typography classes={{ root : classes.typography }}>Min Weight</Typography>
                   </Grid>
-                  <Grid item sm={9}>
+                  <Grid item sm={8}>
                     <Input className={classes.weightInputDiv} label="Graph weight" defaultValue={this.weight} onChange={this.weightChange} inputProps={{ 'aria-label': 'description', id : "weightField", className : classes.weightInput }} />
                   </Grid>
                 </Grid>

@@ -11,7 +11,7 @@ export const RecentSearch = ({ getOptionProps, selectedFilters, recentSearches, 
   const hasTag = (facets_annotations) => {
     let hasTag = false;
     facets_annotations?.forEach( annotation => {
-      if ( selectedFilters[annotation] !== false ) {
+      if ( selectedFilters[annotation] === true || (selectedFilters[annotation] === undefined && Object.keys(selectedFilters)?.length == 0 )) {
         hasTag = true;
       }
     })

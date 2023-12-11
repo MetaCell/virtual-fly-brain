@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import ListViewer from "@metacell/geppetto-meta-ui/list-viewer/ListViewer"
 import listViewerConf from './configuration/VFBListViewer/listViewerConfiguration';
+import ModelFactory from '@metacell/geppetto-meta-core/ModelFactory';
 import { connect } from 'react-redux';
 
 require('../css/VFBListViewer.less');
@@ -29,16 +30,25 @@ class VFBListViewer extends Component {
   getColumnConfiguration () {
     return listViewerConf;
   }
+
+  getAllPaths() {
+    return window.Instances?.map(instance => ({
+      "path": instance.getPath(),
+      "metaType": "VisualType", //instance.getMetaType(),
+      "type": instance.getType(),
+      "static": true
+    })) || [];
+  }
     
   /**
    * Retrieve instances to display in component
    */
   getInstances () {
-    // Retrieve all instances from the ModelFactory
-    let entities = window.GEPPETTO?.ModelFactory.allPaths;
+
+    let entities = this.getAllPaths();
     var visuals = {};
     
-    const { instanceDeleted, idsMap, idsList } = this.props;
+    const { idsList, instancesList } = this.props;
     
     let id = "", instance = "", meta_instance = "", html = "", htmlLabels = "", matchAnchor = "", matchSpan = "", type, tags;
     // Match Visual Types from ModelFactory
@@ -47,10 +57,10 @@ class VFBListViewer extends Component {
         id = entities[i].path.split(".")[0];
         if (idsList.includes(id) && visuals[entities[i].path] === undefined ){
           visuals[id] = entities[i];
-          instance = Instances.getInstance(id);
+          instance = window.Instances.getInstance(id)?.wrappedObj;
           visuals[id].name = instance.name;
           
-          meta_instance = Instances.getInstance(id)[id + "_meta"];
+          meta_instance = window.Instances.getInstance(id)[id + "_meta"];
 
           // Retrieve the HTML type from the Instance, it's in the form of an HTML element saved as a string
           html = meta_instance.getTypes().map((t) => {
@@ -94,13 +104,11 @@ class VFBListViewer extends Component {
 
 
 function mapStateToProps (state) {
-  // return { 
-  //   instanceDeleted : state.generals.ui.canvas.instanceDeleted,
-  //   instanceOnFocus : state.instances.focusInstance,
-  //   idsMap : state.generals.idsMap,
-  //   idsList : state.generals.idsList
-  // }
-  return {}
+
+  return { 
+    idsList : state.instances.allLoadedInstances?.map( (instance) => instance.Id ) || [],
+    instancesList : state.instances.augmentedInstances 
+  }
 }
 
 export default connect(mapStateToProps)(VFBListViewer);

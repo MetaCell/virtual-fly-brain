@@ -16,7 +16,7 @@ import { getInstancesTypes } from '../reducers/actions/types/getInstancesTypes';
 import * as THREE from 'three';
 import SharkViewer, { swcParser } from '@janelia/sharkviewer';
 import { SKELETON, CYLINDERS } from "./../utils/constants"
-
+import { augmentInstances } from '../reducers/actions/instances';
 const {
   whiteColor,
   blackColor
@@ -69,6 +69,7 @@ class ThreeDCanvas extends Component {
     }
     instances?.find( i => i.wrappedObj?.id === instance.id ) ? null : window.Instances = [...instances, instance1]
     augmentInstancesArray(window.Instances);
+    augmentInstances(JSON.stringify(window.Instances.map(i => i.wrappedObj.id)));
   }
   
   getProxyInstances () {

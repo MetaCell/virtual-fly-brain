@@ -34,6 +34,13 @@ const selectInstanceMessage = id => ({
   }
 });
 
+const augmentedInstances = instancesList => ({
+  type: getInstancesTypes.AUGMENTED_INSTANCES,
+  payload: {
+    instancesList
+  }
+});
+
 const showInstanceSkeletonMessage = id => ({
   type: getInstancesTypes.SHOW_SKELETON,
   payload: {
@@ -153,6 +160,10 @@ export const removeInstanceByID = async (queryId) => {
 
 export const selectInstance = async (id) => {
   store.dispatch(selectInstanceMessage(id))
+}
+
+export const augmentInstances = async (instancesList) => {
+  store.dispatch(augmentedInstances(instancesList))
 }
 
 export const add3DSkeleton = async (id) => {

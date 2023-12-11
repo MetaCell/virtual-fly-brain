@@ -7,11 +7,17 @@ export const initialStateInstancesReducer = {
   focusInstance : "",
   event : {},
   isLoading: false,
+  augmentedInstances: "",
   error: false
 };
 
 const InstancesReducer = (state = initialStateInstancesReducer, response) => {
   switch (response.type) {
+    case getInstancesTypes.AUGMENTED_INSTANCES: {
+      return Object.assign({}, state, {
+         augmentedInstances: response.payload.instancesList
+      })
+    }
      case getInstancesTypes.GET_INSTANCES_STARTED: {
         return Object.assign({}, state, {
            isLoading: true

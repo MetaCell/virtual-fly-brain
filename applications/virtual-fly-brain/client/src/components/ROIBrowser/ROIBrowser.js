@@ -523,11 +523,7 @@ const ROIBrowser = (props) => {
         ...classes.root,
         background: {
           lg: blackColor
-        },
-        p: {
-          xs: 2,
-          lg: 2
-        },
+        }
       }}
     >
       { state?.errors !== undefined ? (

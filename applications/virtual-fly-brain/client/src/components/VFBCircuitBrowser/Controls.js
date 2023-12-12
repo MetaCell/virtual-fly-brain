@@ -79,9 +79,6 @@ const styles = theme => ({
     "& .MuiInput-underline:before": {
       borderBottom: "none"
     },
-    "& .MuiInput-underline:before": {
-      borderBottom: "none"
-    },
     "& .MuiInput-underline:after": {
       borderBottom: "none"
     },

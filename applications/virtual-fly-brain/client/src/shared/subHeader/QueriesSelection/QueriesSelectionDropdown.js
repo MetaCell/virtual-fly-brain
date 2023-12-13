@@ -36,6 +36,7 @@ export const QueriesSelectionDropdown = ({option, selectedOption, goBackToInitia
   
   const popoverOpen = Boolean(popoverAnchorEl);
   const id = popoverOpen ? 'simple-popover' : undefined;
+  console.log("option label: ", option.label)
 
   return (
   <Box
@@ -133,8 +134,12 @@ export const QueriesSelectionDropdown = ({option, selectedOption, goBackToInitia
                 id={id}
                 open={popoverOpen}
                 anchorEl={popoverAnchorEl}
+                disablePortal={true}
                 sx={{
-                  marginTop: "0.5px !important"
+                  marginTop: "1px !important",
+                  '&.MuiPopper-root': {
+                    width: 'calc(100% - 3.5rem)'
+                  }
                 }}
               >
                 <List>

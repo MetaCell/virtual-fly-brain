@@ -5,6 +5,7 @@ const vars = {
   outlinedBtnBorderColor: '#707070',
   outlinedBtnTextColor: 'rgba(255, 255, 255, 0.8)',
   secondaryBg: '#3A3A3A',
+  secondaryBtnColor: '#0AB7FE',
   searchBoxBg: '#505050',
   listBg: 'rgba(58, 58, 58, 1)',
   shortcutBg: 'rgba(255, 255, 255, 0.1)',
@@ -39,7 +40,8 @@ const vars = {
   btnTextHoverColor: 'rgba(255, 255, 255, 0.04)',
   queryChipBg: 'rgba(10, 183, 254, 0.8)',
   queryBuilderBg: 'rgba(34, 34, 34, 0.80)',
-  btnDisabledColor: 'rgba(255, 255, 255, 0.4)'
+  btnDisabledColor: 'rgba(255, 255, 255, 0.4)',
+  sliderRailBgColor: '#EEF9FF'
 };
 
 export default vars;

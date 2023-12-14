@@ -6,8 +6,6 @@ import Tree from "./Tree";
 import CircularProgress from "@mui/material/CircularProgress";
 import IconButton from "@mui/material/IconButton";
 import ColorLensIcon from '@mui/icons-material/ColorLens';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
@@ -18,7 +16,7 @@ import { termInfoById } from "../../reducers/actions/termInfo";
 import { getInstanceByID, changeColor, hide3DMesh, show3DMesh } from '../../reducers/actions/instances';
 import theme from "../../theme/index";
 import useClickOutside from "./../useClickOutside";
-import { VisibilityOff } from "../../icons";
+import { VisibilityOff, Eye } from "../../icons";
 
 const {
     secondaryBg,
@@ -246,8 +244,6 @@ const ROIBrowser = (props) => {
                 selectNode(state?.nodes[node[0]])
                 //selectNode(state?.dataTree[0])
             }
-        } else {
-            state?.dataTree && selectNode(state?.dataTree[0]);
         }
     };
 
@@ -375,7 +371,7 @@ const ROIBrowser = (props) => {
                         getInstanceByID(rowInfo.node.instanceId);
                         setState({ ...state, nodeSelected : rowInfo.node });
                     }}>
-                        <VisibilityOff />
+                        <Eye />
                     </IconButton>
                 );
                 break;
@@ -392,7 +388,7 @@ const ROIBrowser = (props) => {
                         setState({ ...state, nodeSelected : rowInfo.node });
                         
                     }}>
-                     <VisibilityOff />
+                     <Eye />
                     </IconButton>
                 );
                 break;
@@ -406,7 +402,7 @@ const ROIBrowser = (props) => {
                             } else {
                                 match.visible = false;
                             }
-                            hideInstance(rowInfo.node.instanceId)
+                            hide3DMesh(rowInfo.node.instanceId)
                             setState({ ...state, nodeSelected : rowInfo.node });
                     }}>
                      <VisibilityOff />
@@ -527,11 +523,7 @@ const ROIBrowser = (props) => {
         ...classes.root,
         background: {
           lg: blackColor
-        },
-        p: {
-          xs: 2,
-          lg: 2
-        },
+        }
       }}
     >
       { state?.errors !== undefined ? (

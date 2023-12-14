@@ -91,6 +91,7 @@ theme = createTheme({
         .flexlayout__tab {
           border-radius: 0px 8px 8px 8px;
           background-color: ${blackColor};
+          padding: 1rem;
         }
         .flexlayout__tab_toolbar {
           gap: 0.25rem;
@@ -204,39 +205,6 @@ theme = createTheme({
       styleOverrides: {
         root: {
           padding: 0
-        }
-      }
-    },
-
-    MuiPopper: {
-      styleOverrides: {
-        root: {
-          maxWidth: '100%',
-          '&:not(.MuiTooltip-popper)': {
-            zIndex: 99,
-            background: bottomNavBg,
-            boxShadow: popperShadow,
-            backdropFilter: 'blur(0.625rem)',
-            borderRadius: '0.375rem',
-            width: '23.9375rem',
-            marginTop: '-1.5rem !important',
-
-            '&.menu-popover': {
-              marginTop: '0 !important',
-              width: '10rem',
-              background: filterPopoverBg,
-              boxShadow: filterPopoverShadow,
-              backdropFilter: 'blur(0.375rem)',
-              borderRadius: '0.125rem'
-            },
-
-            '&.filter-popover': {
-              marginTop: '-1.75rem !important',
-              width: '15.5rem',
-              background: filterPopoverBg,
-              boxShadow: filterPopoverShadow
-            }
-          }
         }
       }
     },
@@ -921,7 +889,6 @@ theme = createTheme({
             backdropFilter: 'blur(0.625rem)',
             borderRadius: '0.375rem',
             width: '23.9375rem',
-            marginTop: '-1.5rem !important',
 
             '&.menu-popover': {
               marginTop: '0 !important',

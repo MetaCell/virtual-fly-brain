@@ -20,7 +20,7 @@ export const stackViewerWidget = {
 
 export const roiBrowserWidget = {
     id: 'roiBrowser',
-    name: "ROI Browser",
+    name: "Template ROI Browser",
     component: "roiBrowser",
     panelName: "left",
     hideOnClose: false,

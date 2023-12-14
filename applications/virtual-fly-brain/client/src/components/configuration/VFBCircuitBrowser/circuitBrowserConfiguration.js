@@ -111,9 +111,9 @@ var styling = {
     "Synaptic_neuropil_subdomain" : "#88ffb3"
   },
   controlIcons : {
-    home : "fa fa-home",
-    zoomIn : "fa fa-search-plus",
-    zoomOut : "fa fa-search-minus"
+    home : "../../../assets/viewer/home.svg",
+    zoomIn : "../../../assets/viewer/zoom_in.svg",
+    zoomOut : "../../../assets/viewer/zoom_out.svg"
   }
 }
 

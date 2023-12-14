@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 import ListViewer from "@metacell/geppetto-meta-ui/list-viewer/ListViewer"
-import listViewerConf from './configuration/VFBListViewer/listViewerConfiguration';
-import ModelFactory from '@metacell/geppetto-meta-core/ModelFactory';
 import { connect } from 'react-redux';
 
 require('../css/VFBListViewer.less');
@@ -23,13 +21,6 @@ class VFBListViewer extends Component {
     return false
   }
   
-  /**
-   * Retrieve configuration to display as column headers
-   * 
-   */
-  getColumnConfiguration () {
-    return listViewerConf;
-  }
 
   getAllPaths() {
     return window.Instances?.map(instance => ({
@@ -39,55 +30,9 @@ class VFBListViewer extends Component {
       "static": true
     })) || [];
   }
-    
-  /**
-   * Retrieve instances to display in component
-   */
-  getInstances () {
-
-    let entities = this.getAllPaths();
-    var visuals = {};
-    
-    const { idsList, instancesList } = this.props;
-    
-    let id = "", instance = "", meta_instance = "", html = "", htmlLabels = "", matchAnchor = "", matchSpan = "", type, tags;
-    // Match Visual Types from ModelFactory
-    for (var i = 0; i < entities?.length; i++) {
-      if (entities[i].metaType === VISUAL_TYPE || entities[i].metaType === COMPOSITE_VISUAL_TYPE ) {
-        id = entities[i].path.split(".")[0];
-        if (idsList.includes(id) && visuals[entities[i].path] === undefined ){
-          visuals[id] = entities[i];
-          instance = window.Instances.getInstance(id)?.wrappedObj;
-          visuals[id].name = instance.name;
-          
-          meta_instance = window.Instances.getInstance(id)[id + "_meta"];
-
-          // Retrieve the HTML type from the Instance, it's in the form of an HTML element saved as a string
-          html = meta_instance.getTypes().map((t) => {
-            return t.type.getInitialValue().value
-          })[0].html;
-
-          htmlLabels = meta_instance.getTypes().map((t) => {
-            return t.label.getInitialValue().value
-          })[0].html;
-          
-          // Extract HTML element anchor text from html string
-          visuals[id].types = html?.match(/<a[^>]*>(.*?)<\/a>/g)?.map((val) =>{
-            return val?.replace(/<a[^>]*>/g, '').replace(/<\/?a>/g,'');
-          }).join();
-          
-          // Extract HTML element anchor text from html string
-          visuals[id].tags = htmlLabels?.match(/<span[^>]*>(.*?)<\/span>/g)?.map((val) =>{
-            return val?.replace(/<span[^>]*>/g, '')?.replace(/<\/?span>/g,'');
-          }).join();
-        }
-      }
-    }
-    return Object.values(visuals);  
-  }
   
   render () {
-    let instances = this.getInstances();
+    const instances = this.getAllPaths();
     return <div id="VFBLayers_component" style= { { backgroundColor : "rgb(53, 51, 51)" } } >
       <ListViewer
         instances={instances}
@@ -95,7 +40,6 @@ class VFBListViewer extends Component {
         handler={this}
         filter={() => true}
         filterFn={() => console.log("Filtering")}
-        columnConfiguration={this.getColumnConfiguration()}
         infiniteScroll={true}
       />
     </div>

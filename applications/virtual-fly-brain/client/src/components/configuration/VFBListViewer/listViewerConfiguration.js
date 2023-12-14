@@ -7,7 +7,7 @@ import ListViewerControlsMenu from '../../VFBListViewer/ListViewerControlsMenu';
  */
 const ControlsMenu = component => {
   let path = component.value.get("path").split(".")[0];
-  let instance = Instances.getInstance(path);
+  let instance = window.Instances.getInstance(path);
   return <ListViewerControlsMenu instance={ instance }/>;
 }
 
@@ -64,7 +64,7 @@ const conf = [
       // Retrieve instance path
       let path = component.value.get("path").split(".")[0];
 
-      let instance = Instances.getInstance(path)[path + "_meta"];
+      let instance = window.Instances.getInstance(path)[path + "_meta"];
 
       if ( instance === undefined ) {
         return null;
@@ -99,10 +99,10 @@ const conf = [
 
       let click = value => {
         let id = value.target.id;
-        if (Instances.getInstance(id) === undefined) {
+        if (window.Instances.getInstance(id) === undefined) {
           window.addVfbId(id);
         } else {
-          window.setTermInfo(Instances.getInstance(id)[id + "_meta"], id);
+          window.setTermInfo(window.Instances.getInstance(id)[id + "_meta"], id);
         }
       };
 
@@ -122,7 +122,7 @@ const conf = [
       // Retrieve path from instance
       let path = entity.path.split(".")[0];
       
-      let instance = Instances.getInstance(path)[path + "_meta"];
+      let instance = window.Instances.getInstance(path)[path + "_meta"];
       
       if ( instance === undefined ) {
         return null;

@@ -10,14 +10,14 @@ export const SearchResult = ({ getOptionProps, selectedFilters, groupedOptions, 
   const hasTag = (facets_annotations) => {
     let hasTag = false;
     facets_annotations?.forEach( annotation => {
-      if ( selectedFilters[annotation] !== false ) {
+      if ( selectedFilters[annotation] === true || (selectedFilters[annotation] === undefined && Object.keys(selectedFilters)?.length == 0 )) {
         hasTag = true;
       }
     })
 
     return hasTag;
   }
-  
+
   return (
     <Box sx={{
       py: '1rem',
@@ -33,7 +33,7 @@ export const SearchResult = ({ getOptionProps, selectedFilters, groupedOptions, 
         Suggested results
       </Typography>
       <Box mt={1.5}>
-        {groupedOptions?.map((option, index) => ( hasTag(option.facets_annotation)  &&
+        {groupedOptions?.map((option, index) => ( hasTag(option.facets_annotation) === true ?
           <Box key={`groupedOptions-${index}`} {...getOptionProps({ option, index })}>
             <Box onClick={() => handleResultSelection(option)} sx={{
               position: 'relative',
@@ -101,12 +101,15 @@ export const SearchResult = ({ getOptionProps, selectedFilters, groupedOptions, 
                     />
                 }
                 )}
-                <Chip sx={{
-                  lineHeight: '140%',
-                  fontSize: '0.625rem',
-                  backgroundColor: searchBoxBg
-                }} label={`+${option?.facets_annotation?.length - chips_cutoff}`}
-                />
+                {
+                  option?.facets_annotation?.length > 3 && <Chip sx={{
+                    lineHeight: '140%',
+                    fontSize: '0.625rem',
+                    backgroundColor: searchBoxBg
+                  }} 
+                  label={`+${option?.facets_annotation?.length - chips_cutoff}`}
+                  />
+                }
               </Box>
 
               <Button sx={{
@@ -133,7 +136,7 @@ export const SearchResult = ({ getOptionProps, selectedFilters, groupedOptions, 
               </Button>
 
             </Box>
-          </Box>
+          </Box> : null
         ))}
       </Box>
     </Box>

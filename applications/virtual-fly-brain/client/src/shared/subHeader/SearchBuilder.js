@@ -171,6 +171,7 @@ export default function SearchBuilder(props) {
     })
     termInfoById(value[value.length -1 ].short_form);
     setIsOpen(false)
+    value.forEach( v => deleteQuery(v))
     setValue([])
   }
 
@@ -179,6 +180,11 @@ export default function SearchBuilder(props) {
     if(!value.some(doesOptionExist)){
       getQueries(option);
       setValue([...value, option])
+      let recentSearches = [...recentSearch];
+      if ( !recentSearches?.find( recent => recent.id === option.id ) ){
+        recentSearches.push(option);
+        setRecentSearch(recentSearches);
+      }
     }
   };
 
@@ -313,10 +319,13 @@ export default function SearchBuilder(props) {
             loadResults={loadResults}
           />) : null }
 
-          { recentSearch.length >= 1 ? (<RecentSearch
+          { recentSearch?.length >= 1 ? <RecentSearch
             chipColors={chipColors}
-            recentSearch={recentSearch}
-          />) : null }
+            recentSearches={recentSearch}
+            getOptionProps={getOptionProps}
+            selectedFilters={props.applyFilters}
+            handleResultSelection={handleResultSelection}
+          /> : null }
 
           { !retrievingResults ? (<SearchResult
             groupedOptions={groupedOptions}

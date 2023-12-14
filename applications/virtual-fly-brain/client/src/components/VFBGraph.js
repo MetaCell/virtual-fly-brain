@@ -529,7 +529,6 @@ class VFBGraph extends Component {
           : <Box sx={{
             width: 600,
             height: 800,
-            padding: '1rem',
             backgroundColor: 'primary.dark',
             '&:hover': {
               backgroundColor: 'primary.main',

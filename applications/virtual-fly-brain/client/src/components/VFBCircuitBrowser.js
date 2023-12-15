@@ -411,7 +411,7 @@ class VFBCircuitBrowser extends Component {
             data={this.state.graph}
             // Create the Graph as 2 Dimensional
             d2={true}
-            nodeLabel={node => node.title}
+            nodeLabel={node => `${node.name}[${node.title}]`}
             // Relationship label, placed in Link
             linkLabel={link => link.label}
             // Width of links, log(weight)
@@ -541,7 +541,6 @@ class VFBCircuitBrowser extends Component {
 
               // We found the node that we are hovering over
               if (node) {
-              // Keep track of hover node, its neighbors and links
                 self.highlightNodes?.add(node);
                 node?.neighbors?.forEach(neighbor => self?.highlightNodes?.add(neighbor));
                 node?.links?.forEach(link => self?.highlightLinks?.add(link));

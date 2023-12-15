@@ -8,6 +8,8 @@ import Controls from './VFBCircuitBrowser/Controls';
 import { queryParser } from './VFBCircuitBrowser/QueryParser';
 import { connect } from "react-redux";
 import { makeStyles } from '@material-ui/core/styles';
+import { termInfoById } from '../reducers/actions/termInfo';
+import { getInstanceByID } from '../reducers/actions/instances';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -180,7 +182,11 @@ class VFBCircuitBrowser extends Component {
    * Handle Left click on Nodes
    */
   handleNodeLeftClick (node, event) {
-    window.addVfbId(node.title);
+    const id = node.title ;
+    termInfoById(id);
+    if (confirm("The image is aligned to another template. Click OK to open in a new tab or Cancel to just view the image metadata")) {
+      getInstanceByID(id);
+    }
   }
   
   handleNodeRightClick (node, event) {

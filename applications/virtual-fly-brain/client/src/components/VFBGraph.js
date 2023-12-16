@@ -12,7 +12,6 @@ import { configuration } from './configuration/VFBGraph/graphConfiguration';
 import { restPostConfig } from './configuration/VFBGraph/graphConfiguration';
 import { cypherQuery } from './configuration/VFBGraph/graphConfiguration';
 import { stylingConfiguration } from './configuration/VFBGraph/graphConfiguration';
-import { termInfoById } from '../reducers/actions/termInfo';
 import { getInstanceByID } from '../reducers/actions/instances';
 
 const UPDATE_GRAPH = 'UPDATE_GRAPH';
@@ -711,8 +710,8 @@ class VFBGraph extends Component {
 
 function mapStateToProps (state) {
   let instanceOnFocus = undefined ;
-  if (state.termInfo.termInfoData !== undefined && state.termInfo.termInfoData !== null && !state.instanceOnFocus) {
-    instanceOnFocus = { id: state.termInfo.termInfoData.Id, name: state.termInfo.termInfoData.Name };
+  if (state.instances.focusedInstance !== undefined && state.instances.focusedInstance !== null) {
+    instanceOnFocus = { id: state.instances.focusedInstance?.metadata?.Id, name: state.instances.focusedInstance?.metadta?.Name };
   }
   instanceOnFocus = state.instanceOnFocus || instanceOnFocus;
 

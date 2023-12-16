@@ -4,7 +4,7 @@ import {SELECTED_COLOR, DESELECTED_COLOR} from './../utils/constants';
 export const initialStateInstancesReducer = {
   allPotentialInstances : [],
   allLoadedInstances : [],
-  focusInstance : "",
+  focusedInstance : "",
   event : {},
   isLoading: false,
   error: false
@@ -18,12 +18,13 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         })
       }
      case getInstancesTypes.GET_INSTANCES_SUCCESS:{
-      const newInstance = response.payload;
+      const newInstance = { metadata : response.payload };
       newInstance.visible = true;
       newInstance.color = DESELECTED_COLOR;
-      let loadedInstances = state.allLoadedInstances?.find( i => i.Id === response.payload.Id ) ? [...state.allLoadedInstances] : [...state.allLoadedInstances, newInstance]
+      let loadedInstances = state.allLoadedInstances?.find( i => i?.metadata?.Id === response.payload.Id ) ? [...state.allLoadedInstances] : [...state.allLoadedInstances, newInstance]
       return Object.assign({}, state, {
           allLoadedInstances: loadedInstances,
+          focusedInstance : state.allLoadedInstances?.find( i => i?.metadata?.Id === response.payload.Id ),
           event : { action : getInstancesTypes.ADD_INSTANCE, id : response.payload.Id, trigger : Date.now()},
           isLoading: false
         })
@@ -35,13 +36,13 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       }
       case getInstancesTypes.REMOVE_INSTANCES_SUCCESS:{
         return Object.assign({}, state, {
-          allLoadedInstances: state.allLoadedInstances?.find( i => i.Id === response.payload.query ) ? [...state.allLoadedInstances.filter(i => i.Id !== response.payload.query)] : [...state.allLoadedInstances],
+          allLoadedInstances: state.allLoadedInstances?.find( i => i.metadata?.Id === response.payload.query ) ? [...state.allLoadedInstances.filter(i => i.Id !== response.payload.query)] : [...state.allLoadedInstances],
           isLoading: false
         })
       }
       case getInstancesTypes.SHOW_3D_MESH:{
         const updateInstances = [...state.allLoadedInstances]
-        const instance = state.allLoadedInstances?.find( i => i.Id === response.payload.id );
+        const instance = state.allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );
         instance.visible = true;
         return Object.assign({}, state, {
           allLoadedInstances:updateInstances,
@@ -51,7 +52,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       }
       case getInstancesTypes.HIDE_3D_MESH:{
         const updateInst = [...state.allLoadedInstances]
-        const match = state.allLoadedInstances?.find( i => i.Id === response.payload.id );
+        const match = state.allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );
         match.visible = false;
         return Object.assign({}, state, {
           allLoadedInstances: updateInst,
@@ -61,7 +62,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       }
       case getInstancesTypes.CHANGE_COLOR:{
         const updateInst = [...state.allLoadedInstances]
-        const match = state.allLoadedInstances?.find( i => i.Id === response.payload.id );
+        const match = state.allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );
         match.color = response.payload.color;
         return Object.assign({}, state, {
           allLoadedInstances: updateInst,
@@ -70,7 +71,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         })
       }
       case getInstancesTypes.FOCUS_INSTANCE:{
-        const findInstance = state.allLoadedInstances?.find( i => i.Id === response.payload.id );
+        const findInstance = state.allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );
         return Object.assign({}, state, {
           focusInstance: findInstance,
           event : { action : getInstancesTypes.FOCUS_INSTANCE, id : response.payload.id, trigger : Date.now()},
@@ -95,9 +96,24 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
           isLoading: false
         })
       }
+      case getInstancesTypes.GET_3D_OBJ_TYPE_STARTED:
+        return Object.assign({}, state, {
+        isLoading: true
+      })
+      case getInstancesTypes.GET_3D_OBJ_TYPE_SUCCESS:
+        return Object.assign({}, state, {
+          instanceOnFocus: response.payload,
+          allLoadedInstances: state.visibleInstances?.find( i => i.Id === response.payload.Id ) ? [...state.visibleInstances] : [...state.visibleInstances, response.payload],
+          isLoading: false
+        })
+      case getInstancesTypes.GET_3D_OBJ_TYPE_FAILURE:
+        return Object.assign({}, state, {
+          instanceOnFocus: response.payload.error,
+          error: true
+        })
       case getInstancesTypes.ADD_SKELETON:{
         const updateInstances = [...state.allLoadedInstances]
-        const instance = state.allLoadedInstances?.find( i => i.Id === response.payload.id );
+        const instance = state.allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );
         instance.visible = true;
         return Object.assign({}, state, {
           allLoadedInstances:updateInstances,
@@ -107,7 +123,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       }
       case getInstancesTypes.SHOW_SKELETON:{
         const updateInstances = [...state.allLoadedInstances]
-        const instance = state.allLoadedInstances?.find( i => i.Id === response.payload.id );
+        const instance = state.allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );
         instance.visible = true;
         return Object.assign({}, state, {
           allLoadedInstances:updateInstances,
@@ -117,7 +133,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       }
       case getInstancesTypes.HIDE_SKELETON:{
         const updateInstances = [...state.allLoadedInstances]
-        const instance = state.allLoadedInstances?.find( i => i.Id === response.payload.id );
+        const instance = state.allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );
         instance.visible = false;
         return Object.assign({}, state, {
           allLoadedInstances:updateInstances,
@@ -127,7 +143,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       }
       case getInstancesTypes.SHOW_CYLINDERS:{
         const updateInstances = [...state.allLoadedInstances]
-        const instance = state.allLoadedInstances?.find( i => i.Id === response.payload.id );
+        const instance = state.allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );
         instance.visible = true;
         return Object.assign({}, state, {
           allLoadedInstances:updateInstances,
@@ -137,7 +153,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       }
       case getInstancesTypes.SHOW_LINES:{
         const updateInstances = [...state.allLoadedInstances]
-        const instance = state.allLoadedInstances?.find( i => i.Id === response.payload.id );
+        const instance = state.allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );
         instance.visible = true;
         return Object.assign({}, state, {
           allLoadedInstances:updateInstances,

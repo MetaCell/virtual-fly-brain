@@ -7,12 +7,10 @@ import CircularProgress from "@mui/material/CircularProgress";
 import IconButton from "@mui/material/IconButton";
 import ColorLensIcon from '@mui/icons-material/ColorLens';
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import axios from 'axios';
 import vars from "../../theme/variables";
 import { useSelector, connect } from "react-redux";
-import { termInfoById } from "../../reducers/actions/termInfo";
 import { getInstanceByID, changeColor, hide3DMesh, show3DMesh } from '../../reducers/actions/instances';
 import theme from "../../theme/index";
 import useClickOutside from "./../useClickOutside";
@@ -38,7 +36,7 @@ const ROIBrowser = (props) => {
     }
 
     const templateID = useSelector((state) => state.globalInfo.templateID);
-    const data = useSelector(state => state.termInfo.termInfoData)
+    const data = useSelector(state => state.instances.focusedInstance)?.metadata;
     const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances)
 
     const styles = {
@@ -367,7 +365,6 @@ const ROIBrowser = (props) => {
                 buttons.push(
                     <IconButton disableRipple color="primary" aria-label="delete" size="small" onClick={(e) => {
                         e.stopPropagation();
-                        // termInfoById(rowInfo.node.instanceId);
                         getInstanceByID(rowInfo.node.instanceId);
                         setState({ ...state, nodeSelected : rowInfo.node });
                     }}>
@@ -480,9 +477,9 @@ const ROIBrowser = (props) => {
                                 }
                                 
                                 if ( instanceFound ) {
-                                    termInfoById(rowInfo.node.instanceId);
+                                    getInstanceByID(rowInfo.node.instanceId);
                                 } else {
-                                    termInfoById(rowInfo.node.classId);
+                                    getInstanceByID(rowInfo.node.instanceId);
                                 }
                                 setState({ ...state, nodeSelected : rowInfo.node });
                             }}

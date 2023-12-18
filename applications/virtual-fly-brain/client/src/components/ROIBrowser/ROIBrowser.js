@@ -337,7 +337,7 @@ const ROIBrowser = (props) => {
         let buttons = [];
         let fillCondition = "unknown";
         let instanceLoaded = false;
-        let match = allLoadedInstances.find( i => i.Id == rowInfo.node.instanceId);
+        let match = allLoadedInstances.find( i => i.metadata?.Id == rowInfo.node.instanceId);
 
         if (
             rowInfo.node.instanceId != undefined &&
@@ -509,10 +509,6 @@ const ROIBrowser = (props) => {
             updateTree(data)
         }
     },[data]);
-
-    React.useEffect(() => {
-        updateTree(data)
-    }, [allLoadedInstances])
 
     return(
         <Box

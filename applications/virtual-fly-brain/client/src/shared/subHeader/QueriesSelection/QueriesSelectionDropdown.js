@@ -36,7 +36,6 @@ export const QueriesSelectionDropdown = ({option, selectedOption, goBackToInitia
   
   const popoverOpen = Boolean(popoverAnchorEl);
   const id = popoverOpen ? 'simple-popover' : undefined;
-  console.log("option label: ", option.label)
 
   return (
   <Box
@@ -145,13 +144,11 @@ export const QueriesSelectionDropdown = ({option, selectedOption, goBackToInitia
                 <List>
                   {!option.queries.Queries.length && <ListItem>
                       <ListItemButton onClick={() => goBack(option.short_form )}>
-                      { selectedQueryIndex === option.short_form || selectedQueryIndex === "" ?
-                      <ListItemText primary={`Select query for ${option.label}`}/>
-                      : null }
+                        <ListItemText primary={`Select query for ${option.label}`}/>
                       </ListItemButton>
                     </ListItem>
                   }
-                  { option.queries?.Queries?.map((query, index) => (selectedQueryIndex === option.short_form || selectedQueryIndex === "" )&& (<ListItem key={query.short_form+index}>
+                  { option.queries?.Queries?.map((query, index) => (<ListItem key={query.short_form+index}>
                     <ListItemButton onClick={() => handleSelect(query, option)}>
                       <ListItemText primary={query.label} />
                     </ListItemButton>

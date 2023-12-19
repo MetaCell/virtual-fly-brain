@@ -567,10 +567,10 @@ class Controls extends Component {
           </div>
           { this.props.resultsAvailable()
             ? <ul className={classes.legend} id="circuitBrowserLegend">
-                <p style={{ fontWeight: 500, margin: 0, marginBottom: "0.25rem" }}>Legend</p>
+                <p style={{ fontWeight: 500, margin: 0, marginBottom: "0.5rem" }}>Legend</p>
               { this.props.legend.map((label, index) => (
                 <li key={index} style={{ display: "flex", alignItems: "center", color: "rgba(255, 255, 255, 0.80)", marginTop: "0.25rem" }}>
-                  <div className={classes.legendItem} style={{ backgroundColor : styling.nodeColorsByLabel[label] }}></div>
+                  <div className={classes.legendItem} style={{ backgroundColor : styling.nodeColorsByLabel[label], border: "1px solid rgba(0, 0, 0, 0.20)" }}></div>
                   {label}
                 </li>
               ))

@@ -151,6 +151,14 @@ class ThreeDCanvas extends Component {
             }
           }
           break;
+        case getInstancesTypes.REMOVE_INSTANCES_SUCCESS:
+          if ( mappedCanvasData?.find( m => m.instancePath === this.props.event.id) ){
+            const index = mappedCanvasData.findIndex( m => m.instancePath === this.props.event.id);
+            mappedCanvasData.splice(index, 1);
+          }
+          this?.canvasRef?.current?.threeDEngine?.updateInstances(mappedCanvasData)
+          this.setState({ ...this.state, mappedCanvasData : mappedCanvasData})
+          break;
         case getInstancesTypes.SHOW_3D_MESH:
           if ( mappedCanvasData?.find( m => m.instancePath === targetInstance?.metadata?.Id) ){
             mappedCanvasData.find( m => m.instancePath === targetInstance?.metadata?.Id).visible = true

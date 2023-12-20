@@ -37,6 +37,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       case getInstancesTypes.REMOVE_INSTANCES_SUCCESS:{
         return Object.assign({}, state, {
           allLoadedInstances: state.allLoadedInstances?.find( i => i.metadata?.Id === response.payload.query ) ? [...state.allLoadedInstances.filter(i => i.metadata?.Id !== response.payload.query)] : [...state.allLoadedInstances],
+          event : { action : getInstancesTypes.REMOVE_INSTANCES_SUCCESS, id : response.payload.query, trigger : Date.now()},
           isLoading: false
         })
       }

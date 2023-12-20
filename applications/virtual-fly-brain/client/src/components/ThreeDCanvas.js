@@ -259,7 +259,7 @@ class ThreeDCanvas extends Component {
             })
           );
         });
-        fetch(match.Images?.[Object.keys(match.Images)[0]][0].swc)
+        fetch(match.metadata?.Images?.[Object.keys(match.metadata?.Images)[0]][0].swc)
           .then(response => response.text())
           .then(base64Content => {
             const swcJSON = swcParser(base64Content);

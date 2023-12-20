@@ -36,7 +36,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       }
       case getInstancesTypes.REMOVE_INSTANCES_SUCCESS:{
         return Object.assign({}, state, {
-          allLoadedInstances: state.allLoadedInstances?.find( i => i.metadata?.Id === response.payload.query ) ? [...state.allLoadedInstances.filter(i => i.Id !== response.payload.query)] : [...state.allLoadedInstances],
+          allLoadedInstances: state.allLoadedInstances?.find( i => i.metadata?.Id === response.payload.query ) ? [...state.allLoadedInstances.filter(i => i.metadata?.Id !== response.payload.query)] : [...state.allLoadedInstances],
           isLoading: false
         })
       }
@@ -114,7 +114,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       case getInstancesTypes.ADD_SKELETON:{
         const updateInstances = [...state.allLoadedInstances]
         const instance = state.allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );
-        instance.visible = true;
+        if ( instance?.skeleton ) instance.skeleton.visible = true;
         return Object.assign({}, state, {
           allLoadedInstances:updateInstances,
           event : { action : getInstancesTypes.ADD_SKELETON, id : response.payload.id, trigger : Date.now()},
@@ -123,8 +123,8 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       }
       case getInstancesTypes.SHOW_SKELETON:{
         const updateInstances = [...state.allLoadedInstances]
-        const instance = state.allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );
-        instance.visible = true;
+        const match = state.allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );
+        if ( match?.skeleton ) match.skeleton.visible = true;
         return Object.assign({}, state, {
           allLoadedInstances:updateInstances,
           event : { action : getInstancesTypes.SHOW_SKELETON, id : response.payload.id, trigger : Date.now()},
@@ -134,7 +134,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       case getInstancesTypes.HIDE_SKELETON:{
         const updateInstances = [...state.allLoadedInstances]
         const instance = state.allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );
-        instance.visible = false;
+        if ( instance?.skeleton ) instance.skeleton.visible = false;
         return Object.assign({}, state, {
           allLoadedInstances:updateInstances,
           event : { action : getInstancesTypes.HIDE_SKELETON, id : response.payload.id, trigger : Date.now()},
@@ -144,7 +144,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       case getInstancesTypes.SHOW_CYLINDERS:{
         const updateInstances = [...state.allLoadedInstances]
         const instance = state.allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );
-        instance.visible = true;
+        instance.skeleton.visible = true;
         return Object.assign({}, state, {
           allLoadedInstances:updateInstances,
           event : { action : getInstancesTypes.SHOW_CYLINDERS, id : response.payload.id, trigger : Date.now()},
@@ -154,7 +154,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       case getInstancesTypes.SHOW_LINES:{
         const updateInstances = [...state.allLoadedInstances]
         const instance = state.allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );
-        instance.visible = true;
+        instance.skeleton.visible = true;
         return Object.assign({}, state, {
           allLoadedInstances:updateInstances,
           event : { action : getInstancesTypes.SHOW_LINES, id : response.payload.id, trigger : Date.now()},

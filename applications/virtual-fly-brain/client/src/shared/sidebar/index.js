@@ -177,10 +177,9 @@ const SideBar = ({ open, setOpen }) => {
     }
   }
 
-  const data = useSelector(state => state.termInfo.termInfoData)
-  const error = useSelector(state => state.termInfo.error)
+  const data = useSelector(state => state.instances.focusedInstance)
 
-  const [termInfoData, setTermInfoData] = useState(data);
+  const [instanceOnFocus, setInstanceOnFocus] = useState(data.metadata);
 
   const termInfoHeading = (
     <>
@@ -222,7 +221,7 @@ const SideBar = ({ open, setOpen }) => {
 
   // FIXME
   useEffect(() => {
-    setTermInfoData(data)
+    setInstanceOnFocus(data)
   }, [data]);
 
   return (
@@ -412,7 +411,7 @@ const SideBar = ({ open, setOpen }) => {
                   <Typography>General Information</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <GeneralInformation data={termInfoData} classes={classes} />
+                  <GeneralInformation data={instanceOnFocus} classes={classes} />
                 </AccordionDetails>
               </Accordion>
 

@@ -15,7 +15,6 @@ import  { getResultsSOLR } from '../../components/configuration/SOLRclient'
 import { DatasourceTypes } from '@metacell/geppetto-meta-ui/search/datasources/datasources';
 import { getInstanceByID } from './../../reducers/actions/instances';
 import { useSelector } from 'react-redux'
-import { termInfoById } from '../../reducers/actions/termInfo';
 import { getQueries, deleteQuery } from '../../reducers/actions/queries';
 
 const QUERIES = "Queries";

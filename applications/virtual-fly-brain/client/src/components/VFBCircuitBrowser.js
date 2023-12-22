@@ -8,7 +8,6 @@ import Controls from './VFBCircuitBrowser/Controls';
 import { queryParser } from './VFBCircuitBrowser/QueryParser';
 import { connect } from "react-redux";
 import { makeStyles } from '@material-ui/core/styles';
-import { termInfoById } from '../reducers/actions/termInfo';
 import { getInstanceByID } from '../reducers/actions/instances';
 
 const useStyles = makeStyles((theme) => ({

@@ -141,21 +141,22 @@ const styles = theme => ({
   deleteNeuron : { padding : "2vh 0px 0px 4px" },
   dottedIcon : { margin : "0.25rem 0 0.25rem 0 " },
   legend : {
-    padding: "2vh",
+    padding: "0.75rem 1rem",
     listStyleType : "none",
     position: "absolute",
     right : "1rem",
-    backgroundColor : "#413C3C",
-    fontFamily : "'Barlow Condensed', 'Khand', sans-serif",
-    zIndex: 100
+    backgroundColor : "#3A3A3A",
+    borderRadius: '0.4rem',
+    zIndex: 100,
+    fontSize: '0.875rem'
   },
   legendItem :{
     position: "relative",
-    top: "2px",
     display : "inline-block",
-    marginRight : "5vh",
-    height : "2vh",
-    width : "2vh"
+    marginRight : "0.5rem",
+    height : "0.875rem",
+    width : "0.875rem",
+    borderRadius: "2px"
   },
   weightInput : { 
     color : "white !important",
@@ -566,11 +567,16 @@ class Controls extends Component {
           </div>
           { this.props.resultsAvailable()
             ? <ul className={classes.legend} id="circuitBrowserLegend">
+                <p style={{ fontWeight: 500, margin: 0, marginBottom: "0.5rem" }}>Legend</p>
               { this.props.legend.map((label, index) => (
-                <li key={index}><div className={classes.legendItem} style={{ backgroundColor : styling.nodeColorsByLabel[label] }}></div>{label}</li>
+                <li key={index} style={{ display: "flex", alignItems: "center", color: "rgba(255, 255, 255, 0.80)", marginTop: "0.25rem" }}>
+                  <div className={classes.legendItem} style={{ backgroundColor : styling.nodeColorsByLabel[label], border: "1px solid rgba(0, 0, 0, 0.20)" }}></div>
+                  {label}
+                </li>
               ))
               }
-              <li key="weight">WEIGHT -Forward [Reverse]→</li>
+              <hr style={{ border: "1px solid #505050" }}/>
+              <li key="weight" style={{color: "rgba(255, 255, 255, 0.80)", fontSize: "0.75rem" }}>WEIGHT -forward [Reverse] →</li>
             </ul>
             : null
           }

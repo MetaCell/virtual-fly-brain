@@ -25,22 +25,6 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
     setSelectedOption(updateSelection)
   }
 
-  const handleSelect = (option, query) => {
-    let count = 0;
-    if ( query.queries?.Examples && !selectedOption[query.short_form]) {
-      count = Object.keys(query.queries?.Examples)?.length;
-    }
-    Object.keys(selectedOption)?.forEach( o => {
-      if ( typeof selectedOption[o] === 'object' ) {
-        count = count + ( selectedOption[o].count || 0 )
-      } 
-    })
-    let updatedSelectedOption = {...selectedOption, [query.short_form]: option, count : count};
-    updatedSelectedOption[query.short_form].count =  Object.keys(query.queries?.Examples)?.length || 0;
-    setSelectedOption(updatedSelectedOption)
-    setPopoverAnchorEl(null);
-  };
-
   const goBackToInitialState = (short_form) => {
     setSelectedQueryIndex("")
     let updatedSelectedOption = {...selectedOption, [short_form]: true, count : selectedOption.count - selectedOption[short_form].count};

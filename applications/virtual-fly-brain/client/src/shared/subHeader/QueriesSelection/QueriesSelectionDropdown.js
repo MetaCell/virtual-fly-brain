@@ -133,20 +133,22 @@ export const QueriesSelectionDropdown = ({option, selectedOption, goBackToInitia
                 id={id}
                 open={popoverOpen}
                 anchorEl={popoverAnchorEl}
+                disablePortal={true}
                 sx={{
-                  marginTop: "0.5px !important"
+                  marginTop: "1px !important",
+                  '&.MuiPopper-root': {
+                    width: 'calc(100% - 3.5rem)'
+                  }
                 }}
               >
                 <List>
                   {!option.queries.Queries.length && <ListItem>
                       <ListItemButton onClick={() => goBack(option.short_form )}>
-                      { selectedQueryIndex === option.short_form || selectedQueryIndex === "" ?
-                      <ListItemText primary={`Select query for ${option.label}`}/>
-                      : null }
+                        <ListItemText primary={`Select query for ${option.label}`}/>
                       </ListItemButton>
                     </ListItem>
                   }
-                  { option.queries?.Queries?.map((query, index) => (selectedQueryIndex === option.short_form || selectedQueryIndex === "" )&& (<ListItem key={query.short_form+index}>
+                  { option.queries?.Queries?.map((query, index) => (<ListItem key={query.short_form+index}>
                     <ListItemButton onClick={() => handleSelect(query, option)}>
                       <ListItemText primary={query.label} />
                     </ListItemButton>

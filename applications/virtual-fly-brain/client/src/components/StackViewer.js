@@ -24,8 +24,7 @@ const VFBStackViewer = (props) => {
     }
   }
 
-  const stackViewerData = useSelector(state => state.termInfo.termInfoData)
-  const error = useSelector(state => state.termInfo.error);
+  const stackViewerData = useSelector(state => state.instances.focusedInstance)
   const templateID = useSelector(state => state.globalInfo.templateID)
   const fields = useSelector((state) => state.WHATEVER_REDUCER);
   const stackRef = useRef();

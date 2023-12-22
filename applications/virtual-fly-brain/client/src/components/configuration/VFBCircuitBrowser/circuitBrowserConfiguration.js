@@ -64,7 +64,7 @@ var configuration = {
 
 var styling = {
   // Background color for canvas
-  canvasColor : "black",
+  canvasColor : "#1A1A1A",
   // Color for links between nodes
   defaultLinkColor : "white",
   // Color apply to links while hovering over them

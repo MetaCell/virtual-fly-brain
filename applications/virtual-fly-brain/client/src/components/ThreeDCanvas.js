@@ -82,7 +82,7 @@ class ThreeDCanvas extends Component {
   }
 
   updateColors ( inst, mappedCanvasData) {
-    let match = mappedCanvasData?.find( m => m.instancePath === inst?.Id )
+    let match = mappedCanvasData?.find( m => m.instancePath === inst?.metadata?.Id )
     let color = { r : inst?.color?.r/255, g : inst?.color?.g/255, b : inst?.color?.b/255 }
     let colorMatch = match?.color?.b === color?.b && match?.color?.r === color?.r && match?.color?.g === color?.g;
     if ( !colorMatch && inst?.color && match ){
@@ -114,7 +114,7 @@ class ThreeDCanvas extends Component {
       let that = this;
       let allLoadedInstances = this.props.allLoadedInstances;
       const mappedCanvasData = [...this.state.mappedCanvasData];
-      const targetInstance = allLoadedInstances?.find( i => i.Id === this.props.event.id)
+      const targetInstance = allLoadedInstances?.find( i => i.metadata?.Id === this.props.event.id)
       const focusInstance = window.Instances?.find( instance => instance.wrappedObj.id === this.props.focusInstance?.Id);
 
       switch(this.props.event.action){
@@ -130,16 +130,16 @@ class ThreeDCanvas extends Component {
           break;
         case getInstancesTypes.ADD_INSTANCE:
           // Set all existing instances to invisible
-          if ( mappedCanvasData?.find( i => targetInstance?.Id === i.instancePath ) === undefined ){
-            if (targetInstance.Images)
+          if ( mappedCanvasData?.find( i => targetInstance?.metadata?.Id === i.instancePath ) === undefined ){
+            if (targetInstance?.metadata?.Images)
             {
-              fetch(targetInstance.Images?.[Object.keys(targetInstance.Images)[0]][0].obj)
+              fetch(targetInstance?.metadata?.Images?.[Object.keys(targetInstance?.metadata?.Images)[0]][0].obj)
               .then(response => response.text())
               .then(base64Content => {
                 const instance = {
                   "eClass": "SimpleInstance",
-                  "id": targetInstance.Id,
-                  "name": targetInstance.Name,
+                  "id": targetInstance?.metadata?.Id,
+                  "name": targetInstance?.metadata?.Name,
                   "type": { "eClass": "SimpleType" },
                   "visualValue": {
                     "eClass": Resources.OBJ,
@@ -152,23 +152,31 @@ class ThreeDCanvas extends Component {
             }
           }
           break;
+        case getInstancesTypes.REMOVE_INSTANCES_SUCCESS:
+          if ( mappedCanvasData?.find( m => m.instancePath === this.props.event.id) ){
+            const index = mappedCanvasData.findIndex( m => m.instancePath === this.props.event.id);
+            mappedCanvasData.splice(index, 1);
+          }
+          this?.canvasRef?.current?.threeDEngine?.updateInstances(mappedCanvasData)
+          this.setState({ ...this.state, mappedCanvasData : mappedCanvasData})
+          break;
         case getInstancesTypes.SHOW_3D_MESH:
-          if ( mappedCanvasData?.find( m => m.instancePath === targetInstance?.Id) ){
-            mappedCanvasData.find( m => m.instancePath === targetInstance.Id).visible = true
+          if ( mappedCanvasData?.find( m => m.instancePath === targetInstance?.metadata?.Id) ){
+            mappedCanvasData.find( m => m.instancePath === targetInstance?.metadata?.Id).visible = true
           }
           this?.canvasRef?.current?.threeDEngine?.updateInstances(mappedCanvasData)
           this.setState({ ...this.state, mappedCanvasData : mappedCanvasData})
           break;
         case getInstancesTypes.HIDE_3D_MESH:
-          if ( mappedCanvasData?.find( m => m.instancePath === targetInstance?.Id) ){
-            mappedCanvasData.find( m => m.instancePath === targetInstance.Id).visible = false
+          if ( mappedCanvasData?.find( m => m.instancePath === targetInstance?.metadata?.Id) ){
+            mappedCanvasData.find( m => m.instancePath === targetInstance?.metadata?.Id).visible = false
           }
           this?.canvasRef?.current?.threeDEngine?.updateInstances(mappedCanvasData)
           this.setState({ ...this.state, mappedCanvasData : mappedCanvasData})
           break;
         case getInstancesTypes.SELECT_INSTANCE:
-          if ( mappedCanvasData?.find( m => m.instancePath === targetInstance?.Id) ){
-            mappedCanvasData.find( m => m.instancePath === targetInstance.Id).selected = targetInstance.selected
+          if ( mappedCanvasData?.find( m => m.instancePath === targetInstance?.metadata?.Id) ){
+            mappedCanvasData.find( m => m.instancePath === targetInstance?.metadata?.Id).selected = targetInstance.selected
           }
           this.updateColors(targetInstance,mappedCanvasData)
           this?.canvasRef?.current?.threeDEngine?.updateInstances(mappedCanvasData)
@@ -241,7 +249,7 @@ class ThreeDCanvas extends Component {
   showSkeleton (targetInstance, mode, visible) {
     let that = this;
     let allLoadedInstances = this.props.allLoadedInstances;
-    let match = allLoadedInstances?.find ( inst => inst.Id === targetInstance?.Id );
+    let match = allLoadedInstances?.find ( inst => inst.metadata?.Id === targetInstance?.metadata?.Id );
 
     if ( targetInstance?.skeleton?.[mode] === undefined ) {
         // Initialize shark viewer to load SWC
@@ -260,24 +268,24 @@ class ThreeDCanvas extends Component {
             })
           );
         });
-        fetch(match.Images?.[Object.keys(match.Images)[0]][0].swc)
+        fetch(match.metadata?.Images?.[Object.keys(match.metadata?.Images)[0]][0].swc)
           .then(response => response.text())
           .then(base64Content => {
             const swcJSON = swcParser(base64Content);
-            let neuron = sharkviewer.createNeuron(swcJSON, targetInstance?.Id, that?.canvasRef?.current?.threeDEngine?.renderer);
-            match.skeleton = { ... match.skeleton, visible : true, [mode] : { visible : true, neuron : neuron }};
-            neuron.name = targetInstance?.Id + mode;
+            let neuron = sharkviewer.createNeuron(swcJSON, targetInstance?.metadata?.Id, that?.canvasRef?.current?.threeDEngine?.renderer);
+            match.skeleton = { ...match.skeleton, visible : true, [mode] : { visible : true, neuron : neuron }};
+            neuron.name = targetInstance?.metadata?.Id + mode;
             
             // add mesh to canvas
             that?.canvasRef?.current?.threeDEngine?.scene.add(neuron);
             that.forceUpdate();
-            add3DSkeleton(targetInstance?.Id)
+            add3DSkeleton(targetInstance?.metadata?.Id)
         })
     } else {
       match.skeleton.visible = visible;
       match.skeleton[mode].visible = visible;
       that?.canvasRef?.current?.threeDEngine?.scene?.children?.forEach( child => {
-        if ( child.name === targetInstance?.Id + mode ) {
+        if ( child.name === targetInstance?.metadata?.Id + mode ) {
           child.visible = visible;
         }
       })
@@ -330,7 +338,7 @@ class ThreeDCanvas extends Component {
 
 const mapStateToProps = state => ({
   allLoadedInstances : state.instances.allLoadedInstances,
-  focusInstance : state.instances.focusInstance,
+  focusInstance : state.instances.instanceOnFocus,
   event : state.instances.event
 });
 

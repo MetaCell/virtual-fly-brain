@@ -288,7 +288,7 @@ const TermInfo = ({ open, setOpen }) => {
   const handleTermClick = (term, evt) => {
     const regExp = /\(([^)]+)\)/g;
     const matches = [...term.id.matchAll(regExp)].flat();
-    termInfoById(matches[0]);
+    getInstanceByID(matches[0]);
   }
 
   const customColorCalculation = ({numTerms, baseRGB, heatLevels, itemData }) => {
@@ -343,7 +343,6 @@ const TermInfo = ({ open, setOpen }) => {
 
   const getInstance = () => {
     let instance = allLoadedInstances.find( instance => instance.metadata?.Id == termInfoData?.metadata?.Id );
-    console.log("Instance ", instance)
     return instance;
   }
   return (

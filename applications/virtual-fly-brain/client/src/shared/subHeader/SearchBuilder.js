@@ -145,7 +145,7 @@ export default function SearchBuilder(props) {
   const [retrievingResults, setRetrievingResults] = React.useState(false)
   const [recentSearch, setRecentSearch] = React.useState([]);
   const [groupedOptions, setGroupedOptions] = React.useState([]);
-  const [isOpen, setIsOpen] = React.useState(true);
+  const [isOpen, setIsOpen] = React.useState(false);
 
   const addQueryTag = () => { 
     if ( !value.find( v => v.label === QUERIES )){
@@ -168,7 +168,6 @@ export default function SearchBuilder(props) {
         getInstanceByID(id);
       }
     })
-    termInfoById(value[value.length -1 ].short_form);
     setIsOpen(false)
     value.forEach( v => deleteQuery(v))
     setValue([])
@@ -215,7 +214,6 @@ export default function SearchBuilder(props) {
       case "OK":
           if (v !== value) {
             setGroupedOptions(data)
-            props.handleFilters(data);
             setRetrievingResults(false);
           }
           break;

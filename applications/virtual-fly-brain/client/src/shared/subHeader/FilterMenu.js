@@ -3,13 +3,14 @@ import React from "react";
 import MediaQuery from 'react-responsive'
 import { CheckBoxDefault, CheckBoxGreen, CheckBoxRed, CleaningServices, Close, Filter, Tick, Undo } from "../../icons";
 import vars from "../../theme/variables";
+import { filters } from "./configuration";
 
 const { primaryBg, outlinedBtnTextColor, bottomNavBg, tabActiveColor, whiteColor } = vars;
 
-export const FilterMenu  = ({ classes, tags, setSelectedFilters }) => {
+export const FilterMenu  = ({ classes, setOpen , setSelectedFilters }) => {
   const [filterAnchorEl, setFilterAnchorEl] = React.useState(null);
   const [selection, setSelection] = React.useState({})
-
+  const tags = filters[0].values;
   const filterhandleClick = (event) => {
     setFilterAnchorEl(filterAnchorEl ? null : event.currentTarget);
     setSelectedFilters(selection)
@@ -29,15 +30,6 @@ export const FilterMenu  = ({ classes, tags, setSelectedFilters }) => {
     updatedSelection[event.target.id] = event.target.checked;
     setSelection(updatedSelection)
   }
-
-  React.useEffect( () => {
-    let updatedSelection = {};
-    tags?.forEach( tag => {
-      updatedSelection[tag] = true;
-    })
-    console.log("updatedSelection",updatedSelection)
-    setSelection(updatedSelection)
-  }, [tags]);
 
   return (
     <Box
@@ -81,6 +73,7 @@ export const FilterMenu  = ({ classes, tags, setSelectedFilters }) => {
             flexShrink: 0,
             minWidth: '0.0625rem'
           }}
+          onClick={() => setOpen(false)}
         >
           Esc
         </Button>
@@ -125,7 +118,7 @@ export const FilterMenu  = ({ classes, tags, setSelectedFilters }) => {
             rowGap: 1.5
           }}>
             {tags?.map( tag => 
-              <FormControlLabel key={tag} control={<Checkbox id={tag} checkedIcon={<CheckBoxGreen />} onChange={handleChange} icon={<CheckBoxDefault />} checked={selection[tag]} />} label={tag} />
+              <FormControlLabel key={tag["key"]} control={<Checkbox id={tag["filter_name"]} checkedIcon={<CheckBoxGreen />} onChange={handleChange} icon={<CheckBoxDefault />} checked={selection[tag["filter_name"]]} />} label={tag["filter_name"]} />
             )}
           </FormGroup>
         </Box>

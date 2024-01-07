@@ -20,8 +20,10 @@ export const QueriesSelectionDropdown = ({option, selectedOption, goBackToInitia
 
   const handleSelect = (option, query) => {
     let count = 0;
-    if (query.queries?.Examples && !selectedOption[query.short_form]) {
+    if ( query.queries?.Examples && !selectedOption[query.short_form]) {
         count = Object.keys(query.queries?.Examples)?.length;
+    } else if ( query.queries?.Images && !selectedOption[query.short_form]) {
+      count = Object.keys(query.queries?.Images)?.length;
     }
     Object.keys(selectedOption)?.forEach( o => {
         if ( typeof selectedOption[o] === 'object' ) {
@@ -29,7 +31,11 @@ export const QueriesSelectionDropdown = ({option, selectedOption, goBackToInitia
         } 
     })
     let updatedSelectedOption = {...selectedOption, [query.short_form]: option, count : count};
-    updatedSelectedOption[query.short_form].count =  Object.keys(query.queries?.Examples)?.length || 0;
+    if ( query.queries?.Examples) {
+      updatedSelectedOption[query.short_form].count =  Object.keys(query.queries?.Examples)?.length || 0;
+    } else if ( query.queries?.Images) {
+      updatedSelectedOption[query.short_form].count =  Object.keys(query.queries?.Images)?.length || 0;
+    }
     setSelectedOption(updatedSelectedOption)
     setPopoverAnchorEl(null);
   }; 

@@ -271,7 +271,6 @@ class VFBGraph extends Component {
     this.graphRef.current.ggv.current.zoomToFit()
     const title = node.title ;
     getInstanceByID(title);
-    termInfoById(title);
   }
 
   /**

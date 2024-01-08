@@ -6,8 +6,7 @@ import ListViewerControlsMenu from '../../VFBListViewer/ListViewerControlsMenu';
  * Create component to display controls
  */
 const ControlsMenu = component => {
-  let path = component.value.get("path").split(".")[0];
-  let instance = window.Instances.getInstance(path);
+  const instance = window.Instances.getInstance("VFB_00101567");
   return <ListViewerControlsMenu instance={ instance }/>;
 }
 
@@ -36,24 +35,8 @@ const conf = [
     id: "name",
     title: "Name",
     customComponent: component => {
-      // Retrieve instance path
-      let path = component.value.get("path").split(".")[0];
 
-      let instance = Instances.getInstance(path);
-      var self = this;
-
-      let click = value => {
-        let instance = Instances.getInstance(value.target.id);
-        window.setTermInfo(Instances.getInstance(path)[path + "_meta"], path);
-      };
-      // Create new HTML string with the Type name and tags only
-      let typeHTML = '<a id="' + instance.id + '" style="color:white;text-decoration: none;cursor:pointer">' + instance.getName() + "</a>" ;
-      if (instance.isSelected()) {
-        typeHTML = '<a id="' + instance.id + '" style="color:yellow;text-decoration: none;cursor:pointer">' + instance.getName() + "</a>" ;
-      }
-
-      // Set HTML string inside div ready for React
-      return <div onClick={e => click(e)} dangerouslySetInnerHTML={{ __html: typeHTML }} />
+      return <div onClick={e => click(e)} dangerouslySetInnerHTML={{ __html: "<div>test</div>" }} />
     },
     source : entity => entity
   },
@@ -61,55 +44,10 @@ const conf = [
     id: "type",
     title: "Type",
     customComponent: component => {
-      // Retrieve instance path
-      let path = component.value.get("path").split(".")[0];
 
-      let instance = window.Instances.getInstance(path)[path + "_meta"];
-
-      if ( instance === undefined ) {
-        return null;
-      }
-
-      // Retrieve the HTML type from the Instance, it's in the form of an HTML element saved as a string
-      let html = instance.getTypes().map((t) => {
-        return t.type.getInitialValue().value
-      })[0].html;
-
-      let htmlLabels = instance.getTypes().map((t) => {
-        return t.label.getInitialValue().value
-      })[0].html;
-
-      // Extract HTML element anchor from html string
-      var matchAnchor = /<a[^>]*>([\s\S]*?)<\/a>/g
-        , type = html.match(matchAnchor);
-
-      // Extract HTML element anchor from html string
-      var matchSpan = /<span[^>]*>([\s\S]*?)<\/span>/g
-        , tags = htmlLabels.match(matchSpan);
-
-      var matchID = /data-instancepath="([A-Za-z0-9 _]*)"/;
-      var classID = type[0].match(matchID)[1];
-
-      var matchText = /<a [^>]+>(.*?)<\/a>/
-        , newText = type[0].match(matchText)[1]
-
-      let textClass = '<a id="' + classID + '" style="color:#428bca;text-decoration: none;cursor:pointer">' + newText + "</a>"
-      // Create new HTML string with the Type name and tags only
-      let typeHTML = tags.join('') ;
-
-      let click = value => {
-        let id = value.target.id;
-        if (window.Instances.getInstance(id) === undefined) {
-          window.addVfbId(id);
-        } else {
-          window.setTermInfo(window.Instances.getInstance(id)[id + "_meta"], id);
-        }
-      };
-
-      // Set HTML string inside div ready for React
       return <div>
-        <div style={{ width: "40%", textAlign: "left", float: "left" }} onClick={e => click(e)} dangerouslySetInnerHTML={{ __html: textClass }} />
-        <div style={{ textAlign: "right", width: "60%", float: "right" }} dangerouslySetInnerHTML={{ __html: typeHTML }} />
+        <div style={{ width: "40%", textAlign: "left", float: "left" }} onClick={e => click(e)} dangerouslySetInnerHTML={{ __html: "test" }} />
+        <div style={{ textAlign: "right", width: "60%", float: "right" }} dangerouslySetInnerHTML={{ __html: "test" }} />
       </div>
     },
     source : entity => entity
@@ -119,24 +57,8 @@ const conf = [
     title: "Thumbnail",
     customComponent: Thumbnail,
     source: entity => { 
-      // Retrieve path from instance
-      let path = entity.path.split(".")[0];
-      
-      let instance = window.Instances.getInstance(path)[path + "_meta"];
-      
-      if ( instance === undefined ) {
-        return null;
-      }
-      
-      let value = GEPPETTO.ModelFactory.getAllVariablesOfMetaType(instance.getType(), 'ImageType')[0].getInitialValues()[0].value;
-      let img = "";
-      if ( value.elements != undefined ) {
-        img = value.elements[0].initialValue.data;
-      } else if ( value.data != undefined ) {
-        img = value.data;
-      }
-      // Retrieve thumbnail image from Instance
-      return img;
+
+      return undefined;
     }
   }
 ];

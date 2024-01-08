@@ -51,17 +51,25 @@ class VFBListViewer extends Component {
   
   render () {
     const configuredInstances = this.getConfiguredInstances();
-    return <div id="VFBLayers_component" style= { { backgroundColor : "rgb(53, 51, 51)" } } >
+    const instances = this.props.idsList.map(instance => ({
+      "path": instance.metadata.Id,
+      "metaType": VISUAL_TYPE, //instance.getMetaType(),
+      "type": COMPOSITE_VISUAL_TYPE,
+      "static": true
+    })) || [] ;
+
+    return instances?.length > 0 ? <div id="VFBLayers_component" style= { { backgroundColor : "rgb(53, 51, 51)" } } >
       <ListViewer
-        instances={configuredInstances}
+        instances={instances}
         className = "vfbListViewer"
         handler={this}
         filter={() => true}
         filterFn={() => console.log("Filtering")}
-        columnConfiguration={this.getColumnConfiguration()}
+        //columnConfiguration={this.getColumnConfiguration()}
+        //needs refactoring for ListViewerControlsMenu
         infiniteScroll={true}
       />
-    </div>
+    </div> : <div>Loading...</div>
   }
 }
 
@@ -69,7 +77,7 @@ class VFBListViewer extends Component {
 function mapStateToProps (state) {
 
   return { 
-    idsList : state.instances.allLoadedInstances?.map( (instance) => instance.Id ) || [],
+    idsList : state.instances.allLoadedInstances,
     instancesList : state.instances.augmentedInstances 
   }
 }

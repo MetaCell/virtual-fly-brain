@@ -54,7 +54,7 @@ const {
 
 const SubHeader = ({ setBottomNav, bottomNav }) => {
   const [focused, setFocused] = useState(false);
-  const [open, setOpen] = useState(true);
+  const [closeResults, setCloseResults] = useState(true);
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedFilters, setSelectedFilters] = useState({});
 
@@ -142,9 +142,9 @@ const SubHeader = ({ setBottomNav, bottomNav }) => {
         {focused ? <AngleLeft style={{ margin: 0 }} size={20} /> : <Search style={{ margin: 0 }} />}
 
         <Box flexGrow={1} px={1}>
-          <SearchBuilder applyFilters={selectedFilters} setFocused={setFocused}  bottomNav={bottomNav} setBottomNav={setBottomNav} />
+          <SearchBuilder applyFilters={selectedFilters} setCloseResults={setCloseResults} closeResults={closeResults} setFocused={setFocused}  bottomNav={bottomNav} setBottomNav={setBottomNav} />
         </Box>
-        <FilterMenu classes={classes} setOpen={setOpen} setSelectedFilters={setSelectedFilters} />
+        <FilterMenu classes={classes} setCloseResults={setCloseResults} setSelectedFilters={setSelectedFilters} />
 
         {/* <MediaQuery minWidth={1200}>
           {!focused && (

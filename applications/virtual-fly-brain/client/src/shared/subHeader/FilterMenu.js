@@ -7,13 +7,15 @@ import { filters } from "./configuration";
 
 const { primaryBg, outlinedBtnTextColor, bottomNavBg, tabActiveColor, whiteColor } = vars;
 
-export const FilterMenu  = ({ classes, setOpen , setSelectedFilters }) => {
+export const FilterMenu  = ({ classes, setCloseResults , setSelectedFilters }) => {
   const [filterAnchorEl, setFilterAnchorEl] = React.useState(null);
   const [selection, setSelection] = React.useState({})
   const tags = filters[0].values;
   const filterhandleClick = (event) => {
     setFilterAnchorEl(filterAnchorEl ? null : event.currentTarget);
-    setSelectedFilters(selection)
+    if( filterAnchorEl !== null ) {
+      setSelectedFilters(selection)
+    }
   };
 
   const cleanAll = (event) => {
@@ -40,7 +42,7 @@ export const FilterMenu  = ({ classes, setOpen , setSelectedFilters }) => {
     >
       <Button
         aria-describedby={filterId}
-        onClick={filterhandleClick}
+        onClick={(e) => filterhandleClick(e)}
         sx={{
           ...classes.shortcut,
           flexShrink: 0,
@@ -73,7 +75,11 @@ export const FilterMenu  = ({ classes, setOpen , setSelectedFilters }) => {
             flexShrink: 0,
             minWidth: '0.0625rem'
           }}
-          onClick={() => setOpen(false)}
+          onClick={() => {
+            setCloseResults(false);
+            setFilterAnchorEl(null)
+            }
+          }
         >
           Esc
         </Button>
@@ -104,7 +110,7 @@ export const FilterMenu  = ({ classes, setOpen , setSelectedFilters }) => {
               lineHeight: '133%',
             }}
           >Filters</Typography>
-          <IconButton size="small" onClick={filterhandleClick}>
+          <IconButton size="small" onClick={(e) => filterhandleClick(e)}>
             <Undo />
           </IconButton>
         </Box>
@@ -150,7 +156,7 @@ export const FilterMenu  = ({ classes, setOpen , setSelectedFilters }) => {
             Clean all
           </Button>
           <Button
-            onClick={filterhandleClick}
+            onClick={(e) => filterhandleClick(e)}
             variant="outlined"
             color="primary"
             sx={{

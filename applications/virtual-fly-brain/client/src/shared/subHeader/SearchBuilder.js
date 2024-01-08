@@ -264,6 +264,9 @@ export default function SearchBuilder(props) {
 
   React.useEffect(() => {
     handleFocused(focused);
+    if ( focused ){
+      props.setCloseResults(true);
+    }
   }, [focused])
 
   return (
@@ -302,7 +305,7 @@ export default function SearchBuilder(props) {
           <input placeholder='Find something...' {...getInputProps()}/>
         </InputWrapper>
       </Box>
-      {focused && isOpen ? (
+      { props.closeResults && isOpen ? (
         <Listbox
           className='scrollbar'
           {...getListboxProps()}

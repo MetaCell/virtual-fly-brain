@@ -13,9 +13,7 @@ export const FilterMenu  = ({ classes, setCloseResults , setSelectedFilters }) =
   const tags = filters[0].values;
   const filterhandleClick = (event) => {
     setFilterAnchorEl(filterAnchorEl ? null : event.currentTarget);
-    if( filterAnchorEl !== null ) {
-      setSelectedFilters(selection)
-    }
+    setSelectedFilters(selection)
   };
 
   const cleanAll = (event) => {
@@ -138,7 +136,7 @@ export const FilterMenu  = ({ classes, setCloseResults , setSelectedFilters }) =
           display: 'flex'
         }}>
           <Button
-            onClick={cleanAll}
+            onClick={(e) => cleanAll(e)}
             variant="text"
             sx={{
               px: 0,

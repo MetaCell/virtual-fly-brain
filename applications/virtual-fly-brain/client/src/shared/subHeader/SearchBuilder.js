@@ -146,6 +146,7 @@ export default function SearchBuilder(props) {
   const [recentSearch, setRecentSearch] = React.useState([]);
   const [groupedOptions, setGroupedOptions] = React.useState([]);
   const [isOpen, setIsOpen] = React.useState(false);
+  const [lastSearch, setLastSearch] = React.useState("");
 
   const addQueryTag = () => { 
     if ( !value.find( v => v.label === QUERIES )){
@@ -214,6 +215,7 @@ export default function SearchBuilder(props) {
       case "OK":
           if (v !== value) {
             setGroupedOptions(data)
+            setLastSearch(v)
             setRetrievingResults(false);
           }
           break;
@@ -230,7 +232,7 @@ export default function SearchBuilder(props) {
   const datasourceConfiguration = require('../../components/configuration/VFBSearchBuilder/searchConfiguration').datasourceConfiguration;
 
   const handleSearch = (searchWord) => {
-    if ( searchWord?.length >= 1 ){
+    if ( searchWord?.length >= 1 && searchWord != lastSearch ){
       setRetrievingResults(true);
       setIsOpen(true)
       getResultsSOLR(searchWord,

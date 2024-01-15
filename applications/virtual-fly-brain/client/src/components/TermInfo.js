@@ -63,7 +63,7 @@ const getRibbonData = (query) => {
     const regExp = /\(([^)]+)\)/g;
     const matches = [...row.Neurotransmitter.matchAll(regExp)].flat();
     return { id: row.Neurotransmitter,
-      name: <Link underline="none" href={window.location.origin + "/?id=" + matches[0]}>{row.Neurotransmitter}</Link>,
+      name: <Link underline="none" href="#">{row.Neurotransmitter}</Link>,
       descendant_terms: [row.Weight]
     }
 });
@@ -288,7 +288,9 @@ const TermInfo = ({ open, setOpen }) => {
   const handleTermClick = (term, evt) => {
     const regExp = /\(([^)]+)\)/g;
     const matches = [...term.id.matchAll(regExp)].flat();
-    getInstanceByID(matches[0]);
+    console.log("Term id ", term);
+    console.log("Matches ", matches)
+    getInstanceByID(matches[1]);
   }
 
   const customColorCalculation = ({numTerms, baseRGB, heatLevels, itemData }) => {

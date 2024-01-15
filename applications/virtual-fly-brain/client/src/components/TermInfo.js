@@ -288,8 +288,6 @@ const TermInfo = ({ open, setOpen }) => {
   const handleTermClick = (term, evt) => {
     const regExp = /\(([^)]+)\)/g;
     const matches = [...term.id.matchAll(regExp)].flat();
-    console.log("Term id ", term);
-    console.log("Matches ", matches)
     getInstanceByID(matches[1]);
   }
 

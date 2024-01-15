@@ -3,13 +3,14 @@ import React from "react";
 import MediaQuery from 'react-responsive'
 import { CheckBoxDefault, CheckBoxGreen, CheckBoxRed, CleaningServices, Close, Filter, Tick, Undo } from "../../icons";
 import vars from "../../theme/variables";
+import { filters } from "./configuration";
 
 const { primaryBg, outlinedBtnTextColor, bottomNavBg, tabActiveColor, whiteColor } = vars;
 
-export const FilterMenu  = ({ classes, tags, setSelectedFilters }) => {
+export const FilterMenu  = ({ classes, setCloseResults , setSelectedFilters }) => {
   const [filterAnchorEl, setFilterAnchorEl] = React.useState(null);
   const [selection, setSelection] = React.useState({})
-
+  const tags = filters[0].values;
   const filterhandleClick = (event) => {
     setFilterAnchorEl(filterAnchorEl ? null : event.currentTarget);
     setSelectedFilters(selection)
@@ -30,15 +31,6 @@ export const FilterMenu  = ({ classes, tags, setSelectedFilters }) => {
     setSelection(updatedSelection)
   }
 
-  React.useEffect( () => {
-    let updatedSelection = {};
-    tags?.forEach( tag => {
-      updatedSelection[tag] = true;
-    })
-    console.log("updatedSelection",updatedSelection)
-    setSelection(updatedSelection)
-  }, [tags]);
-
   return (
     <Box
       flexShrink={0}
@@ -48,7 +40,7 @@ export const FilterMenu  = ({ classes, tags, setSelectedFilters }) => {
     >
       <Button
         aria-describedby={filterId}
-        onClick={filterhandleClick}
+        onClick={(e) => filterhandleClick(e)}
         sx={{
           ...classes.shortcut,
           flexShrink: 0,
@@ -81,6 +73,11 @@ export const FilterMenu  = ({ classes, tags, setSelectedFilters }) => {
             flexShrink: 0,
             minWidth: '0.0625rem'
           }}
+          onClick={() => {
+            setCloseResults(false);
+            setFilterAnchorEl(null)
+            }
+          }
         >
           Esc
         </Button>
@@ -111,7 +108,7 @@ export const FilterMenu  = ({ classes, tags, setSelectedFilters }) => {
               lineHeight: '133%',
             }}
           >Filters</Typography>
-          <IconButton size="small" onClick={filterhandleClick}>
+          <IconButton size="small" onClick={(e) => filterhandleClick(e)}>
             <Undo />
           </IconButton>
         </Box>
@@ -125,7 +122,7 @@ export const FilterMenu  = ({ classes, tags, setSelectedFilters }) => {
             rowGap: 1.5
           }}>
             {tags?.map( tag => 
-              <FormControlLabel key={tag} control={<Checkbox id={tag} checkedIcon={<CheckBoxGreen />} onChange={handleChange} icon={<CheckBoxDefault />} checked={selection[tag]} />} label={tag} />
+              <FormControlLabel key={tag["key"]} control={<Checkbox id={tag["filter_name"]} checkedIcon={<CheckBoxGreen />} onChange={handleChange} icon={<CheckBoxDefault />} checked={selection[tag["filter_name"]]} />} label={tag["filter_name"]} />
             )}
           </FormGroup>
         </Box>
@@ -139,7 +136,7 @@ export const FilterMenu  = ({ classes, tags, setSelectedFilters }) => {
           display: 'flex'
         }}>
           <Button
-            onClick={cleanAll}
+            onClick={(e) => cleanAll(e)}
             variant="text"
             sx={{
               px: 0,
@@ -157,7 +154,7 @@ export const FilterMenu  = ({ classes, tags, setSelectedFilters }) => {
             Clean all
           </Button>
           <Button
-            onClick={filterhandleClick}
+            onClick={(e) => filterhandleClick(e)}
             variant="outlined"
             color="primary"
             sx={{

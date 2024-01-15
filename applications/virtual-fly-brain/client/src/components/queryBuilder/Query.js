@@ -31,6 +31,8 @@ const Query = ({ fullWidth, queries }) => {
   queries.forEach( query => {
     if ( query.queries?.Examples) {
       count = count + Object.keys(query.queries?.Examples)?.length;
+    } else if ( query.queries?.Images) {
+      count = count + Object.keys(query.queries?.Images)?.length;
     }
   });
   const title = count + " Query results";
@@ -156,6 +158,8 @@ const Query = ({ fullWidth, queries }) => {
             let examples = {};
             if ( query?.queries?.Examples ){
               examples = query?.queries?.Examples;
+            } else if ( query?.queries?.Images ){
+              examples = query?.queries?.Images;
             }
             return ( Object.keys(examples)?.map((item, index) => {
               return (
@@ -168,7 +172,7 @@ const Query = ({ fullWidth, queries }) => {
                   lg={fullWidth ? 4 : 3}
                   xl={3}
                 >
-                  <QueryCard facets_annotation={query.facets_annotation} query={query?.queries?.Examples[item][0]} fullWidth={fullWidth} />
+                  <QueryCard facets_annotation={query.facets_annotation} query={query?.queries?.Examples?.[item][0] || query?.queries?.Images?.[item][0]} fullWidth={fullWidth} />
                 </Grid>
               )
             }))

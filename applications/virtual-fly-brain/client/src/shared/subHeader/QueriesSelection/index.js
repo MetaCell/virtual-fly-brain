@@ -17,11 +17,19 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
   }, [recentSearch])
 
   const deleteQuery = (event) => {
+    let matchQuery = searchQueries.find( q => event.currentTarget.id === q.label);
     let queries = searchQueries.filter( q => event.currentTarget.id !== q.label);
     setSearchQueries(queries);
     handleQueryDeletion(event.currentTarget.id);
-    delete selectedOption[event.currentTarget.id];
+    delete selectedOption[matchQuery.short_form];
     let updateSelection = selectedOption;
+    let count = 0;
+    Object.keys(selectedOption)?.forEach( o => {
+        if ( typeof selectedOption[o] === 'object' ) {
+          count = count + ( selectedOption[o].count || 0 )
+        } 
+    })
+    updateSelection.count = count;
     setSelectedOption(updateSelection)
   }
 
@@ -97,7 +105,7 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
         >
           <Button
               onClick={checkResults}
-              disabled={!(selectedOption?.count > 1)}
+              disabled={!(selectedOption?.count >= 1)}
               sx={{
                 px: '0.5rem',
                 py: '0.25rem',
@@ -106,7 +114,7 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
                 fontSize: '0.75rem',
                 height: '1.5rem',
                 '& svg path': {
-                  fill: !(selectedOption?.count > 1) && btnDisabledColor
+                  fill: !(selectedOption?.count >= 1) && btnDisabledColor
                 },
                 '&.Mui-disabled': {
                   color: btnDisabledColor

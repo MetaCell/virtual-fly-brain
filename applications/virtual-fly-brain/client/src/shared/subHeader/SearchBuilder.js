@@ -145,7 +145,8 @@ export default function SearchBuilder(props) {
   const [retrievingResults, setRetrievingResults] = React.useState(false)
   const [recentSearch, setRecentSearch] = React.useState([]);
   const [groupedOptions, setGroupedOptions] = React.useState([]);
-  const [isOpen, setIsOpen] = React.useState(true);
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [lastSearch, setLastSearch] = React.useState("");
 
   const addQueryTag = () => { 
     if ( !value.find( v => v.label === QUERIES )){
@@ -168,7 +169,6 @@ export default function SearchBuilder(props) {
         getInstanceByID(id);
       }
     })
-    termInfoById(value[value.length -1 ].short_form);
     setIsOpen(false)
     value.forEach( v => deleteQuery(v))
     setValue([])
@@ -215,7 +215,7 @@ export default function SearchBuilder(props) {
       case "OK":
           if (v !== value) {
             setGroupedOptions(data)
-            props.handleFilters(data);
+            setLastSearch(v)
             setRetrievingResults(false);
           }
           break;
@@ -232,7 +232,7 @@ export default function SearchBuilder(props) {
   const datasourceConfiguration = require('../../components/configuration/VFBSearchBuilder/searchConfiguration').datasourceConfiguration;
 
   const handleSearch = (searchWord) => {
-    if ( searchWord?.length >= 1 ){
+    if ( searchWord?.length >= 1 && searchWord != lastSearch ){
       setRetrievingResults(true);
       setIsOpen(true)
       getResultsSOLR(searchWord,
@@ -266,6 +266,9 @@ export default function SearchBuilder(props) {
 
   React.useEffect(() => {
     handleFocused(focused);
+    if ( focused ){
+      props.setCloseResults(true);
+    }
   }, [focused])
 
   return (
@@ -304,7 +307,7 @@ export default function SearchBuilder(props) {
           <input placeholder='Find something...' {...getInputProps()}/>
         </InputWrapper>
       </Box>
-      {focused && isOpen ? (
+      { props.closeResults && isOpen ? (
         <Listbox
           className='scrollbar'
           {...getListboxProps()}

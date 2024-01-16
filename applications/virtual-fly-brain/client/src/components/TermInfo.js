@@ -335,6 +335,7 @@ const TermInfo = ({ open, setOpen }) => {
   }, [data]);
 
   useEffect(() => {
+    console.log("allLoadedInstances",allLoadedInstances)
     if (  allLoadedInstances?.find( instance => instance.metadata?.Id == data?.metadata?.Id ) ) {
       setTermInfoData(data)
     }
@@ -516,8 +517,10 @@ const TermInfo = ({ open, setOpen }) => {
                           <ChromePicker
                             color={termInfoData?.color}
                             onChangeComplete={ (color, event) => {
-                              changeColor(termInfoData.metadata?.Id, color.rgb)
-                              termInfoData.color = color.rgb
+                              let rgb = { r:color.rgb.r/255, g:color.rgb.g/255, b:color.rgb.b/255, a:color.rgb.a }
+                              changeColor(termInfoData.metadata?.Id, rgb)
+                              console.log("New color ", rgb)
+                              termInfoData.color = rgb
                               setDisplayColorPicker(true)
                             }}
                             style={{ zIndex: 10 }}/>

@@ -417,7 +417,9 @@ const ROIBrowser = (props) => {
                                 <div style={{ width: '100%' }} ref={popover}><ChromePicker
                                     color={match.color}
                                     onChangeComplete={(color, event) => {
-                                        changeColor(rowInfo.node.instanceId, color.rgb)
+                                        let rgb = { r:color.rgb.r/255, g:color.rgb.g/255, b:color.rgb.b/255, a:color.rgb.a }
+                                        changeColor(rowInfo.node.instanceId, rgb)
+                                        console.log("roi ", color)
                                     }}
                                     style={{ zIndex: 10 }}
                                 /></div>

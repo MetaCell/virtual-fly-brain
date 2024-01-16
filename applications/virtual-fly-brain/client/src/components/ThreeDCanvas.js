@@ -63,6 +63,7 @@ class ThreeDCanvas extends Component {
   loadInstances (instance){
     ModelFactory.cleanModel();
     const instance1 = new SimpleInstance(instance)
+    instance1.color = instance.color;
     let instances = window.Instances;
     if ( instances === undefined ){
       instances = [];
@@ -75,14 +76,16 @@ class ThreeDCanvas extends Component {
     return window.Instances.map(i => (
       { ...i,
         instancePath: i.getId(),
-        visible : this.state.mappedCanvasData?.find( cd => cd.instancePath === i.getId())?.visible
+        visible : this.state.mappedCanvasData?.find( cd => cd.instancePath === i.getId())?.visible,
+        color : i.color
       }
     ))
   }
 
   updateColors ( inst, mappedCanvasData) {
     let match = mappedCanvasData?.find( m => m.instancePath === inst?.metadata?.Id )
-    let color = { r : inst?.color?.r/255, g : inst?.color?.g/255, b : inst?.color?.b/255 }
+    let color = inst.color;
+    console.log("Update color ", color)
     let colorMatch = match?.color?.b === color?.b && match?.color?.r === color?.r && match?.color?.g === color?.g;
     if ( !colorMatch && inst?.color && match ){
         match.color = color;
@@ -93,7 +96,12 @@ class ThreeDCanvas extends Component {
   newInstance (instance) {
     this.loadInstances(instance)
     const data = this.getProxyInstances();
-    const newData = mapToCanvasData(data)
+    const newData = data.map(function (item) {
+      return {
+        color: item.color,
+        instancePath: item.instancePath
+      };
+    });
     instance.setGeometryType && instance.setGeometryType('cylinders')
 
     newData?.forEach( dat => {
@@ -144,7 +152,8 @@ class ThreeDCanvas extends Component {
                     "eClass": Resources.OBJ,
                     'obj': base64Content
                   }, 
-                  "visible" : true
+                  "visible" : true,
+                  "color" : targetInstance?.color
                 }
                 that.newInstance(instance);
               });

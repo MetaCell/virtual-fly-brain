@@ -69,6 +69,10 @@ class ThreeDCanvas extends Component {
       instances = [];
     }
     instances?.find( i => i.wrappedObj?.id === instance.id ) ? null : window.Instances = [...instances, instance1]
+    let that = this;
+    window.Instances.forEach( inst => {
+      inst.color = that.props.allLoadedInstances?.find( i => inst.wrappedObj.id === i.metadata.Id ).color;
+    })
     augmentInstancesArray(window.Instances);
   }
   
@@ -85,7 +89,6 @@ class ThreeDCanvas extends Component {
   updateColors ( inst, mappedCanvasData) {
     let match = mappedCanvasData?.find( m => m.instancePath === inst?.metadata?.Id )
     let color = inst.color;
-    console.log("Update color ", color)
     let colorMatch = match?.color?.b === color?.b && match?.color?.r === color?.r && match?.color?.g === color?.g;
     if ( !colorMatch && inst?.color && match ){
         match.color = color;
@@ -96,7 +99,7 @@ class ThreeDCanvas extends Component {
   newInstance (instance) {
     this.loadInstances(instance)
     const data = this.getProxyInstances();
-    const newData = data.map(function (item) {
+    const newData = data.map((item) => {
       return {
         color: item.color,
         instancePath: item.instancePath
@@ -212,7 +215,6 @@ class ThreeDCanvas extends Component {
 
   componentWillUnmount () {
     document.removeEventListener('mousedown', this.handleClickOutside);
-    console.log("Component unmouted")
   }
 
   handleToggle () {

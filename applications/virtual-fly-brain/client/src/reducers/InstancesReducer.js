@@ -86,9 +86,13 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       case getInstancesTypes.SELECT_INSTANCE:{
         const updateInstances = [...state.allLoadedInstances]
         updateInstances?.forEach( i => { 
-          if ( i.Id === response.payload.id ) {
+          if ( i.metadata?.Id === response.payload.id ) {
             i.selected = !i.selected;
             if ( i.selected ) i.color = SELECTED_COLOR;
+            else if ( !i.selected && i.metadata?.IsTemplate ) i.color = TEMPLATE_COLOR;
+            else {
+              i.color = DESELECTED_COLOR;
+            } 
           }
         });
         return Object.assign({}, state, {

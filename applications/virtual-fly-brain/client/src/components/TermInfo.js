@@ -40,9 +40,9 @@ const {
 } = vars;
 
 const RGBAToHexA = (color) => {
-  let r =  color?.r?.toString(16);
-  let g =  color?.g?.toString(16);
-  let b =  color?.b?.toString(16);
+  let r =  Math.round(color?.r * 255).toString(16);
+  let g =  Math.round(color?.g * 255).toString(16);
+  let b =  Math.round(color?.b * 255).toString(16);
   let a = Math.round(color?.a * 255).toString(16);
 
   if (r?.length == 1)
@@ -335,7 +335,6 @@ const TermInfo = ({ open, setOpen }) => {
   }, [data]);
 
   useEffect(() => {
-    console.log("allLoadedInstances",allLoadedInstances)
     if (  allLoadedInstances?.find( instance => instance.metadata?.Id == data?.metadata?.Id ) ) {
       setTermInfoData(data)
     }
@@ -517,11 +516,15 @@ const TermInfo = ({ open, setOpen }) => {
                           <ChromePicker
                             color={termInfoData?.color}
                             onChangeComplete={ (color, event) => {
-                              let rgb = { r:color.rgb.r/255, g:color.rgb.g/255, b:color.rgb.b/255, a:color.rgb.a }
-                              changeColor(termInfoData.metadata?.Id, rgb)
-                              console.log("New color ", rgb)
+                              let rgb;
+                              if ( color.source === "hsv" ){
+                                rgb = { r:color.rgb.r/255, g:color.rgb.g/255, b:color.rgb.b/255, a:color.rgb.a }
+                              } else if ( color.source === "hsl" ) {
+                                rgb = color.rgb;
+                              }
                               termInfoData.color = rgb
-                              setDisplayColorPicker(true)
+                              changeColor(termInfoData.metadata?.Id, rgb)
+                              setDisplayColorPicker(false)
                             }}
                             style={{ zIndex: 10 }}/>
                             : null

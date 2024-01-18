@@ -121,95 +121,8 @@ class VFBGraph extends Component {
   }
 
   componentDidUpdate () {
-    let self = this;
 
-    // Hanles the case of the first load of the graph, when is not yet visible
-    if (this.firstLoad) {
-      if (this.state.currentQuery.id === undefined || this.state.currentQuery.id === "" || this.state.currentQuery.id === null){
-        if (this.props.instance !== null && this.props.instance !== undefined) {
-          if (this.props.instance?.getParent() !== null) {
-            this.focusedInstance = this.props.instance?.getParent();
-          } else {
-            this.focusedInstance = this.props.instance;
-          }
-          this.firstLoad = false;
-          this.updateGraph();
-        } else if (this.props.instanceOnFocus !== null && this.props.instanceOnFocus !== undefined) {
-          if (this.props.instanceOnFocus?.getParent && this.props.instanceOnFocus?.getParent() !== null) {
-            this.focusedInstance = this.props.instanceOnFocus?.getParent();
-          } else {
-            this.focusedInstance = this.props.instanceOnFocus;
-          }
-          this.firstLoad = false;
-          this.updateGraph();
-        }
-      }
-    }
-
-
-    // Reset camera if graph component is visible, not focused or has been resized
-    if ( this.props.visible && ( !this.focused || this.graphResized ) ) {
-      /*
-       * Update graph with selected query index from configuration dropdown selection
-       */
-      stylingConfiguration.dropDownQueries.map((item, index) => {
-        if ( parseInt(self.props.graphQueryIndex) >= 0 && self.firstLoad ) {
-          if ( parseInt(self.props.graphQueryIndex) === index ) {
-            self.selectedDropDownQuery = index;
-            self.loading = true;
-            let idToSearch = self.props.instanceOnFocus.id;
-            let instanceName = self.props.instanceOnFocus.name;
-            if (self.props.instanceOnFocus?.getParent && self.props.instanceOnFocus?.getParent() !== null) {
-              idToSearch = self.props.instanceOnFocus?.getParent().id;
-              instanceName = this.focusedInstance?.getParent().name;
-            }
-            self.queryResults(item.query(idToSearch), { id : idToSearch, name : instanceName } );
-          }
-        }
-      });
-      // Reset camera view after graph component becomes visible
-      this.updateCameraAtStart();
-    } else if ( !this.props.visible ) {
-      this.focused = false;
-      if ( parseInt(this.props.graphQueryIndex) >= 0 && !this.firstLoad ) {
-        this.props.vfbGraph(UPDATE_GRAPH, this.focusedInstance, -1, true, false);
-      }
-      this.firstLoad = true;
-
-      // Reset camera view after graph component becomes visible
-      this.updateCameraAtStart();
-    } else if ( this.props.visible && this.focused) {
-      /*
-       * If graph is visible, update contents based on properties passed by redux store
-       * Retrieve id and name of selected instance
-       */
-      let idToSearch = self.props.instanceOnFocus?.id;
-      let instanceName = self.props.instanceOnFocus.name;
-      if ( typeof self.props.instanceOnFocus?.getParent === "function" ) {
-        if ( self.props.instanceOnFocus?.getParent() !== null ) {
-          idToSearch = self.props.instanceOnFocus?.getParent()?.id;
-          instanceName = self.props.instanceOnFocus?.getParent()?.name;
-        }
-      }
-      /*
-       * Update graph with selected query index from configuration dropdown selection
-       */
-      if ( parseInt(this.props.graphQueryIndex) !== this.selectedDropDownQuery || idToSearch != this.state.currentQuery?.id) {
-        if ( this.props.sync ) {
-          stylingConfiguration?.dropDownQueries?.map((item, index) => {
-            if ( parseInt(self.props.graphQueryIndex) === index ) {
-              self.props.vfbGraph(UPDATE_GRAPH, null, -1, true, false);
-              self.instanceFocusChange(self.props.instanceOnFocus);
-              self.selectedDropDownQuery = index;
-              self.loading = true;
-              self.queryResults(item.query(idToSearch), { id : idToSearch, name : instanceName } );
-            }
-          });
-        }
-      }
-
-      this.updateCameraAtStart();
-    }
+    this.updateCameraAtStart();
   }
 
   updateCameraAtStart () {
@@ -491,8 +404,10 @@ class VFBGraph extends Component {
       );
     }
 
+    const focusedInstanceId = this.props.instanceOnFocus?.id; 
+    const stateFocusedInstanceId = this.props.stateInstanceOnFocus?.metadata?.Id;
     // Out of sync if instanceOnFocus is not what's on display
-    if ( !this.props.instanceOnFocus?.id?.includes(this?.focusedInstance?.id) ) {
+    if ( focusedInstanceId !== stateFocusedInstanceId) {
       syncColor = stylingConfiguration.outOfSyncIconColor;
     }
 
@@ -708,21 +623,18 @@ class VFBGraph extends Component {
 }
 
 function mapStateToProps (state) {
-  let instanceOnFocus = undefined ;
-  if (state.instances.focusedInstance !== undefined && state.instances.focusedInstance !== null) {
-    instanceOnFocus = { id: state.instances.focusedInstance?.metadata?.Id, name: state.instances.focusedInstance?.metadta?.Name };
-  }
-  instanceOnFocus = state.instanceOnFocus || instanceOnFocus;
+  const instanceOnFocus = state.graph.instanceOnFocus;
+  const stateInstanceOnFocus = state.instances.focusedInstance;
 
   const newProps = {
     graphQueryIndex : state.graph.graphQueryIndex,
     sync : state.graph.sync,
     instanceOnFocus,
+    stateInstanceOnFocus,
     loading: instanceOnFocus !== undefined
   }
 
-  if (JSON.stringify(instanceOnFocus) !== JSON.stringify(state.graph.instanceOnFocus))
-    return newProps ;
+  return newProps ;
 }
 
 function mapDispatchToProps (dispatch) {

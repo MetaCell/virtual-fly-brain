@@ -4,7 +4,7 @@ import {SELECTED_COLOR, DESELECTED_COLOR} from './../utils/constants';
 export const initialStateInstancesReducer = {
   allPotentialInstances : [],
   allLoadedInstances : [],
-  focusedInstance : "",
+  focusedInstance : undefined,
   event : {},
   isLoading: false,
   error: false
@@ -24,7 +24,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       let loadedInstances = state.allLoadedInstances?.find( i => i?.metadata?.Id === response.payload.Id ) ? [...state.allLoadedInstances] : [...state.allLoadedInstances, newInstance]
       return Object.assign({}, state, {
           allLoadedInstances: loadedInstances,
-          focusedInstance : state.allLoadedInstances?.find( i => i?.metadata?.Id === response.payload.Id ),
+          focusedInstance : loadedInstances?.find( i => i?.metadata?.Id === response.payload.Id ),
           event : { action : getInstancesTypes.ADD_INSTANCE, id : response.payload.Id, trigger : Date.now()},
           isLoading: false
         })

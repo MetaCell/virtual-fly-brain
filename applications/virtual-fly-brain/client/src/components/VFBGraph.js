@@ -77,34 +77,6 @@ class VFBGraph extends Component {
 
   componentDidMount () {
     let self = this;
-    this.__isMounted = true;
-
-    // This is where the initial call to load the graph happens first, after component is mounted
-    if (this.state.currentQuery.id !== undefined && this.state.currentQuery.id !== "" && this.state.currentQuery.id !== null){
-      // Set focusedInstance
-      if ( this.props.instance !== null ) {
-        if (this.props.instance?.getParent() !== null) {
-          this.focusedInstance = this.props.instance?.getParent();
-        } else {
-          this.focusedInstance = this.props.instance;
-        }
-      }
-
-      // If there's a graphQueryIndex set, it is used to retrieve the corresponding option from the DropDownQueries options
-      if ( parseInt(self.props.graphQueryIndex) >= 0 ){
-        stylingConfiguration.dropDownQueries.map((item, index) => {
-          if ( parseInt(self.props.graphQueryIndex) === index ) {
-            self.selectedDropDownQuery = index;
-            self.loading = true;
-            // Call to query graph
-            self.queryResults(item.query(this.focusedInstance.id), { id : this.focusedInstance.id, name : this.focusedInstance.name } );
-          }
-        });
-      } else {
-        // If there was no graphQueryIndex set, the default graph is loaded
-        this.updateGraph();
-      }
-    }
 
     // Keyboard listener, detect when shift is pressed down
     document.addEventListener("keydown", event => {
@@ -121,6 +93,15 @@ class VFBGraph extends Component {
   }
 
   componentDidUpdate () {
+    const graphInstance = this.props.graphInstanceOnFocus ;
+    const stateInstance = this.props.stateInstanceOnFocus
+    if (graphInstance == undefined && stateInstance)
+    {
+      const instanceId = stateInstance.metadata.Id ;
+      const instanceName = stateInstance.metadata.Name ;
+      this.props.vfbGraph(UPDATE_GRAPH, stateInstance, -1, true, false);
+      this.queryResults(cypherQuery(instanceId), { id : instanceId, name : instanceName });
+    }
 
     this.updateCameraAtStart();
   }
@@ -195,7 +176,7 @@ class VFBGraph extends Component {
   }
 
   sync () {
-    this.instanceFocusChange(this.props.instanceOnFocus);
+    this.instanceFocusChange(this.props.stateInstanceOnFocus);
     this.selectedDropDownQuery = -1;
     this.updateGraph();
   }
@@ -258,24 +239,25 @@ class VFBGraph extends Component {
    * Re-render graph with a new instance
    */
   updateGraph () {
-    var idToSearch = this.focusedInstance.id;
-    var instanceName = this.focusedInstance.name;
+    const stateInstance = this.props.stateInstanceOnFocus ;
+
+    let instanceId   = stateInstance.metadata.Id;
+    let instanceName = stateInstance.metadata.Name;
     /*
      * function handler called by the VFBMain whenever there is an update of the instance on focus,
      * this will reflect and move to the node (if it exists) that we have on focus.
      */
-    if (this.focusedInstance?.getParent && this.focusedInstance?.getParent() !== null) {
-      idToSearch = this.focusedInstance?.getParent()?.id;
-      instanceName = this.focusedInstance?.getParent()?.name;
+    if (stateInstance?.getParent && stateInstance?.getParent() !== null) {
+      instanceId   = stateInstance.getParent()?.id;
+      instanceName = stateInstance.getParent()?.name;
     }
 
-    if (this.__isMounted){
-      // Show loading spinner while cypher query search occurs
-      this.loading = true;
-      this.setState({ optionsIconColor : stylingConfiguration.defaultRefreshIconColor });
-      // Perform cypher query
-      this.queryResults(cypherQuery(idToSearch), { id : idToSearch, name : instanceName });
-    }
+    this.loading = true;
+    this.setState({ optionsIconColor : stylingConfiguration.defaultRefreshIconColor });
+    
+    // Perform cypher query
+    this.props.vfbGraph(UPDATE_GRAPH, stateInstance, -1, true, false);
+    this.queryResults(cypherQuery(instanceId), { id : instanceId, name : instanceName });
   }
 
   /**
@@ -404,10 +386,10 @@ class VFBGraph extends Component {
       );
     }
 
-    const focusedInstanceId = this.props.instanceOnFocus?.id; 
-    const stateFocusedInstanceId = this.props.stateInstanceOnFocus?.metadata?.Id;
+    const graphInstanceId = this.props.graphInstanceOnFocus?.metadata?.Id; 
+    const stateInstanceId = this.props.stateInstanceOnFocus?.metadata?.Id;
     // Out of sync if instanceOnFocus is not what's on display
-    if ( focusedInstanceId !== stateFocusedInstanceId) {
+    if ( graphInstanceId !== stateInstanceId) {
       syncColor = stylingConfiguration.outOfSyncIconColor;
     }
 
@@ -623,15 +605,15 @@ class VFBGraph extends Component {
 }
 
 function mapStateToProps (state) {
-  const instanceOnFocus = state.graph.instanceOnFocus;
+  const graphInstanceOnFocus = state.graph.instanceOnFocus;
   const stateInstanceOnFocus = state.instances.focusedInstance;
 
   const newProps = {
-    graphQueryIndex : state.graph.graphQueryIndex,
+    graphQueryIndex : graphInstanceOnFocus && stateInstanceOnFocus ? 0 : -1,
     sync : state.graph.sync,
-    instanceOnFocus,
+    graphInstanceOnFocus,
     stateInstanceOnFocus,
-    loading: instanceOnFocus !== undefined
+    loading: graphInstanceOnFocus !== undefined
   }
 
   return newProps ;

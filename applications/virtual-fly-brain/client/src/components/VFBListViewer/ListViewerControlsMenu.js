@@ -100,7 +100,7 @@ class ListViewerControlsMenu extends Component {
       if (instance.getType().getMetaType() == GEPPETTO.Resources.IMPORT_TYPE) {
         self = this;
         instance.getType().resolve(() => {
-          self.props.instance.setColor(color);
+          self.props.instance?.setColor(color);
           if ( instance.getInstancePath !== undefined ) {
             window.GEPPETTO?.trigger('experiment:visibility_changed', instance);
             window.GEPPETTO?.ControlPanel.refresh();
@@ -203,7 +203,7 @@ class ListViewerControlsMenu extends Component {
    */
   updateControlsConfiguration () {
     // Create deep clone of configuration
-    var configuration = $.extend(true, {}, controlsConfiguration);
+    var configuration = { ...controlsConfiguration };
     let list = new Array();
     let self = this;
     /**
@@ -214,8 +214,8 @@ class ListViewerControlsMenu extends Component {
      * is already selected or not. 
      */ 
     configuration.buttons.map((button, index) => {
-      if ( self.props.instance.getColor !== undefined ) {
-        button.activeColor = self.props.instance.getColor();
+      if ( self.props.instance?.getColor !== undefined ) {
+        button.activeColor = self.props.instance?.getColor();
         button.list.map(item => {
           // Iterate through button list in configuration, store new configuration in 'list' array
           this.iterateConfList(list, item);
@@ -224,10 +224,10 @@ class ListViewerControlsMenu extends Component {
         // Replace buttons list in configuration with updated one
         button.list = list;
       }
-      if (self.props.instance.isVisible()) {
-        button.icon.props.className = "fa fa-eye-slash";
+      if (self.props.instance?.isVisible()) {
+        button.icon.props?.className = "fa fa-eye-slash";
       } else {
-        button.icon.props.className = "fa fa-eye";
+        button.icon.props?.className = "fa fa-eye";
       }
     });
         

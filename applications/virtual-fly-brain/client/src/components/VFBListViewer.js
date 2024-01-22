@@ -66,7 +66,6 @@ class VFBListViewer extends Component {
         filter={() => true}
         filterFn={() => console.log("Filtering")}
         //columnConfiguration={this.getColumnConfiguration()}
-        //needs refactoring for ListViewerControlsMenu
         infiniteScroll={true}
       />
     </div> : <div>Loading...</div>

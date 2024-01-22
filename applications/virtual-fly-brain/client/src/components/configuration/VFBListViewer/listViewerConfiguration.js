@@ -6,7 +6,7 @@ import ListViewerControlsMenu from '../../VFBListViewer/ListViewerControlsMenu';
  * Create component to display controls
  */
 const ControlsMenu = component => {
-  const instance = window.Instances.getInstance("VFB_00101567");
+  const instance = {} || window.Instances?.getInstance("VFB_00101567");
   return <ListViewerControlsMenu instance={ instance }/>;
 }
 

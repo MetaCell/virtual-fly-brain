@@ -51,10 +51,12 @@ class VFBListViewer extends Component {
   
   render () {
     const configuredInstances = this.getConfiguredInstances();
-    const instances = this.props.idsList.map(instance => ({
+
+    const instances = this.props.allLoadedInstances.map(instance => ({
       "path": instance.metadata.Id,
       "metaType": VISUAL_TYPE, //instance.getMetaType(),
       "type": COMPOSITE_VISUAL_TYPE,
+      "thumbnail": instance.metadata.Images[Object.keys(instance.metadata.Images)[0]][0].thumbnail,
       "static": true
     })) || [] ;
 
@@ -65,7 +67,7 @@ class VFBListViewer extends Component {
         handler={this}
         filter={() => true}
         filterFn={() => console.log("Filtering")}
-        //columnConfiguration={this.getColumnConfiguration()}
+        columnConfiguration={this.getColumnConfiguration()}
         infiniteScroll={true}
       />
     </div> : <div>Loading...</div>
@@ -76,8 +78,7 @@ class VFBListViewer extends Component {
 function mapStateToProps (state) {
 
   return { 
-    idsList : state.instances.allLoadedInstances,
-    instancesList : state.instances.augmentedInstances 
+    allLoadedInstances : state.instances.allLoadedInstances
   }
 }
 

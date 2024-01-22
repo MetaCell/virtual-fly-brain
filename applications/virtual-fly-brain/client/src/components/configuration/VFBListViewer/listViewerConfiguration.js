@@ -35,8 +35,8 @@ const conf = [
     id: "name",
     title: "Name",
     customComponent: component => {
-
-      return <div onClick={e => click(e)} dangerouslySetInnerHTML={{ __html: "<div>test</div>" }} />
+      const entityName = component.value._root.entries.find( e=> e[0] == "path")[1] ;
+      return <div onClick={e => click(e)} dangerouslySetInnerHTML={{ __html: "<div>"+entityName+"</div>" }} />
     },
     source : entity => entity
   },
@@ -45,9 +45,10 @@ const conf = [
     title: "Type",
     customComponent: component => {
 
+      const entityType = component.value._root.entries.find( e=> e[0] == "type")[1] ;
       return <div>
-        <div style={{ width: "40%", textAlign: "left", float: "left" }} onClick={e => click(e)} dangerouslySetInnerHTML={{ __html: "test" }} />
-        <div style={{ textAlign: "right", width: "60%", float: "right" }} dangerouslySetInnerHTML={{ __html: "test" }} />
+        <div style={{ width: "40%", textAlign: "left", float: "left" }} onClick={e => click(e)} dangerouslySetInnerHTML={{ __html: entityType }} />
+        <div style={{ textAlign: "right", width: "60%", float: "right" }} dangerouslySetInnerHTML={{ __html: entityType }} />
       </div>
     },
     source : entity => entity
@@ -58,7 +59,7 @@ const conf = [
     customComponent: Thumbnail,
     source: entity => { 
 
-      return undefined;
+      return entity.thumbnail;
     }
   }
 ];

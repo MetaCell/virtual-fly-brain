@@ -224,11 +224,11 @@ class ListViewerControlsMenu extends Component {
         // Replace buttons list in configuration with updated one
         button.list = list;
       }
-      if (self.props.instance?.isVisible()) {
-        button.icon.props?.className = "fa fa-eye-slash";
-      } else {
-        button.icon.props?.className = "fa fa-eye";
-      }
+      // if (self.props.instance && self.props.instance.isVisible && self.props.instance.isVisible() && button.icon.props) {
+      //   button.icon.props.className = "fa fa-eye-slash";
+      // } else {
+      //   button.icon.props.className = "fa fa-eye";
+      // }
     });
         
     return configuration;

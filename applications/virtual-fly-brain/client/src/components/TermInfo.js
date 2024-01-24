@@ -190,7 +190,8 @@ const classes = {
         lg: secondaryBg
       }
     },
-    width : "100%"
+    width : "100%",
+    justifyContent : "end"
   }
 }
 
@@ -559,11 +560,14 @@ const TermInfo = ({ open, setOpen }) => {
                         </Tooltip>
                         :
                         null}
+                        { termInfoData?.metadata?.IsTemplate != undefined ?
                         <Tooltip title={"Delete From Term Info"}>
-                          <Button onClick={() => deleteId()}>
+                          <Button disabled={termInfoData?.metadata?.IsTemplate} onClick={() => deleteId()}>
                             <Delete />
                           </Button>
                         </Tooltip>
+                        :
+                        null}
                       </ButtonGroup>
                     </Box>
                   </Box>

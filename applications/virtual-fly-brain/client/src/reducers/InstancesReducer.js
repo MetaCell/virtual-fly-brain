@@ -35,8 +35,14 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         })
       }
       case getInstancesTypes.REMOVE_INSTANCES_SUCCESS:{
+        let loadedInstances = state.allLoadedInstances?.find( i => i.metadata?.Id === response.payload.query ) ? [...state.allLoadedInstances.filter(i => i.metadata?.Id !== response.payload.query)] : [...state.allLoadedInstances];
+        let focusedInstance = state.focusedInstance;
+        if ( loadedInstances.length === 1 && loadedInstances[0]?.metadata.IsTemplate){
+          focusedInstance = loadedInstances[0];
+        }
         return Object.assign({}, state, {
-          allLoadedInstances: state.allLoadedInstances?.find( i => i.metadata?.Id === response.payload.query ) ? [...state.allLoadedInstances.filter(i => i.metadata?.Id !== response.payload.query)] : [...state.allLoadedInstances],
+          allLoadedInstances: loadedInstances,
+          focusedInstance : focusedInstance,
           event : { action : getInstancesTypes.REMOVE_INSTANCES_SUCCESS, id : response.payload.query, trigger : Date.now()},
           isLoading: false
         })

@@ -4,7 +4,7 @@ import {SELECTED_COLOR, DESELECTED_COLOR, TEMPLATE_COLOR} from './../utils/const
 export const initialStateInstancesReducer = {
   allPotentialInstances : [],
   allLoadedInstances : [],
-  focusedInstance : "",
+  focusedInstance : undefined,
   event : {},
   isLoading: false,
   launchTemplate : null,

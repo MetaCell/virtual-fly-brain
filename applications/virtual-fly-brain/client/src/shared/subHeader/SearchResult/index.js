@@ -8,10 +8,10 @@ const { secondaryBg, searchBoxBg, whiteColor, searchHeadingColor, listHover } = 
 const chips_cutoff = 3;
 export const SearchResult = ({ getOptionProps, selectedFilters, groupedOptions, chipColors, handleResultSelection }) => {
   const hasTag = (facets_annotations) => {
-    let hasTag = false;
+    let hasTag = true;
     facets_annotations?.forEach( annotation => {
-      if ( selectedFilters[annotation] === true || (selectedFilters[annotation] === undefined && Object.keys(selectedFilters)?.length == 0 )) {
-        hasTag = true;
+      if ( selectedFilters[annotation] === false) {
+        hasTag = false;
       }
     })
 

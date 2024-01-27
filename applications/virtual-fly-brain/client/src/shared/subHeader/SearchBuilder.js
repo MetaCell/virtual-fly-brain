@@ -215,7 +215,6 @@ export default function SearchBuilder(props) {
       case "OK":
           if (v !== value) {
             setGroupedOptions(data)
-            setLastSearch(v)
             setRetrievingResults(false);
           }
           break;
@@ -240,6 +239,7 @@ export default function SearchBuilder(props) {
         searchConfiguration.sorter,
         datasourceConfiguration,
         setGroupedOptions);
+      setLastSearch(searchWord)
     }
   }
 

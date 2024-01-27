@@ -2,16 +2,7 @@ import React, { Component } from "react";
 import Menu from "@metacell/geppetto-meta-ui/menu/Menu";
 import { connect } from 'react-redux';
 import { ChromePicker } from 'react-color';
-
-export const VFB_LOAD_TERM_INFO = 'VFB_LOAD_TERM_INFO';
-
-export const setTermInfo = ( instance, visible ) => ({
-  type: VFB_LOAD_TERM_INFO,
-  data : {
-    instance : instance,
-    visible : visible
-  }
-});
+import { getInstanceByID } from '../../reducers/actions/instances';
 
 const controlsConfiguration = require('../configuration/VFBListViewer/controlsMenuConfiguration').default;
 const ACTIONS = controlsConfiguration.actions;
@@ -26,7 +17,7 @@ class ListViewerControlsMenu extends Component {
     this.menuHandler = this.menuHandler.bind(this);
     this.iterateConfList = this.iterateConfList.bind(this);
     this.visibleButton = this.visibleButton.bind(this);
-    this.updateControlsConfiguraiton = this.updateControlsConfiguration.bind(this);
+    this.updateControlsConfiguration = this.updateControlsConfiguration.bind(this);
     this.monitorMouseClick = this.monitorMouseClick.bind(this);
 
     // Keep track of color picker action and ID
@@ -79,14 +70,7 @@ class ListViewerControlsMenu extends Component {
       this.props.instance.delete();   
       break;
     case ACTIONS.INFO:
-      var self = this;
-      /**
-       * Needs a 100 ms delay before calling the setTermInfo method, this is due to Menu taking 
-       * a few ms to close.
-       */
-      setTimeout ( () => { 
-        self.props.setTermInfo(self.props.instance, true);
-      }, 100);
+      getInstanceByID(this.props.instance.getId());
       break;
     case ACTIONS.COLOR:
       this.setState({ displayColorPicker: true });
@@ -206,13 +190,7 @@ class ListViewerControlsMenu extends Component {
     var configuration = { ...controlsConfiguration };
     let list = new Array();
     let self = this;
-    /**
-     * Loop through configuration buttons and create button list with correct visibility buttons.
-     * Some buttons in configuration have two set of options and a condition. 
-     * E.G.
-     * For the selection button, there's two configuration options based on whether Instance
-     * is already selected or not. 
-     */ 
+ 
     configuration.buttons.map((button, index) => {
       if ( self.props.instance?.getColor !== undefined ) {
         button.activeColor = self.props.instance?.getColor();
@@ -224,16 +202,10 @@ class ListViewerControlsMenu extends Component {
         // Replace buttons list in configuration with updated one
         button.list = list;
       }
-      // if (self.props.instance && self.props.instance.isVisible && self.props.instance.isVisible() && button.icon.props) {
-      //   button.icon.props.className = "fa fa-eye-slash";
-      // } else {
-      //   button.icon.props.className = "fa fa-eye";
-      // }
     });
         
     return configuration;
   }
-
   render () {
     // Update Menu Configuration
     let configuration = this.updateControlsConfiguration();

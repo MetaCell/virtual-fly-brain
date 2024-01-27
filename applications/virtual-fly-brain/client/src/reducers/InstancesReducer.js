@@ -1,5 +1,5 @@
 import { getInstancesTypes } from './actions/types/getInstancesTypes';
-import {SELECTED_COLOR, DESELECTED_COLOR} from './../utils/constants';
+import {SELECTED_COLOR, DESELECTED_COLOR, TEMPLATE_COLOR} from './../utils/constants';
 
 export const initialStateInstancesReducer = {
   allPotentialInstances : [],
@@ -37,12 +37,18 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
      case getInstancesTypes.GET_INSTANCES_SUCCESS:{
       const newInstance = { metadata : response.payload };
       newInstance.visible = true;
-      newInstance.color = DESELECTED_COLOR;
+      if ( newInstance.metadata?.IsTemplate ){
+        newInstance.color = TEMPLATE_COLOR;
+      } else {
+        newInstance.color = DESELECTED_COLOR;
+      }
+
       if ( newInstance.IsTemplate && state.allLoadedInstances?.find( i => i?.metadata?.IsTemplate )) {
         return Object.assign({}, state, {
           launchTemplate: newInstance
         })
       }
+      
       let loadedInstances = state.allLoadedInstances?.find( i => i?.metadata?.Id === response.payload.Id ) ? [...state.allLoadedInstances] : [...state.allLoadedInstances, newInstance]
       return Object.assign({}, state, {
           allLoadedInstances: loadedInstances,
@@ -110,14 +116,14 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       case getInstancesTypes.SELECT_INSTANCE:{
         const updateInstances = [...state.allLoadedInstances]
         updateInstances?.forEach( i => { 
-          if ( i.Id === response.payload.id ) {
+          if ( i.metadata?.Id === response.payload.id ) {
             i.selected = !i.selected;
             if ( i.selected ) i.color = SELECTED_COLOR;
-            else if ( !i.selected ) i.color = DESELECTED_COLOR;
-           } else {
-            i.selected = false;
-            i.color = DESELECTED_COLOR;
-           } 
+            else if ( !i.selected && i.metadata?.IsTemplate ) i.color = TEMPLATE_COLOR;
+            else {
+              i.color = DESELECTED_COLOR;
+            } 
+          }
         });
         return Object.assign({}, state, {
           allLoadedInstances:updateInstances,

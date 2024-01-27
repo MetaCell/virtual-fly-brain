@@ -40,9 +40,9 @@ const {
 } = vars;
 
 const RGBAToHexA = (color) => {
-  let r =  color?.r?.toString(16);
-  let g =  color?.g?.toString(16);
-  let b =  color?.b?.toString(16);
+  let r =  Math.round(color?.r * 255).toString(16);
+  let g =  Math.round(color?.g * 255).toString(16);
+  let b =  Math.round(color?.b * 255).toString(16);
   let a = Math.round(color?.a * 255).toString(16);
 
   if (r?.length == 1)
@@ -517,9 +517,15 @@ const TermInfo = ({ open, setOpen }) => {
                           <ChromePicker
                             color={termInfoData?.color}
                             onChangeComplete={ (color, event) => {
-                              changeColor(termInfoData.metadata?.Id, color.rgb)
-                              termInfoData.color = color.rgb
-                              setDisplayColorPicker(true)
+                              let rgb;
+                              if ( color.source === "hsv" ){
+                                rgb = { r:color.rgb.r/255, g:color.rgb.g/255, b:color.rgb.b/255, a:color.rgb.a }
+                              } else if ( color.source === "hsl" ) {
+                                rgb = color.rgb;
+                              }
+                              termInfoData.color = rgb
+                              changeColor(termInfoData.metadata?.Id, rgb)
+                              setDisplayColorPicker(false)
                             }}
                             style={{ zIndex: 10 }}/>
                             : null

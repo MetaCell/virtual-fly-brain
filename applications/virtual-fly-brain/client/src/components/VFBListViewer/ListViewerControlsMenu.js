@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import Menu from "@metacell/geppetto-meta-ui/menu/Menu";
 import { connect } from 'react-redux';
 import { ChromePicker } from 'react-color';
-import { getInstanceByID } from '../../reducers/actions/instances';
+import { getInstanceByID, removeInstanceByID, selectInstance } from '../../reducers/actions/instances';
 
 const controlsConfiguration = require('../configuration/VFBListViewer/controlsMenuConfiguration').default;
 const ACTIONS = controlsConfiguration.actions;
@@ -49,15 +49,17 @@ class ListViewerControlsMenu extends Component {
 
       break;
     case ACTIONS.HIDE:
-      this.props.instance.hide();
       break;
     case ACTIONS.SELECT:
+      selectInstance(this.props.instance);
       break;
     case ACTIONS.DESELECT:
+      selectInstance(this.props.instance);
       break;
     case ACTIONS.ZOOM_TO:
       break;
     case ACTIONS.DELETE:
+      removeInstanceByID(this.props.instance);
       break;
     case ACTIONS.INFO:
       getInstanceByID(this.props.instance);

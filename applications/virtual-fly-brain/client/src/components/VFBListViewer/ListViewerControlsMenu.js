@@ -46,86 +46,36 @@ class ListViewerControlsMenu extends Component {
   menuHandler (action, component) {
     switch (action.handlerAction){
     case ACTIONS.SHOW:
-      this.props.instance.show();
-      if ( window["StackViewer1"] !== null ) {
-        window["StackViewer1"]?.updateStackWidget();
-      }
+
       break;
     case ACTIONS.HIDE:
       this.props.instance.hide();
-      if ( window["StackViewer1"] !== null ) {
-        window["StackViewer1"]?.updateStackWidget();
-      }
       break;
     case ACTIONS.SELECT:
-      this.props.instance.select();
       break;
     case ACTIONS.DESELECT:
-      this.props.instance.deselect();
       break;
     case ACTIONS.ZOOM_TO:
-      window.GEPPETTO?.SceneController.zoomTo([this.props.instance]);
       break;
     case ACTIONS.DELETE:
-      this.props.instance.delete();   
       break;
     case ACTIONS.INFO:
-      getInstanceByID(this.props.instance.getId());
+      getInstanceByID(this.props.instance);
       break;
     case ACTIONS.COLOR:
       this.setState({ displayColorPicker: true });
       break;
     case ACTIONS.SHOW_VOLUME:
-      var color = this.props.instance.getColor();
-      var instance = this.props.instance[this.props.instance.getId() + "_obj"];
-      if ( instance === undefined ) {
-        instance = this.props.instance.getType()[this.props.instance.getId() + "_obj"];
-      }
-      if (instance.getType().getMetaType() == GEPPETTO.Resources.IMPORT_TYPE) {
-        self = this;
-        instance.getType().resolve(() => {
-          self.props.instance?.setColor(color);
-          if ( instance.getInstancePath !== undefined ) {
-            window.GEPPETTO?.trigger('experiment:visibility_changed', instance);
-            window.GEPPETTO?.ControlPanel.refresh();
-          }
-        });
-      } else { 
-        if (window.GEPPETTO?.SceneController.isInstancePresent(instance)) { 
-          window.GEPPETTO?.SceneController.show([instance]);
-        } else { 
-          window.GEPPETTO?.SceneController.display(instance); instance.setColor(color);
-        }
-      }
+
       break;
     case ACTIONS.HIDE_VOLUME:
-      instance = this.props.instance[this.props.instance.getId() + "_obj"];
-      if ( instance === undefined ) {
-        instance = this.props.instance.getType()[this.props.instance.getId() + "_obj"];
-      }
-      instance.hide();
+
       break;
     case ACTIONS.SHOW_SKELETON:
-      color = this.props.instance.getColor();
-      instance = this.props.instance[this.props.instance.getId() + "_swc"];
-      if (instance.getType().getMetaType() == GEPPETTO.Resources.IMPORT_TYPE) {
-        var col = instance.getParent().getColor();
-        instance.getType().resolve( () => { 
-          instance.setColor(col);
-          window.GEPPETTO?.trigger('experiment:visibility_changed', instance);
-          window.GEPPETTO?.ControlPanel.refresh();
-        });
-      } else {
-        if (window.GEPPETTO?.SceneController.isInstancePresent(instance)) {
-          window.GEPPETTO?.SceneController.show([instance]);
-        } else {
-          window.GEPPETTO?.SceneController.display(instance);
-          instance.setColor(color);
-        }
-      }
+
       break;
     case ACTIONS.HIDE_SKELETON:
-      window.GEPPETTO?.SceneController.hide([this.props.instance[this.props.instance.getId() + "_swc"]]);
+
       break;
     }
   }

@@ -6,8 +6,10 @@ import ListViewerControlsMenu from '../../VFBListViewer/ListViewerControlsMenu';
  * Create component to display controls
  */
 const ControlsMenu = component => {
-  const instance = {} || window.Instances?.getInstance("VFB_00101567");
-  return <ListViewerControlsMenu instance={ instance }/>;
+  const path = component.value._root.entries.find( e=> e[0] == "path")[1] ;
+  //let instance = Instances.getInstance(path); anti pattern fix: we don't pass the full instance anymore as we have an indirection level through the reducer
+  //actions should be executed through the reducer, given an instance path 
+  return <ListViewerControlsMenu instance={ path }/>;
 }
 
 const Thumbnail = component => (

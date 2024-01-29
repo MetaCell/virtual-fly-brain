@@ -63,7 +63,7 @@ const getRibbonData = (query) => {
     const regExp = /\(([^)]+)\)/g;
     const matches = [...row.Neurotransmitter.matchAll(regExp)].flat();
     return { id: row.Neurotransmitter,
-      name: <Link underline="none" href={window.location.origin + "/?id=" + matches[0]}>{row.Neurotransmitter}</Link>,
+      name: <Link underline="none" href="#">{row.Neurotransmitter}</Link>,
       descendant_terms: [row.Weight]
     }
 });
@@ -190,7 +190,8 @@ const classes = {
         lg: secondaryBg
       }
     },
-    width : "100%"
+    width : "100%",
+    justifyContent : "end"
   }
 }
 
@@ -288,7 +289,7 @@ const TermInfo = ({ open, setOpen }) => {
   const handleTermClick = (term, evt) => {
     const regExp = /\(([^)]+)\)/g;
     const matches = [...term.id.matchAll(regExp)].flat();
-    getInstanceByID(matches[0]);
+    getInstanceByID(matches[1]);
   }
 
   const customColorCalculation = ({numTerms, baseRGB, heatLevels, itemData }) => {
@@ -565,11 +566,14 @@ const TermInfo = ({ open, setOpen }) => {
                         </Tooltip>
                         :
                         null}
+                        { termInfoData?.metadata?.IsTemplate != undefined ?
                         <Tooltip title={"Delete From Term Info"}>
-                          <Button onClick={() => deleteId()}>
+                          <Button disabled={termInfoData?.metadata?.IsTemplate} onClick={() => deleteId()}>
                             <Delete />
                           </Button>
                         </Tooltip>
+                        :
+                        null}
                       </ButtonGroup>
                     </Box>
                   </Box>

@@ -13,12 +13,12 @@ export const FilterMenu  = ({ classes, setCloseResults , setSelectedFilters }) =
   const tags = filters[0].values;
   const filterhandleClick = (event) => {
     setFilterAnchorEl(filterAnchorEl ? null : event.currentTarget);
+    console.log("Apply Filters ", selection)
     setSelectedFilters(selection)
   };
 
   const cleanAll = (event) => {
-    let updatedSelection = {...selection};
-    Object.keys(updatedSelection)?.forEach( id => updatedSelection[id] = false );
+    let updatedSelection = {};
     setSelection(updatedSelection)
   };
 
@@ -27,8 +27,15 @@ export const FilterMenu  = ({ classes, setCloseResults , setSelectedFilters }) =
 
   const handleChange = (event) => {
     let updatedSelection = {...selection};
-    updatedSelection[event.target.id] = event.target.checked;
+    if ( updatedSelection[event.currentTarget.id] === undefined ) {
+      updatedSelection[event.currentTarget.id] = true;
+    } else if ( updatedSelection[event.currentTarget.id] === true ){
+      updatedSelection[event.currentTarget.id] = false;
+    } else if ( updatedSelection[event.currentTarget.id] === false ) {
+      delete updatedSelection[event.currentTarget.id];
+    }
     setSelection(updatedSelection)
+    event.preventDefault();
   }
 
   return (
@@ -122,7 +129,7 @@ export const FilterMenu  = ({ classes, setCloseResults , setSelectedFilters }) =
             rowGap: 1.5
           }}>
             {tags?.map( tag => 
-              <FormControlLabel key={tag["key"]} control={<Checkbox id={tag["filter_name"]} checkedIcon={<CheckBoxGreen />} onChange={handleChange} icon={<CheckBoxDefault />} checked={selection[tag["filter_name"]]} />} label={tag["filter_name"]} />
+              <FormControlLabel key={tag["key"]} control={<IconButton id={tag["filter_name"]} onClick={handleChange} >{selection[tag["filter_name"]] === -1 || selection[tag["filter_name"]] === undefined ? <CheckBoxDefault/> : selection[tag["filter_name"]] ? <CheckBoxGreen/> : <CheckBoxRed/> }</IconButton>} label={tag["filter_name"]} />
             )}
           </FormGroup>
         </Box>

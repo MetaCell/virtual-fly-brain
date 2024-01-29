@@ -7,12 +7,29 @@ export const initialStateInstancesReducer = {
   focusedInstance : "",
   event : {},
   isLoading: false,
+  launchTemplate : null,
   error: false
 };
 
 const InstancesReducer = (state = initialStateInstancesReducer, response) => {
   switch (response.type) {
-     case getInstancesTypes.GET_INSTANCES_STARTED: {
+    case getInstancesTypes.LAUNCH_TEMPLATE:{
+      if ( !response.payload.openTemplate ) {
+        let loadedInstances = state.allLoadedInstances?.find( i => i?.metadata?.Id === response.payload.id ) ? [...state.allLoadedInstances] : [...state.allLoadedInstances, state.launchTemplate]
+        return Object.assign({}, state, {
+            allLoadedInstances: loadedInstances,
+            launchTemplate : null,
+            focusedInstance : loadedInstances?.find( i => i?.metadata?.Id === response.payload.id ),
+            event : { action : getInstancesTypes.ADD_INSTANCE, id : response.payload.id, trigger : Date.now()},
+            isLoading: false
+        })
+      } else {
+        return Object.assign({}, state, {
+            launchTemplate : null
+        })
+      }
+    } 
+    case getInstancesTypes.GET_INSTANCES_STARTED: {
         return Object.assign({}, state, {
            isLoading: true
         })
@@ -25,10 +42,15 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       } else {
         newInstance.color = DESELECTED_COLOR;
       }
+      if ( newInstance.IsTemplate && state.allLoadedInstances?.find( i => i?.metadata?.IsTemplate )) {
+        return Object.assign({}, state, {
+          launchTemplate: newInstance
+        })
+      }
       let loadedInstances = state.allLoadedInstances?.find( i => i?.metadata?.Id === response.payload.Id ) ? [...state.allLoadedInstances] : [...state.allLoadedInstances, newInstance]
       return Object.assign({}, state, {
           allLoadedInstances: loadedInstances,
-          focusedInstance : state.allLoadedInstances?.find( i => i?.metadata?.Id === response.payload.Id ),
+          focusedInstance : loadedInstances?.find( i => i?.metadata?.Id === response.payload.Id ),
           event : { action : getInstancesTypes.ADD_INSTANCE, id : response.payload.Id, trigger : Date.now()},
           isLoading: false
         })
@@ -39,8 +61,14 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         })
       }
       case getInstancesTypes.REMOVE_INSTANCES_SUCCESS:{
+        let loadedInstances = [...state.allLoadedInstances.filter(i => i.metadata?.Id !== response.payload.query)];
+        let focusedInstance = state.focusedInstance;
+        if ( loadedInstances.length === 1 && loadedInstances[0]?.metadata.IsTemplate ){
+          focusedInstance = loadedInstances[0];
+        }
         return Object.assign({}, state, {
-          allLoadedInstances: state.allLoadedInstances?.find( i => i.metadata?.Id === response.payload.query ) ? [...state.allLoadedInstances.filter(i => i.metadata?.Id !== response.payload.query)] : [...state.allLoadedInstances],
+          allLoadedInstances: loadedInstances,
+          focusedInstance : focusedInstance,
           event : { action : getInstancesTypes.REMOVE_INSTANCES_SUCCESS, id : response.payload.query, trigger : Date.now()},
           isLoading: false
         })

@@ -17,6 +17,11 @@ const QueriesReducer = (state = initialStateQueriesReducer, response) => {
           queries: !state.queries?.find( i => i.short_form === response.payload.short_form ) !== undefined && [...state.queries, response.payload],
           isLoading: false
         })
+      case getQueriesTypes.UPDATE_QUERIES:
+        return Object.assign({}, state, {
+          queries: response.payload,
+          isLoading: false
+        })
       case getQueriesTypes.DELETE_QUERY:
         return Object.assign({}, state, {
           queries: state.queries?.filter( i => i.short_form !== response.payload.short_form ),

@@ -1,7 +1,9 @@
 import { getGlobalTypes } from './actions/types/GlobalTypes';
 
 export const initialStateGlobalReducer = {
-  templateID: ""
+  templateID: "",
+  querySelected : [{ id : "", label : "" }],
+  querySelectedVisible : true
 };
 
 const GlobalReducer = (state = initialStateGlobalReducer, response) => {

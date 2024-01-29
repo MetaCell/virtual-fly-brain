@@ -15,7 +15,7 @@ import  { getResultsSOLR } from '../../components/configuration/SOLRclient'
 import { DatasourceTypes } from '@metacell/geppetto-meta-ui/search/datasources/datasources';
 import { getInstanceByID } from './../../reducers/actions/instances';
 import { useSelector } from 'react-redux'
-import { getQueries, deleteQuery } from '../../reducers/actions/queries';
+import { getQueries, deleteQuery, updateQueries } from '../../reducers/actions/queries';
 
 const QUERIES = "Queries";
 
@@ -147,6 +147,8 @@ export default function SearchBuilder(props) {
   const [groupedOptions, setGroupedOptions] = React.useState([]);
   const [isOpen, setIsOpen] = React.useState(false);
   const [lastSearch, setLastSearch] = React.useState("");
+  const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances);
+  const queries = useSelector(state => state.queries.queries);
 
   const addQueryTag = () => { 
     if ( !value.find( v => v.label === QUERIES )){
@@ -156,10 +158,20 @@ export default function SearchBuilder(props) {
   const checkResults = () => {
     props.setBottomNav(2)
     setIsOpen(false)
-    props.setFocused(false)
+    props.setFocused(false);
+    let updatedQueries = [];
+    queries.length > 0 ? updatedQueries = [...queries] : []
+    updatedQueries.forEach( q => {
+      let match = value?.find( v => v.label === q.label );
+      if ( match !== undefined ) {
+        q.active = true;
+      } else {
+        q.active = false;
+      }
+    })
+    updateQueries(updatedQueries);
+    setValue([])
   }
-  const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances);
-  const queries = useSelector(state => state.queries.queries);
 
   const loadResults = () => {
     value.forEach( (v, index) => {
@@ -177,7 +189,9 @@ export default function SearchBuilder(props) {
   const handleResultSelection = async(option) => {
     const doesOptionExist =  obj => obj.label === option.label
     if(!value.some(doesOptionExist)){
-      getQueries(option);
+      if (!queries?.find( q => q.label === option.label ) ) { 
+        getQueries(option);
+      } 
       setValue([...value, option])
       let recentSearches = [...recentSearch];
       if ( !recentSearches?.find( recent => recent.id === option.id ) ){
@@ -312,7 +326,7 @@ export default function SearchBuilder(props) {
           className='scrollbar'
           {...getListboxProps()}
         >
-          { value.find( v => v.label === QUERIES ) && queries?.length >= 1 ? (<QueriesSelection checkResults={checkResults} handleQueryDeletion={handleChipDelete} recentSearch={queries}/>) : null }
+          { value.find( v => v.label === QUERIES ) && value.filter( v => v.label !== QUERIES )?.length >= 1 ? (<QueriesSelection checkResults={checkResults} handleQueryDeletion={handleChipDelete} recentSearch={queries} queriesRequested={value.filter( v => v.label !== QUERIES )}/>) : null }
 
           {/* { groupedOptions.length >=1 ? <NarrowSearchFilter chipColors={chipColors} groupedOptions={groupedOptions}/> :null } */}
 

@@ -16,6 +16,14 @@ const deleteQuerySuccess = query => ({
   }
 });
 
+const updateQuerySuccess = queries => ({
+  type: getQueriesTypes.UPDATE_QUERIES,
+  payload: [
+    ...queries
+  ]
+});
+
+
 const getQueriesStarted = () => ({
   type: getQueriesTypes.GET_QUERIES_STARTED
 });
@@ -46,4 +54,8 @@ export const getQueries = async (instance) => {
 
 export const deleteQuery = async (instance) => {
   store.dispatch(deleteQuerySuccess(instance))
+}
+
+export const updateQueries = async (instance) => {
+  store.dispatch(updateQuerySuccess(instance))
 }

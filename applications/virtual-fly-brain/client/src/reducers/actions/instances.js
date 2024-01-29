@@ -126,6 +126,14 @@ const removeInstancesFailure = error => ({
   }
 });
 
+const templateLoadedMessage = (id, openTemplate) => ({
+  type: getInstancesTypes.LAUNCH_TEMPLATE,
+  payload: {
+    id,
+    openTemplate
+  }
+});
+
 export const getInstanceByID = async (queryId) => {
 
   store.dispatch(getInstancesStarted())
@@ -202,3 +210,8 @@ export const changeColor = async (id, color) => {
 export const focusInstance = async (id) => {
   store.dispatch(focusInstanceMessage(id))
 }
+
+export const templateLoaded = async (id, openTemplate) => {
+  store.dispatch(templateLoadedMessage(id, openTemplate))
+}
+

@@ -61,16 +61,16 @@ const GeneralInformation = ({data, classes}) => {
                 ...classes.heading,
                 color: whiteColor,
                 textAlign: 'right'
-              }}>{data?.Name}[{data?.Id}]</Typography>
+              }}>{data?.metadata?.Name}[{data?.metadata?.Id}]</Typography>
             </Box>
 
             <Box display='flex' justifyContent='space-between' columnGap={1}>
               <Typography sx={classes.heading}>Tags</Typography>
                 <Box display='flex' gap={'0.188rem'}>
                   {
-                    data?.Tags?.map((tag, i) => <Chip key={tag} color={chipColor[i]} label={tag} />)
+                    data?.metadata?.Tags?.map((tag, i) => <Chip key={tag} color={chipColor[i]} label={tag} />)
                   }
-                { data?.Tags?.length > 2 && <Chip label={`+${data?.Tags?.length - 2}`} /> }
+                { data?.metadata?.Tags?.length > 2 && <Chip label={`+${data?.metadata?.Tags?.length - 2}`} /> }
               </Box>
             </Box>
 
@@ -99,7 +99,7 @@ const GeneralInformation = ({data, classes}) => {
                     xl: toggleReadMore ? secondaryBg : 'transparent',
                   }
                 }}>
-                    {toggleReadMore ? data?.Meta?.Description : `${data?.Meta?.Description?.substr(0, MAX_LENGTH)}...`}
+                    {toggleReadMore ? data?.metadata?.Meta?.Description : `${data?.metadata?.Meta?.Description?.substr(0, MAX_LENGTH)}...`}
                 </Typography>
                 <Button
                     onClick={() => setToggleReadMore((prev) => !prev)} disableRipple

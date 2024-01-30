@@ -126,6 +126,7 @@ const TerminfoSlider = (props) => {
       <Slide canSwipe={ false } slidesToShow={ 1 } slidesToScroll={ 1 } infinite={ false } indicators={ true } prevArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } nextArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } arrows={ true }>
             {slideImages?.map((slideImage, index) => (
                 <img
+                  key={index}
                   style={imageStyle}
                   src={slideImage.url}
                   alt={slideImage.caption}

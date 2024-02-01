@@ -40,7 +40,7 @@ const App = () => {
     if ( allLoadedInstances?.find( i => i?.metadata?.IsTemplate ) && !templateLoaded) {
       setTemplateLoaded(true);
       const id = queryString("id");
-      if ( id != templateID ){
+      if ( id != templateID && id != undefined && id != "" ){
         getInstanceByID(id);
       }
     }

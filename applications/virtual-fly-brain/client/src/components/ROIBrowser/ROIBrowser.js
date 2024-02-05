@@ -417,7 +417,13 @@ const ROIBrowser = (props) => {
                                 <div style={{ width: '100%' }} ref={popover}><ChromePicker
                                     color={match.color}
                                     onChangeComplete={(color, event) => {
-                                        changeColor(rowInfo.node.instanceId, color.rgb)
+                                        let rgb;
+                                        if ( color.source === "hsv" ){
+                                            rgb = { r:color.rgb.r/255, g:color.rgb.g/255, b:color.rgb.b/255, a:color.rgb.a }
+                                        } else if ( color.source === "hsl" ) {
+                                            rgb = color.rgb;
+                                        }
+                                        changeColor(rowInfo.node.instanceId, rgb)
                                     }}
                                     style={{ zIndex: 10 }}
                                 /></div>

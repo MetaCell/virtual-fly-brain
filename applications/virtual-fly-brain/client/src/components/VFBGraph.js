@@ -38,7 +38,8 @@ class VFBGraph extends Component {
       currentQuery : this.props.instance != null ? this.props.instance : { id : "" , name : "" },
       dropDownAnchorEl : null,
       optionsIconColor : stylingConfiguration.defaultRefreshIconColor,
-      reload : false
+      reload : false,
+      lastClick: { timestamp: 0, nodeId: null }
     }
     this.updateGraph = this.updateGraph.bind(this);
     this.instanceFocusChange = this.instanceFocusChange.bind(this);
@@ -158,13 +159,22 @@ class VFBGraph extends Component {
     this.graphRef.current.ggv.current.zoom(zoom - out , 100);
   }
 
-  /**
-   * Handle Left click on Nodes
-   */
-  handleNodeLeftClick (node, event) {
-    this.graphRef.current.ggv.current.zoomToFit()
-    const title = node.title ;
-    getInstanceByID(title);
+  handleNodeLeftClick(node, event) {
+    const currentTime = Date.now();
+    const doubleClickThreshold = 300; // Time in milliseconds to consider it a double-click
+    const isDoubleClick = this.state.lastClick.nodeId === node.id &&
+                          (currentTime - this.state.lastClick.timestamp) < doubleClickThreshold;
+
+    if (isDoubleClick) {
+      const title = node.title ;
+      getInstanceByID(title);
+    } else {
+      this.graphRef.current.ggv.current.zoomToFit()
+    }
+
+    this.setState({
+      lastClick: { timestamp: currentTime, nodeId: node.id },
+    });
   }
 
   /**

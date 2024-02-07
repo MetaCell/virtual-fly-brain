@@ -185,14 +185,12 @@ class VFBGraph extends Component {
    * Handle Menu drop down clicks
    */
   handleMenuClick (selection) {
-    if (this.__isMounted){
-      // Show loading spinner while cypher query search occurs
-      this.loading = true;
-      this.querySelection = selection;
-      this.forceUpdate();
-      // Perform cypher query
-      this.queryResults(selection.query(this.state.currentQuery.id), { id : this.state.currentQuery.id, name : this.state.currentQuery.name } );
-    }
+    // Show loading spinner while cypher query search occurs
+    this.loading = true;
+    this.querySelection = selection;
+    this.forceUpdate();
+    // Perform cypher query
+    this.queryResults(selection.query(this.state.currentQuery.id), { id : this.state.currentQuery.id, name : this.state.currentQuery.name } );
   }
 
   /**

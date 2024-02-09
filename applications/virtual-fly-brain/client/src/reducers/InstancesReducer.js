@@ -2,8 +2,6 @@ import { getInstancesTypes } from './actions/types/getInstancesTypes';
 import {SELECTED_COLOR, DESELECTED_COLOR, TEMPLATE_COLOR} from './../utils/constants';
 import SimpleInstance from "@metacell/geppetto-meta-core/model/SimpleInstance";
 import { augmentInstancesArray } from '@metacell/geppetto-meta-core/Instances';
-import SharkViewer, { swcParser } from '@janelia/sharkviewer';
-import * as THREE from 'three';
 
 export const initialStateInstancesReducer = {
   allPotentialInstances : [],
@@ -16,7 +14,6 @@ export const initialStateInstancesReducer = {
   error: false
 };
 
-//TODO : Refactor into reducer
 const loadInstances = (instance, simpleInstances) =>{
   const instance1 = new SimpleInstance(instance)
   instance1.color = instance.color;
@@ -25,52 +22,12 @@ const loadInstances = (instance, simpleInstances) =>{
     instances = [];
   }
   instances?.find( i => i.wrappedObj?.id === instance.id ) ? null : window.Instances = [...instances, instance1]
-  let that = this;
   window.Instances.forEach( inst => {
     inst.color = simpleInstances?.find( i => inst.wrappedObj.id === i.Id )?.color;
   })
   augmentInstancesArray(window.Instances);
 }
 
-
-//TODO : Refactor into reducer
-const showSkeleton = (targetInstance, mode, visible) => {
-  let that = this;
-  let allLoadedInstances = props.allLoadedInstances;
-  let match = allLoadedInstances?.find ( inst => inst.metadata?.Id === targetInstance?.metadata?.Id );
-
-  if ( targetInstance?.skeleton?.[mode] === undefined ) {
-      // Initialize shark viewer to load SWC
-      let sharkviewer = new SharkViewer({ dom_element: "canvas" });
-      sharkviewer.mode = mode;
-      sharkviewer.three_colors = [];
-      Object.keys(sharkviewer.colors).forEach(color => {
-        sharkviewer.three_colors.push(new THREE.Color(sharkviewer.colors[color]));
-      })
-      sharkviewer.three_materials = [];
-      Object.keys(sharkviewer.colors).forEach(color => {
-        sharkviewer.three_materials.push(
-          new THREE.MeshBasicMaterial({
-            color: sharkviewer.colors[color],
-            wireframe: false
-          })
-        );
-      });
-      fetch(match.metadata?.Images?.[Object.keys(match.metadata?.Images)[0]][0].swc)
-        .then(response => response.text())
-        .then(base64Content => {
-          const swcJSON = swcParser(base64Content);
-          let neuron = sharkviewer.createNeuron(swcJSON, targetInstance?.metadata?.Id, that?.canvasRef?.current?.threeDEngine?.renderer);
-          match.skeleton = { ...match.skeleton, visible : true, [mode] : { visible : true, neuron : neuron }};
-          neuron.name = targetInstance?.metadata?.Id + mode;
-      })
-  } else {
-    match.skeleton.visible = visible;
-    match.skeleton[mode].visible = visible;
-  }
-}
-
-//TODO : Refactor into reducer
 const getProxyInstances = (simpleInstances) => {
   return window.Instances.map(i => (
     { ...i,

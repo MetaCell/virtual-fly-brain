@@ -9,6 +9,8 @@ import CameraControls from './CameraControls';
 import {Button, Box} from '@mui/material'
 import Canvas from "@metacell/geppetto-meta-ui/3d-canvas/Canvas";
 import { getInstancesTypes } from '../reducers/actions/types/getInstancesTypes';
+import SharkViewer, { swcParser } from '@janelia/sharkviewer';
+import * as THREE from 'three';
 
 const {
   whiteColor,
@@ -69,8 +71,82 @@ class ThreeDCanvas extends Component {
         case getInstancesTypes.UPDATE_INSTANCES:
           this.setState({ ...this.state, mappedCanvasData : mappedCanvasData})
           break;
+        case getInstancesTypes.SHOW_SKELETON:
+          this.showSkeleton(targetInstance, SKELETON, true)
+          break;
+        case getInstancesTypes.HIDE_SKELETON:
+          this.showSkeleton(targetInstance, SKELETON, false)
+          this.showSkeleton(targetInstance, CYLINDERS, false)
+          break;
+        case getInstancesTypes.SHOW_CYLINDERS:
+          this.showSkeleton(targetInstance, SKELETON, false)  
+          this.showCylinders(targetInstance)
+          break;
+        case getInstancesTypes.SHOW_LINES:
+          this.showSkeleton(targetInstance, CYLINDERS, false)
+          this.showSkeleton(targetInstance, SKELETON, true)
+          break;
         default:
       }
+    }
+  }
+
+  showCylinders (targetInstance) {
+    if ( targetInstance?.skeleton?.[CYLINDERS] === undefined ){
+      this.showSkeleton (targetInstance, CYLINDERS, true);
+    } else {
+      this.showSkeleton (targetInstance, CYLINDERS, true);
+    }
+  }
+
+  showLines (targetInstance) {
+    if ( targetInstance?.skeleton?.[SKELETON] === undefined ){
+      this.showSkeleton (targetInstance, SKELETON, true);
+    }else {
+      this.showSkeleton (targetInstance, SKELETON, true);
+    }
+  }
+
+  showSkeleton (targetInstance, mode, visible) {
+    let that = this;
+    let allLoadedInstances = this.props.allLoadedInstances;
+    let match = allLoadedInstances?.find ( inst => inst.metadata?.Id === targetInstance?.metadata?.Id );
+
+    if ( targetInstance?.skeleton?.[mode] === undefined ) {
+        // Initialize shark viewer to load SWC
+        let sharkviewer = new SharkViewer({ dom_element: "canvas" });
+        sharkviewer.mode = mode;
+        sharkviewer.three_colors = [];
+        Object.keys(sharkviewer.colors).forEach(color => {
+          sharkviewer.three_colors.push(new THREE.Color(sharkviewer.colors[color]));
+        })
+        sharkviewer.three_materials = [];
+        Object.keys(sharkviewer.colors).forEach(color => {
+          sharkviewer.three_materials.push(
+            new THREE.MeshBasicMaterial({
+              color: sharkviewer.colors[color],
+              wireframe: false
+            })
+          );
+        });
+        fetch(match.metadata?.Images?.[Object.keys(match.metadata?.Images)[0]][0].swc)
+          .then(response => response.text())
+          .then(base64Content => {
+            const swcJSON = swcParser(base64Content);
+            let neuron = sharkviewer.createNeuron(swcJSON, targetInstance?.metadata?.Id, that?.canvasRef?.current?.threeDEngine?.renderer);
+            match.skeleton = { ...match.skeleton, visible : true, [mode] : { visible : true, neuron : neuron }};
+            neuron.name = targetInstance?.metadata?.Id + mode;
+            
+            add3DSkeleton(targetInstance?.metadata?.Id)
+        })
+    } else {
+      match.skeleton.visible = visible;
+      match.skeleton[mode].visible = visible;
+      that?.canvasRef?.current?.threeDEngine?.scene?.children?.forEach( child => {
+        if ( child.name === targetInstance?.metadata?.Id + mode ) {
+          child.visible = visible;
+        }
+      })
     }
   }
 

@@ -56,7 +56,6 @@ class ThreeDCanvas extends Component {
   componentDidUpdate(prevProps, prevState) {
     if(this.props.event.trigger !== prevProps.event.trigger){ 
       const mappedCanvasData = [...this.props.simpleInstances];
-      const targetInstance = mappedCanvasData?.find( i => i.metadata?.Id === this.props.event.id)
       const focusInstance = window.Instances?.find( instance => instance.wrappedObj.id === this.props.focusInstance?.Id);
 
       switch(this.props.event.action){

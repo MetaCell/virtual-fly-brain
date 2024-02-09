@@ -9,16 +9,15 @@ import { initFileWithoutReading } from './reducers/actions/readFile';
 import Ajv from 'ajv';
 
 const App = () => {
+  const [templateLoaded, setTemplateLoaded] = React.useState(false);
 
   const focusedInstance = useSelector(state => state.instances.focusedInstance)
-
-  if (!focusedInstance) {
-    const id = queryString("id") || "VFB_00101567";
-    if (id)
-    {
-      getInstanceByID(id);
-    }
+  const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances)
+  const templateID = "VFB_00101567";
+  if ( !focusedInstance ){
+    getInstanceByID(templateID);
   }
+
   if ( focusedInstance ) // load initial 3d model TODO: proper instance, class treatement
   {
     //validate schemma
@@ -37,17 +36,15 @@ const App = () => {
     // obj && initFileWithoutReading({ url: obj });
   }
 
-  // let theme = createMuiTheme({
-  //   typography: { fontFamily: 'Roboto, Helvetica, Arial, sans-serif' },
-  //   palette: {
-  //     type: 'dark',
-  //     primary: { main: orange[500] },
-  //     secondary: { main: blue[500] },
-  //     button: { main: '#fc6320' },
-  //     toolbarBackground: { main: 'rgb(0,0,0,0.5)' },
-  //   },
-  // });
-  // theme = responsiveFontSizes(theme);
+  React.useEffect( () => {
+    if ( allLoadedInstances?.find( i => i?.metadata?.IsTemplate ) && !templateLoaded) {
+      setTemplateLoaded(true);
+      const id = queryString("id");
+      if ( id != templateID && id != undefined && id != "" ){
+        getInstanceByID(id);
+      }
+    }
+  }, [allLoadedInstances])
 
   return (
     <Main />

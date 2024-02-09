@@ -182,7 +182,6 @@ class VFBCircuitBrowser extends Component {
    */
   handleNodeLeftClick (node, event) {
     const id = node.title ;
-    termInfoById(id);
     if (confirm("The image is aligned to another template. Click OK to open in a new tab or Cancel to just view the image metadata")) {
       getInstanceByID(id);
     }
@@ -579,7 +578,7 @@ class VFBCircuitBrowser extends Component {
 VFBCircuitBrowser.propTypes = { classes: PropTypes.object.isRequired };
 
 function mapStateToProps (state) {
-  return { circuitQuerySelected : state.circuit.querySelected }
+  return { circuitQuerySelected : state.globalInfo.querySelected }
 }
 
 export default connect(mapStateToProps, null, null)(VFBCircuitBrowser);

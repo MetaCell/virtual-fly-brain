@@ -139,9 +139,9 @@ class VFBGraph extends Component {
             this.focusedInstance = this.props.instanceOnFocus?.getParent();
           } else {
             this.focusedInstance = this.props.instanceOnFocus;
+            this.firstLoad = false;
+            this.updateGraph();
           }
-          this.firstLoad = false;
-          this.updateGraph();
         }
       }
     }
@@ -174,7 +174,7 @@ class VFBGraph extends Component {
       if ( parseInt(this.props.graphQueryIndex) >= 0 && !this.firstLoad ) {
         this.props.vfbGraph(UPDATE_GRAPH, this.focusedInstance, -1, true, false);
       }
-      this.firstLoad = true;
+      // this.firstLoad = true;
 
       // Reset camera view after graph component becomes visible
       this.updateCameraAtStart();
@@ -271,7 +271,6 @@ class VFBGraph extends Component {
     this.graphRef.current.ggv.current.zoomToFit()
     const title = node.title ;
     getInstanceByID(title);
-    termInfoById(title);
   }
 
   /**

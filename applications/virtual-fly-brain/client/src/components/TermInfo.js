@@ -40,9 +40,9 @@ const {
 } = vars;
 
 const RGBAToHexA = (color) => {
-  let r =  color?.r?.toString(16);
-  let g =  color?.g?.toString(16);
-  let b =  color?.b?.toString(16);
+  let r =  Math.round(color?.r * 255).toString(16);
+  let g =  Math.round(color?.g * 255).toString(16);
+  let b =  Math.round(color?.b * 255).toString(16);
   let a = Math.round(color?.a * 255).toString(16);
 
   if (r?.length == 1)
@@ -63,7 +63,7 @@ const getRibbonData = (query) => {
     const regExp = /\(([^)]+)\)/g;
     const matches = [...row.Neurotransmitter.matchAll(regExp)].flat();
     return { id: row.Neurotransmitter,
-      name: <Link underline="none" href={window.location.origin + "/?id=" + matches[0]}>{row.Neurotransmitter}</Link>,
+      name: <Link underline="none" href="#">{row.Neurotransmitter}</Link>,
       descendant_terms: [row.Weight]
     }
 });
@@ -190,7 +190,8 @@ const classes = {
         lg: secondaryBg
       }
     },
-    width : "100%"
+    width : "100%",
+    justifyContent : "end"
   }
 }
 
@@ -246,7 +247,7 @@ const TermInfo = ({ open, setOpen }) => {
   }
 
   const handleVisibility = () => {
-    if ( allLoadedInstances.find( instance => instance.metadata?.Id == termInfoData.metadata?.Id )?.visible ) {
+    if ( allLoadedInstances.find( instance => instance.metadata?.Id == termInfoData.metadata?.Id )?.simpleInstance?.visibility ) {
       hide3DMesh(termInfoData.metadata?.Id)
     } else {
       show3DMesh(termInfoData.metadata?.Id)
@@ -254,7 +255,7 @@ const TermInfo = ({ open, setOpen }) => {
   }
 
   const handleMeshVisibility = () => {
-    if ( allLoadedInstances.find( instance => instance.metadata?.Id == termInfoData.metadata?.Id )?.visible ) {
+    if ( allLoadedInstances.find( instance => instance.metadata?.Id == termInfoData.metadata?.Id )?.simpleInstance?.visibility ) {
       hide3DMesh(termInfoData.metadata?.Id)
     } else {
       show3DMesh(termInfoData.metadata?.Id)
@@ -270,7 +271,7 @@ const TermInfo = ({ open, setOpen }) => {
   }
 
   const handleSkeleton = (event) => {
-    if ( !allLoadedInstances.find( instance => instance.metadata?.Id == termInfoData.metadata?.Id )?.skeleton?.visible ) {
+    if ( !allLoadedInstances.find( instance => instance.metadata?.Id == termInfoData.metadata?.Id )?.skeleton?.skeleton?.visible ) {
       show3DSkeleton(termInfoData.metadata?.Id)
     } else {
       hide3DSkeleton(termInfoData.metadata?.Id)
@@ -288,7 +289,7 @@ const TermInfo = ({ open, setOpen }) => {
   const handleTermClick = (term, evt) => {
     const regExp = /\(([^)]+)\)/g;
     const matches = [...term.id.matchAll(regExp)].flat();
-    termInfoById(matches[0]);
+    getInstanceByID(matches[1]);
   }
 
   const customColorCalculation = ({numTerms, baseRGB, heatLevels, itemData }) => {
@@ -343,7 +344,6 @@ const TermInfo = ({ open, setOpen }) => {
 
   const getInstance = () => {
     let instance = allLoadedInstances.find( instance => instance.metadata?.Id == termInfoData?.metadata?.Id );
-    console.log("Instance ", instance)
     return instance;
   }
   return (
@@ -507,64 +507,72 @@ const TermInfo = ({ open, setOpen }) => {
                         <>
                           <Tooltip title={"Edit 3D Canvas Color"}>
                             <Button
-                            disabled={getInstance()?.metadata?.Images == undefined}
                             sx={{ width: 75 }} 
                             onClick={() => setDisplayColorPicker(!displayColorPicker)}>
-                            <RectangleIcon sx={{color : RGBAToHexA( getInstance()?.color)}}/><ArrowDown/>
+                            <RectangleIcon sx={{color : RGBAToHexA( getInstance()?.simpleInstance?.color)}}/><ArrowDown/>
                           </Button>
                           </Tooltip>
                           { displayColorPicker ?
                           <ChromePicker
-                            color={termInfoData?.color}
+                            color={getInstance()?.simpleInstance?.color}
                             onChangeComplete={ (color, event) => {
-                              changeColor(termInfoData.metadata?.Id, color.rgb)
-                              termInfoData.color = color.rgb
-                              setDisplayColorPicker(true)
+                              let rgb;
+                              if ( color.source === "hsv" ){
+                                rgb = { r:color.rgb.r/255, g:color.rgb.g/255, b:color.rgb.b/255, a:color.rgb.a }
+                                changeColor(termInfoData.metadata?.Id, rgb)
+                                setDisplayColorPicker(false)
+                              } else if ( color.source === "hsl" ) {
+                                rgb = color.rgb;
+                                changeColor(termInfoData.metadata?.Id, rgb)
+                              }                              
                             }}
                             style={{ zIndex: 10 }}/>
                             : null
                           }
                         </>
-                        <Tooltip title={ getInstance()?.visible ? "Hide" : "Show"}>
-                          <Button disabled={getInstance()?.metadata?.Images == undefined} onClick={() => handleVisibility()}>
-                            {  getInstance()?.visible ? <EyeOff /> : <Eye /> }
+                        <Tooltip title={ getInstance()?.simpleInstance?.visibility ? "Hide" : "Show"}>
+                          <Button onClick={() => handleVisibility()}>
+                            {  getInstance()?.simpleInstance?.visibility ? <EyeOff /> : <Eye /> }
                           </Button>
                         </Tooltip>
-                        <Tooltip title={ getInstance()?.selected ? "Deselect" : "Select"}>
-                          <Button disabled={getInstance()?.metadata?.Images == undefined} onClick={(event) => handleSelection(event)}>
-                            { getInstance()?.selected ? <SelectOff /> : <Focus /> }
+                        <Tooltip title={ getInstance()?.simpleInstance?.selected ? "Deselect" : "Select"}>
+                          <Button onClick={(event) => handleSelection(event)}>
+                            { getInstance()?.simpleInstance?.selected ? <SelectOff /> : <Focus /> }
                           </Button>
                         </Tooltip>
                         <Tooltip title={"Focus on 3D Mesh"}>
-                          <Button disabled={getInstance()?.metadata?.Images == undefined} onClick={(event) => handleFocus(event, true)}>
+                          <Button onClick={(event) => handleFocus(event, true)}>
                             <Target />
                           </Button>
                         </Tooltip>
-                        <Tooltip title={getInstance()?.visible ? "Hide 3D Mesh" : "Show 3D Mesh"}>
-                          <Button disabled={getInstance()?.metadata?.Images == undefined} onClick={(event) => handleMeshVisibility()}>
-                          { getInstance()?.visible ? <ArViewOff /> : <ArView /> }                          </Button>
+                        <Tooltip title={getInstance()?.simpleInstance?.visibility ? "Hide 3D Mesh" : "Show 3D Mesh"}>
+                          <Button  onClick={(event) => handleMeshVisibility()}>
+                          { getInstance()?.simpleInstance?.visibility ? <ArViewOff /> : <ArView /> }                          </Button>
                         </Tooltip>
                         { termInfoData?.metadata?.SuperTypes?.find( s => s === NEURON) ?
-                        <Tooltip title={getInstance()?.skeleton?.visible ? "Disable 3D Skeleton" : "Enable 3D Skeleton"}>
-                          <Button disabled={getInstance()?.metadata?.Images == undefined} onClick={(event) => handleSkeleton(event)}>
-                            {getInstance()?.skeleton?.visible ? <SkeletonOff /> : <SkeletonOn /> }
+                        <Tooltip title={getInstance()?.skeleton?.[SKELETON]?.visible ? "Disable 3D Skeleton" : "Enable 3D Skeleton"}>
+                          <Button onClick={(event) => handleSkeleton(event)}>
+                            {getInstance()?.skeleton?.[SKELETON]?.visible ? <SkeletonOff /> : <SkeletonOn /> }
                           </Button>
                         </Tooltip>
                         :
                         null}
                         { termInfoData?.metadata?.SuperTypes?.find( s => s === NEURON) ?
                         <Tooltip title={getInstance()?.skeleton?.[SKELETON]?.visible ? "Show 3D Cylinder Skeleton" : "Show 3D Lines Skeleton"}>
-                          <Button disabled={getInstance()?.metadata?.Images == undefined} onClick={(event) => handleCylinder(event)}>
+                          <Button onClick={(event) => handleCylinder(event)}>
                           {getInstance()?.skeleton?.[SKELETON]?.visible ? <CylinderOn id={CYLINDERS}/> : <CylinderOff id={SKELETON} /> }
                           </Button>
                         </Tooltip>
                         :
                         null}
+                        { termInfoData?.metadata?.IsTemplate != undefined ?
                         <Tooltip title={"Delete From Term Info"}>
-                          <Button onClick={() => deleteId()}>
+                          <Button disabled={termInfoData?.metadata?.IsTemplate} onClick={() => deleteId()}>
                             <Delete />
                           </Button>
                         </Tooltip>
+                        :
+                        null}
                       </ButtonGroup>
                     </Box>
                   </Box>
@@ -589,7 +597,7 @@ const TermInfo = ({ open, setOpen }) => {
                   <Typography>General Information</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <GeneralInformation data={termInfoData} classes={classes} />
+                  <GeneralInformation data={termInfoData.metadata} classes={classes} />
                 </AccordionDetails>
               </Accordion>
 

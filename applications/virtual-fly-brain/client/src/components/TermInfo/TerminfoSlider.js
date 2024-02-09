@@ -37,11 +37,13 @@ const TerminfoSlider = (props) => {
       },
 
       '& .react-slideshow-container': {
-        height: '100%'
+        height: '100%',
       },
 
       '& .images-wrap': {
         height: '100%',
+        width: '100% !important',
+        transform: "translate(0px) !important",
         '& > div': {
         height: '100%',
         '& > div': {
@@ -122,19 +124,14 @@ const TerminfoSlider = (props) => {
   return (
     <Box sx={classes.root}>
       <Slide canSwipe={ false } slidesToShow={ 1 } slidesToScroll={ 1 } infinite={ false } indicators={ true } prevArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } nextArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } arrows={ true }>
-        {slideImages.length > 0 && (
-          <>
             {slideImages?.map((slideImage, index) => (
-              <div key={index}>
                 <img
+                  key={index}
                   style={imageStyle}
                   src={slideImage.url}
                   alt={slideImage.caption}
                 />
-              </div>
             ))}
-          </>
-        )}
       </Slide>
       {props.allowFullscreen && (
         <Button onClick={() => props.setFullScreen(true)} sx={ {

@@ -86,41 +86,31 @@ const controlsMenuConf = {
           icon: "fa fa-info",
           action: { handlerAction: ACTIONS.INFO }
         },
-        // {
-          // toggle : {
-          //   condition : entity => true, //entity.isSelected(),
-          //   isVisible : entity => true, //entity.isVisible(),
-          //   options : {
-          //     false : {
-          //       label: "Select",
-          //       icon: "fa fa-check-circle-o",
-          //       action: { handlerAction: ACTIONS.SELECT, }
-          //     },
-          //     true : {
-          //       label: "Unselect",
-          //       icon: "fa fa-check-circle",
-          //       action: { handlerAction: ACTIONS.DESELECT, }
-          //     }
-          //   }
-          // }
-        // },
-        // {
-          // toggle : {
-          //   condition : entity => true, //entity.isVisible(),
-          //   options : {
-          //     false : {
-          //       label: "Show",
-          //       icon: "fa fa-eye",
-          //       action: { handlerAction: ACTIONS.SHOW, }
-          //     },
-          //     true : {
-          //       label: "Hide",
-          //       icon: "fa fa-eye-slash",
-          //       action: { handlerAction: ACTIONS.HIDE, }
-          //     }
-          //   }
-          // }
-        // },
+        {
+          label: "Select",
+          icon: "fa fa-check-circle-o",
+          action: { handlerAction: ACTIONS.SELECT, }
+        },
+        {
+          label: "Deselect",
+          icon: "fa fa-check-circle-o",
+          action: { handlerAction: ACTIONS.DESELECT, }
+        },
+        {
+          label: "Show",
+          icon: "fa fa-eye",
+          action: { handlerAction: ACTIONS.SHOW, }
+        },
+        {
+          label: "Hide",
+          icon: "fa fa-eye-slash",
+          action: { handlerAction: ACTIONS.HIDE, }
+        },
+        {
+          label: "Color",
+          icon: "fa fa-color",
+          action: { handlerAction: ACTIONS.COLOR, }
+        },
         {
           label: "Delete",
           icon: "fa fa-trash",
@@ -131,7 +121,6 @@ const controlsMenuConf = {
           label: "Zoom To",
           icon: "fa fa-search-plus",
           action: { handlerAction: ACTIONS.ZOOM_TO },
-          isVisible : entity => entity.isVisible()
         },
         {
           label: "Show Volume",
@@ -140,22 +129,14 @@ const controlsMenuConf = {
           position: "right-start",
           list: [
             {
-              // toggle : {
-              //   condition : entity => { return true },
-              //   isVisible : entity => { return true },
-              //   options : {
-              //     false : {
-              //       label: "Enable 3D Volume",
-              //       icon: "gpt-shapeshow",
-              //       action: { handlerAction: ACTIONS.SHOW_VOLUME }
-              //     },
-              //     true : {
-              //       label: "Disable 3D Volume",
-              //       icon: "gpt-shapehide",
-              //       action: { handlerAction: ACTIONS.HIDE_VOLUME }
-              //     }
-              //   }
-              // }
+              label: "Enable 3D Volume",
+              icon: "gpt-shapeshow",
+              action: { handlerAction: ACTIONS.SHOW_VOLUME }
+            },
+            {
+              label: "Disable 3D Volume",
+              icon: "gpt-shapehide",
+              action: { handlerAction: ACTIONS.HIDE_VOLUME }
             },
           ]
         },
@@ -166,23 +147,14 @@ const controlsMenuConf = {
           position: "right-start",
           list: [
             {
-              // toggle : {
-              //   condition : entity => { return true },
-              //   isVisible : entity => { return true },
-              //   options : {
-              //     false : {
-              //       label: "Enable 3D Skeleton",
-              //       icon: "gpt-3dhide",
-              //       tooltip : "Show 3D Skeleton",
-              //       action: { handlerAction: ACTIONS.SHOW_SKELETON }
-              //     },
-              //     true : {
-              //       label: "Disable 3D Skeleton",
-              //       icon: "gpt-3dshow",
-              //       action: { handlerAction: ACTIONS.HIDE_SKELETON }
-              //     }
-              //   }
-              //}
+              label: "Enable 3D Skeleton",
+              icon: "gpt-3dhide",
+              action: { handlerAction: ACTIONS.SHOW_SKELETON }
+            },
+            {
+              label: "Disable 3D Skeleton",
+              icon: "gpt-3dshow",
+              action: { handlerAction: ACTIONS.HIDE_SKELETON }
             },
           ]
         },

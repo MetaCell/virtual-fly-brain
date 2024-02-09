@@ -63,9 +63,15 @@ class ThreeDCanvas extends Component {
     if(this.props.event.trigger !== prevProps.event.trigger){ 
       const mappedCanvasData = [...this.props.allLoadedInstances];
       const threeDObjects = [...this.props.threeDObjects];
+      const focusInstance = window.Instances?.find( instance => instance.wrappedObj.id === this.props.focusInstance?.Id);
 
       switch(this.props.event.action){
         case getInstancesTypes.FOCUS_INSTANCE:
+          if ( focusInstance){
+            this.canvasRef.current.threeDEngine.cameraManager.zoomTo([focusInstance])
+          } else {
+            this.canvasRef.current.defaultCameraControlsHandler("cameraHome")
+          }
           break;
         case getInstancesTypes.ADD_INSTANCE:{
           const instance = mappedCanvasData.find( i => i.metadata?.Id === this.props.event.id );

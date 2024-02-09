@@ -50,7 +50,6 @@ const conf = [
       const entityType = component.value._root.entries.find( e=> e[0] == "type")[1] ;
       return <div>
         <div style={{ width: "40%", textAlign: "left", float: "left" }} onClick={e => click(e)} dangerouslySetInnerHTML={{ __html: entityType }} />
-        <div style={{ textAlign: "right", width: "60%", float: "right" }} dangerouslySetInnerHTML={{ __html: entityType }} />
       </div>
     },
     source : entity => entity

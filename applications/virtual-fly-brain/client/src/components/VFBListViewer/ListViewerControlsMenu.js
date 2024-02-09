@@ -2,7 +2,8 @@ import React, { Component } from "react";
 import Menu from "@metacell/geppetto-meta-ui/menu/Menu";
 import { connect } from 'react-redux';
 import { ChromePicker } from 'react-color';
-import { getInstanceByID, removeInstanceByID, selectInstance } from '../../reducers/actions/instances';
+import { getInstanceByID, removeInstanceByID, selectInstance, changeColor,
+  show3DMesh, hide3DMesh, focusInstance, show3DSkeleton, hide3DSkeleton } from '../../reducers/actions/instances';
 
 const controlsConfiguration = require('../configuration/VFBListViewer/controlsMenuConfiguration').default;
 const ACTIONS = controlsConfiguration.actions;
@@ -46,9 +47,10 @@ class ListViewerControlsMenu extends Component {
   menuHandler (action, component) {
     switch (action.handlerAction){
     case ACTIONS.SHOW:
-
+      show3DMesh(this.props.instance)
       break;
     case ACTIONS.HIDE:
+      hide3DMesh(this.props.instance)
       break;
     case ACTIONS.SELECT:
       selectInstance(this.props.instance);
@@ -57,6 +59,7 @@ class ListViewerControlsMenu extends Component {
       selectInstance(this.props.instance);
       break;
     case ACTIONS.ZOOM_TO:
+      focusInstance(this.props.instance)
       break;
     case ACTIONS.DELETE:
       removeInstanceByID(this.props.instance);
@@ -68,16 +71,16 @@ class ListViewerControlsMenu extends Component {
       this.setState({ displayColorPicker: true });
       break;
     case ACTIONS.SHOW_VOLUME:
-
+      show3DMesh(this.props.instance)
       break;
     case ACTIONS.HIDE_VOLUME:
-
+      hide3DMesh(this.props.instance)
       break;
     case ACTIONS.SHOW_SKELETON:
-
+      show3DSkeleton(this.props.instance)
       break;
     case ACTIONS.HIDE_SKELETON:
-
+      hide3DSkeleton(this.props.instance)
       break;
     }
   }
@@ -161,6 +164,7 @@ class ListViewerControlsMenu extends Component {
   render () {
     // Update Menu Configuration
     let configuration = this.updateControlsConfiguration();
+    let matchInstance = this.props.allLoadedInstances.find( instance => instance.metadata?.Id === this.props.instance);
     return (
       <div id="LayersControls_Menu">
         <Menu
@@ -172,10 +176,18 @@ class ListViewerControlsMenu extends Component {
             ref={ref => this.colorPickerContainer = ref}
             style={{ left: this.state.pickerPosition }}>
             <ChromePicker
-              color={ this.props.instance.getColor() }
+              color={ matchInstance.color }
               onChangeComplete={ (color, event) => {
-                this.props.instance.setColor(color.hex);
-                this.setState({ displayColorPicker: true });
+                let rgb;
+                if ( color.source === "hsv" ){
+                  rgb = { r:color.rgb.r/255, g:color.rgb.g/255, b:color.rgb.b/255, a:color.rgb.a }
+                  changeColor(this.props.instance, rgb)
+                  setDisplayColorPicker(false)
+                } else if ( color.source === "hsl" ) {
+                  rgb = color.rgb;
+                  changeColor(this.props.instance, rgb)
+                }
+                this.setState({ displayColorPicker: true });                              
               }}
               style={{ zIndex: 10 }}/>
           </div>
@@ -186,7 +198,10 @@ class ListViewerControlsMenu extends Component {
 }
 
 function mapStateToProps (state) {
-  return { ... state }
+
+  return { 
+    allLoadedInstances : state.instances.allLoadedInstances
+  }
 }
 
 function mapDispatchToProps (dispatch) {

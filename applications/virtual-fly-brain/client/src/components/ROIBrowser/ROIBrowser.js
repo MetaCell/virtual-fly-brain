@@ -37,7 +37,7 @@ const ROIBrowser = (props) => {
 
     const templateID = useSelector((state) => state.globalInfo.templateID);
     const data = useSelector(state => state.instances.focusedInstance)?.metadata;
-    const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances)
+    const simpleInstances = useSelector(state => state.instances.simpleInstances)
 
     const styles = {
         left_second_column: 395,
@@ -337,7 +337,7 @@ const ROIBrowser = (props) => {
         let buttons = [];
         let fillCondition = "unknown";
         let instanceLoaded = false;
-        let match = allLoadedInstances.find( i => i.metadata?.Id == rowInfo.node.instanceId);
+        let match = simpleInstances.find( i => i.instancePath == rowInfo.node.instanceId);
 
         if (
             rowInfo.node.instanceId != undefined &&
@@ -420,10 +420,8 @@ const ROIBrowser = (props) => {
                                         let rgb;
                                         if ( color.source === "hsv" ){
                                             rgb = { r:color.rgb.r/255, g:color.rgb.g/255, b:color.rgb.b/255, a:color.rgb.a }
-                                        } else if ( color.source === "hsl" ) {
-                                            rgb = color.rgb;
+                                            changeColor(rowInfo.node.instanceId, rgb)
                                         }
-                                        changeColor(rowInfo.node.instanceId, rgb)
                                     }}
                                     style={{ zIndex: 10 }}
                                 /></div>

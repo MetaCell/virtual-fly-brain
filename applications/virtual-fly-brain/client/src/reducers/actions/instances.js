@@ -59,10 +59,12 @@ const showInstanceSkeletonMessage = id => ({
   }
 });
 
-const addInstanceSkeletonMessage = id => ({
+const addInstanceSkeletonMessage = (skeleton, mode, id) => ({
   type: getInstancesTypes.ADD_SKELETON,
   payload: {
-    id
+    id,
+    mode,
+    skeleton
   }
 });
 
@@ -166,10 +168,12 @@ export const getInstanceByID = async (queryId) => {
   }
 
   store.dispatch(getInstancesSuccess(response))
+}
 
+export const get3DMesh = async (instance) => {
   let mesh_response;
   try {
-    mesh_response = await get_3d_mesh(response);
+    mesh_response = await get_3d_mesh(instance);
   } catch (error) {
     console.log("Error ", error)
     store.dispatch(get3DOBJFailure(error.message))
@@ -192,8 +196,8 @@ export const selectInstance = async (id) => {
   store.dispatch(selectInstanceMessage(id))
 }
 
-export const add3DSkeleton = async (id) => {
-  store.dispatch(addInstanceSkeletonMessage(id))
+export const add3DSkeleton = async (skeleton,mode, id) => {
+  store.dispatch(addInstanceSkeletonMessage(skeleton, mode, id))
 }
 
 export const show3DSkeleton = async (id) => {

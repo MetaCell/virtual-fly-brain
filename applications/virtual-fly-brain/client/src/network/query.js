@@ -38,13 +38,13 @@ export const get_instance = async (short_form) => {
 }
 
 export const get_3d_mesh = async (targetInstance) => {
-  let response = await fetch(targetInstance?.Images?.[Object.keys(targetInstance?.Images)[0]][0].obj)
+  let response = await fetch(targetInstance?.metadata?.Images?.[Object.keys(targetInstance?.metadata?.Images)[0]][0].obj)
     .then(response => response.text())
     .then(base64Content => {
       const instance = {
         "eClass": "SimpleInstance",
-        "id": targetInstance?.Id,
-        "name": targetInstance?.Name,
+        "id": targetInstance?.metadata?.Id,
+        "name": targetInstance?.metadata?.Name,
         "type": { "eClass": "SimpleType" },
         "visualValue": {
           "eClass": Resources.OBJ,

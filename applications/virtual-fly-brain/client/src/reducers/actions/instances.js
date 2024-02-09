@@ -1,5 +1,5 @@
 import store from '../../store';
-import { get_instance } from "../../network/query"
+import { get_3d_mesh, get_instance } from "../../network/query"
 import { getInstancesTypes } from './types/getInstancesTypes';
 
 const getInstancesSuccess = query => ({
@@ -15,6 +15,24 @@ const getInstancesStarted = () => ({
 
 const getInstancesFailure = error => ({
   type: getInstancesTypes.GET_INSTANCES_FAILURE,
+  payload: {
+    error
+  }
+});
+
+const get3DOBJSuccess = query => ({
+  type: getInstancesTypes.GET_3D_OBJ_TYPE_SUCCESS,
+  payload: {
+    ...query
+  }
+});
+
+const get3DOBJStarted = () => ({
+  type: getInstancesTypes.GET_3D_OBJ_TYPE_STARTED
+});
+
+const get3DOBJFailure = error => ({
+  type: getInstancesTypes.GET_3D_OBJ_TYPE_FAILURE,
   payload: {
     error
   }
@@ -148,6 +166,17 @@ export const getInstanceByID = async (queryId) => {
   }
 
   store.dispatch(getInstancesSuccess(response))
+
+  let mesh_response;
+  try {
+    mesh_response = await get_3d_mesh(response);
+  } catch (error) {
+    console.log("Error ", error)
+    store.dispatch(get3DOBJFailure(error.message))
+    return
+  }
+
+  store.dispatch(get3DOBJSuccess(mesh_response))
 }
 
 export const removeInstanceByID = async (queryId) => {

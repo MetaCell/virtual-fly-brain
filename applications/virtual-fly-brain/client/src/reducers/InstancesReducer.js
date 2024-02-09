@@ -1,15 +1,95 @@
 import { getInstancesTypes } from './actions/types/getInstancesTypes';
 import {SELECTED_COLOR, DESELECTED_COLOR, TEMPLATE_COLOR} from './../utils/constants';
+import SimpleInstance from "@metacell/geppetto-meta-core/model/SimpleInstance";
+import { augmentInstancesArray } from '@metacell/geppetto-meta-core/Instances';
+import SharkViewer, { swcParser } from '@janelia/sharkviewer';
+import * as THREE from 'three';
 
 export const initialStateInstancesReducer = {
   allPotentialInstances : [],
   allLoadedInstances : [],
+  simpleInstances : [],
   focusedInstance : "",
   event : {},
   isLoading: false,
   launchTemplate : null,
   error: false
 };
+
+//TODO : Refactor into reducer
+const loadInstances = (instance, simpleInstances) =>{
+  const instance1 = new SimpleInstance(instance)
+  instance1.color = instance.color;
+  let instances = window.Instances;
+  if ( instances === undefined ){
+    instances = [];
+  }
+  instances?.find( i => i.wrappedObj?.id === instance.id ) ? null : window.Instances = [...instances, instance1]
+  let that = this;
+  window.Instances.forEach( inst => {
+    inst.color = simpleInstances?.find( i => inst.wrappedObj.id === i.Id )?.color;
+  })
+  augmentInstancesArray(window.Instances);
+}
+
+
+//TODO : Refactor into reducer
+const showSkeleton = (targetInstance, mode, visible) => {
+  let that = this;
+  let allLoadedInstances = props.allLoadedInstances;
+  let match = allLoadedInstances?.find ( inst => inst.metadata?.Id === targetInstance?.metadata?.Id );
+
+  if ( targetInstance?.skeleton?.[mode] === undefined ) {
+      // Initialize shark viewer to load SWC
+      let sharkviewer = new SharkViewer({ dom_element: "canvas" });
+      sharkviewer.mode = mode;
+      sharkviewer.three_colors = [];
+      Object.keys(sharkviewer.colors).forEach(color => {
+        sharkviewer.three_colors.push(new THREE.Color(sharkviewer.colors[color]));
+      })
+      sharkviewer.three_materials = [];
+      Object.keys(sharkviewer.colors).forEach(color => {
+        sharkviewer.three_materials.push(
+          new THREE.MeshBasicMaterial({
+            color: sharkviewer.colors[color],
+            wireframe: false
+          })
+        );
+      });
+      fetch(match.metadata?.Images?.[Object.keys(match.metadata?.Images)[0]][0].swc)
+        .then(response => response.text())
+        .then(base64Content => {
+          const swcJSON = swcParser(base64Content);
+          let neuron = sharkviewer.createNeuron(swcJSON, targetInstance?.metadata?.Id, that?.canvasRef?.current?.threeDEngine?.renderer);
+          match.skeleton = { ...match.skeleton, visible : true, [mode] : { visible : true, neuron : neuron }};
+          neuron.name = targetInstance?.metadata?.Id + mode;
+      })
+  } else {
+    match.skeleton.visible = visible;
+    match.skeleton[mode].visible = visible;
+  }
+}
+
+//TODO : Refactor into reducer
+const getProxyInstances = (simpleInstances) => {
+  return window.Instances.map(i => (
+    { ...i,
+      instancePath: i.getId(),
+      visibility : simpleInstances?.find( cd => cd.instancePath === i.getId())?.visibility,
+      color : i.color
+    }
+  ))
+}
+
+//TODO : Refactor into reducer
+const updateColors = ( inst) => {
+  let match = state.simpleInstances?.find( m => m.instancePath === inst?.metadata?.Id )
+  let color = inst.color;
+  let colorMatch = match?.color?.b === color?.b && match?.color?.r === color?.r && match?.color?.g === color?.g;
+  if ( !colorMatch && inst?.color && match ){
+      match.color = color;
+  }
+}
 
 const InstancesReducer = (state = initialStateInstancesReducer, response) => {
   switch (response.type) {
@@ -133,12 +213,27 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         return Object.assign({}, state, {
         isLoading: true
       })
-      case getInstancesTypes.GET_3D_OBJ_TYPE_SUCCESS:
+      case getInstancesTypes.GET_3D_OBJ_TYPE_SUCCESS:{
+        const matchLoadedInstance = state.allLoadedInstances.find( i => i.metadata?.Id === response.payload.Id );
+        const simpleInstance = response.payload;
+        const simpleInstances = [...state.simpleInstances]
+        simpleInstance.color = matchLoadedInstance?.color;
+        loadInstances(simpleInstance, simpleInstances)
+        const data = getProxyInstances(simpleInstances);
+        const newData = data.map((item) => {
+          return {
+            color: item.color,
+            instancePath: item.instancePath,
+            visibility : true
+          };
+        });
+        simpleInstance.setGeometryType && simpleInstance.setGeometryType('cylinders')
+      
         return Object.assign({}, state, {
-          instanceOnFocus: response.payload,
-          allLoadedInstances: state.visibleInstances?.find( i => i.Id === response.payload.Id ) ? [...state.visibleInstances] : [...state.visibleInstances, response.payload],
+          simpleInstances : newData,
+          event : { action : getInstancesTypes.UPDATE_INSTANCES, id : response.payload.id, trigger : Date.now()},
           isLoading: false
-        })
+        })}
       case getInstancesTypes.GET_3D_OBJ_TYPE_FAILURE:
         return Object.assign({}, state, {
           instanceOnFocus: response.payload.error,

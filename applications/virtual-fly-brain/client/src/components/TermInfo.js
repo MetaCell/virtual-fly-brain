@@ -18,7 +18,7 @@ import { TreeItem } from "@mui/lab";
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import RectangleIcon from '@mui/icons-material/Rectangle';
 import GeneralInformation from "./TermInfo/GeneralInformation";
-import { getInstanceByID, selectInstance, hide3DMesh, show3DMesh, removeInstanceByID,
+import { getInstanceByID, selectInstance, hide3DMesh, hide3D, show3D, show3DMesh, removeInstanceByID,
   changeColor, focusInstance, show3DSkeleton, hide3DSkeleton, show3DSkeletonLines, show3DSkeletonCylinders } from './../reducers/actions/instances';
 import Ribbon from '@flybase/react-ontology-ribbon';
 import { ChromePicker } from 'react-color';
@@ -248,9 +248,9 @@ const TermInfo = ({ open, setOpen }) => {
 
   const handleVisibility = () => {
     if ( allLoadedInstances.find( instance => instance.metadata?.Id == termInfoData.metadata?.Id )?.simpleInstance?.visibility ) {
-      hide3DMesh(termInfoData.metadata?.Id)
+      hide3D(termInfoData.metadata?.Id)
     } else {
-      show3DMesh(termInfoData.metadata?.Id)
+      show3D(termInfoData.metadata?.Id)
     }
   }
 
@@ -279,7 +279,7 @@ const TermInfo = ({ open, setOpen }) => {
   }
 
   const handleCylinder = (event) => {
-    if ( allLoadedInstances.find( instance => instance.metadata?.Id == termInfoData.metadata?.Id )?.skeleton?.skeleton?.visible ) {
+    if ( !allLoadedInstances.find( instance => instance.metadata?.Id == termInfoData.metadata?.Id )?.skeleton?.sphere?.visible ) {
       show3DSkeletonCylinders(termInfoData.metadata?.Id)
     } else {
       show3DSkeletonLines(termInfoData.metadata?.Id)
@@ -530,9 +530,9 @@ const TermInfo = ({ open, setOpen }) => {
                             : null
                           }
                         </>
-                        <Tooltip title={ getInstance()?.simpleInstance?.visibility ? "Hide" : "Show"}>
+                        <Tooltip title={ getInstance()?.visible ? "Hide" : "Show"}>
                           <Button onClick={() => handleVisibility()}>
-                            {  getInstance()?.simpleInstance?.visibility ? <EyeOff /> : <Eye /> }
+                            {  getInstance()?.visible ? <EyeOff /> : <Eye /> }
                           </Button>
                         </Tooltip>
                         <Tooltip title={ getInstance()?.simpleInstance?.selected ? "Deselect" : "Select"}>
@@ -558,9 +558,9 @@ const TermInfo = ({ open, setOpen }) => {
                         :
                         null}
                         { termInfoData?.metadata?.SuperTypes?.find( s => s === NEURON) ?
-                        <Tooltip title={getInstance()?.skeleton?.[SKELETON]?.visible ? "Show 3D Cylinder Skeleton" : "Show 3D Lines Skeleton"}>
+                        <Tooltip title={getInstance()?.skeleton?.[CYLINDERS]?.visible ? "Show 3D Lines Skeleton" : "Show 3D Cylinder Skeleton"}>
                           <Button onClick={(event) => handleCylinder(event)}>
-                          {getInstance()?.skeleton?.[SKELETON]?.visible ? <CylinderOn id={CYLINDERS}/> : <CylinderOff id={SKELETON} /> }
+                          {getInstance()?.skeleton?.[CYLINDERS]?.visible ? <CylinderOff id={SKELETON} /> : <CylinderOn id={CYLINDERS}/> }
                           </Button>
                         </Tooltip>
                         :

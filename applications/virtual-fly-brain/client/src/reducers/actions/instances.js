@@ -110,15 +110,15 @@ const hide3DMeshMessage = id => ({
   }
 });
 
-const show3DVolumeMessage = id => ({
-  type: getInstancesTypes.SHOW_3D_VOLUME,
+const show3DMessage = id => ({
+  type: getInstancesTypes.SHOW_3D,
   payload: {
     id
   }
 });
 
-const hide3DVolumeMessage = id => ({
-  type: getInstancesTypes.HIDE_3D_VOLUME,
+const hide3DMessage = id => ({
+  type: getInstancesTypes.HIDE_3D,
   payload: {
     id
   }
@@ -228,12 +228,12 @@ export const hide3DMesh = async (id) => {
   store.dispatch(hide3DMeshMessage(id))
 }
 
-export const show3DVolume = async (id) => {
-  store.dispatch(show3DVolumeMessage(id))
+export const show3D = async (id) => {
+  store.dispatch(show3DMessage(id))
 }
 
-export const hide3DVolume = async (id) => {
-  store.dispatch(hide3DVolumeMessage(id))
+export const hide3D = async (id) => {
+  store.dispatch(hide3DMessage(id))
 }
 
 export const changeColor = async (id, color) => {

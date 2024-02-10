@@ -129,7 +129,17 @@ class ThreeDCanvas extends Component {
             add3DSkeleton(neuron, mode, match?.metadata?.Id)
         })
     } else {
-      this.setState({ ...this.state, threeDObjects : threeDObjects})
+      let updatedCanvasData = allLoadedInstances?.filter( m => m?.simpleInstance )?.map( instance => {
+        let { color, visibility, id } = instance.simpleInstance;
+        return {
+          instancePath : id,
+          visibility,
+          color,
+          selected : instance.selected
+        }
+      })
+      let updatedObjects = threeDObjects?.filter( m => m.visible);
+      this.setState({ ...this.state, mappedCanvasData : updatedCanvasData, threeDObjects : updatedObjects})
     }
   }
 

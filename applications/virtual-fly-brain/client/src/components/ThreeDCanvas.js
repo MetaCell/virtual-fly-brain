@@ -85,7 +85,7 @@ class ThreeDCanvas extends Component {
             }
           })
 
-          let updatedObjects = threeDObjects?.filter( m => m.visible)?.map( object => { return object });
+          let updatedObjects = threeDObjects?.filter( m => m.visible);
 
           this.setState({ ...this.state, mappedCanvasData : updatedCanvasData, threeDObjects : updatedObjects})
           break;

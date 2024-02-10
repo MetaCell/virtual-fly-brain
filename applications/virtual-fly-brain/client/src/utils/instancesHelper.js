@@ -24,20 +24,3 @@ export const getProxyInstances = (loadedInstances, instances) => {
     }
   ))
 }
-
-export const getInstance = (instance) => {
-  const simpleInstance = {
-    "eClass": "SimpleInstance",
-    "id": instance?.instancePath,
-    "name": instance?.name,
-    "type": { "eClass": "SimpleType" },
-    "visualValue": {
-      "eClass": Resources.OBJ,
-      'obj': base64Content
-    }, 
-    "visible" : true,
-    "color" : instance?.color
-  }
-
-  return simpleInstance;
-}

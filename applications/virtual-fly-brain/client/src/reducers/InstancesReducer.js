@@ -1,6 +1,8 @@
 import { getInstancesTypes } from './actions/types/getInstancesTypes';
 import {SELECTED_COLOR, DESELECTED_COLOR, TEMPLATE_COLOR, SKELETON, CYLINDERS } from './../utils/constants';
 import { loadInstances, getProxyInstances } from './../utils/instancesHelper'
+import { SkeletonOff } from '../icons';
+import { on } from 'events';
 
 export const initialStateInstancesReducer = {
   allPotentialInstances : [],
@@ -101,9 +103,11 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         matchSimpleInstance.color = response.payload.color;
 
         const threeDObjects = [...state.threeDObjects];
-        const matchObject = threeDObjects.find( o => o.name === response.payload.id );
-        if ( matchObject ) {
-          matchObject.color = response.payload.color;
+        const matchObjects = threeDObjects.filter( o => o.name.includes(response.payload.id));
+        if ( matchObjects?.length > 0 ) {
+          matchObjects?.forEach( mo => 
+            mo.children[0].material.color = response.payload.color
+          )
         }
 
         return Object.assign({}, state, {
@@ -174,11 +178,13 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       case getInstancesTypes.ADD_SKELETON:{
         const allLoadedInstances = [...state.allLoadedInstances]
         const instance = allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );
-        
+        const mode = response.payload.mode;
+        const objectName = response.payload.id + "_" + mode;
+
         let skeleton = response.payload.skeleton;
         skeleton.visible = true;
+        skeleton.name = objectName;
 
-        const mode = response.payload.mode;
         const threeDObjects = [...state.threeDObjects];
         if ( instance.skeleton ) {
           instance.skeleton[mode] = skeleton;
@@ -186,7 +192,10 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
           instance.skeleton = {};
           instance.skeleton[mode] = skeleton;
         }
-        threeDObjects.push(skeleton);
+
+        if ( !threeDObjects?.find( o => o.name === objectName) ) {
+          threeDObjects.push(skeleton);
+        }
 
         return Object.assign({}, state, {
           threeDObjects : threeDObjects,
@@ -201,7 +210,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       }
       case getInstancesTypes.SHOW_SKELETON:{
         const threeDObjects = [...state.threeDObjects];
-        const matchObject = threeDObjects.find( o => o.name === response.payload.id );
+        const matchObject = threeDObjects.find( o => o.name === response.payload.id  + "_" + SKELETON );
         if ( matchObject ) {
           matchObject.visible = true;
         }
@@ -220,7 +229,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       case getInstancesTypes.HIDE_SKELETON:{
         const threeDObjects = [...state.threeDObjects];
         
-        const matchObject = threeDObjects.find( o => o.name === response.payload.id );
+        const matchObject = threeDObjects.find( o => o.name === response.payload.id + "_" + SKELETON );
         if ( matchObject ){
           matchObject.visible = false;
         }
@@ -231,22 +240,47 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         })
       }
       case getInstancesTypes.SHOW_CYLINDERS:{
-        const updateInstances = [...state.allLoadedInstances]
-        const instance = state.allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );
-        instance.skeleton.visible = true;
+        const threeDObjects = [...state.threeDObjects];
+        const matchObject = threeDObjects.find( o => o.name === response.payload.id  + "_" + CYLINDERS );
+        if ( matchObject ) {
+          matchObject.visible = true;
+        }
+        const matchSkeleton = threeDObjects.find( o => o.name === response.payload.id  + "_" + SKELETON );
+        if ( matchSkeleton ) {
+          matchSkeleton.visible = false;
+        }
+
         return Object.assign({}, state, {
-          allLoadedInstances:updateInstances,
-          event : { action : getInstancesTypes.SHOW_CYLINDERS, mode : CYLINDERS, id : response.payload.id, trigger : Date.now()},
+          threeDObjects : threeDObjects, 
+          event : { 
+            action : getInstancesTypes.UPDATE_SKELETON, 
+            id : response.payload.id,  
+            mode : CYLINDERS,
+            visible : true, 
+            trigger : Date.now()
+          },
           isLoading: false
         })
       }
       case getInstancesTypes.SHOW_LINES:{
-        const updateInstances = [...state.allLoadedInstances]
-        const instance = state.allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );
-        instance.skeleton.visible = true;
+        const threeDObjects = [...state.threeDObjects];
+        const matchObject = threeDObjects.find( o => o.name === response.payload.id  + "_" + SKELETON );
+        if ( matchObject ) {
+          matchObject.visible = true;
+        }
+        const matchLines = threeDObjects.find( o => o.name === response.payload.id  + "_" + CYLINDERS );
+        if ( matchLines ) {
+          matchLines.visible = false;
+        }
         return Object.assign({}, state, {
-          allLoadedInstances:updateInstances,
-          event : { action : getInstancesTypes.SHOW_LINES, mode : SKELETON, id : response.payload.id, trigger : Date.now()},
+          threeDObjects : threeDObjects, 
+          event : { 
+            action : getInstancesTypes.UPDATE_SKELETON, 
+            id : response.payload.id,  
+            mode : SKELETON,
+            visible : true, 
+            trigger : Date.now()
+          },
           isLoading: false
         })
       }

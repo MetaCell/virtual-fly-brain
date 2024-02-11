@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { ChromePicker } from 'react-color';
 import { getInstanceByID, removeInstanceByID, selectInstance, changeColor,
   show3DMesh, hide3DMesh, focusInstance, show3DSkeleton, hide3DSkeleton } from '../../reducers/actions/instances';
+import { NEURON , RGBAToHexA} from "./../../utils/constants"
 
 const controlsConfiguration = require('../configuration/VFBListViewer/controlsMenuConfiguration').default;
 const ACTIONS = controlsConfiguration.actions;
@@ -150,18 +151,19 @@ class ListViewerControlsMenu extends Component {
     let buttons = [...configuration.buttons];
  
     let updatedButtons = buttons.map((button, index) => {
+      const updatedButton = {...button}
       if ( self.props.allLoadedInstances?.find( i => i.metadata?.Id == self.props.instance) !== undefined ) {
-        button.activeColor = self.props.allLoadedInstances?.find( i => i.metadata?.Id == self.props.instance)?.color;
-        button.list.map(item => {
+        updatedButton.activeColor = RGBAToHexA(self.props.allLoadedInstances?.find( i => i.metadata?.Id == self.props.instance)?.color);
+        updatedButton.list.map(item => {
           // Iterate through button list in configuration, store new configuration in 'list' array
           this.iterateConfList(list, item);
         })
       
         // Replace buttons list in configuration with updated one
-        button.list = list;
+        updatedButton.list = list;
       }
 
-      return button;
+      return updatedButton;
     });
         
     return { ...configuration, buttons : updatedButtons };
@@ -188,7 +190,7 @@ class ListViewerControlsMenu extends Component {
                 if ( color.source === "hsv" ){
                   rgb = { r:color.rgb.r/255, g:color.rgb.g/255, b:color.rgb.b/255, a:color.rgb.a }
                   changeColor(this.props.instance, rgb)
-                  setDisplayColorPicker(false)
+                  this.setState({ displayColorPicker: false });     
                 } else if ( color.source === "hsl" ) {
                   rgb = color.rgb;
                   changeColor(this.props.instance, rgb)

@@ -1,4 +1,6 @@
 import React from "react";
+import { SkeletonOff, SkeletonOn } from "../../../icons";
+import { NEURON } from "../../../utils/constants";
 
 var ACTIONS = {
   COLOR : 'color',
@@ -72,7 +74,7 @@ const controlsMenuConf = {
     {
       label: "",
       icon: <i className="fa fa-eye" />,
-      activeColor : "",
+      activeColor : "red",
       action: "",
       position: "bottom-start",
       caret : {
@@ -109,8 +111,8 @@ const controlsMenuConf = {
         {
           list : [
               { toggle : {
-                condition : entity => { return entity.visible },
-                isVisible : entity => { true },
+                condition : entity => { return entity.simpleInstance?.visibility ? true : false},
+                isVisible : entity => { return true },
                 options : {
                   false : {
                     label: "Show",
@@ -146,17 +148,17 @@ const controlsMenuConf = {
           list: [
             {
               toggle : {
-                condition : entity => { return true },
+                condition : entity => { return entity?.simpleInstance?.visibility ? true : false },
                 isVisible : entity => { return true },
                 options : {
                   false : {
                     label: "Enable 3D Volume",
-                    icon: "gpt-shapeshow",
+                    icon: "fa fa-eye",
                     action: { handlerAction: ACTIONS.SHOW_VOLUME }
                   },
                   true : {
                     label: "Disable 3D Volume",
-                    icon: "gpt-shapehide",
+                    icon: "fa fa-eye-slash",
                     action: { handlerAction: ACTIONS.HIDE_VOLUME }
                   }
                 }
@@ -168,18 +170,18 @@ const controlsMenuConf = {
           list: [
             {
               toggle : {
-                condition : entity => { return true },
+                condition : entity => { return entity?.skeleton?.skeleton?.visible || entity?.skeleton?.sphere?.visible ? true : false },
                 isVisible : entity => { return true },
                 options : {
                   false : {
                     label: "Enable 3D Skeleton",
-                    icon: "gpt-3dhide",
+                    icon: <SkeletonOn/>,
                     tooltip : "Show 3D Skeleton",
                     action: { handlerAction: ACTIONS.SHOW_SKELETON }
                   },
                   true : {
                     label: "Disable 3D Skeleton",
-                    icon: "gpt-3dshow",
+                    icon: <SkeletonOff/>,
                     action: { handlerAction: ACTIONS.HIDE_SKELETON }
                   }
                 }

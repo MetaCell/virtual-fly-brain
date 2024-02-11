@@ -24,10 +24,8 @@ import Ribbon from '@flybase/react-ontology-ribbon';
 import { ChromePicker } from 'react-color';
 import Link from '@mui/material/Link';
 import useClickOutside from "./useClickOutside";
-import { SKELETON, CYLINDERS } from "./../utils/constants"
+import { SKELETON, CYLINDERS , NEURON , RGBAToHexA} from "./../utils/constants"
 import '@flybase/react-ontology-ribbon/dist/style.css';
-
-const NEURON = "Neuron";
 
 const {
   whiteColor,
@@ -38,24 +36,6 @@ const {
   headerBorderColor,
   primaryBg
 } = vars;
-
-const RGBAToHexA = (color) => {
-  let r =  Math.round(color?.r * 255).toString(16);
-  let g =  Math.round(color?.g * 255).toString(16);
-  let b =  Math.round(color?.b * 255).toString(16);
-  let a = Math.round(color?.a * 255).toString(16);
-
-  if (r?.length == 1)
-    r = "0" + r;
-  if (g?.length == 1)
-    g = "0" + g;
-  if (b?.length == 1)
-    b = "0" + b;
-  if (a?.length == 1)
-    a = "0" + a;
-
-  return "#" + r + g + b + a;
-}
 
 const getRibbonData = (query) => {
 

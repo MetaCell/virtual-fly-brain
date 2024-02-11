@@ -237,8 +237,8 @@ const TermInfo = ({ open, setOpen }) => {
   }
 
   const deleteId = (id) => {
-    hide3DMesh(termInfoData.metadata?.Id)
-    removeInstanceByID(termInfoData.metadata?.Id)
+    hide3DMesh(termInfoData?.metadata?.Id)
+    removeInstanceByID(termInfoData?.metadata?.Id)
     setTermInfoData(null)
   }
 
@@ -247,42 +247,42 @@ const TermInfo = ({ open, setOpen }) => {
   }
 
   const handleVisibility = () => {
-    if ( allLoadedInstances.find( instance => instance.metadata?.Id == termInfoData.metadata?.Id )?.simpleInstance?.visibility ) {
-      hide3D(termInfoData.metadata?.Id)
+    if ( allLoadedInstances.find( instance => instance.metadata?.Id == termInfoData?.metadata?.Id )?.visible ) {
+      hide3D(termInfoData?.metadata?.Id)
     } else {
-      show3D(termInfoData.metadata?.Id)
+      show3D(termInfoData?.metadata?.Id)
     }
   }
 
   const handleMeshVisibility = () => {
-    if ( allLoadedInstances.find( instance => instance.metadata?.Id == termInfoData.metadata?.Id )?.simpleInstance?.visibility ) {
-      hide3DMesh(termInfoData.metadata?.Id)
+    if ( allLoadedInstances.find( instance => instance.metadata?.Id == termInfoData?.metadata?.Id )?.simpleInstance?.visibility ) {
+      hide3DMesh(termInfoData?.metadata?.Id)
     } else {
-      show3DMesh(termInfoData.metadata?.Id)
+      show3DMesh(termInfoData?.metadata?.Id)
     }
   }
 
   const handleFocus = (event) => {
-    focusInstance(termInfoData.Id)
+    focusInstance(termInfoData?.Id)
   }
 
   const handleSelection = (event) => {
-    selectInstance(termInfoData.metadata?.Id)
+    selectInstance(termInfoData?.metadata?.Id)
   }
 
   const handleSkeleton = (event) => {
-    if ( !allLoadedInstances.find( instance => instance.metadata?.Id == termInfoData.metadata?.Id )?.skeleton?.skeleton?.visible ) {
-      show3DSkeleton(termInfoData.metadata?.Id)
+    if ( !allLoadedInstances.find( instance => instance.metadata?.Id == termInfoData?.metadata?.Id )?.skeleton?.skeleton?.visible ) {
+      show3DSkeleton(termInfoData?.metadata?.Id)
     } else {
-      hide3DSkeleton(termInfoData.metadata?.Id)
+      hide3DSkeleton(termInfoData?.metadata?.Id)
     }
   }
 
   const handleCylinder = (event) => {
-    if ( !allLoadedInstances.find( instance => instance.metadata?.Id == termInfoData.metadata?.Id )?.skeleton?.sphere?.visible ) {
-      show3DSkeletonCylinders(termInfoData.metadata?.Id)
+    if ( !allLoadedInstances.find( instance => instance.metadata?.Id == termInfoData?.metadata?.Id )?.skeleton?.sphere?.visible ) {
+      show3DSkeletonCylinders(termInfoData?.metadata?.Id)
     } else {
-      show3DSkeletonLines(termInfoData.metadata?.Id)
+      show3DSkeletonLines(termInfoData?.metadata?.Id)
     }
   }
 
@@ -519,11 +519,11 @@ const TermInfo = ({ open, setOpen }) => {
                               let rgb;
                               if ( color.source === "hsv" ){
                                 rgb = { r:color.rgb.r/255, g:color.rgb.g/255, b:color.rgb.b/255, a:color.rgb.a }
-                                changeColor(termInfoData.metadata?.Id, rgb)
+                                changeColor(termInfoData?.metadata?.Id, rgb)
                                 setDisplayColorPicker(false)
                               } else if ( color.source === "hsl" ) {
                                 rgb = color.rgb;
-                                changeColor(termInfoData.metadata?.Id, rgb)
+                                changeColor(termInfoData?.metadata?.Id, rgb)
                               }                              
                             }}
                             style={{ zIndex: 10 }}/>
@@ -597,7 +597,7 @@ const TermInfo = ({ open, setOpen }) => {
                   <Typography>General Information</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <GeneralInformation data={termInfoData.metadata} classes={classes} />
+                  <GeneralInformation data={termInfoData?.metadata} classes={classes} />
                 </AccordionDetails>
               </Accordion>
 

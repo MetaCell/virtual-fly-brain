@@ -70,10 +70,15 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         if ( loadedInstances.length === 1 && loadedInstances[0]?.metadata.IsTemplate ){
           focusedInstance = loadedInstances[0];
         }
+
+        const threeDObjects = [...state.threeDObjects];
+        const matchObjects = threeDObjects.filter( o => !o.name.includes(response.payload.query));
+
         return Object.assign({}, state, {
           allLoadedInstances: loadedInstances,
+          threeDObjects : matchObjects,
           focusedInstance : focusedInstance,
-          event : { action : getInstancesTypes.REMOVE_INSTANCES_SUCCESS, id : response.payload.query, trigger : Date.now()},
+          event : { action : getInstancesTypes.UPDATE_INSTANCES, id : response.payload.query, trigger : Date.now()},
           isLoading: false
         })
       }
@@ -183,7 +188,6 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         const simpleInstance = response.payload;
         simpleInstance.color = matchLoadedInstance?.color;
         loadInstances(simpleInstance, state.allLoadedInstances)
-        // simpleInstance.setGeometryType && simpleInstance.setGeometryType('cylinders')
         simpleInstance.visibility = true;
         matchLoadedInstance.simpleInstance = simpleInstance;
 
@@ -333,7 +337,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         }
         
         const threeDObjects = [...state.threeDObjects];
-        const matchObject = threeDObjects.find( o => o.name === response.payload.id  + SKELETON );
+        const matchObject = threeDObjects.forEach( o => o.name.includes(response.payload.id) ? matchObject.visible = true : null );
         if ( matchObject ) {
           matchObject.visible = true;
         }

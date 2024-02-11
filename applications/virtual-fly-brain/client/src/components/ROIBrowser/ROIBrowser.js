@@ -37,7 +37,7 @@ const ROIBrowser = (props) => {
 
     const templateID = useSelector((state) => state.globalInfo.templateID);
     const data = useSelector(state => state.instances.focusedInstance)?.metadata;
-    const simpleInstances = useSelector(state => state.instances.simpleInstances)
+    const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances)
 
     const styles = {
         left_second_column: 395,
@@ -337,7 +337,7 @@ const ROIBrowser = (props) => {
         let buttons = [];
         let fillCondition = "unknown";
         let instanceLoaded = false;
-        let match = simpleInstances.find( i => i.instancePath == rowInfo.node.instanceId);
+        let match = allLoadedInstances.find( i => i.metadata?.Id == rowInfo.node.instanceId);
 
         if (
             rowInfo.node.instanceId != undefined &&

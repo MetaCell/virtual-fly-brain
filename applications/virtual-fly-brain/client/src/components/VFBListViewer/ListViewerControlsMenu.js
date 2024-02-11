@@ -65,7 +65,7 @@ class ListViewerControlsMenu extends Component {
       removeInstanceByID(this.props.instance);
       break;
     case ACTIONS.INFO:
-      getInstanceByID(this.props.instance);
+      focusInstance(this.props.instance);
       break;
     case ACTIONS.COLOR:
       this.setState({ displayColorPicker: true });
@@ -96,11 +96,12 @@ class ListViewerControlsMenu extends Component {
    * }
    */
   visibleButton (list,item) {
+    let instance = this.props.allLoadedInstances?.find( i => i.metadata?.Id == this.props.instance);
     // Button configuration has two options, perform condition to determine which button to use 
     if ( item.toggle ){
-      let condition = item.toggle.condition(this.props.instance);
+      let condition = item.toggle.condition(instance);
       if ( item.toggle.isVisible !== undefined) {
-        let visible = item.toggle.isVisible(this.props.instance);
+        let visible = item.toggle.isVisible(instance);
         if ( visible ) {
           list.push(item.toggle.options[condition]);
         }
@@ -109,7 +110,7 @@ class ListViewerControlsMenu extends Component {
       }
     } else {
       if ( item.isVisible !== undefined) {
-        let visible = item.isVisible(this.props.instance);
+        let visible = item.isVisible(instance);
         if ( visible ) {
           list.push(item);
         }
@@ -145,10 +146,12 @@ class ListViewerControlsMenu extends Component {
     var configuration = { ...controlsConfiguration };
     let list = new Array();
     let self = this;
+
+    let buttons = [...configuration.buttons];
  
-    configuration.buttons.map((button, index) => {
-      if ( self.props.instance?.getColor !== undefined ) {
-        button.activeColor = self.props.instance?.getColor();
+    let updatedButtons = buttons.map((button, index) => {
+      if ( self.props.allLoadedInstances?.find( i => i.metadata?.Id == self.props.instance) !== undefined ) {
+        button.activeColor = self.props.allLoadedInstances?.find( i => i.metadata?.Id == self.props.instance)?.color;
         button.list.map(item => {
           // Iterate through button list in configuration, store new configuration in 'list' array
           this.iterateConfList(list, item);
@@ -157,9 +160,11 @@ class ListViewerControlsMenu extends Component {
         // Replace buttons list in configuration with updated one
         button.list = list;
       }
+
+      return button;
     });
         
-    return configuration;
+    return { ...configuration, buttons : updatedButtons };
   }
   render () {
     // Update Menu Configuration
@@ -169,6 +174,7 @@ class ListViewerControlsMenu extends Component {
       <div id="LayersControls_Menu">
         <Menu
           configuration={configuration}
+          key="list_viewer"
           menuHandler={ value => this.menuHandler(value) }/>
         { this.state.displayColorPicker === true
           ? <div

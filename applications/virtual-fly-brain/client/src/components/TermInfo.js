@@ -340,7 +340,12 @@ const TermInfo = ({ open, setOpen }) => {
       setTermInfoData(data)
     }
   }, [allLoadedInstances])
-  
+
+  useEffect(() => {
+    if (  focusInstance?.metadata !== undefined ) {
+      setTermInfoData(focusInstance)
+    }
+  }, [focusInstance])
 
   const getInstance = () => {
     let instance = allLoadedInstances.find( instance => instance.metadata?.Id == termInfoData?.metadata?.Id );
@@ -535,9 +540,9 @@ const TermInfo = ({ open, setOpen }) => {
                             {  getInstance()?.visible ? <EyeOff /> : <Eye /> }
                           </Button>
                         </Tooltip>
-                        <Tooltip title={ getInstance()?.simpleInstance?.selected ? "Deselect" : "Select"}>
+                        <Tooltip title={ getInstance()?.selected ? "Deselect" : "Select"}>
                           <Button onClick={(event) => handleSelection(event)}>
-                            { getInstance()?.simpleInstance?.selected ? <SelectOff /> : <Focus /> }
+                            { getInstance()?.selected ? <SelectOff /> : <Focus /> }
                           </Button>
                         </Tooltip>
                         <Tooltip title={"Focus on 3D Mesh"}>

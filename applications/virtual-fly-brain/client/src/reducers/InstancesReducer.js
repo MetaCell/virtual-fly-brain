@@ -3,6 +3,7 @@ import {SELECTED_COLOR, DESELECTED_COLOR, TEMPLATE_COLOR, SKELETON, CYLINDERS } 
 import { loadInstances, getProxyInstances } from './../utils/instancesHelper'
 import { SkeletonOff } from '../icons';
 import { on } from 'events';
+import { find } from '@nosferatu500/react-sortable-tree';
 
 export const initialStateInstancesReducer = {
   allPotentialInstances : [],
@@ -147,19 +148,21 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       case getInstancesTypes.FOCUS_INSTANCE:{
         const findInstance = state.allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );
         return Object.assign({}, state, {
-          focusInstance: findInstance,
+          focusedInstance: findInstance,
           event : { action : getInstancesTypes.FOCUS_INSTANCE, id : response.payload.id, trigger : Date.now()},
           isLoading: false
         })
       }
       case getInstancesTypes.SELECT_INSTANCE:{
         const allLoadedInstances = [...state.allLoadedInstances]
-        const findInstance = allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id )?.simpleInstance;
+        const findInstance = allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );
         findInstance.selected = !findInstance.selected;
         if ( findInstance.selected ) findInstance.color = SELECTED_COLOR;
         else {
           findInstance.color = DESELECTED_COLOR;
         }
+
+        if ( findInstance?.simpleInstance ) findInstance.simpleInstance.color = findInstance.color;
         
         const threeDObjects = [...state.threeDObjects];
         const matchObject = threeDObjects.find( o => o.name === response.payload.id );

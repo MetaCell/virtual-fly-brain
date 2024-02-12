@@ -4,17 +4,33 @@ import { loadInstances, getProxyInstances } from './../utils/instancesHelper'
 import { SkeletonOff } from '../icons';
 import { on } from 'events';
 import { find } from '@nosferatu500/react-sortable-tree';
+import { get3DMesh } from './actions/instances';
 
 export const initialStateInstancesReducer = {
   allPotentialInstances : [],
   allLoadedInstances : [],
   threeDObjects : [],
+  mappedCanvasData : [],
   focusedInstance : "",
   event : {},
   isLoading: false,
   launchTemplate : null,
   error: false
 };
+
+const getMappedCanvasData = (loadedInstances) => {
+  let updatedCanvasData = loadedInstances?.filter( m => m?.simpleInstance )?.map( instance => {
+    let { color, visibility, id } = instance.simpleInstance;
+    return {
+      instancePath : id,
+      visibility,
+      color,
+      selected : instance.selected
+    }
+  })
+
+  return updatedCanvasData;
+}
 
 const InstancesReducer = (state = initialStateInstancesReducer, response) => {
   switch (response.type) {
@@ -53,6 +69,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         })
       }
       let loadedInstances = state.allLoadedInstances?.find( i => i?.metadata?.Id === response.payload.Id ) ? [...state.allLoadedInstances] : [...state.allLoadedInstances, newInstance]
+
       return Object.assign({}, state, {
           allLoadedInstances: loadedInstances,
           focusedInstance : loadedInstances?.find( i => i?.metadata?.Id === response.payload.Id ),
@@ -77,6 +94,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
 
         return Object.assign({}, state, {
           allLoadedInstances: loadedInstances,
+          mappedCanvasData : getMappedCanvasData(loadedInstances),
           threeDObjects : matchObjects,
           focusedInstance : focusedInstance,
           event : { action : getInstancesTypes.UPDATE_INSTANCES, id : response.payload.query, trigger : Date.now()},
@@ -90,6 +108,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         if ( matchInstance?.simpleInstance ) matchInstance.simpleInstance.visibility = true;
         return Object.assign({}, state, {
           allLoadedInstances: allLoadedInstances,
+          mappedCanvasData : getMappedCanvasData(allLoadedInstances),
           event : { action : getInstancesTypes.UPDATE_INSTANCES, id : response.payload.id, trigger : Date.now()},
           isLoading: false
         })
@@ -101,6 +120,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         if ( matchInstance?.simpleInstance ) matchInstance.simpleInstance.visibility = false;
         return Object.assign({}, state, {
           allLoadedInstances: allLoadedInstances,
+          mappedCanvasData : getMappedCanvasData(allLoadedInstances),
           event : { action : getInstancesTypes.UPDATE_INSTANCES, id : response.payload.id, trigger : Date.now()},
           isLoading: false
         })
@@ -111,6 +131,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         matchSimpleInstance.visibility = true;
         return Object.assign({}, state, {
           allLoadedInstances: allLoadedInstances,
+          mappedCanvasData : getMappedCanvasData(allLoadedInstances),
           event : { action : getInstancesTypes.UPDATE_INSTANCES, id : response.payload.id, trigger : Date.now()},
           isLoading: false
         })
@@ -121,6 +142,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         matchSimpleInstance.visibility = false;
         return Object.assign({}, state, {
           allLoadedInstances: allLoadedInstances,
+          mappedCanvasData : getMappedCanvasData(allLoadedInstances),
           event : { action : getInstancesTypes.UPDATE_INSTANCES, id : response.payload.id, trigger : Date.now()},
           isLoading: false
         })
@@ -141,6 +163,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         return Object.assign({}, state, {
           allLoadedInstances : allLoadedInstances,
           threeDObjects : threeDObjects, 
+          mappedCanvasData : getMappedCanvasData(allLoadedInstances),
           event : { action : getInstancesTypes.UPDATE_INSTANCES, id : response.payload.id, trigger : Date.now()},
           isLoading: false
         })
@@ -177,6 +200,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         return Object.assign({}, state, {
           allLoadedInstances:allLoadedInstances,
           threeDObjects : threeDObjects,
+          mappedCanvasData : getMappedCanvasData(allLoadedInstances),
           event : { action : getInstancesTypes.UPDATE_INSTANCES, id : response.payload.id, trigger : Date.now()},
           isLoading: false
         })
@@ -196,6 +220,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
 
         return Object.assign({}, state, {
           allLoadedInstances : loadedInstances,
+          mappedCanvasData : getMappedCanvasData(loadedInstances),
           event : { action : getInstancesTypes.UPDATE_INSTANCES, id : response.payload.id, trigger : Date.now()},
           isLoading: false
         })}
@@ -237,6 +262,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         return Object.assign({}, state, {
           threeDObjects : threeDObjects,
           allLoadedInstances : allLoadedInstances,
+          mappedCanvasData : getMappedCanvasData(allLoadedInstances),
           event : { 
             action : getInstancesTypes.UPDATE_INSTANCES,
             id : response.payload.id,
@@ -286,7 +312,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
           matchObject.visible = false;
         }
         return Object.assign({}, state, {
-          threeDObjects : threeDObjects, 
+          threeDObjects : threeDObjects,
           allLoadedInstances : allLoadedInstances,
           event : { action : getInstancesTypes.UPDATE_SKELETON, mode : SKELETON, id : response.payload.id, visible : false, trigger : Date.now()},
           isLoading: false

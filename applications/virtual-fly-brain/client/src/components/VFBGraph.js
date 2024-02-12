@@ -435,8 +435,8 @@ class VFBGraph extends Component {
             <div style={ { position: "absolute", padding: '1rem', width: "5vh", height: "100px",zIndex: "2" } }>
               <DropDownQueries
                 handleMenuClick={selection => self.handleMenuClick(selection)}
-                currentQuery = { self.state.currentQuery }
-                focusedInstance = {self.focusedInstance}
+                graphInstanceOnFocus = {this.props.graphInstanceOnFocus}
+                stateInstanceOnFocus = {this.props.stateInstanceOnFocus}
                 sync = { () => self.sync() }
                 syncColor = { syncColor }
                 stylingConfiguration = { stylingConfiguration }
@@ -581,8 +581,8 @@ class VFBGraph extends Component {
                   </Tooltip>
                   <DropDownQueries
                     handleMenuClick={selection => self.handleMenuClick(selection)}
-                    currentQuery = {self.state.currentQuery}
-                    focusedInstance = {self.focusedInstance}
+                    graphInstanceOnFocus = {this.props.graphInstanceOnFocus}
+                    stateInstanceOnFocus = {this.props.stateInstanceOnFocus}
                     sync = { () => self.sync() }
                     syncColor = { syncColor }
                     stylingConfiguration = { stylingConfiguration }

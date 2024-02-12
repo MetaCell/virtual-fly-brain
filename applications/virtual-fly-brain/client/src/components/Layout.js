@@ -10,9 +10,12 @@ import VFBUploader from "./VFBUploader/VFBUploader";
 import QueryBuilder from "./queryBuilder";
 import { getLayoutManagerInstance } from "@metacell/geppetto-meta-client/common/layout/LayoutManager";
 import { addWidget } from '@metacell/geppetto-meta-client/common/layout/actions';
-import { threeDCanvasWidget, stackViewerWidget, roiBrowserWidget, termContextWidget, circuitBrowserWidget } from "./layout/widgets";
+import { threeDCanvasWidget, stackViewerWidget, roiBrowserWidget, termContextWidget, circuitBrowserWidget, listViewerWidget } from "./layout/widgets";
 import { templateLoaded } from './../reducers/actions/instances';
 import store from "../store";
+import VFBStackViewer from "./StackViewer";
+import VFBListViewer from "./VFBListViewer"
+
 const {
   secondaryBg,
   headerBorderColor,
@@ -70,6 +73,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
     dispatch(addWidget(circuitBrowserWidget));
     dispatch(addWidget(roiBrowserWidget));
     dispatch(addWidget(termContextWidget));
+    dispatch(addWidget(listViewerWidget));
   }, [sidebarOpen, setSidebarOpen])
 
   const classes = {
@@ -204,7 +208,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
         {desktopScreen ? (
           <>
             {tabContent}
-            {bottomNav === 0 && <VFBUploader open={true} setBottomNav={setBottomNav} />}
+            {bottomNav === 0 && <VFBStackViewer  />}
             {bottomNav === 1 && <VFBDownloadContents open={true} setBottomNav={setBottomNav} />}
             {bottomNav === 2 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} />}
           </>
@@ -213,7 +217,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
             {
               bottomNav != 2 && tabContent
             }
-            {bottomNav === 0 && <VFBUploader open={true} setBottomNav={setBottomNav} />}
+            {bottomNav === 0 && <VFBStackViewer  />}
             {bottomNav === 1 && <VFBDownloadContents open={true} setBottomNav={setBottomNav} />}
             {bottomNav === 2 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} />}
           </>

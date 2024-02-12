@@ -49,3 +49,14 @@ export const circuitBrowserWidget = {
     status: WidgetStatus.ACTIVE,
     props: { size: { height: 600, width: 300 } }
 };
+
+export const listViewerWidget = {
+  id: 'listViewer',
+  name: "List Viewer",
+  component: "listViewer",
+  panelName: "left",
+  enableClose: false,
+  hideOnClose: false,
+  status: WidgetStatus.ACTIVE,
+  props: { size: { height: 600, width: 300 } }
+};

@@ -3,19 +3,17 @@ import React, { Component } from 'react';
 import SimpleInstance from "@metacell/geppetto-meta-core/model/SimpleInstance";
 import { withStyles } from '@material-ui/core';
 import { applySelection, mapToCanvasData } from "@metacell/geppetto-meta-ui/3d-canvas/utils/SelectionUtils"
-import Resources from '@metacell/geppetto-meta-core/Resources';
-import ModelFactory from '@metacell/geppetto-meta-core/ModelFactory';
-import { augmentInstancesArray } from '@metacell/geppetto-meta-core/Instances';
 import { connect } from 'react-redux';
 import vars from '../theme/variables';
 import CameraControls from './CameraControls';
 import {Button, Box} from '@mui/material'
 import Canvas from "@metacell/geppetto-meta-ui/3d-canvas/Canvas";
-import { add3DSkeleton } from './../reducers/actions/instances';
 import { getInstancesTypes } from '../reducers/actions/types/getInstancesTypes';
-import * as THREE from 'three';
 import SharkViewer, { swcParser } from '@janelia/sharkviewer';
+import * as THREE from 'three';
 import { SKELETON, CYLINDERS } from "./../utils/constants"
+import { get3DMesh, add3DSkeleton } from '../reducers/actions/instances';
+import Resources from '@metacell/geppetto-meta-core/Resources';
 
 const {
   whiteColor,
@@ -55,65 +53,16 @@ class ThreeDCanvas extends Component {
       },
       showModel: false,
       mappedCanvasData: [],
+      threeDObjects : []
     };
 
     this.canvasRef = React.createRef();
   }
 
-  loadInstances (instance){
-    ModelFactory.cleanModel();
-    const instance1 = new SimpleInstance(instance)
-    let instances = window.Instances;
-    if ( instances === undefined ){
-      instances = [];
-    }
-    instances?.find( i => i.wrappedObj?.id === instance.id ) ? null : window.Instances = [...instances, instance1]
-    augmentInstancesArray(window.Instances);
-  }
-  
-  getProxyInstances () {
-    return window.Instances.map(i => (
-      { ...i,
-        instancePath: i.getId(),
-        visible : this.state.mappedCanvasData?.find( cd => cd.instancePath === i.getId())?.visible
-      }
-    ))
-  }
-
-  updateColors ( inst, mappedCanvasData) {
-    let match = mappedCanvasData?.find( m => m.instancePath === inst?.metadata?.Id )
-    let color = { r : inst?.color?.r/255, g : inst?.color?.g/255, b : inst?.color?.b/255 }
-    let colorMatch = match?.color?.b === color?.b && match?.color?.r === color?.r && match?.color?.g === color?.g;
-    if ( !colorMatch && inst?.color && match ){
-        match.color = color;
-        this.canvasRef.current.threeDEngine.updateInstances(mappedCanvasData)
-    }
-  }
-
-  newInstance (instance) {
-    this.loadInstances(instance)
-    const data = this.getProxyInstances();
-    const newData = mapToCanvasData(data)
-    instance.setGeometryType && instance.setGeometryType('cylinders')
-
-    newData?.forEach( dat => {
-      dat.visible = data?.find( i => i.Id === data.instancePath )?.visible;
-    })
-    let mappedCanvasData = [...newData]
-    let match = mappedCanvasData?.find( m => instance.id === m.instancePath )
-    if ( match ){
-      match.visible = true;
-      this?.canvasRef?.current?.threeDEngine?.updateInstances(mappedCanvasData)
-      this.setState({ ...this.state, mappedCanvasData : mappedCanvasData})
-    }
-  }
-
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps) {
     if(this.props.event.trigger !== prevProps.event.trigger){ 
-      let that = this;
-      let allLoadedInstances = this.props.allLoadedInstances;
-      const mappedCanvasData = [...this.state.mappedCanvasData];
-      const targetInstance = allLoadedInstances?.find( i => i.metadata?.Id === this.props.event.id)
+      const mappedCanvasData = [...this.props.allLoadedInstances];
+      const threeDObjects = [...this.props.threeDObjects];
       const focusInstance = window.Instances?.find( instance => instance.wrappedObj.id === this.props.focusInstance?.Id);
 
       switch(this.props.event.action){
@@ -124,133 +73,43 @@ class ThreeDCanvas extends Component {
             this.canvasRef.current.defaultCameraControlsHandler("cameraHome")
           }
           break;
-        case getInstancesTypes.CHANGE_COLOR:
-          this.updateColors(targetInstance,mappedCanvasData)
+        case getInstancesTypes.ADD_INSTANCE:{
+          const instance = mappedCanvasData.find( i => i.metadata?.Id === this.props.event.id );
+          if ( instance?.simpleInstance === undefined ) {
+            get3DMesh(instance)
+          } 
           break;
-        case getInstancesTypes.ADD_INSTANCE:
-          // Set all existing instances to invisible
-          if ( mappedCanvasData?.find( i => targetInstance?.metadata?.Id === i.instancePath ) === undefined ){
-            if (targetInstance?.metadata?.Images)
-            {
-              fetch(targetInstance?.metadata?.Images?.[Object.keys(targetInstance?.metadata?.Images)[0]][0].obj)
-              .then(response => response.text())
-              .then(base64Content => {
-                const instance = {
-                  "eClass": "SimpleInstance",
-                  "id": targetInstance?.metadata?.Id,
-                  "name": targetInstance?.metadata?.Name,
-                  "type": { "eClass": "SimpleType" },
-                  "visualValue": {
-                    "eClass": Resources.OBJ,
-                    'obj': base64Content
-                  }, 
-                  "visible" : true
-                }
-                that.newInstance(instance);
-              });
+        }
+        case getInstancesTypes.UPDATE_INSTANCES:{
+          let updatedCanvasData = mappedCanvasData?.filter( m => m?.simpleInstance )?.map( instance => {
+            let { color, visibility, id } = instance.simpleInstance;
+            return {
+              instancePath : id,
+              visibility,
+              color,
+              selected : instance.selected
             }
-          }
+          })
+
+          let updatedObjects = threeDObjects?.filter( m => m.visible);
+
+          this.setState({ ...this.state, mappedCanvasData : updatedCanvasData, threeDObjects : updatedObjects})
           break;
-        case getInstancesTypes.REMOVE_INSTANCES_SUCCESS:
-          if ( mappedCanvasData?.find( m => m.instancePath === this.props.event.id) ){
-            const index = mappedCanvasData.findIndex( m => m.instancePath === this.props.event.id);
-            mappedCanvasData.splice(index, 1);
-          }
-          this?.canvasRef?.current?.threeDEngine?.updateInstances(mappedCanvasData)
-          this.setState({ ...this.state, mappedCanvasData : mappedCanvasData})
-          break;
-        case getInstancesTypes.SHOW_3D_MESH:
-          if ( mappedCanvasData?.find( m => m.instancePath === targetInstance?.metadata?.Id) ){
-            mappedCanvasData.find( m => m.instancePath === targetInstance?.metadata?.Id).visible = true
-          }
-          this?.canvasRef?.current?.threeDEngine?.updateInstances(mappedCanvasData)
-          this.setState({ ...this.state, mappedCanvasData : mappedCanvasData})
-          break;
-        case getInstancesTypes.HIDE_3D_MESH:
-          if ( mappedCanvasData?.find( m => m.instancePath === targetInstance?.metadata?.Id) ){
-            mappedCanvasData.find( m => m.instancePath === targetInstance?.metadata?.Id).visible = false
-          }
-          this?.canvasRef?.current?.threeDEngine?.updateInstances(mappedCanvasData)
-          this.setState({ ...this.state, mappedCanvasData : mappedCanvasData})
-          break;
-        case getInstancesTypes.SELECT_INSTANCE:
-          if ( mappedCanvasData?.find( m => m.instancePath === targetInstance?.metadata?.Id) ){
-            mappedCanvasData.find( m => m.instancePath === targetInstance?.metadata?.Id).selected = targetInstance.selected
-          }
-          this.updateColors(targetInstance,mappedCanvasData)
-          this?.canvasRef?.current?.threeDEngine?.updateInstances(mappedCanvasData)
-          this.setState({ ...this.state, mappedCanvasData : mappedCanvasData})
-          break;
-        case getInstancesTypes.SHOW_SKELETON:
-          this.showSkeleton(targetInstance, SKELETON, true)
-          break;
-        case getInstancesTypes.HIDE_SKELETON:
-          this.showSkeleton(targetInstance, SKELETON, false)
-          this.showSkeleton(targetInstance, CYLINDERS, false)
-          break;
-        case getInstancesTypes.SHOW_CYLINDERS:
-        this.showSkeleton(targetInstance, SKELETON, false)  
-        this.showCylinders(targetInstance)
-          break;
-        case getInstancesTypes.SHOW_LINES:
-          this.showSkeleton(targetInstance, CYLINDERS, false)
-          this.showSkeleton(targetInstance, SKELETON, true)
+        }
+        case getInstancesTypes.UPDATE_SKELETON:
+          this.showSkeleton(this.props.event.id, this.props.event.mode, this.props.event.visible, threeDObjects)
           break;
         default:
       }
     }
   }
 
-  componentWillUnmount () {
-    document.removeEventListener('mousedown', this.handleClickOutside);
-    console.log("Component unmouted")
-  }
-
-  handleToggle () {
-    this.setState({ showLoader: true })
-    this.loadInstances()
-    this.setState({ showModel: true, showLoader: false, data: this.getProxyInstances(), cameraOptions: { ...this.state.cameraOptions, } })
-  }
-
-  handleClickOutside (event) {
-    if (this.node && !this.node.contains(event.target)) {
-      if (event.offsetX <= event.target.clientWidth){
-        this.setState({ showModel: false })
-      }
-    }
-  }
-
-  onSelection (selectedInstances){
-    let updatedCanvas = applySelection(this.state.mappedCanvasData, selectedInstances);
-    this.setState({ mappedCanvasData: updatedCanvas })
-  }
-
-  hoverHandler () {
-
-  }
-
-  showCylinders (targetInstance) {
-    if ( targetInstance?.skeleton?.[CYLINDERS] === undefined ){
-      this.showSkeleton (targetInstance, CYLINDERS, true);
-    } else {
-      this.showSkeleton (targetInstance, CYLINDERS, true);
-    }
-  }
-
-  showLines (targetInstance) {
-    if ( targetInstance?.skeleton?.[SKELETON] === undefined ){
-      this.showSkeleton (targetInstance, SKELETON, true);
-    }else {
-      this.showSkeleton (targetInstance, SKELETON, true);
-    }
-  }
-
-  showSkeleton (targetInstance, mode, visible) {
-    let that = this;
+  showSkeleton (instanceID, mode, visible, threeDObjects) {
     let allLoadedInstances = this.props.allLoadedInstances;
-    let match = allLoadedInstances?.find ( inst => inst.metadata?.Id === targetInstance?.metadata?.Id );
+    let match = allLoadedInstances?.find ( inst => inst.metadata?.Id === instanceID );
+    let that = this;
 
-    if ( targetInstance?.skeleton?.[mode] === undefined ) {
+    if ( match?.skeleton?.[mode] === undefined ) {
         // Initialize shark viewer to load SWC
         let sharkviewer = new SharkViewer({ dom_element: "canvas" });
         sharkviewer.mode = mode;
@@ -267,30 +126,52 @@ class ThreeDCanvas extends Component {
             })
           );
         });
-        fetch(match.metadata?.Images?.[Object.keys(match.metadata?.Images)[0]][0].swc)
+        fetch(match?.metadata?.Images?.[Object.keys(match.metadata?.Images)[0]][0].swc)
           .then(response => response.text())
           .then(base64Content => {
             const swcJSON = swcParser(base64Content);
-            let neuron = sharkviewer.createNeuron(swcJSON, targetInstance?.metadata?.Id, that?.canvasRef?.current?.threeDEngine?.renderer);
-            match.skeleton = { ...match.skeleton, visible : true, [mode] : { visible : true, neuron : neuron }};
-            neuron.name = targetInstance?.metadata?.Id + mode;
-            
-            // add mesh to canvas
-            that?.canvasRef?.current?.threeDEngine?.scene.add(neuron);
-            that.forceUpdate();
-            add3DSkeleton(targetInstance?.metadata?.Id)
+            let neuron = sharkviewer.createNeuron(swcJSON, match?.metadata?.Id, that?.canvasRef?.current?.threeDEngine?.renderer);
+            neuron.name = match?.metadata?.Id;
+            add3DSkeleton(neuron, mode, match?.metadata?.Id)
         })
     } else {
-      match.skeleton.visible = visible;
-      match.skeleton[mode].visible = visible;
-      that?.canvasRef?.current?.threeDEngine?.scene?.children?.forEach( child => {
-        if ( child.name === targetInstance?.metadata?.Id + mode ) {
-          child.visible = visible;
+      let updatedCanvasData = allLoadedInstances?.filter( m => m?.simpleInstance )?.map( instance => {
+        let { color, visibility, id } = instance.simpleInstance;
+        return {
+          instancePath : id,
+          visibility,
+          color,
+          selected : instance.selected
         }
       })
-      that?.canvasRef?.current?.threeDEngine?.animate();
+      let updatedObjects = threeDObjects?.filter( m => m.visible);
+      this.setState({ ...this.state, mappedCanvasData : updatedCanvasData, threeDObjects : updatedObjects})
     }
   }
+
+  componentWillUnmount () {
+    document.removeEventListener('mousedown', this.handleClickOutside);
+  }
+
+  handleToggle () {
+    this.setState({ showLoader: true })
+    this.setState({ showModel: true, showLoader: false, data: this.state.mappedCanvasData, cameraOptions: { ...this.state.cameraOptions, } })
+  }
+
+  handleClickOutside (event) {
+    if (this.node && !this.node.contains(event.target)) {
+      if (event.offsetX <= event.target.clientWidth){
+        this.setState({ showModel: false })
+      }
+    }
+  }
+
+  onSelection (selectedInstances){
+    let updatedCanvas = applySelection(this.state.mappedCanvasData, selectedInstances);
+    this.setState({ mappedCanvasData: updatedCanvas })
+  }
+
+  hoverHandler () {}
 
   render () {
     const { cameraOptions } = this.state
@@ -311,7 +192,8 @@ class ThreeDCanvas extends Component {
           <>
             <Canvas
               ref={this.canvasRef}
-              data={this.state.mappedCanvasData?.filter(d => d?.visible )}
+              data={this.state.mappedCanvasData?.filter(d => d?.visibility )}
+              threeDObjects={this.state.threeDObjects}
               cameraOptions={cameraOptions}
               backgroundColor={blackColor}
               onSelection={this.onSelection}
@@ -337,7 +219,8 @@ class ThreeDCanvas extends Component {
 
 const mapStateToProps = state => ({
   allLoadedInstances : state.instances.allLoadedInstances,
-  focusInstance : state.instances.instanceOnFocus,
+  threeDObjects : state.instances.threeDObjects,
+  focusInstance : state.instances.focusInstance,
   event : state.instances.event
 });
 

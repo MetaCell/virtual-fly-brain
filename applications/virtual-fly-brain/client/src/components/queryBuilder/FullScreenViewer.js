@@ -35,20 +35,15 @@ const FullScreenViewer = ( { open, onClose, maxWidth = 'md', images, sx, childre
         <CrossCircle />
       </IconButton>
       {children}
-      {images.length > 0 && (
-        <Slide canSwipe slidesToShow={ 1 } slidesToScroll={ 1 } infinite={ false } indicators={ true } prevArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } nextArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } arrows={ true }>
-          <>
-            {images?.map((slideImage, index) => (
-              <div key={index}>
+      <Slide canSwipe={ false } slidesToShow={ 1 } slidesToScroll={ 1 } infinite={ false } indicators={ true } prevArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } nextArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } arrows={ true }>
+            {Object.keys(images)?.map((src, index) => (
                 <img
+                  key={index}
                   style={imageStyle}
-                  src={slideImage?.url}
+                  src={images[src]?.[0].thumbnail}
                 />
-              </div>
             ))}
-          </>
         </Slide>
-      )}
     </Dialog>
   )
 };

@@ -1,5 +1,5 @@
 import store from '../../store';
-import { get_instance } from "../../network/query"
+import { get_3d_mesh, get_instance } from "../../network/query"
 import { getInstancesTypes } from './types/getInstancesTypes';
 
 const getInstancesSuccess = query => ({
@@ -20,6 +20,24 @@ const getInstancesFailure = error => ({
   }
 });
 
+const get3DOBJSuccess = query => ({
+  type: getInstancesTypes.GET_3D_OBJ_TYPE_SUCCESS,
+  payload: {
+    ...query
+  }
+});
+
+const get3DOBJStarted = () => ({
+  type: getInstancesTypes.GET_3D_OBJ_TYPE_STARTED
+});
+
+const get3DOBJFailure = error => ({
+  type: getInstancesTypes.GET_3D_OBJ_TYPE_FAILURE,
+  payload: {
+    error
+  }
+});
+
 const removeInstancesSuccess = query => ({
   type: getInstancesTypes.REMOVE_INSTANCES_SUCCESS,
   payload: {
@@ -34,6 +52,13 @@ const selectInstanceMessage = id => ({
   }
 });
 
+const augmentedInstances = instancesList => ({
+  type: getInstancesTypes.AUGMENTED_INSTANCES,
+  payload: {
+    instancesList
+  }
+});
+
 const showInstanceSkeletonMessage = id => ({
   type: getInstancesTypes.SHOW_SKELETON,
   payload: {
@@ -41,10 +66,12 @@ const showInstanceSkeletonMessage = id => ({
   }
 });
 
-const addInstanceSkeletonMessage = id => ({
+const addInstanceSkeletonMessage = (skeleton, mode, id) => ({
   type: getInstancesTypes.ADD_SKELETON,
   payload: {
-    id
+    id,
+    mode,
+    skeleton
   }
 });
 
@@ -90,15 +117,15 @@ const hide3DMeshMessage = id => ({
   }
 });
 
-const show3DVolumeMessage = id => ({
-  type: getInstancesTypes.SHOW_3D_VOLUME,
+const show3DMessage = id => ({
+  type: getInstancesTypes.SHOW_3D,
   payload: {
     id
   }
 });
 
-const hide3DVolumeMessage = id => ({
-  type: getInstancesTypes.HIDE_3D_VOLUME,
+const hide3DMessage = id => ({
+  type: getInstancesTypes.HIDE_3D,
   payload: {
     id
   }
@@ -126,6 +153,14 @@ const removeInstancesFailure = error => ({
   }
 });
 
+const templateLoadedMessage = (id, openTemplate) => ({
+  type: getInstancesTypes.LAUNCH_TEMPLATE,
+  payload: {
+    id,
+    openTemplate
+  }
+});
+
 export const getInstanceByID = async (queryId) => {
 
   store.dispatch(getInstancesStarted())
@@ -142,6 +177,19 @@ export const getInstanceByID = async (queryId) => {
   store.dispatch(getInstancesSuccess(response))
 }
 
+export const get3DMesh = async (instance) => {
+  let mesh_response;
+  try {
+    mesh_response = await get_3d_mesh(instance);
+  } catch (error) {
+    console.log("Error ", error)
+    store.dispatch(get3DOBJFailure(error.message))
+    return
+  }
+
+  store.dispatch(get3DOBJSuccess(mesh_response))
+}
+
 export const removeInstanceByID = async (queryId) => {
   try {
     store.dispatch(removeInstancesSuccess(queryId))
@@ -155,8 +203,8 @@ export const selectInstance = async (id) => {
   store.dispatch(selectInstanceMessage(id))
 }
 
-export const add3DSkeleton = async (id) => {
-  store.dispatch(addInstanceSkeletonMessage(id))
+export const add3DSkeleton = async (skeleton,mode, id) => {
+  store.dispatch(addInstanceSkeletonMessage(skeleton, mode, id))
 }
 
 export const show3DSkeleton = async (id) => {
@@ -187,12 +235,12 @@ export const hide3DMesh = async (id) => {
   store.dispatch(hide3DMeshMessage(id))
 }
 
-export const show3DVolume = async (id) => {
-  store.dispatch(show3DVolumeMessage(id))
+export const show3D = async (id) => {
+  store.dispatch(show3DMessage(id))
 }
 
-export const hide3DVolume = async (id) => {
-  store.dispatch(hide3DVolumeMessage(id))
+export const hide3D = async (id) => {
+  store.dispatch(hide3DMessage(id))
 }
 
 export const changeColor = async (id, color) => {
@@ -202,3 +250,8 @@ export const changeColor = async (id, color) => {
 export const focusInstance = async (id) => {
   store.dispatch(focusInstanceMessage(id))
 }
+
+export const templateLoaded = async (id, openTemplate) => {
+  store.dispatch(templateLoadedMessage(id, openTemplate))
+}
+

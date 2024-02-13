@@ -1,25 +1,21 @@
 
 import React, { useEffect, useState } from "react";
-import { useDispatch, useStore } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import MediaQuery from 'react-responsive';
-import { Box, Button, useMediaQuery, useTheme, CircularProgress } from "@mui/material";
-import ThreeDCanvas from "./ThreeDCanvas"
+import { Box, Button,Modal, useMediaQuery, useTheme, Typography, CircularProgress, Link } from "@mui/material";
 import TermInfo from "./TermInfo"
-import Images from "./Images";
-import StackViewer from './StackViewer';
-import ROIBrowser from './ROIBrowser/ROIBrowser';
 import vars from "../theme/variables";
-import VFBGraph from "./VFBGraph";
-import SideBar from "../shared/sidebar";
-import VFBCircuitBrowser from "./VFBCircuitBrowser";
-import StackViewerComponent from "./StackViewerComponent";
 import VFBDownloadContents from "./VFBDownloadContents/VFBDownloadContents";
 import VFBUploader from "./VFBUploader/VFBUploader";
 import QueryBuilder from "./queryBuilder";
 import { getLayoutManagerInstance } from "@metacell/geppetto-meta-client/common/layout/LayoutManager";
 import { addWidget } from '@metacell/geppetto-meta-client/common/layout/actions';
-import { threeDCanvasWidget, stackViewerWidget, roiBrowserWidget, termContextWidget, circuitBrowserWidget } from "./layout/widgets";
+import { threeDCanvasWidget, stackViewerWidget, roiBrowserWidget, termContextWidget, circuitBrowserWidget, listViewerWidget } from "./layout/widgets";
+import { templateLoaded } from './../reducers/actions/instances';
 import store from "../store";
+import VFBStackViewer from "./StackViewer";
+import VFBListViewer from "./VFBListViewer"
+
 const {
   secondaryBg,
   headerBorderColor,
@@ -38,15 +34,26 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
   const theme = useTheme();
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
   const desktopScreen = useMediaQuery(theme.breakpoints.up('lg'));
   const defaultActiveTab = desktopScreen ? [0, 1, 2, 3, 4] : [0];
   const [tab, setTab] = useState([]);
   const [LayoutComponent, setLayoutComponent] = useState(undefined);
+  const launchTemplate = useSelector(state => state.instances.launchTemplate)
   const dispatch = useDispatch();
+  let templateRef = window.location.origin + "?id=" + launchTemplate?.metadata?.Id;
 
   useEffect(() => {
     setTab(defaultActiveTab)
   }, [desktopScreen])
+
+  useEffect(() => {
+    if ( launchTemplate !== null ) {
+      setModalOpen(true)
+    } else {
+      setModalOpen(false)
+    }
+  }, [launchTemplate])
 
   useEffect(() => {
     if (LayoutComponent === undefined) {
@@ -66,6 +73,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
     dispatch(addWidget(circuitBrowserWidget));
     dispatch(addWidget(roiBrowserWidget));
     dispatch(addWidget(termContextWidget));
+    dispatch(addWidget(listViewerWidget));
   }, [sidebarOpen, setSidebarOpen])
 
   const classes = {
@@ -98,10 +106,27 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
         // display: 'flex'
       }
     },
+    modalStyle : {
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      width: 400,
+      bgcolor: 'background.paper',
+      border: '2px solid #000',
+      boxShadow: 24,
+      p: 4,
+    }
   }
 
   const handleTabSelect = (id) => {
     setTab([id])
+  }
+
+  const handleModalClose = (id, openTemplate) => {
+    templateLoaded(id, openTemplate);
+    setModalOpen(false)
+    templateRef = window.location.origin + "?id=" + id
   }
 
   const tabContent = (
@@ -132,7 +157,23 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
           </Box>
         ) : null}
       </MediaQuery>
-
+      <Modal
+        open={modalOpen}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={classes.modalStyle}>
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Template Alignation
+          </Typography>
+          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+            The image you requested is aligned to another template. Click Okay
+            to open in a new tab or Cancel to just view the image metadata.
+          </Typography>
+          <Button variant="contained" color="primary" onClick={() => handleModalClose(launchTemplate?.metadata?.Id, true )} target="_blank" href={templateRef}>Okay</Button>
+          <Button variant="outlined" color="secondary" onClick={() => handleModalClose(launchTemplate?.metadata?.Id, false )}>Cancel</Button>
+        </Box>
+      </Modal>
       <Box
         display='flex'
         flexWrap='wrap'
@@ -167,7 +208,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
         {desktopScreen ? (
           <>
             {tabContent}
-            {bottomNav === 0 && <VFBUploader open={true} setBottomNav={setBottomNav} />}
+            {bottomNav === 0 && <VFBStackViewer  />}
             {bottomNav === 1 && <VFBDownloadContents open={true} setBottomNav={setBottomNav} />}
             {bottomNav === 2 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} />}
           </>
@@ -176,7 +217,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
             {
               bottomNav != 2 && tabContent
             }
-            {bottomNav === 0 && <VFBUploader open={true} setBottomNav={setBottomNav} />}
+            {bottomNav === 0 && <VFBStackViewer  />}
             {bottomNav === 1 && <VFBDownloadContents open={true} setBottomNav={setBottomNav} />}
             {bottomNav === 2 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} />}
           </>

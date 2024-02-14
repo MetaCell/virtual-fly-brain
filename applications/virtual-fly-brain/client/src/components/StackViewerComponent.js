@@ -904,7 +904,7 @@ import React from 'react';
         });
         this.checkStack();
       }
-      if (nextProps.scl !== this.state.scl || nextProps.zoomLevel !== this.props.zoomLevel || nextProps.width !== this.props.width || nextProps.height !== this.props.height || nextProps.stackX !== this.stack.position.x || nextProps.stackY !== this.stack.position.y){
+      if (nextProps.scl !== this.state.scl){
         if (nextProps.scl < this.state.scl) {
           // wipe the stack if image is getting smaller
           this.state.images = [];
@@ -1297,18 +1297,12 @@ const StackViewerComponent = () => createClass({
         this.onWheelEvent(e);
       });
 
-      if (this.props.data && this.props.data != null && this.props.data.instances && this.props.data.instances != null) {
+      if ( this.state.ids?.find( i => i != this.prop.data.id) === undefined && this.props.data && this.props.data != null && this.props.data.instances && this.props.data.instances != null) {
         this.setState(this.handleInstances(this.props.data.instances));
       }
 
       setTimeout(this.onHome, 5000);
 
-    },
-
-    componentDidUpdate: function (prevProps, prevState) {
-      if (prevProps.data != undefined && prevProps.data != null && prevProps.data.instances != undefined) {
-        this.setState(this.handleInstances(this.props.data.instances));
-      } 
     },
 
     handleInstances: function (instances) {

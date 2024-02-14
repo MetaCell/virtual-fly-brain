@@ -24,8 +24,7 @@ const VFBStackViewer = (props) => {
     }
   }
 
-  const stackViewerData = useSelector(state => state.instances.focusedInstance)
-  const templateID = useSelector(state => state.globalInfo.templateID)
+  const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances)
   const fields = useSelector((state) => state.WHATEVER_REDUCER);
   const stackRef = useRef();
   const layout = props.layout;
@@ -122,41 +121,48 @@ const VFBStackViewer = (props) => {
   // FIXME
   useEffect( () => {
     let instances = stackData.instances;
-    if (!instances.find( i => i?.Id === stackViewerData?.Id) && stackViewerData?.Images && stackViewerData?.IsTemplate) {
-      let keys = Object.keys(stackViewerData.Images);
+    let stackViewerData = allLoadedInstances?.find( i => i?.metadata?.IsTemplate );
+    let match = instances?.find( i => i.wrappedObj.id?.includes(stackViewerData?.metadata?.Id) );
+    if (!instances.find( i => i?.wrappedObj.id?.includes(stackViewerData?.metadata?.Id)) && stackViewerData?.metadata?.Images && stackViewerData?.metadata?.IsTemplate) {
+      let keys = Object.keys(stackViewerData.metadata?.Images);
 
       const instancespec = {
         "eClass": "SimpleInstance",
-        "id": stackViewerData.Id,
+        "id": stackViewerData.metadata?.Id,
         "name": stackViewerData.Name,
         "type": { "eClass": "SimpleType" },
         "visualValue": {
           "eClass": Resources.IMAGE,
-          data :stackViewerData.Images[keys[0]]?.[0].wlz.replace("https://www.virtualflybrain.org/data/","/disk/data/VFB/IMAGE_DATA/")
+          data :stackViewerData.metadata?.Images[keys[0]]?.[0].wlz.replace("https://www.virtualflybrain.org/data/","/disk/data/VFB/IMAGE_DATA/")
         }
       };
 
       const instance1spec = {
         "eClass": "SimpleInstance",
-        "id": stackViewerData.Id + "_slices",
-        "name": stackViewerData.Name + "_slices",
+        "id": stackViewerData.metadata?.Id + "_slices",
+        "name": stackViewerData.metadata?.Name + "_slices",
         "type": { "eClass": "SimpleType" },
         "visualValue": {
           "eClass": Resources.IMAGE,
-          data :stackViewerData.Images[keys[0]]?.[0].wlz.replace("https://www.virtualflybrain.org/data/","/disk/data/VFB/IMAGE_DATA/")
+          data :stackViewerData.metadata?.Images[keys[0]]?.[0].wlz.replace("https://www.virtualflybrain.org/data/","/disk/data/VFB/IMAGE_DATA/")
         }
       };
       const parent = new SimpleInstance(instancespec);
       const slices = new SimpleInstance(instance1spec);
       slices.parent = parent;
-      parent[stackViewerData.Id + "_slices"] = slices;
+      parent[stackViewerData.metadata?.Id + "_slices"] = slices;
       instances.push(slices);
 
-      const newData = {...stackData , instances : instances };
+      const newData = {
+        ...stackData ,
+        id : stackViewerData?.metadata?.Id,
+        height: props.height,
+        width: props.width,
+        instances : instances };
       setStackData(newData);
     }
     
-  },[stackViewerData]);
+  },[allLoadedInstances]);
 
   // Update height and width of the stackwidget, happens when flex layout resizes tabs
   useEffect( () => {
@@ -172,18 +178,19 @@ const VFBStackViewer = (props) => {
 
   // Update config and voxel size before re-rendering
   useMemo(() => {
-    if (stackViewerData?.Images) {
-      let keys = Object.keys(stackViewerData.Images);
-      config = stackViewerData.Images[keys[0]]?.[0];
+    let stackViewerData = props.allLoadedInstances?.find( i => i?.metadata?.IsTemplate );
+    if (stackViewerData?.metadata?.Images) {
+      let keys = Object.keys(stackViewerData.metadata?.Images);
+      config = stackViewerData.metadata?.Images[keys[0]]?.[0];
       config.serverUrl = 'http://www.virtualflybrain.org/fcgi/wlziipsrv.fcgi';
-      if ( stackViewerData?.Domains ){
-        keys = Object.keys(stackViewerData?.Domains);
+      if ( stackViewerData?.metadata?.Domains ){
+        keys = Object.keys(stackViewerData?.metadata?.Domains);
       }
       let ids = [parseInt(keys[keys?.length - 1]) + 1], labels = [parseInt(keys[keys?.length - 1]) + 1], classID = [parseInt(keys[keys?.length - 1]) + 1]; 
       keys?.forEach( key => {
-        ids[parseInt(key)] = (stackViewerData?.Domains?.[key]?.id);
-        labels[parseInt(key)] = (stackViewerData?.Domains?.[key]?.type_label);
-        classID[parseInt(key)] = (stackViewerData?.Domains?.[key]?.type_id);
+        ids[parseInt(key)] = (stackViewerData?.metadata?.Domains?.[key]?.id);
+        labels[parseInt(key)] = (stackViewerData?.metadata?.Domains?.[key]?.type_label);
+        classID[parseInt(key)] = (stackViewerData?.metadata?.Domains?.[key]?.type_id);
       })
       let voxels = [];
       if (config?.voxel != undefined) {

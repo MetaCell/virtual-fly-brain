@@ -20,7 +20,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
   switch (response.type) {
     case getInstancesTypes.LAUNCH_TEMPLATE:{
       if ( !response.payload.openTemplate ) {
-        let loadedInstances = state.allLoadedInstances?.find( i => i?.metadata?.Id === response.payload.id ) ? [...state.allLoadedInstances] : [...state.allLoadedInstances, state.launchTemplate]
+        let loadedInstances = [...state.allLoadedInstances]
         return Object.assign({}, state, {
             allLoadedInstances: loadedInstances,
             launchTemplate : null,

@@ -208,7 +208,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
         {desktopScreen ? (
           <>
             {tabContent}
-            {bottomNav === 0 && <VFBStackViewer  />}
+            {bottomNav === 0 && <VFBStackViewer width={450} height={480} />}
             {bottomNav === 1 && <VFBDownloadContents open={true} setBottomNav={setBottomNav} />}
             {bottomNav === 2 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} />}
           </>

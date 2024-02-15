@@ -3,13 +3,8 @@ import QueryHeader from "./QueryHeader";
 import { Item } from "./HistoryItem";
 import vars from "../../theme/variables";
 import { Box } from "@mui/material";
-const {
-  chipPink,
-  chipRed,
-  chipGreen,
-  chipYellow,
-  chipOrange
-} = vars;
+
+const facets_annotations_colors = require("../configuration/VFBColors").facets_annotations_colors;
 
 const recentSearch = [
   {
@@ -53,8 +48,6 @@ const recentSearch = [
 ]
 
 const History = () => {
-  const chipColors = [chipRed, chipGreen, chipOrange, chipPink, chipYellow];
-
   return (
     <>
       <QueryHeader title="8 results in history" />
@@ -64,7 +57,7 @@ const History = () => {
           <Item
             key={`recentSearch-${index}`}
             search={search}
-            chipColors={chipColors}
+            chipColors={facets_annotations_colors}
             index={index}
           />
         ))}

@@ -11,19 +11,13 @@ const {
   listHeadingColor,
   whiteColor,
   tabActiveColor,
-  chipGreen,
-  chipOrange,
-  chipRed,
-  chipPink,
   primaryBg,
-  chipYellow,
   secondaryBg,
   outlinedBtnBorderColor,
   outlinedBtnTextColor
 } = vars;
 
-
-const chipColors = [chipRed, chipGreen, chipOrange, chipPink, chipYellow];
+const facets_annotations_colors = require("../configuration/VFBColors").facets_annotations_colors;
 
 const QueryCard = ({ fullWidth, facets_annotation, query }) => {
   const [toggleReadMore, setToggleReadMore] = useState(false);
@@ -269,7 +263,7 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
                   sx={{
                     lineHeight: '140%',
                     fontSize: '0.625rem',
-                    backgroundColor: chipColors[index%(chipColors.length-1)] || chipColors[0]
+                    backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors['Default']?.color
                   }}
                   label={tag} />
                 ))}
@@ -284,7 +278,7 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
                           sx={{
                             lineHeight: '140%',
                             fontSize: '0.625rem',
-                            backgroundColor: chipColors[index%(chipColors.length-1)] || chipColors[0]
+                            backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors['Default']?.color
                           }}
                           label={tag} />
                       ))}

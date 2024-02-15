@@ -68,7 +68,7 @@ const GeneralInformation = ({data, classes}) => {
               <Typography sx={classes.heading}>Tags</Typography>
                 <Box display='flex' gap={'0.188rem'}>
                   {
-                    data?.metadata?.Tags?.map((tag, i) => ( <Chip key={tag} sx={{backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors['Default'].color }} label={tag} /> ) )
+                    data?.metadata?.Tags?.map((tag, i) => ( <Chip key={tag} sx={{backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color}} label={tag} /> ) )
                   }
                 { data?.metadata?.Tags?.length > 2 && <Chip label={`+${data?.metadata?.Tags?.length - 2}`} /> }
               </Box>

@@ -97,7 +97,7 @@ export const SearchResult = ({ getOptionProps, selectedFilters, groupedOptions, 
                       sx={{
                         lineHeight: '140%',
                         fontSize: '0.625rem',
-                        backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors['Default']?.color
+                        backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color
                       }}
                       label={tag}
                     />

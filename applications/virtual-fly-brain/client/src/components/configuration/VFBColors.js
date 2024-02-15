@@ -1,5 +1,5 @@
 const facets_annotations_colors = {
-    Default : {
+    default : {
         color : "#A04E4E"
     },
     Adult: {

@@ -13,9 +13,10 @@ export const stackViewerWidget = {
     id: 'stackViewer',
     name: "Stack Viewer",
     component: "stackViewer",
-    panelName: "right",
+    panelName: "left",
     hideOnClose: false,
     status: WidgetStatus.ACTIVE,
+    props: { size: { height: 600, width: 600 } }
 };
 
 export const roiBrowserWidget = {

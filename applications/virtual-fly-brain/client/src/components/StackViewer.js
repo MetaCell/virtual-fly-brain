@@ -24,7 +24,7 @@ const VFBStackViewer = (props) => {
     }
   }
 
-  const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances)
+  const stackViewerData = useSelector(state => state.instances.stackViewerData)
   const fields = useSelector((state) => state.WHATEVER_REDUCER);
   const stackRef = useRef();
   const layout = props.layout;
@@ -36,8 +36,10 @@ const VFBStackViewer = (props) => {
   let voxelSize = { x:0.622088, y:0.622088, z:0.622088 };
 
   const [stackData, setStackData] = React.useState({
-    id: props.id, height: props.defHeight, width: props.defWidth, instances: [], selected: []
+    id: props.id, height: props.size?.height, width: props.size?.width, instances: [], selected: []
   });
+
+  const [prevData, setPrevData]= React.useState(false)
 
   const [canvasRef, setCanvasRef] = React.useState(props.canvasRef);
   
@@ -121,9 +123,8 @@ const VFBStackViewer = (props) => {
   // FIXME
   useEffect( () => {
     let instances = stackData.instances;
-    let stackViewerData = allLoadedInstances?.find( i => i?.metadata?.IsTemplate );
     let match = instances?.find( i => i.wrappedObj.id?.includes(stackViewerData?.metadata?.Id) );
-    if (!instances.find( i => i?.wrappedObj.id?.includes(stackViewerData?.metadata?.Id)) && stackViewerData?.metadata?.Images && stackViewerData?.metadata?.IsTemplate) {
+    if (stackViewerData?.metadata?.Id !== stackData?.id && stackViewerData?.metadata?.Images && stackViewerData?.metadata?.IsTemplate) {
       let keys = Object.keys(stackViewerData.metadata?.Images);
 
       const instancespec = {
@@ -156,29 +157,28 @@ const VFBStackViewer = (props) => {
       const newData = {
         ...stackData ,
         id : stackViewerData?.metadata?.Id,
-        height: props.height,
-        width: props.width,
+        height: props.size.height,
+        width: props.size.width,
         instances : instances };
       setStackData(newData);
     }
     
-  },[allLoadedInstances]);
+  },[stackViewerData]);
 
   // Update height and width of the stackwidget, happens when flex layout resizes tabs
   useEffect( () => {
-    if (stackData?.height !== props?.defHeight || stackData?.width !== props?.defWidth) {
+    if (stackData?.height !== props?.size?.height || stackData?.width !== props?.size?.width) {
       let newData = stackData;
-      newData.height = props.defHeight;
-      newData.width = props.defWidth;
+      newData.height = props.size?.height;
+      newData.width = props.size?.width;
       setStackData(newData);
       updateStackWidget();
     }
-  }, [props?.defHeight, props?.defWidth])
+  }, [props?.size?.height, props?.size?.width])
 
 
   // Update config and voxel size before re-rendering
   useMemo(() => {
-    let stackViewerData = props.allLoadedInstances?.find( i => i?.metadata?.IsTemplate );
     if (stackViewerData?.metadata?.Images) {
       let keys = Object.keys(stackViewerData.metadata?.Images);
       config = stackViewerData.metadata?.Images[keys[0]]?.[0];
@@ -208,7 +208,7 @@ const VFBStackViewer = (props) => {
         serverUrl: 'http://www.virtualflybrain.org/fcgi/wlziipsrv.fcgi',
         templateId: 'NOTSET'
       };
-    }  
+    }
   }, [stackData]);
 
   const StackComponent = StackViewerComponent();
@@ -239,10 +239,12 @@ const VFBStackViewer = (props) => {
       }}
     >
       Stack Viewer
-      <StackComponent
+      { stackData?.instances?.length > 0 ? <StackComponent
       data={stackData}
+      height={stackData.height}
+      width={stackData.width}
       config={config}
-      voxel={voxelSize}/>
+      voxel={voxelSize}/> : null }
     </Box>
   )
 }

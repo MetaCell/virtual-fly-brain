@@ -9,6 +9,7 @@ export const initialStateInstancesReducer = {
   allPotentialInstances : [],
   allLoadedInstances : [],
   threeDObjects : [],
+  stackViewerData : null,
   focusedInstance : "",
   event : {},
   isLoading: false,
@@ -42,8 +43,10 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
      case getInstancesTypes.GET_INSTANCES_SUCCESS:{
       const newInstance = { metadata : response.payload };
       newInstance.visible = true;
+      let stackViewerData = state.stackViewerData;
       if ( newInstance.metadata?.IsTemplate ){
         newInstance.color = TEMPLATE_COLOR;
+        stackViewerData = newInstance;
       } else {
         newInstance.color = DESELECTED_COLOR;
       }
@@ -55,6 +58,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       let loadedInstances = state.allLoadedInstances?.find( i => i?.metadata?.Id === response.payload.Id ) ? [...state.allLoadedInstances] : [...state.allLoadedInstances, newInstance]
       return Object.assign({}, state, {
           allLoadedInstances: loadedInstances,
+          stackViewerData : stackViewerData,
           focusedInstance : loadedInstances?.find( i => i?.metadata?.Id === response.payload.Id ),
           event : { action : getInstancesTypes.ADD_INSTANCE, id : response.payload.Id, trigger : Date.now()},
           isLoading: false

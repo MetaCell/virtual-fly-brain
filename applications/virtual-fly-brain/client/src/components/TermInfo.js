@@ -242,7 +242,7 @@ const TermInfo = ({ open, setOpen }) => {
   }
 
   const handleFocus = (event) => {
-    focusInstance(termInfoData?.Id)
+    focusInstance(termInfoData?.metadata?.Id)
   }
 
   const handleSelection = (event) => {

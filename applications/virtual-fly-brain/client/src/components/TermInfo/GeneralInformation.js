@@ -44,7 +44,7 @@ const GeneralInformation = ({data, classes}) => {
             <TerminfoSlider
               allowFullscreen
               setFullScreen={setFullScreen}
-              examples={data?.Images ? data?.Images : data?.Examples}
+              examples={data?.metadata?.Images ? data?.metadata?.Images : data?.metadata?.Examples}
             />
           </Box>
         </Grid>
@@ -80,7 +80,7 @@ const GeneralInformation = ({data, classes}) => {
                 ...classes.heading,
                 color: whiteColor,
                 textAlign: 'right'
-              }}>Adult brain</Typography>
+              }}>{ data?.metadata?.Classification }</Typography>
             </Box>
 
             <Box display='flex' justifyContent='space-between' columnGap={1}>
@@ -125,7 +125,7 @@ const GeneralInformation = ({data, classes}) => {
                 ...classes.heading,
                 color: whiteColor,
                 textAlign: 'right'
-              }}>CC-BY-NC-SA_4.0</Typography>
+              }}>{data?.metadata?.Licenses?.[0]?.label}</Typography>
             </Box>
 
             <Box display='flex' justifyContent='space-between' columnGap={1}>
@@ -137,7 +137,7 @@ const GeneralInformation = ({data, classes}) => {
       </Grid>
 
       {fullScreen && (
-        <FullScreenViewer open={ fullScreen } onClose={ () => setFullScreen( false ) } images={data?.Images ? data?.Images : data?.Examples}>
+        <FullScreenViewer open={ fullScreen } onClose={ () => setFullScreen( false ) } images={data?.metadata?.Images ? data?.metadata?.Images : data?.metadata?.Examples}>
           <Button sx={ { position: 'absolute', zIndex: 9, gap: '0.25rem', right: '1.75rem', top: '1.75rem' } } variant="contained" color="info">
             <Compare />
             Compare images with current

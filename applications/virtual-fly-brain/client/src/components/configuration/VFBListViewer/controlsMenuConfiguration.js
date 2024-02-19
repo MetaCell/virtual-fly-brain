@@ -136,7 +136,7 @@ const controlsMenuConf = {
         {
           label: "Delete",
           icon: "fa fa-trash",
-          isVisible : entity => entity.visible, //entity.getId() != window.templateID,
+          isVisible : entity => !entity.metadata?.IsTemplate, //entity.getId() != window.templateID,
           action: { handlerAction: ACTIONS.DELETE },
         },
         {
@@ -171,7 +171,7 @@ const controlsMenuConf = {
             {
               toggle : {
                 condition : entity => { return entity?.skeleton?.skeleton?.visible || entity?.skeleton?.sphere?.visible ? true : false },
-                isVisible : entity => { return true },
+                isVisible : entity => { return entity?.metadata?.SuperTypes?.find( s => s === NEURON) },
                 options : {
                   false : {
                     label: "Enable 3D Skeleton",

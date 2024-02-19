@@ -24,8 +24,7 @@ const VFBStackViewer = (props) => {
     }
   }
 
-  const stackViewerData = useSelector(state => state.instances.focusedInstance)
-  const templateID = useSelector(state => state.globalInfo.templateID)
+  const stackViewerData = useSelector(state => state.instances.stackViewerData)
   const fields = useSelector((state) => state.WHATEVER_REDUCER);
   const stackRef = useRef();
   const layout = props.layout;
@@ -37,8 +36,10 @@ const VFBStackViewer = (props) => {
   let voxelSize = { x:0.622088, y:0.622088, z:0.622088 };
 
   const [stackData, setStackData] = React.useState({
-    id: props.id, height: props.defHeight, width: props.defWidth, instances: [], selected: []
+    id: props.id, height: props.size?.height, width: props.size?.width, instances: [], selected: []
   });
+
+  const [prevData, setPrevData]= React.useState(false)
 
   const [canvasRef, setCanvasRef] = React.useState(props.canvasRef);
   
@@ -122,37 +123,43 @@ const VFBStackViewer = (props) => {
   // FIXME
   useEffect( () => {
     let instances = stackData.instances;
-    if (!instances.find( i => i?.Id === stackViewerData?.Id) && stackViewerData?.Images && stackViewerData?.IsTemplate) {
-      let keys = Object.keys(stackViewerData.Images);
+    let match = instances?.find( i => i.wrappedObj.id?.includes(stackViewerData?.metadata?.Id) );
+    if (stackViewerData?.metadata?.Id !== stackData?.id && stackViewerData?.metadata?.Images && stackViewerData?.metadata?.IsTemplate) {
+      let keys = Object.keys(stackViewerData.metadata?.Images);
 
       const instancespec = {
         "eClass": "SimpleInstance",
-        "id": stackViewerData.Id,
+        "id": stackViewerData.metadata?.Id,
         "name": stackViewerData.Name,
         "type": { "eClass": "SimpleType" },
         "visualValue": {
           "eClass": Resources.IMAGE,
-          data :stackViewerData.Images[keys[0]]?.[0].wlz.replace("https://www.virtualflybrain.org/data/","/disk/data/VFB/IMAGE_DATA/")
+          data :stackViewerData.metadata?.Images[keys[0]]?.[0].wlz.replace("https://www.virtualflybrain.org/data/","/disk/data/VFB/IMAGE_DATA/")
         }
       };
 
       const instance1spec = {
         "eClass": "SimpleInstance",
-        "id": stackViewerData.Id + "_slices",
-        "name": stackViewerData.Name + "_slices",
+        "id": stackViewerData.metadata?.Id + "_slices",
+        "name": stackViewerData.metadata?.Name + "_slices",
         "type": { "eClass": "SimpleType" },
         "visualValue": {
           "eClass": Resources.IMAGE,
-          data :stackViewerData.Images[keys[0]]?.[0].wlz.replace("https://www.virtualflybrain.org/data/","/disk/data/VFB/IMAGE_DATA/")
+          data :stackViewerData.metadata?.Images[keys[0]]?.[0].wlz.replace("https://www.virtualflybrain.org/data/","/disk/data/VFB/IMAGE_DATA/")
         }
       };
       const parent = new SimpleInstance(instancespec);
       const slices = new SimpleInstance(instance1spec);
       slices.parent = parent;
-      parent[stackViewerData.Id + "_slices"] = slices;
+      parent[stackViewerData.metadata?.Id + "_slices"] = slices;
       instances.push(slices);
 
-      const newData = {...stackData , instances : instances };
+      const newData = {
+        ...stackData ,
+        id : stackViewerData?.metadata?.Id,
+        height: props.size.height,
+        width: props.size.width,
+        instances : instances };
       setStackData(newData);
     }
     
@@ -160,30 +167,30 @@ const VFBStackViewer = (props) => {
 
   // Update height and width of the stackwidget, happens when flex layout resizes tabs
   useEffect( () => {
-    if (stackData?.height !== props?.defHeight || stackData?.width !== props?.defWidth) {
+    if (stackData?.height !== props?.size?.height || stackData?.width !== props?.size?.width) {
       let newData = stackData;
-      newData.height = props.defHeight;
-      newData.width = props.defWidth;
+      newData.height = props.size?.height;
+      newData.width = props.size?.width;
       setStackData(newData);
       updateStackWidget();
     }
-  }, [props?.defHeight, props?.defWidth])
+  }, [props?.size?.height, props?.size?.width])
 
 
   // Update config and voxel size before re-rendering
   useMemo(() => {
-    if (stackViewerData?.Images) {
-      let keys = Object.keys(stackViewerData.Images);
-      config = stackViewerData.Images[keys[0]]?.[0];
+    if (stackViewerData?.metadata?.Images) {
+      let keys = Object.keys(stackViewerData.metadata?.Images);
+      config = stackViewerData.metadata?.Images[keys[0]]?.[0];
       config.serverUrl = 'http://www.virtualflybrain.org/fcgi/wlziipsrv.fcgi';
-      if ( stackViewerData?.Domains ){
-        keys = Object.keys(stackViewerData?.Domains);
+      if ( stackViewerData?.metadata?.Domains ){
+        keys = Object.keys(stackViewerData?.metadata?.Domains);
       }
       let ids = [parseInt(keys[keys?.length - 1]) + 1], labels = [parseInt(keys[keys?.length - 1]) + 1], classID = [parseInt(keys[keys?.length - 1]) + 1]; 
       keys?.forEach( key => {
-        ids[parseInt(key)] = (stackViewerData?.Domains?.[key]?.id);
-        labels[parseInt(key)] = (stackViewerData?.Domains?.[key]?.type_label);
-        classID[parseInt(key)] = (stackViewerData?.Domains?.[key]?.type_id);
+        ids[parseInt(key)] = (stackViewerData?.metadata?.Domains?.[key]?.id);
+        labels[parseInt(key)] = (stackViewerData?.metadata?.Domains?.[key]?.type_label);
+        classID[parseInt(key)] = (stackViewerData?.metadata?.Domains?.[key]?.type_id);
       })
       let voxels = [];
       if (config?.voxel != undefined) {
@@ -201,7 +208,7 @@ const VFBStackViewer = (props) => {
         serverUrl: 'http://www.virtualflybrain.org/fcgi/wlziipsrv.fcgi',
         templateId: 'NOTSET'
       };
-    }  
+    }
   }, [stackData]);
 
   const StackComponent = StackViewerComponent();
@@ -232,10 +239,12 @@ const VFBStackViewer = (props) => {
       }}
     >
       Stack Viewer
-      <StackComponent
+      { stackData?.instances?.length > 0 ? <StackComponent
       data={stackData}
+      height={stackData.height}
+      width={stackData.width}
       config={config}
-      voxel={voxelSize}/>
+      voxel={voxelSize}/> : null }
     </Box>
   )
 }

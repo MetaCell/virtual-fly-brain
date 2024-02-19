@@ -3,22 +3,6 @@ import { CheckBoxDefault, CheckBoxGreen, CheckBoxRed, CleaningServices, FilterIc
 import { Box, Button, Checkbox, FormControlLabel, FormGroup, IconButton, Popper, Typography } from "@mui/material";
 import vars from "../../theme/variables";
 
-const filterChipColors = [
-  '#6D4EA0',
-  '#4E5BA0',
-  '#4E91A0',
-  '#4EA082',
-  '#4EA060',
-  '#68A04E',
-  '#7CA04E',
-  '#A0984E',
-  '#A07A4E',
-  '#A0624E',
-  '#A04E6C',
-  '#994EA0',
-  '#A04E4E'
-];
-
 const DUMMY_FILTERS = [
   {
     id: 0,
@@ -77,7 +61,7 @@ const DUMMY_FILTERS = [
 
 const { primaryBg, outlinedBtnTextColor, bottomNavBg, tabActiveColor, whiteColor, searchHeadingColor } = vars;
 
-const Filter = () => {
+const Filter = (props) => {
   const [filterAnchorEl, setFilterAnchorEl] = React.useState(null);
   const [filtersApplied, setFiltersApplied] = useState(true)
 
@@ -152,12 +136,12 @@ const Filter = () => {
             alignItems: 'flex-start',
             rowGap: 1.5
           }}>
-            {DUMMY_FILTERS.map((filter, index) => (
+            {DUMMY_FILTERS.map((tag, index) => (
               <FormControlLabel sx={{
                 height: '20px',
                 borderRadius: '50px',
                 px: '0.5rem',
-                backgroundColor: filterChipColors[index],
+                backgroundColor: props.facets_annotations_colors[tag.label]?.color,
 
                 '& .MuiCheckbox-root': {
                   marginRight: '0.25rem'
@@ -168,7 +152,7 @@ const Filter = () => {
                   fontSize: '0.625rem'
                 }
 
-              }} key={filter.id} control={<Checkbox checkedIcon={<Tick color={whiteColor} />} icon={<></>} />} label={filter.label} />
+              }} key={tag.id} control={<Checkbox checkedIcon={<Tick color={whiteColor} />} icon={<></>} />} label={tag.label} />
             ))}
           </FormGroup>
         </Box>

@@ -78,7 +78,7 @@ export const Item = ({
               }}>
                 {search?.facet_annotations?.slice(2)?.map((tag, index) => <Chip key={`remaining-tag-${index}`} sx={{
                   lineHeight: '140%',
-                  fontSize: '0.625rem', backgroundColor: chipColors[tag.id]
+                  fontSize: '0.625rem', backgroundColor: facets_annotations_colors[tag.id]?.color
                 }} label={tag.label} />)}
               </Box>
             }

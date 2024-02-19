@@ -153,7 +153,7 @@ class ListViewerControlsMenu extends Component {
     let updatedButtons = buttons.map((button, index) => {
       const updatedButton = {...button}
       if ( self.props.allLoadedInstances?.find( i => i.metadata?.Id == self.props.instance) !== undefined ) {
-        updatedButton.activeColor = RGBAToHexA(self.props.allLoadedInstances?.find( i => i.metadata?.Id == self.props.instance)?.color);
+        updatedButton.activeColor = RGBAToHexA(self.props.allLoadedInstances?.find( i => i.metadata?.Id == self.props.instance)?.simpleInstance?.color);
         updatedButton.list.map(item => {
           // Iterate through button list in configuration, store new configuration in 'list' array
           this.iterateConfList(list, item);

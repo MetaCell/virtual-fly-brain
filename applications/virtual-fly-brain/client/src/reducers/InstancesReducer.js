@@ -4,23 +4,40 @@ import { loadInstances, getProxyInstances } from './../utils/instancesHelper'
 import { SkeletonOff } from '../icons';
 import { on } from 'events';
 import { find } from '@nosferatu500/react-sortable-tree';
+import { get3DMesh } from './actions/instances';
 
 export const initialStateInstancesReducer = {
   allPotentialInstances : [],
   allLoadedInstances : [],
   focusedInstance : undefined,
   threeDObjects : [],
+  stackViewerData : null,
+  focusedInstance : "",
   event : {},
   isLoading: false,
   launchTemplate : null,
   error: false
 };
 
+const getMappedCanvasData = (loadedInstances) => {
+  let updatedCanvasData = loadedInstances?.filter( m => m?.simpleInstance )?.map( instance => {
+    let { color, visibility, id } = instance.simpleInstance;
+    return {
+      instancePath : id,
+      visibility,
+      color,
+      selected : instance.selected
+    }
+  })
+
+  return updatedCanvasData;
+}
+
 const InstancesReducer = (state = initialStateInstancesReducer, response) => {
   switch (response.type) {
     case getInstancesTypes.LAUNCH_TEMPLATE:{
       if ( !response.payload.openTemplate ) {
-        let loadedInstances = state.allLoadedInstances?.find( i => i?.metadata?.Id === response.payload.id ) ? [...state.allLoadedInstances] : [...state.allLoadedInstances, state.launchTemplate]
+        let loadedInstances = [...state.allLoadedInstances]
         return Object.assign({}, state, {
             allLoadedInstances: loadedInstances,
             launchTemplate : null,
@@ -42,8 +59,10 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
      case getInstancesTypes.GET_INSTANCES_SUCCESS:{
       const newInstance = { metadata : response.payload };
       newInstance.visible = true;
+      let stackViewerData = state.stackViewerData;
       if ( newInstance.metadata?.IsTemplate ){
         newInstance.color = TEMPLATE_COLOR;
+        stackViewerData = newInstance;
       } else {
         newInstance.color = DESELECTED_COLOR;
       }
@@ -53,8 +72,10 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         })
       }
       let loadedInstances = state.allLoadedInstances?.find( i => i?.metadata?.Id === response.payload.Id ) ? [...state.allLoadedInstances] : [...state.allLoadedInstances, newInstance]
+
       return Object.assign({}, state, {
           allLoadedInstances: loadedInstances,
+          stackViewerData : stackViewerData,
           focusedInstance : loadedInstances?.find( i => i?.metadata?.Id === response.payload.Id ),
           event : { action : getInstancesTypes.ADD_INSTANCE, id : response.payload.Id, trigger : Date.now()},
           isLoading: false
@@ -67,16 +88,14 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       }
       case getInstancesTypes.REMOVE_INSTANCES_SUCCESS:{
         let loadedInstances = [...state.allLoadedInstances.filter(i => i.metadata?.Id !== response.payload.query)];
-        let focusedInstance = state.focusedInstance;
-        if ( loadedInstances.length === 1 && loadedInstances[0]?.metadata.IsTemplate ){
-          focusedInstance = loadedInstances[0];
-        }
+        let focusedInstance = loadedInstances?.find( i => i?.metadata?.IsTemplate );
 
         const threeDObjects = [...state.threeDObjects];
         const matchObjects = threeDObjects.filter( o => !o.name.includes(response.payload.query));
 
         return Object.assign({}, state, {
           allLoadedInstances: loadedInstances,
+          mappedCanvasData : getMappedCanvasData(loadedInstances),
           threeDObjects : matchObjects,
           focusedInstance : focusedInstance,
           event : { action : getInstancesTypes.UPDATE_INSTANCES, id : response.payload.query, trigger : Date.now()},
@@ -90,6 +109,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         if ( matchInstance?.simpleInstance ) matchInstance.simpleInstance.visibility = true;
         return Object.assign({}, state, {
           allLoadedInstances: allLoadedInstances,
+          mappedCanvasData : getMappedCanvasData(allLoadedInstances),
           event : { action : getInstancesTypes.UPDATE_INSTANCES, id : response.payload.id, trigger : Date.now()},
           isLoading: false
         })
@@ -101,6 +121,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         if ( matchInstance?.simpleInstance ) matchInstance.simpleInstance.visibility = false;
         return Object.assign({}, state, {
           allLoadedInstances: allLoadedInstances,
+          mappedCanvasData : getMappedCanvasData(allLoadedInstances),
           event : { action : getInstancesTypes.UPDATE_INSTANCES, id : response.payload.id, trigger : Date.now()},
           isLoading: false
         })
@@ -111,6 +132,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         matchSimpleInstance.visibility = true;
         return Object.assign({}, state, {
           allLoadedInstances: allLoadedInstances,
+          mappedCanvasData : getMappedCanvasData(allLoadedInstances),
           event : { action : getInstancesTypes.UPDATE_INSTANCES, id : response.payload.id, trigger : Date.now()},
           isLoading: false
         })
@@ -121,6 +143,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         matchSimpleInstance.visibility = false;
         return Object.assign({}, state, {
           allLoadedInstances: allLoadedInstances,
+          mappedCanvasData : getMappedCanvasData(allLoadedInstances),
           event : { action : getInstancesTypes.UPDATE_INSTANCES, id : response.payload.id, trigger : Date.now()},
           isLoading: false
         })
@@ -141,12 +164,14 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         return Object.assign({}, state, {
           allLoadedInstances : allLoadedInstances,
           threeDObjects : threeDObjects, 
+          mappedCanvasData : getMappedCanvasData(allLoadedInstances),
           event : { action : getInstancesTypes.UPDATE_INSTANCES, id : response.payload.id, trigger : Date.now()},
           isLoading: false
         })
       }
       case getInstancesTypes.FOCUS_INSTANCE:{
-        const findInstance = state.allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );
+        const loadedInstances = [...state.allLoadedInstances]
+        const findInstance = loadedInstances?.find( i => i.metadata?.Id === response.payload.id );
         return Object.assign({}, state, {
           focusedInstance: findInstance,
           event : { action : getInstancesTypes.FOCUS_INSTANCE, id : response.payload.id, trigger : Date.now()},
@@ -177,6 +202,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         return Object.assign({}, state, {
           allLoadedInstances:allLoadedInstances,
           threeDObjects : threeDObjects,
+          mappedCanvasData : getMappedCanvasData(allLoadedInstances),
           event : { action : getInstancesTypes.UPDATE_INSTANCES, id : response.payload.id, trigger : Date.now()},
           isLoading: false
         })
@@ -196,6 +222,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
 
         return Object.assign({}, state, {
           allLoadedInstances : loadedInstances,
+          mappedCanvasData : getMappedCanvasData(loadedInstances),
           event : { action : getInstancesTypes.UPDATE_INSTANCES, id : response.payload.id, trigger : Date.now()},
           isLoading: false
         })}
@@ -237,6 +264,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         return Object.assign({}, state, {
           threeDObjects : threeDObjects,
           allLoadedInstances : allLoadedInstances,
+          mappedCanvasData : getMappedCanvasData(allLoadedInstances),
           event : { 
             action : getInstancesTypes.UPDATE_INSTANCES,
             id : response.payload.id,
@@ -286,7 +314,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
           matchObject.visible = false;
         }
         return Object.assign({}, state, {
-          threeDObjects : threeDObjects, 
+          threeDObjects : threeDObjects,
           allLoadedInstances : allLoadedInstances,
           event : { action : getInstancesTypes.UPDATE_SKELETON, mode : SKELETON, id : response.payload.id, visible : false, trigger : Date.now()},
           isLoading: false

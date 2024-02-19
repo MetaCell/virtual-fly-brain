@@ -13,7 +13,6 @@ import { addWidget } from '@metacell/geppetto-meta-client/common/layout/actions'
 import { threeDCanvasWidget, stackViewerWidget, roiBrowserWidget, termContextWidget, circuitBrowserWidget, listViewerWidget } from "./layout/widgets";
 import { templateLoaded } from './../reducers/actions/instances';
 import store from "../store";
-import VFBStackViewer from "./StackViewer";
 import VFBListViewer from "./VFBListViewer"
 
 const {
@@ -68,7 +67,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
   useEffect(() => {
     dispatch(addWidget(threeDCanvasWidget));
     // TODO: fix stack viewer
-    // dispatch(addWidget(stackViewerWidget));
+    dispatch(addWidget(stackViewerWidget));
     //dispatch(addWidget(sideBarWidget(sidebarOpen, setSidebarOpen)));
     dispatch(addWidget(circuitBrowserWidget));
     dispatch(addWidget(roiBrowserWidget));
@@ -208,7 +207,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
         {desktopScreen ? (
           <>
             {tabContent}
-            {bottomNav === 0 && <VFBStackViewer  />}
+            {bottomNav === 0 && < VFBUploader open={true} setBottomNav={setBottomNav} />}
             {bottomNav === 1 && <VFBDownloadContents open={true} setBottomNav={setBottomNav} />}
             {bottomNav === 2 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} />}
           </>
@@ -217,7 +216,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
             {
               bottomNav != 2 && tabContent
             }
-            {bottomNav === 0 && <VFBStackViewer  />}
+            {bottomNav === 0 && <VFBUploader open={true} setBottomNav={setBottomNav} />}
             {bottomNav === 1 && <VFBDownloadContents open={true} setBottomNav={setBottomNav} />}
             {bottomNav === 2 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} />}
           </>

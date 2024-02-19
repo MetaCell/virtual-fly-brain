@@ -175,6 +175,8 @@ export const getInstanceByID = async (queryId) => {
   }
 
   store.dispatch(getInstancesSuccess(response))
+
+  get3DMesh(response)
 }
 
 export const get3DMesh = async (instance) => {

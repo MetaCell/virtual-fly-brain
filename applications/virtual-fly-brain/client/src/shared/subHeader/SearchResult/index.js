@@ -4,9 +4,11 @@ import vars from "../../../theme/variables";
 import { Search } from "../../../icons";
 import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
 
+const facets_annotations_colors = require("../../../components/configuration/VFBColors").facets_annotations_colors;
+
 const { secondaryBg, searchBoxBg, whiteColor, searchHeadingColor, listHover } = vars;
 const chips_cutoff = 3;
-export const SearchResult = ({ getOptionProps, selectedFilters, groupedOptions, chipColors, handleResultSelection }) => {
+export const SearchResult = ({ getOptionProps, selectedFilters, groupedOptions, facets_annotations_colors, handleResultSelection }) => {
   const hasTag = (facets_annotations) => {
     let hasTag = true;
     facets_annotations?.forEach( annotation => {
@@ -95,7 +97,7 @@ export const SearchResult = ({ getOptionProps, selectedFilters, groupedOptions, 
                       sx={{
                         lineHeight: '140%',
                         fontSize: '0.625rem',
-                        backgroundColor: chipColors[index] || chipColors[0]
+                        backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color
                       }}
                       label={tag}
                     />

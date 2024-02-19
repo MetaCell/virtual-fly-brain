@@ -80,7 +80,7 @@ const GeneralInformation = ({data, classes}) => {
                 ...classes.heading,
                 color: whiteColor,
                 textAlign: 'right'
-              }}>Adult brain</Typography>
+              }}>{ data?.metadata?.Classification }</Typography>
             </Box>
 
             <Box display='flex' justifyContent='space-between' columnGap={1}>
@@ -125,7 +125,7 @@ const GeneralInformation = ({data, classes}) => {
                 ...classes.heading,
                 color: whiteColor,
                 textAlign: 'right'
-              }}>CC-BY-NC-SA_4.0</Typography>
+              }}>{data?.metadata?.Licenses?.[0]?.label}</Typography>
             </Box>
 
             <Box display='flex' justifyContent='space-between' columnGap={1}>

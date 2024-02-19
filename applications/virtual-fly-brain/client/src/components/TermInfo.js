@@ -219,7 +219,6 @@ const TermInfo = ({ open, setOpen }) => {
   const deleteId = (id) => {
     hide3DMesh(termInfoData?.metadata?.Id)
     removeInstanceByID(termInfoData?.metadata?.Id)
-    setTermInfoData(null)
   }
 
   const addId = (id) => {
@@ -243,7 +242,7 @@ const TermInfo = ({ open, setOpen }) => {
   }
 
   const handleFocus = (event) => {
-    focusInstance(termInfoData?.Id)
+    focusInstance(termInfoData?.metadata?.Id)
   }
 
   const handleSelection = (event) => {
@@ -320,12 +319,6 @@ const TermInfo = ({ open, setOpen }) => {
       setTermInfoData(data)
     }
   }, [allLoadedInstances])
-
-  useEffect(() => {
-    if (  focusInstance?.metadata !== undefined ) {
-      setTermInfoData(focusInstance)
-    }
-  }, [focusInstance])
 
   const getInstance = () => {
     let instance = allLoadedInstances.find( instance => instance.metadata?.Id == termInfoData?.metadata?.Id );

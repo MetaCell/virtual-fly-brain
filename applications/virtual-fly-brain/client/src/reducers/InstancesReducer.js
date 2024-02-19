@@ -87,10 +87,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       }
       case getInstancesTypes.REMOVE_INSTANCES_SUCCESS:{
         let loadedInstances = [...state.allLoadedInstances.filter(i => i.metadata?.Id !== response.payload.query)];
-        let focusedInstance = state.focusedInstance;
-        if ( loadedInstances.length === 1 && loadedInstances[0]?.metadata.IsTemplate ){
-          focusedInstance = loadedInstances[0];
-        }
+        let focusedInstance = loadedInstances?.find( i => i?.metadata?.IsTemplate );
 
         const threeDObjects = [...state.threeDObjects];
         const matchObjects = threeDObjects.filter( o => !o.name.includes(response.payload.query));
@@ -172,7 +169,8 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         })
       }
       case getInstancesTypes.FOCUS_INSTANCE:{
-        const findInstance = state.allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );
+        const loadedInstances = [...state.allLoadedInstances]
+        const findInstance = loadedInstances?.find( i => i.metadata?.Id === response.payload.id );
         return Object.assign({}, state, {
           focusedInstance: findInstance,
           event : { action : getInstancesTypes.FOCUS_INSTANCE, id : response.payload.id, trigger : Date.now()},

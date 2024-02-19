@@ -16,7 +16,8 @@ export const initialStateInstancesReducer = {
   event : {},
   isLoading: false,
   launchTemplate : null,
-  error: false
+  error: false,
+  errorMessage: undefined
 };
 
 const getMappedCanvasData = (loadedInstances) => {
@@ -78,12 +79,15 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
           stackViewerData : stackViewerData,
           focusedInstance : loadedInstances?.find( i => i?.metadata?.Id === response.payload.Id ),
           event : { action : getInstancesTypes.ADD_INSTANCE, id : response.payload.Id, trigger : Date.now()},
-          isLoading: false
+          isLoading: false,
+          error: false,
+          errorMessage: undefined
         })
       }
       case getInstancesTypes.GET_INSTANCES_FAILURE:{
         return Object.assign({}, state, {
-          error: true
+          error: true,
+          errorMessage: response.payload.error,
         })
       }
       case getInstancesTypes.REMOVE_INSTANCES_SUCCESS:{

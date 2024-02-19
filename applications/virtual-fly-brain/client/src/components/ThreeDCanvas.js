@@ -61,43 +61,14 @@ class ThreeDCanvas extends Component {
 
   componentDidUpdate(prevProps) {
     if(this.props.event.trigger !== prevProps.event.trigger){ 
-      const mappedCanvasData = [...this.props.allLoadedInstances];
-      const threeDObjects = [...this.props.threeDObjects];
-      const focusInstance = window.Instances?.find( instance => instance.wrappedObj.id === this.props.focusInstance?.Id);
-
       switch(this.props.event.action){
+        // TODO : Remove and let custom camera handler control this action. Issue #VFB-136
         case getInstancesTypes.FOCUS_INSTANCE:
-          if ( focusInstance){
-            this.canvasRef.current.threeDEngine.cameraManager.zoomTo([focusInstance])
-          } else {
-            this.canvasRef.current.defaultCameraControlsHandler("cameraHome")
-          }
+          this.canvasRef.current.defaultCameraControlsHandler("cameraHome")
           break;
-        case getInstancesTypes.ADD_INSTANCE:{
-          const instance = mappedCanvasData.find( i => i.metadata?.Id === this.props.event.id );
-          if ( instance?.simpleInstance === undefined ) {
-            get3DMesh(instance)
-          } 
-          break;
-        }
-        case getInstancesTypes.UPDATE_INSTANCES:{
-          let updatedCanvasData = mappedCanvasData?.filter( m => m?.simpleInstance )?.map( instance => {
-            let { color, visibility, id } = instance.simpleInstance;
-            return {
-              instancePath : id,
-              visibility,
-              color,
-              selected : instance.selected
-            }
-          })
-
-          let updatedObjects = threeDObjects?.filter( m => m.visible);
-
-          this.setState({ ...this.state, mappedCanvasData : updatedCanvasData, threeDObjects : updatedObjects})
-          break;
-        }
         case getInstancesTypes.UPDATE_SKELETON:
-          this.showSkeleton(this.props.event.id, this.props.event.mode, this.props.event.visible, threeDObjects)
+        // Called to create the Neuron skeleton using the THREED Renderer  
+        this.showSkeleton(this.props.event.id, this.props.event.mode, this.props.event.visible, this.props.threeDObjects)
           break;
         default:
       }
@@ -135,17 +106,8 @@ class ThreeDCanvas extends Component {
             add3DSkeleton(neuron, mode, match?.metadata?.Id)
         })
     } else {
-      let updatedCanvasData = allLoadedInstances?.filter( m => m?.simpleInstance )?.map( instance => {
-        let { color, visibility, id } = instance.simpleInstance;
-        return {
-          instancePath : id,
-          visibility,
-          color,
-          selected : instance.selected
-        }
-      })
       let updatedObjects = threeDObjects?.filter( m => m.visible);
-      this.setState({ ...this.state, mappedCanvasData : updatedCanvasData, threeDObjects : updatedObjects})
+      this.setState({ ...this.state, threeDObjects : updatedObjects})
     }
   }
 
@@ -155,7 +117,7 @@ class ThreeDCanvas extends Component {
 
   handleToggle () {
     this.setState({ showLoader: true })
-    this.setState({ showModel: true, showLoader: false, data: this.state.mappedCanvasData, cameraOptions: { ...this.state.cameraOptions, } })
+    this.setState({ showModel: true, showLoader: false, data: this.props.mappedCanvasData, cameraOptions: { ...this.state.cameraOptions, } })
   }
 
   handleClickOutside (event) {
@@ -167,15 +129,14 @@ class ThreeDCanvas extends Component {
   }
 
   onSelection (selectedInstances){
-    let updatedCanvas = applySelection(this.state.mappedCanvasData, selectedInstances);
-    this.setState({ mappedCanvasData: updatedCanvas })
+    applySelection(this.props.mappedCanvasData, selectedInstances);
   }
 
   hoverHandler () {}
 
   render () {
     const { cameraOptions } = this.state
-    const { classes } = this.props
+    const { classes , mappedCanvasData, threeDObjects} = this.props
 
     return <Box
       sx={{
@@ -187,14 +148,15 @@ class ThreeDCanvas extends Component {
         }
       }}
     >
-      {this.state.mappedCanvasData?.length > 0 ? (
+      {mappedCanvasData?.length > 0 ? (
         <div ref={node => this.node = node} id="canvas" className={classes.container}>
           <>
             <Canvas
               ref={this.canvasRef}
-              data={this.state.mappedCanvasData?.filter(d => d?.visibility )}
-              threeDObjects={this.state.threeDObjects}
+              data={mappedCanvasData?.filter(d => d?.visibility )}
+              threeDObjects={threeDObjects}
               cameraOptions={cameraOptions}
+              onMount={scene => this.scene = scene}
               backgroundColor={blackColor}
               onSelection={this.onSelection}
               onHoverListeners={{ 'hoverId': this.hoverHandler }}
@@ -219,6 +181,7 @@ class ThreeDCanvas extends Component {
 
 const mapStateToProps = state => ({
   allLoadedInstances : state.instances.allLoadedInstances,
+  mappedCanvasData : state.instances.mappedCanvasData,
   threeDObjects : state.instances.threeDObjects,
   focusInstance : state.instances.focusInstance,
   event : state.instances.event

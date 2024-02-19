@@ -534,7 +534,7 @@ const TermInfo = ({ open, setOpen }) => {
                           <Button  onClick={(event) => handleMeshVisibility()}>
                           { getInstance()?.simpleInstance?.visibility ? <ArViewOff /> : <ArView /> }                          </Button>
                         </Tooltip>
-                        { termInfoData?.metadata?.SuperTypes?.find( s => s === NEURON) ?
+                        { termInfoData?.metadata?.SuperTypes?.find( s => s.toLowerCase() === NEURON.toLowerCase()) ?
                         <Tooltip title={getInstance()?.skeleton?.[SKELETON]?.visible ? "Disable 3D Skeleton" : "Enable 3D Skeleton"}>
                           <Button onClick={(event) => handleSkeleton(event)}>
                             {getInstance()?.skeleton?.[SKELETON]?.visible ? <SkeletonOff /> : <SkeletonOn /> }
@@ -542,7 +542,7 @@ const TermInfo = ({ open, setOpen }) => {
                         </Tooltip>
                         :
                         null}
-                        { termInfoData?.metadata?.SuperTypes?.find( s => s === NEURON) ?
+                        { termInfoData?.metadata?.SuperTypes?.find( s => s.toLowerCase() === NEURON.toLowerCase()) ?
                         <Tooltip title={getInstance()?.skeleton?.[CYLINDERS]?.visible ? "Show 3D Lines Skeleton" : "Show 3D Cylinder Skeleton"}>
                           <Button onClick={(event) => handleCylinder(event)}>
                           {getInstance()?.skeleton?.[CYLINDERS]?.visible ? <CylinderOff id={SKELETON} /> : <CylinderOn id={CYLINDERS}/> }
@@ -582,7 +582,7 @@ const TermInfo = ({ open, setOpen }) => {
                   <Typography>General Information</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <GeneralInformation data={termInfoData?.metadata} classes={classes} />
+                  <GeneralInformation data={termInfoData} classes={classes} />
                 </AccordionDetails>
               </Accordion>
 

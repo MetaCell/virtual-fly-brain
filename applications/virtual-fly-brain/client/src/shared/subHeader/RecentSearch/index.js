@@ -7,7 +7,7 @@ import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
 const { secondaryBg, searchBoxBg, whiteColor, searchHeadingColor, listHover } = vars;
 const chips_cutoff = 3;
 
-export const RecentSearch = ({ getOptionProps, selectedFilters, recentSearches, chipColors, handleResultSelection }) => {
+export const RecentSearch = ({ getOptionProps, selectedFilters, recentSearches, facets_annotations_colors, handleResultSelection }) => {
   const hasTag = (facets_annotations) => {
     let hasTag = false;
     facets_annotations?.forEach( annotation => {
@@ -100,7 +100,7 @@ export const RecentSearch = ({ getOptionProps, selectedFilters, recentSearches, 
                       sx={{
                         lineHeight: '140%',
                         fontSize: '0.625rem',
-                        backgroundColor: chipColors[index] || chipColors[0]
+                        backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color
                       }}
                       label={tag}
                     />

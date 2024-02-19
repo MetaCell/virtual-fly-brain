@@ -3,9 +3,9 @@ import React from "react";
 import CloseIcon from '@mui/icons-material/Close';
 import vars from "../../../theme/variables";
 
-const { searchHeadingColor, chipGreenSecondary, primaryBg, chipRedSecondary, outlinedBtnTextColor } = vars;
+const { searchHeadingColor, primaryBg, outlinedBtnTextColor } = vars;
 
-export const NarrowSearchFilter = ({groupedOptions, chipColors}) => {
+export const NarrowSearchFilter = ({groupedOptions, facets_annotations_colors}) => {
   let tags = [];
   groupedOptions?.forEach((option, index) => (
     option?.facets_annotation?.forEach( fa => { if ( !tags.find(t => t == fa )) tags.push(fa)})
@@ -51,7 +51,7 @@ export const NarrowSearchFilter = ({groupedOptions, chipColors}) => {
               sx={{
                 lineHeight: '140%',
                 fontSize: '0.625rem',
-                backgroundColor: chipColors[index%(chipColors.length-1)] || chipColors[0]
+                backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color
               }}
               label= {tag}
               onDelete={() => null}

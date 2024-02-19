@@ -24,11 +24,6 @@ const {
   outlinedBtnTextColor,
   primaryBg,
   outlinedBtnBorderColor,
-  chipPink,
-  chipRed,
-  chipGreen,
-  chipYellow,
-  chipOrange,
   queryChipBg
 } = vars;
 
@@ -133,11 +128,11 @@ const Listbox = styled('div')(
 `,
 );
 
-const chipColors = [chipRed, chipGreen, chipOrange, chipPink, chipYellow];
-
 const searchResults = [
 
 ];
+
+const facets_annotations_colors = require("../../components/configuration/VFBColors").facets_annotations_colors;
 
 export default function SearchBuilder(props) {
 
@@ -336,7 +331,7 @@ export default function SearchBuilder(props) {
           />) : null }
 
           { recentSearch?.length >= 1 ? <RecentSearch
-            chipColors={chipColors}
+            facets_annotations_colors={facets_annotations_colors}
             recentSearches={recentSearch}
             getOptionProps={getOptionProps}
             selectedFilters={props.applyFilters}
@@ -347,7 +342,7 @@ export default function SearchBuilder(props) {
             groupedOptions={groupedOptions}
             getOptionProps={getOptionProps}
             selectedFilters={props.applyFilters}
-            chipColors={chipColors}
+            facets_annotations_colors={facets_annotations_colors}
             handleResultSelection={handleResultSelection}
           />) : <CircularProgress sx={{left: '50%', marginTop : '10%', position : 'relative'}}/> }
         </Listbox>

@@ -15,7 +15,7 @@ const {
   descriptionBg
 } = vars;
 
-const chipColor = [ 'primary', 'secondary' ];
+const facets_annotations_colors = require("../../components/configuration/VFBColors").facets_annotations_colors;
 
 const GeneralInformation = ({data, classes}) => {
   const [ toggleReadMore, setToggleReadMore ] = useState( false );
@@ -44,7 +44,7 @@ const GeneralInformation = ({data, classes}) => {
             <TerminfoSlider
               allowFullscreen
               setFullScreen={setFullScreen}
-              examples={data?.Images ? data?.Images : data?.Examples}
+              examples={data?.metadata?.Images ? data?.metadata?.Images : data?.metadata?.Examples}
             />
           </Box>
         </Grid>
@@ -68,7 +68,7 @@ const GeneralInformation = ({data, classes}) => {
               <Typography sx={classes.heading}>Tags</Typography>
                 <Box display='flex' gap={'0.188rem'}>
                   {
-                    data?.metadata?.Tags?.map((tag, i) => <Chip key={tag} color={chipColor[i]} label={tag} />)
+                    data?.metadata?.Tags?.map((tag, i) => ( <Chip key={tag} sx={{backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color}} label={tag} /> ) )
                   }
                 { data?.metadata?.Tags?.length > 2 && <Chip label={`+${data?.metadata?.Tags?.length - 2}`} /> }
               </Box>
@@ -137,7 +137,7 @@ const GeneralInformation = ({data, classes}) => {
       </Grid>
 
       {fullScreen && (
-        <FullScreenViewer open={ fullScreen } onClose={ () => setFullScreen( false ) } images={data?.Images ? data?.Images : data?.Examples}>
+        <FullScreenViewer open={ fullScreen } onClose={ () => setFullScreen( false ) } images={data?.metadata?.Images ? data?.metadata?.Images : data?.metadata?.Examples}>
           <Button sx={ { position: 'absolute', zIndex: 9, gap: '0.25rem', right: '1.75rem', top: '1.75rem' } } variant="contained" color="info">
             <Compare />
             Compare images with current

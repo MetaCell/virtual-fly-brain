@@ -1,6 +1,10 @@
 import React from 'react';
 import Tooltip from '@material-ui/core/Tooltip';
+import Chip from '@material-ui/core/Chip';
 import ListViewerControlsMenu from '../../VFBListViewer/ListViewerControlsMenu';
+import { Typography } from '@mui/material';
+
+const facets_annotations_colors = require("../VFBColors").facets_annotations_colors;
 
 /**
  * Create component to display controls
@@ -37,8 +41,10 @@ const conf = [
     id: "name",
     title: "Name",
     customComponent: component => {
-      const entityName = component.value._root.entries.find( e=> e[0] == "path")[1] ;
-      return <div onClick={e => click(e)} dangerouslySetInnerHTML={{ __html: "<div>"+entityName+"</div>" }} />
+      const entityName = component.value._root.entries.find( e=> e[0] == "name")[1] ;
+      return <div  style={{ width: "100%", textAlign: "left", float: "left" }} onClick={e => click(e)}>
+          <Typography variant="subtitle1">{entityName}</Typography>
+        </div>
     },
     source : entity => entity
   },
@@ -47,9 +53,34 @@ const conf = [
     title: "Type",
     customComponent: component => {
 
-      const entityType = component.value._root.entries.find( e=> e[0] == "type")[1] ;
-      return <div>
-        <div style={{ width: "40%", textAlign: "left", float: "left" }} onClick={e => click(e)} dangerouslySetInnerHTML={{ __html: entityType }} />
+      const entityType = component.value._root.entries.find( e=> e[0] == "types")[1]?.match(/\[(.*?)\]/)[1];
+      const tags = component.value._root.entries.find( e=> e[0] == "tags")[1];
+      const chips_cutoff = 3;
+      return <div style={{ width: "100%" }}>
+        <div style={{ textAlign: "left", float: "left" }}>
+          <Typography variant="subtitle1">{entityType}</Typography>
+        </div>
+        <div style={{ textAlign: "right", float: "right" }}> 
+        {tags?.slice(0,chips_cutoff).map((tag, index) => {
+          return (<Chip
+            key={tag + index}
+            style={{
+              lineHeight: '140%',
+              fontSize: '0.625rem',
+              alignSelf: 'center',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              height : 'auto',
+              width : 'auto',
+              maxWidth: '5.9375rem',
+              backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color
+            }}
+            label={tag}
+          />)
+        }
+        )}
+        </div>
       </div>
     },
     source : entity => entity

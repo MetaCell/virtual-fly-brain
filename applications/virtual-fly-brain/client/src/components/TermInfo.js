@@ -582,7 +582,7 @@ const TermInfo = ({ open, setOpen }) => {
                   <Typography>General Information</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <GeneralInformation data={termInfoData?.metadata} classes={classes} />
+                  <GeneralInformation data={termInfoData} classes={classes} />
                 </AccordionDetails>
               </Accordion>
 

@@ -6,21 +6,9 @@ import QueryHeader from "./QueryHeader";
 import vars from "../../theme/variables";
 import Filter from "./Filter";
 
-const { chipOrange, chipGreen, chipRed, chipPink, chipYellow, headerBorderColor, searchHeadingColor, secondaryBg, listHeadingColor, primaryBg } = vars;
-const chipColors = [chipRed, chipGreen, chipOrange, chipPink, chipYellow];
+const { headerBorderColor, searchHeadingColor, secondaryBg, listHeadingColor, primaryBg } = vars;
+const facets_annotations_colors = require("../configuration/VFBColors").facets_annotations_colors;
 
-const chipsArr = [
-  {
-    id: 0,
-    label: 'Anatomy',
-    color: chipGreen
-  },
-  {
-    id: 1,
-    label: 'Neuron',
-    color: chipOrange
-  }
-];
 
 export const dividerStyle = {
   height: '0.875rem', width: '0.0625rem', background: listHeadingColor, borderRadius: '0.125rem'
@@ -81,10 +69,10 @@ const Query = ({ fullWidth, queries }) => {
                 sx={{
                   lineHeight: '0.875rem',
                   fontSize: '0.625rem',
-                  backgroundColor: chipColors[index%(chipColors.length-1)] || chipColors[0],
+                  backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color,
                   height: '1.25rem',
                   '&:hover': {
-                    backgroundColor: chipColors[index%(chipColors.length-1)] || chipColors[0]
+                    backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color
                   }
                 }}
                 label={tag} />
@@ -108,7 +96,7 @@ const Query = ({ fullWidth, queries }) => {
                         sx={{
                           lineHeight: '140%',
                           fontSize: '0.625rem',
-                          backgroundColor: chipColors[index%(chipColors.length-1)] || chipColors[0]
+                          backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color
                         }}
                         label={tag} />
                     ))}
@@ -127,7 +115,7 @@ const Query = ({ fullWidth, queries }) => {
         </Box>
 
         <Box display='flex' alignItems='center' gap={ 1.2 }>
-          <Filter />
+          <Filter facets_annotations_colors={facets_annotations_colors} />
           <Divider sx={dividerStyle} />
           <Button
             disableRipple

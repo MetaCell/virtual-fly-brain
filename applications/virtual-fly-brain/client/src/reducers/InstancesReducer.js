@@ -9,6 +9,7 @@ import { get3DMesh } from './actions/instances';
 export const initialStateInstancesReducer = {
   allPotentialInstances : [],
   allLoadedInstances : [],
+  focusedInstance : undefined,
   threeDObjects : [],
   stackViewerData : null,
   focusedInstance : "",

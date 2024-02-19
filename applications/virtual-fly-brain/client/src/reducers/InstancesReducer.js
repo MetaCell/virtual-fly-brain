@@ -10,7 +10,7 @@ export const initialStateInstancesReducer = {
   allPotentialInstances : [],
   allLoadedInstances : [],
   threeDObjects : [],
-  mappedCanvasData : [],
+  stackViewerData : null,
   focusedInstance : "",
   event : {},
   isLoading: false,
@@ -36,7 +36,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
   switch (response.type) {
     case getInstancesTypes.LAUNCH_TEMPLATE:{
       if ( !response.payload.openTemplate ) {
-        let loadedInstances = state.allLoadedInstances?.find( i => i?.metadata?.Id === response.payload.id ) ? [...state.allLoadedInstances] : [...state.allLoadedInstances, state.launchTemplate]
+        let loadedInstances = [...state.allLoadedInstances]
         return Object.assign({}, state, {
             allLoadedInstances: loadedInstances,
             launchTemplate : null,
@@ -58,8 +58,10 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
      case getInstancesTypes.GET_INSTANCES_SUCCESS:{
       const newInstance = { metadata : response.payload };
       newInstance.visible = true;
+      let stackViewerData = state.stackViewerData;
       if ( newInstance.metadata?.IsTemplate ){
         newInstance.color = TEMPLATE_COLOR;
+        stackViewerData = newInstance;
       } else {
         newInstance.color = DESELECTED_COLOR;
       }
@@ -72,6 +74,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
 
       return Object.assign({}, state, {
           allLoadedInstances: loadedInstances,
+          stackViewerData : stackViewerData,
           focusedInstance : loadedInstances?.find( i => i?.metadata?.Id === response.payload.Id ),
           event : { action : getInstancesTypes.ADD_INSTANCE, id : response.payload.Id, trigger : Date.now()},
           isLoading: false

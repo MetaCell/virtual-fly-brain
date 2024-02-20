@@ -3,7 +3,8 @@ import { getQueriesTypes } from './actions/types/getQueriesTypes';
 export const initialStateQueriesReducer = {
   queries : [],
   isLoading: false,
-  error: false
+  error: false,
+  errorMessage: undefined
 };
 
 const QueriesReducer = (state = initialStateQueriesReducer, response) => {
@@ -25,11 +26,14 @@ const QueriesReducer = (state = initialStateQueriesReducer, response) => {
       case getQueriesTypes.DELETE_QUERY:
         return Object.assign({}, state, {
           queries: state.queries?.filter( i => i.short_form !== response.payload.short_form ),
-          isLoading: false
+          isLoading: false,
+          error: false,
+          errorMessage: undefined
         })
       case getQueriesTypes.GET_QUERIES_FAILURE:
         return Object.assign({}, state, {
-          error: true
+          error: true,
+          errorMessage: response.payload,
         })
      default:
         return state;

@@ -8,6 +8,7 @@ import vars from "../theme/variables";
 import VFBDownloadContents from "./VFBDownloadContents/VFBDownloadContents";
 import VFBUploader from "./VFBUploader/VFBUploader";
 import QueryBuilder from "./queryBuilder";
+import ErrorModal from "./ErrorModal";
 import { getLayoutManagerInstance } from "@metacell/geppetto-meta-client/common/layout/LayoutManager";
 import { addWidget } from '@metacell/geppetto-meta-client/common/layout/actions';
 import { threeDCanvasWidget, stackViewerWidget, roiBrowserWidget, termContextWidget, circuitBrowserWidget, listViewerWidget } from "./layout/widgets";
@@ -41,6 +42,15 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
   const launchTemplate = useSelector(state => state.instances.launchTemplate)
   const dispatch = useDispatch();
   let templateRef = window.location.origin + "?id=" + launchTemplate?.metadata?.Id;
+
+  //global reducers errors
+  const instancesError = useSelector(state => state.instances.error);
+  const instancesErrorMessage = useSelector(state => state.instances.errorMessage);
+  const queriesError = useSelector(state => state.queries.error);
+  const queriesErrorMessage = useSelector(state => state.queries.errorMessage);
+
+  const modalError = instancesError || queriesError;
+  const modalErrorMessage = instancesErrorMessage || queriesErrorMessage;
 
   useEffect(() => {
     setTab(defaultActiveTab)
@@ -156,6 +166,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
           </Box>
         ) : null}
       </MediaQuery>
+      <ErrorModal display={modalError} message={modalErrorMessage} />
       <Modal
         open={modalOpen}
         aria-labelledby="modal-modal-title"

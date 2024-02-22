@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -17,10 +17,20 @@ const style = {
 };
 
 const ErrorModal = ({ display, message }) => {
+  const [open, setOpen] = useState(display);
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  React.useEffect(() => {
+    setOpen(display);
+  }, [display]);
+
   return (
     <Modal
-      open={display}
-      onClose={() => {}}
+      open={open}
+      onClose={handleClose} 
       aria-labelledby="error-modal-title"
       aria-describedby="error-modal-description"
     >
@@ -32,7 +42,7 @@ const ErrorModal = ({ display, message }) => {
           {message}
         </Typography>
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
-          <Button onClick={() => {}} variant="contained" color="error">
+          <Button onClick={handleClose} variant="contained" color="error">
             Close
           </Button>
         </Box>

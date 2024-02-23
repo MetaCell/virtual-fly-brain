@@ -7,13 +7,12 @@ import { filters } from "./configuration";
 
 const { primaryBg, outlinedBtnTextColor, bottomNavBg, tabActiveColor, whiteColor } = vars;
 
-export const FilterMenu  = ({ classes, setCloseResults , setSelectedFilters }) => {
+export const FilterMenu  = ({ classes , setSelectedFilters }) => {
   const [filterAnchorEl, setFilterAnchorEl] = React.useState(null);
   const [selection, setSelection] = React.useState({})
   const tags = filters[0].values;
   const filterhandleClick = (event) => {
     setFilterAnchorEl(filterAnchorEl ? null : event.currentTarget);
-    console.log("Apply Filters ", selection)
     setSelectedFilters(selection)
   };
 
@@ -81,7 +80,6 @@ export const FilterMenu  = ({ classes, setCloseResults , setSelectedFilters }) =
             minWidth: '0.0625rem'
           }}
           onClick={() => {
-            setCloseResults(false);
             setFilterAnchorEl(null)
             }
           }

@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector, useStore } from 'react-redux';
 import MediaQuery from 'react-responsive';
 import { Box, Button,Modal, useMediaQuery, useTheme, Typography, CircularProgress, Link } from "@mui/material";
 import TermInfo from "./TermInfo"
@@ -10,11 +10,9 @@ import VFBUploader from "./VFBUploader/VFBUploader";
 import QueryBuilder from "./queryBuilder";
 import ErrorModal from "./ErrorModal";
 import { getLayoutManagerInstance } from "@metacell/geppetto-meta-client/common/layout/LayoutManager";
-import { addWidget } from '@metacell/geppetto-meta-client/common/layout/actions';
-import { threeDCanvasWidget, stackViewerWidget, roiBrowserWidget, termContextWidget, circuitBrowserWidget, listViewerWidget } from "./layout/widgets";
+import { addWidget, updateWidget, deleteWidget } from '@metacell/geppetto-meta-client/common/layout/actions';
 import { templateLoaded } from './../reducers/actions/instances';
-import store from "../store";
-import VFBListViewer from "./VFBListViewer"
+import { widgets } from "./layout/widgets";
 
 const {
   secondaryBg,
@@ -42,6 +40,9 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
   const launchTemplate = useSelector(state => state.instances.launchTemplate)
   const dispatch = useDispatch();
   let templateRef = window.location.origin + "?id=" + launchTemplate?.metadata?.Id;
+  const store = useStore();
+
+  const widget = useSelector(state => state.layout.widget);
 
   //global reducers errors
   const instancesError = useSelector(state => state.instances.error);
@@ -75,15 +76,34 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
   }, [store])
 
   useEffect(() => {
-    dispatch(addWidget(threeDCanvasWidget));
-    // TODO: fix stack viewer
-    dispatch(addWidget(stackViewerWidget));
-    //dispatch(addWidget(sideBarWidget(sidebarOpen, setSidebarOpen)));
-    dispatch(addWidget(circuitBrowserWidget));
-    dispatch(addWidget(roiBrowserWidget));
-    dispatch(addWidget(termContextWidget));
-    dispatch(addWidget(listViewerWidget));
+    let stateWidgets = Object.keys(store.getState().widgets);
+    const existingWidget = stateWidgets?.find( w => w === widget )
+    if (!existingWidget && widget) {
+      dispatch(addWidget(widgets[widget]))
+    }
+  }, [widget])
+
+  useEffect(() => {
+    dispatch(addWidget(widgets.threeDCanvasWidget));
+    dispatch(addWidget(widgets.stackViewerWidget));
+    dispatch(addWidget(widgets.circuitBrowserWidget));
+    dispatch(addWidget(widgets.roiBrowserWidget));
+    dispatch(addWidget(widgets.termContextWidget));
+    dispatch(addWidget(widgets.listViewerWidget));
   }, [sidebarOpen, setSidebarOpen])
+
+  const getWidgetStatus = (widgetId) => {
+    return store.getState().widgets[widgetId].status
+}
+
+  const getWidget = (widgetId) => {
+    switch (widgetId) {
+      case widgets.stackViewerWidget.id:
+          return widgets.stackViewerWidget
+      default:
+        break;
+    }
+  }
 
   const classes = {
     tabs: {
@@ -155,7 +175,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
 
   return (
     <>
-      <MediaQuery maxWidth={1199}>
+      {/*<MediaQuery maxWidth={1199}>
         {!bottomNav ? (
           <Box display='flex' sx={classes.tabs}>
             {tabsArr.map((el) => (
@@ -166,6 +186,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
           </Box>
         ) : null}
       </MediaQuery>
+      */}
       <ErrorModal display={modalError} message={modalErrorMessage} />
       <Modal
         open={modalOpen}

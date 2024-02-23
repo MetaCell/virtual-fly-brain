@@ -1,7 +1,11 @@
 import React from 'react';
 import vars from "../../../theme/variables";
-
+import { widgets } from "../../layout/widgets";
 const { primaryFont, whiteColor, tabActiveColor, primaryBg } = vars;
+
+const ACTIONS = {
+  SHOW_COMPONENT : 'SHOW_COMPONENT'
+};
 
 export const toolbarMenu = {
   global: {
@@ -100,6 +104,7 @@ export const toolbarMenu = {
     },
   },
   itemOptions: { customArrow: <i style={{ marginLeft: 'auto', marginRight: 0}} className="fa fa-angle-right menu-caret" /> },
+  actions : ACTIONS,
   buttons: [
     {
       label: "Virtual Fly Brain",
@@ -178,80 +183,80 @@ export const toolbarMenu = {
           label: "Search",
           icon: "fa fa-search",
           action: {
-            handlerAction: "UIElementHandler",
-            parameters: ["spotlightVisible"]
+            handlerAction: ACTIONS.SHOW_COMPONENT,
+            parameters: widgets.circuitBrowserWidget.id
           }
         },
         {
           label: "Query",
           icon: "fa fa-quora",
           action: {
-            handlerAction: "UIElementHandler",
-            parameters: ["queryBuilderVisible"]
+            handlerAction: ACTIONS.SHOW_COMPONENT,
+            parameters: widgets.circuitBrowserWidget.id
           }
         },
         {
           label: "Layers",
           icon: "fa fa-list",
           action: {
-            handlerAction: "UIElementHandler",
-            parameters: ["listViewerVisible"]
+            handlerAction: ACTIONS.SHOW_COMPONENT,
+            parameters: widgets.listViewerWidget.id
           }
         },
         {
           label: "Term Info",
           icon: "fa fa-info",
           action: {
-            handlerAction: "UIElementHandler",
-            parameters: ["termInfoVisible"]
+            handlerAction: ACTIONS.SHOW_COMPONENT,
+            parameters: widgets.termContextWidget.id
           }
         },
         {
           label: "3D Viewer",
           icon: "fa fa-cube",
           action: {
-            handlerAction: "UIElementHandler",
-            parameters: ["canvasVisible"]
+            handlerAction: ACTIONS.SHOW_COMPONENT,
+            parameters: widgets.threeDCanvasWidget.id
           }
         },
         {
           label: "Slice Viewer",
           icon: "fa fa-sliders",
           action: {
-            handlerAction: "UIElementHandler",
-            parameters: ["sliceViewerVisible"]
+            handlerAction: ACTIONS.SHOW_COMPONENT,
+            parameters: widgets.stackViewerWidget.id
           }
         },
         {
           label: "Template ROI Browser",
           icon: "fa fa-indent",
           action: {
-            handlerAction: "UIElementHandler",
-            parameters: ["treeBrowserVisible"]
+            handlerAction: ACTIONS.SHOW_COMPONENT,
+            parameters: widgets.roiBrowserWidget.id
           }
         },
         {
           label: "Term Context",
           icon: "fa fa-sitemap",
           action: {
-            handlerAction: "UIElementHandler",
-            parameters: ["graphVisible"]
+            handlerAction: ACTIONS.SHOW_COMPONENT,
+            parameters: widgets.termContextWidget.id
           }
         },
         {
           label: "Circuit Browser",
           icon: "fa fa-connectdevelop",
           action: {
-            handlerAction: "UIElementHandler",
-            parameters: ["circuitBrowserVisible"]
+            handlerAction: ACTIONS.SHOW_COMPONENT,
+            parameters: widgets.circuitBrowserWidget.id
           }
         },
         {
           label: "Download Contents",
           icon: "fa fa-download",
           action: {
-            handlerAction: "downloadContentsVisible",
-            parameters: []
+            handlerAction: ACTIONS.SHOW_COMPONENT,
+            parameters: widgets.circuitBrowserWidget.id
           }
         },
         {

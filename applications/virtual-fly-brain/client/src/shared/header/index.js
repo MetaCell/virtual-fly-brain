@@ -1,11 +1,15 @@
 import { Box, Button, Link } from "@mui/material";
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 import vars from '../../theme/variables';
 import MediaQuery from 'react-responsive';
 import { History, Logo, Menu as MenuIcon, QueryStats } from "../../icons";
 import Menu from '@metacell/geppetto-meta-ui/menu/Menu';
 import { toolbarMenu } from "../../components/configuration/VFBToolbar/vfbtoolbarMenuConfiguration";
+import { showComponent } from "../../reducers/actions/layout";
+
 const { primaryBg, headerBoxShadow, headerBorderColor } = vars;
+const ACTIONS = toolbarMenu.actions;
 
 const Header = ({setBottomNav}) => {
   const classes = {
@@ -21,6 +25,7 @@ const Header = ({setBottomNav}) => {
   };
 
   const [navShow, setNavShow] = useState(false)
+  const dispatch = useDispatch();
 
   const handleLogoClick = () => {
     console.log('Logo Clicked!')
@@ -36,6 +41,19 @@ const Header = ({setBottomNav}) => {
 
   const handleMenuClick = () => {
     setNavShow(prev => !prev)
+  }
+
+  /**
+   * Handler function triggered when a Menu item is clicked.
+   */
+  const menuHandler = (action, component) => {
+    switch (action.handlerAction){
+      case ACTIONS.SHOW_COMPONENT:
+        console.log("action ", action)
+        console.log("component ", component)
+        showComponent(action.parameters)
+        break;
+    }
   }
 
   return (
@@ -129,7 +147,7 @@ const Header = ({setBottomNav}) => {
         >
           <Menu
             configuration={toolbarMenu}
-            menuHandler={() => {}}
+            menuHandler={menuHandler}
           />
         </Box>
       </Box>

@@ -1,10 +1,6 @@
 import { getInstancesTypes } from './actions/types/getInstancesTypes';
 import {SELECTED_COLOR, DESELECTED_COLOR, TEMPLATE_COLOR, SKELETON, CYLINDERS } from './../utils/constants';
-import { loadInstances, getProxyInstances } from './../utils/instancesHelper'
-import { SkeletonOff } from '../icons';
-import { on } from 'events';
-import { find } from '@nosferatu500/react-sortable-tree';
-import { get3DMesh } from './actions/instances';
+import { loadInstances } from './../utils/instancesHelper'
 
 export const initialStateInstancesReducer = {
   allPotentialInstances : [],

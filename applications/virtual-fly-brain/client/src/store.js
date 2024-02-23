@@ -1,4 +1,5 @@
 import { combineReducers } from 'redux';
+import { urlUpdaterMiddleware } from './urlUpdaterMiddleware';
 import { createStore } from '@metacell/geppetto-meta-client/common';
 import './index.css';
 
@@ -27,7 +28,7 @@ const isMinimizeEnabled = true;
 const store = createStore(
   reducers,
   INIT_STATE,
-  [],
+  [urlUpdaterMiddleware],
   { layout, componentMap, isMinimizeEnabled }
 )
 

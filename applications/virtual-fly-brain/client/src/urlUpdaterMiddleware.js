@@ -17,9 +17,8 @@ export const urlUpdaterMiddleware = store => next => action => {
 // the default id that we load is VFB_00101567, so if we try to load something and we don’t get anything in return just load the default template.
 // this paramater circle back to the url
 
-  if (action.type === getInstancesTypes.ADD_INSTANCE) {
-    const state = store.getState();
-    updateUrlParameterWithCurrentUrl("id", action.payload.id);
+  if (action.type === getInstancesTypes.GET_INSTANCES_SUCCESS) {
+    updateUrlParameterWithCurrentUrl("id", action.payload.Id);
   }
 
   // i= specify the list of ids that we should have in the scene when the ui is loaded
@@ -27,13 +26,14 @@ export const urlUpdaterMiddleware = store => next => action => {
   // all the ids that are passed to this parameter are part of the scene upon loding the url.
   // this paramater circle back to the url
 
-
+  if (action.type === getInstancesTypes.GET_3D_OBJ_TYPE_SUCCESS) {
+    updateUrlParameterWithCurrentUrl("i", action.payload.id);
+  }
 
   // q= specify which query results we want to have opened by default for a certain id
   // when using q= the query results component should be opened by default, even if the results to display are 0.
   // q= needs to support the query type that we use in the vfbqueries library (e.g. ListAllAvailableImages, SimilarMorphologyTo, etc), and comma separated the id instance for which
   if (action.type === getQueriesTypes.UPDATE_QUERIES || action.type === getQueriesTypes.GET_QUERIES_SUCCESS) {
-    const state = store.getState();
-    updateUrlParameterWithCurrentUrl("q", action.payload.id);
+    updateUrlParameterWithCurrentUrl("q", action.payload.shortform);
   }
 };

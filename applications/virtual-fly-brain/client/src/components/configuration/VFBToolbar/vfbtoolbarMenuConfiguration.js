@@ -4,7 +4,16 @@ import { widgets } from "../../layout/widgets";
 const { primaryFont, whiteColor, tabActiveColor, primaryBg } = vars;
 
 const ACTIONS = {
-  SHOW_COMPONENT : 'SHOW_COMPONENT'
+  SHOW_WIDGET : 'SHOW_WIDGET',
+  SHOW_SEARCH : 'SHOW_SEARCH',
+  SHOW_COMPONENT : 'SHOW_COMPONENT',
+  SHOW_TERM_INFO : 'SHOW_TERM_INFO',
+  OPEN_NEW_TAB : 'OPEN_NEW_TAB',
+  REDIRECT_TO : 'REDIRECT_TO',
+  CLICK_ABOUT : 'CLICK_ABOUT',
+  CLICK_FEEDBACK : 'CLICK_FEEDBACK',
+  CLICK_CONTRIBUTE : 'CLICK_CONTRIBUTE',
+  CLICK_QUICK_HELP : 'CLICK_QUICK_HELP'
 };
 
 export const toolbarMenu = {
@@ -116,7 +125,7 @@ export const toolbarMenu = {
           label: "About",
           icon: "",
           action: {
-            handlerAction: "openNewTab",
+            handlerAction: ACTIONS.OPEN_NEW_TAB,
             parameters: ["https://www.virtualflybrain.org/about/"]
           }
         },
@@ -124,7 +133,7 @@ export const toolbarMenu = {
           label: "Contribute",
           icon: "",
           action: {
-            handlerAction: "openNewTab",
+            handlerAction: ACTIONS.OPEN_NEW_TAB,
             parameters: ["http://www.virtualflybrain.org/docs/contribution-guidelines/"]
           }
         },
@@ -132,7 +141,7 @@ export const toolbarMenu = {
           label: "Feedback",
           icon: "",
           action: {
-            handlerAction: "clickFeedback",
+            handlerAction: ACTIONS.CLICK_FEEDBACK,
             parameters: []
           }
         },
@@ -149,7 +158,7 @@ export const toolbarMenu = {
               label: "Twitter",
               icon: "fa fa-twitter",
               action: {
-                handlerAction: "openNewTab",
+                handlerAction: ACTIONS.OPEN_NEW_TAB,
                 parameters: ["http://twitter.com/virtualflybrain"]
               },
             },
@@ -157,7 +166,7 @@ export const toolbarMenu = {
               label: "Facebook",
               icon: "fa fa-facebook",
               action: {
-                handlerAction: "openNewTab",
+                handlerAction: ACTIONS.OPEN_NEW_TAB,
                 parameters: ["https://www.facebook.com/pages/Virtual-Fly-Brain/131151036987118"]
               },
             },
@@ -165,7 +174,7 @@ export const toolbarMenu = {
               label: "Latest News & Releases",
               icon: "",
               action: {
-                handlerAction: "openNewTab",
+                handlerAction: ACTIONS.OPEN_NEW_TAB,
                 parameters: ["https://www.virtualflybrain.org/blog/"]
               },
             }
@@ -183,8 +192,8 @@ export const toolbarMenu = {
           label: "Search",
           icon: "fa fa-search",
           action: {
-            handlerAction: ACTIONS.SHOW_COMPONENT,
-            parameters: widgets.circuitBrowserWidget.id
+            handlerAction: ACTIONS.SHOW_SEARCH,
+            parameters: [widgets.circuitBrowserWidget.id]
           }
         },
         {
@@ -192,63 +201,63 @@ export const toolbarMenu = {
           icon: "fa fa-quora",
           action: {
             handlerAction: ACTIONS.SHOW_COMPONENT,
-            parameters: widgets.circuitBrowserWidget.id
+            parameters: [2]
           }
         },
         {
           label: "Layers",
           icon: "fa fa-list",
           action: {
-            handlerAction: ACTIONS.SHOW_COMPONENT,
-            parameters: widgets.listViewerWidget.id
+            handlerAction: ACTIONS.SHOW_WIDGET,
+            parameters: [widgets.listViewerWidget.id]
           }
         },
         {
           label: "Term Info",
           icon: "fa fa-info",
           action: {
-            handlerAction: ACTIONS.SHOW_COMPONENT,
-            parameters: widgets.termContextWidget.id
+            handlerAction: ACTIONS.SHOW_TERM_INFO,
+            parameters: [""]
           }
         },
         {
           label: "3D Viewer",
           icon: "fa fa-cube",
           action: {
-            handlerAction: ACTIONS.SHOW_COMPONENT,
-            parameters: widgets.threeDCanvasWidget.id
+            handlerAction: ACTIONS.SHOW_WIDGET,
+            parameters: [widgets.threeDCanvasWidget.id]
           }
         },
         {
           label: "Slice Viewer",
           icon: "fa fa-sliders",
           action: {
-            handlerAction: ACTIONS.SHOW_COMPONENT,
-            parameters: widgets.stackViewerWidget.id
+            handlerAction: ACTIONS.SHOW_WIDGET,
+            parameters: [widgets.stackViewerWidget.id]
           }
         },
         {
           label: "Template ROI Browser",
           icon: "fa fa-indent",
           action: {
-            handlerAction: ACTIONS.SHOW_COMPONENT,
-            parameters: widgets.roiBrowserWidget.id
+            handlerAction: ACTIONS.SHOW_WIDGET,
+            parameters: [widgets.roiBrowserWidget.id]
           }
         },
         {
           label: "Term Context",
           icon: "fa fa-sitemap",
           action: {
-            handlerAction: ACTIONS.SHOW_COMPONENT,
-            parameters: widgets.termContextWidget.id
+            handlerAction: ACTIONS.SHOW_WIDGET,
+            parameters: [widgets.termContextWidget.id]
           }
         },
         {
           label: "Circuit Browser",
           icon: "fa fa-connectdevelop",
           action: {
-            handlerAction: ACTIONS.SHOW_COMPONENT,
-            parameters: widgets.circuitBrowserWidget.id
+            handlerAction: ACTIONS.SHOW_WIDGET,
+            parameters: [widgets.circuitBrowserWidget.id]
           }
         },
         {
@@ -256,15 +265,15 @@ export const toolbarMenu = {
           icon: "fa fa-download",
           action: {
             handlerAction: ACTIONS.SHOW_COMPONENT,
-            parameters: widgets.circuitBrowserWidget.id
+            parameters: [1]
           }
         },
         {
           label: "NBLAST Uploader",
           icon: "fa fa-upload",
           action: {
-            handlerAction: "uploaderContentsVisible",
-            parameters: []
+            handlerAction: ACTIONS.SHOW_COMPONENT,
+            parameters: [0]
           }
         },
         {
@@ -278,7 +287,7 @@ export const toolbarMenu = {
               icon: "",
               trailerIcon: "fa fa-external-link",
               action: {
-                handlerAction: "openNewTab",
+                handlerAction: ACTIONS.OPEN_NEW_TAB,
                 parameters: ["http://flybrain.mrc-lmb.cam.ac.uk/si/nblast/www/"]
               }
             },
@@ -287,7 +296,7 @@ export const toolbarMenu = {
               icon: "",
               trailerIcon: "fa fa-external-link",
               action: {
-                handlerAction: "openNewTab",
+                handlerAction: ACTIONS.OPEN_NEW_TAB,
                 parameters: ["http://nblast.virtualflybrain.org:8080/NBLAST_on-the-fly/?gal4_n=10&all_use_mean=F&all_query=&tab=One%20against%20all&gal4_query="]
               }
             }
@@ -304,7 +313,7 @@ export const toolbarMenu = {
               icon: "",
               trailerIcon: "fa fa-external-link",
               action: {
-                handlerAction: "openNewTab",
+                handlerAction: ACTIONS.OPEN_NEW_TAB,
                 parameters: ["https://www.virtualflybrain.org/blog/releases/catmaid/"]
               }
             },
@@ -322,7 +331,7 @@ export const toolbarMenu = {
                   icon: "",
                   trailerIcon: "fa fa-external-link",
                   action: {
-                    handlerAction: "openNewTab",
+                    handlerAction: ACTIONS.OPEN_NEW_TAB,
                     parameters: ["https://fafb.catmaid.virtualflybrain.org/?pid=1&zp=65720&yp=160350.0517811483&xp=487737.6942783438&tool=tracingtool&sid0=1&s0=3.1999999999999993&help=true&layout=h(XY,%20%7B%20type:%20%22neuron-search%22,%20id:%20%22neuron-search-1%22,%20options:%20%7B%22annotation-name%22:%20%22Published%22%7D%7D,%200.6)"]
                   }
                 },
@@ -340,7 +349,7 @@ export const toolbarMenu = {
                       icon: "",
                       trailerIcon: "fa fa-external-link",
                       action: {
-                        handlerAction: "openNewTab",
+                        handlerAction: ACTIONS.OPEN_NEW_TAB,
                         parameters: ["https://fanc.catmaid.virtualflybrain.org/?pid=1&zp=55260&yp=512482.5999999994&xp=173092.19999999998&tool=tracingtool&sid0=1&s0=9&help=true&layout=h(XY,%20%7B%20type:%20%22neuron-search%22,%20id:%20%22neuron-search-1%22,%20options:%20%7B%22annotation-name%22:%20%22publication%22%7D%7D,%200.6)"]
                       }
                     },
@@ -349,7 +358,7 @@ export const toolbarMenu = {
                       icon: "",
                       trailerIcon: "fa fa-external-link",
                       action: {
-                        handlerAction: "openNewTab",
+                        handlerAction: ACTIONS.OPEN_NEW_TAB,
                         parameters: ["https://fanc.catmaid.virtualflybrain.org/?pid=2&zp=70800&yp=268000&xp=131600&tool=tracingtool&sid0=3&s0=1&help=true&layout=h(XY,%20%7B%20type:%20%22neuron-search%22,%20id:%20%22neuron-search-1%22,%20options:%20%7B%22annotation-name%22:%20%22publication%22%7D%7D,%200.6)"]
                       }
                     }
@@ -369,7 +378,7 @@ export const toolbarMenu = {
                       icon: "",
                       trailerIcon: "fa fa-external-link",
                       action: {
-                        handlerAction: "openNewTab",
+                        handlerAction: ACTIONS.OPEN_NEW_TAB,
                         parameters: ["https://l1em.catmaid.virtualflybrain.org/?pid=1&zp=108250&yp=82961.59999999999&xp=54210.799999999996&tool=tracingtool&sid0=1&s0=2.4999999999999996&help=true&layout=h(XY,%20%7B%20type:%20%22neuron-search%22,%20id:%20%22neuron-search-1%22,%20options:%20%7B%22annotation-name%22:%20%22papers%22%7D%7D,%200.6)"]
                       }
                     },
@@ -377,7 +386,7 @@ export const toolbarMenu = {
                       label: "Larval (L3VNC)",
                       icon: "",
                       action: {
-                        handlerAction: "openNewTab",
+                        handlerAction: ACTIONS.OPEN_NEW_TAB,
                         parameters: ["https://l3vnc.catmaid.virtualflybrain.org/?pid=2&zp=0&yp=53578.49999999999&xp=71242.5&tool=tracingtool&sid0=2&s0=6&help=true&layout=h(XY,%20%7B%20type:%20%22neuron-search%22,%20id:%20%22neuron-search-1%22,%20options:%20%7B%22annotation-name%22:%20%22papers%22%7D%7D,%200.6)"]
                       }
                     },
@@ -385,7 +394,7 @@ export const toolbarMenu = {
                       label: "Larval (ABD1.5)",
                       icon: "",
                       action: {
-                        handlerAction: "openNewTab",
+                        handlerAction: ACTIONS.OPEN_NEW_TAB,
                         parameters: ["https://abd1.5.catmaid.virtualflybrain.org/?pid=1&zp=10485&yp=40560.65722061269&xp=42396.0789533435&tool=tracingtool&sid0=1&s0=4.5&help=true&layout=h(XY,%20%7B%20type:%20%22neuron-search%22,%20id:%20%22neuron-search-1%22,%20options:%20%7B%22annotation-name%22:%20%22papers%22%7D%7D,%200.6)"]
                       }
                     },
@@ -393,7 +402,7 @@ export const toolbarMenu = {
                       label: "Larval Mutant (IAV-Robo)",
                       icon: "",
                       action: {
-                        handlerAction: "openNewTab",
+                        handlerAction: ACTIONS.OPEN_NEW_TAB,
                         parameters: ["https://iav-robo.catmaid.virtualflybrain.org/?pid=1&zp=18360&yp=25383.555362060197&xp=40676.497110038756&tool=tracingtool&sid0=1&s0=4&help=true&layout=h(XY,%20%7B%20type:%20%22neuron-search%22,%20id:%20%22neuron-search-1%22,%20options:%20%7B%22annotation-name%22:%20%22papers%22%7D%7D,%200.6)"]
                       }
                     },
@@ -401,7 +410,7 @@ export const toolbarMenu = {
                       label: "Larval Mutant (IAV-TNT)",
                       icon: "",
                       action: {
-                        handlerAction: "openNewTab",
+                        handlerAction: ACTIONS.OPEN_NEW_TAB,
                         parameters: ["https://iav-tnt.catmaid.virtualflybrain.org/?pid=2&zp=0&yp=28633&xp=45094.6&sid0=2&s0=4&tool=tracingtool&help=true&layout=h(XY,%20%7B%20type:%20%22neuron-search%22,%20id:%20%22neuron-search-1%22,%20options:%20%7B%22annotation-name%22:%20%22papers%22%7D%7D,%200.6)"]
                       }
                     }
@@ -422,7 +431,7 @@ export const toolbarMenu = {
                   label: "Adult Brain (FAFB)",
                   icon: "",
                   action: {
-                    handlerAction: "openNewTab",
+                    handlerAction: ACTIONS.OPEN_NEW_TAB,
                     parameters: ["https://fafb.catmaid.virtualflybrain.org/apis/"]
                   }
                 },
@@ -430,7 +439,7 @@ export const toolbarMenu = {
                   label: "Adult VNC (FANC)",
                   icon: "",
                   action: {
-                    handlerAction: "openNewTab",
+                    handlerAction: ACTIONS.OPEN_NEW_TAB,
                     parameters: ["https://fanc.catmaid.virtualflybrain.org/apis/"]
                   }
                 },
@@ -438,7 +447,7 @@ export const toolbarMenu = {
                   label: "Larval (L1EM)",
                   icon: "",
                   action: {
-                    handlerAction: "openNewTab",
+                    handlerAction: ACTIONS.OPEN_NEW_TAB,
                     parameters: ["https://l1em.catmaid.virtualflybrain.org/apis/"]
                   }
                 },
@@ -446,7 +455,7 @@ export const toolbarMenu = {
                   label: "Larval (L3VNC)",
                   icon: "",
                   action: {
-                    handlerAction: "openNewTab",
+                    handlerAction: ACTIONS.OPEN_NEW_TAB,
                     parameters: ["https://l3vnc.catmaid.virtualflybrain.org/apis/"]
                   }
                 },
@@ -454,7 +463,7 @@ export const toolbarMenu = {
                   label: "Larval (ABD1.5)",
                   icon: "",
                   action: {
-                    handlerAction: "openNewTab",
+                    handlerAction: ACTIONS.OPEN_NEW_TAB,
                     parameters: ["https://abd1.5.catmaid.virtualflybrain.org/apis/"]
                   }
                 },
@@ -462,7 +471,7 @@ export const toolbarMenu = {
                   label: "Larval Mutant (IAV-Robo)",
                   icon: "",
                   action: {
-                    handlerAction: "openNewTab",
+                    handlerAction: ACTIONS.OPEN_NEW_TAB,
                     parameters: ["https://iav-robo.catmaid.virtualflybrain.org/apis/"]
                   }
                 },
@@ -470,7 +479,7 @@ export const toolbarMenu = {
                   label: "Larval Mutant (IAV-TNT)",
                   icon: "",
                   action: {
-                    handlerAction: "openNewTab",
+                    handlerAction: ACTIONS.OPEN_NEW_TAB,
                     parameters: ["https://iav-tnt.catmaid.virtualflybrain.org/apis/"]
                   }
                 }
@@ -489,7 +498,7 @@ export const toolbarMenu = {
               icon: "",
               trailerIcon: "fa fa-external-link",
               action: {
-                handlerAction: "openNewTab",
+                handlerAction: ACTIONS.OPEN_NEW_TAB,
                 parameters: ["https://vfb-connect.readthedocs.io/"]
               }
             },
@@ -498,7 +507,7 @@ export const toolbarMenu = {
               icon: "",
               trailerIcon: "fa fa-external-link",
               action: {
-                handlerAction: "openNewTab",
+                handlerAction: ACTIONS.OPEN_NEW_TAB,
                 parameters: ["https://pypi.org/project/vfb-connect/"]
               }
             },
@@ -507,7 +516,7 @@ export const toolbarMenu = {
               icon: "",
               trailerIcon: "fa fa-external-link",
               action: {
-                handlerAction: "openNewTab",
+                handlerAction: ACTIONS.OPEN_NEW_TAB,
                 parameters: ["https://github.com/jefferis/vfbconnectr"]
               }
             }
@@ -558,16 +567,16 @@ export const toolbarMenu = {
               label: "Adult Brain Unisex (JRC2018U)",
               icon: "",
               action: {
-                handlerAction: "openNewTab",
-                parameters: ["/org.geppetto.frontend/geppetto?i=VFB_00101567"]
+                handlerAction: ACTIONS.OPEN_NEW_TAB,
+                parameters: ["/?id=VFB_00101567"]
               }
             },
             {
               label: "Adult VNC Unisex (JRC2018VU)",
               icon: "",
               action: {
-                handlerAction: "openNewTab",
-                parameters: ["/org.geppetto.frontend/geppetto?i=VFB_00200000"]
+                handlerAction: ACTIONS.OPEN_NEW_TAB,
+                parameters: ["/?id=VFB_00200000"]
               }
             },
             {
@@ -583,40 +592,40 @@ export const toolbarMenu = {
                   label: "Adult Head (McKellar)",
                   icon: "",
                   action: {
-                    handlerAction: "openNewTab",
-                    parameters: ["/org.geppetto.frontend/geppetto?i=VFB_00110000"]
+                    handlerAction: ACTIONS.OPEN_NEW_TAB,
+                    parameters: ["/?id=VFB_00110000"]
                   }
                 },
                 {
                   label: "Adult Brain (JFRC2/2010)",
                   icon: "",
                   action: {
-                    handlerAction: "openNewTab",
-                    parameters: ["/org.geppetto.frontend/geppetto?i=VFB_00017894"]
+                    handlerAction: ACTIONS.OPEN_NEW_TAB,
+                    parameters: ["/?id=VFB_00017894"]
                   }
                 },
                 {
                   label: "Adult VNS (Court2018)",
                   icon: "",
                   action: {
-                    handlerAction: "openNewTab",
-                    parameters: ["/org.geppetto.frontend/geppetto?i=VFB_00100000"]
+                    handlerAction: ACTIONS.OPEN_NEW_TAB,
+                    parameters: ["/?id=VFB_00100000"]
                   }
                 },
                 {
                   label: "Janelia FlyEM HemiBrain",
                   icon: "",
                   action: {
-                    handlerAction: "openNewTab",
-                    parameters: ["/org.geppetto.frontend/geppetto?i=VFB_00101384"]
+                    handlerAction: ACTIONS.OPEN_NEW_TAB,
+                    parameters: ["/?id=VFB_00101384"]
                   }
                 },
                 {
                   label: "Ito Half Brain",
                   icon: "",
                   action: {
-                    handlerAction: "openNewTab",
-                    parameters: ["/org.geppetto.frontend/geppetto?i=VFB_00030786"]
+                    handlerAction: ACTIONS.OPEN_NEW_TAB,
+                    parameters: ["/?id=VFB_00030786"]
                   }
                 }
               ]
@@ -636,16 +645,16 @@ export const toolbarMenu = {
               label: "L1 CNS (ssTEM)",
               icon: "",
               action: {
-                handlerAction: "openNewTab",
-                parameters: ["/org.geppetto.frontend/geppetto?i=VFB_00050000"]
+                handlerAction: ACTIONS.OPEN_NEW_TAB,
+                parameters: ["/?id=VFB_00050000"]
               }
             },
             {
               label: "L3 CNS (Wood2018)",
               icon: "",
               action: {
-                handlerAction: "openNewTab",
-                parameters: ["/org.geppetto.frontend/geppetto?i=VFB_00049000"]
+                handlerAction: ACTIONS.OPEN_NEW_TAB,
+                parameters: ["/?id=VFB_00049000"]
               }
             }
           ]
@@ -831,7 +840,7 @@ export const toolbarMenu = {
           label: "Documentation",
           icon: "fa fa-comments-o",
           action: {
-            handlerAction: "openNewTab",
+            handlerAction: ACTIONS.OPEN_NEW_TAB,
             parameters: ["https://www.virtualflybrain.org/docs/"]
           }
         },
@@ -839,7 +848,7 @@ export const toolbarMenu = {
           label: "Support Forum",
           icon: "fa fa-medkit",
           action: {
-            handlerAction: "openNewTab",
+            handlerAction: ACTIONS.OPEN_NEW_TAB,
             parameters: ["https://groups.google.com/g/vfb-suport"]
           }
         },
@@ -847,7 +856,7 @@ export const toolbarMenu = {
           label: "Contribute",
           icon: "",
           action: {
-            handlerAction: "openNewTab",
+            handlerAction: ACTIONS.OPEN_NEW_TAB,
             parameters: ["http://www.virtualflybrain.org/docs/contribution-guidelines/"]
           }
         },
@@ -856,7 +865,7 @@ export const toolbarMenu = {
           icon: "fa fa-connectdevelop",
           trailerIcon: "fa fa-external-link",
           action: {
-            handlerAction: "openNewTab",
+            handlerAction: ACTIONS.OPEN_NEW_TAB,
             parameters: ["https://github.com/VirtualFlyBrain/graph_queries/blob/main/weighted_path.md"]
           }
         },
@@ -864,16 +873,8 @@ export const toolbarMenu = {
           label: "Report an issue",
           icon: "fa fa-bug",
           action: {
-            handlerAction: "clickFeedback",
+            handlerAction: ACTIONS.CLICK_FEEDBACK,
             parameters: []
-          }
-        },
-        {
-          label: "Quick Help",
-          icon: "fa fa-question",
-          action: {
-            handlerAction: "UIElementHandler",
-            parameters: ["quickHelpVisible"]
           }
         }
       ]

@@ -1,7 +1,6 @@
 
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector, useStore } from 'react-redux';
-import MediaQuery from 'react-responsive';
 import { Box, Button,Modal, useMediaQuery, useTheme, Typography, CircularProgress, Link } from "@mui/material";
 import TermInfo from "./TermInfo"
 import vars from "../theme/variables";
@@ -10,7 +9,7 @@ import VFBUploader from "./VFBUploader/VFBUploader";
 import QueryBuilder from "./queryBuilder";
 import ErrorModal from "./ErrorModal";
 import { getLayoutManagerInstance } from "@metacell/geppetto-meta-client/common/layout/LayoutManager";
-import { addWidget, updateWidget, deleteWidget } from '@metacell/geppetto-meta-client/common/layout/actions';
+import { addWidget } from '@metacell/geppetto-meta-client/common/layout/actions';
 import { templateLoaded } from './../reducers/actions/instances';
 import { widgets } from "./layout/widgets";
 
@@ -76,14 +75,6 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
   }, [store])
 
   useEffect(() => {
-    let stateWidgets = Object.keys(store.getState().widgets);
-    const existingWidget = stateWidgets?.find( w => w === widget )
-    if (!existingWidget && widget) {
-      dispatch(addWidget(widgets[widget]))
-    }
-  }, [widget])
-
-  useEffect(() => {
     dispatch(addWidget(widgets.threeDCanvasWidget));
     dispatch(addWidget(widgets.stackViewerWidget));
     dispatch(addWidget(widgets.circuitBrowserWidget));
@@ -91,19 +82,6 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
     dispatch(addWidget(widgets.termContextWidget));
     dispatch(addWidget(widgets.listViewerWidget));
   }, [sidebarOpen, setSidebarOpen])
-
-  const getWidgetStatus = (widgetId) => {
-    return store.getState().widgets[widgetId].status
-}
-
-  const getWidget = (widgetId) => {
-    switch (widgetId) {
-      case widgets.stackViewerWidget.id:
-          return widgets.stackViewerWidget
-      default:
-        break;
-    }
-  }
 
   const classes = {
     tabs: {

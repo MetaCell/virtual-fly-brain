@@ -7,6 +7,7 @@ import { History, Logo, Menu as MenuIcon, QueryStats } from "../../icons";
 import Menu from '@metacell/geppetto-meta-ui/menu/Menu';
 import { toolbarMenu } from "../../components/configuration/VFBToolbar/vfbtoolbarMenuConfiguration";
 import { showComponent } from "../../reducers/actions/layout";
+import { WidgetStatus } from "@metacell/geppetto-meta-client/common/layout/model";
 
 const { primaryBg, headerBoxShadow, headerBorderColor } = vars;
 const ACTIONS = toolbarMenu.actions;
@@ -48,10 +49,16 @@ const Header = ({setBottomNav}) => {
    */
   const menuHandler = (action, component) => {
     switch (action.handlerAction){
+      case ACTIONS.SHOW_WIDGET:
+        dispatch(showComponent(action.parameters[0], { status : WidgetStatus.ACTIVE }))
+        break;
       case ACTIONS.SHOW_COMPONENT:
-        console.log("action ", action)
-        console.log("component ", component)
-        showComponent(action.parameters)
+        setBottomNav(action.parameters[0])
+        break;
+      case ACTIONS.OPEN_NEW_TAB:
+        action.parameters.map((item, index) => {
+          window.open(item, '_blank');
+        })
         break;
     }
   }

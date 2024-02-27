@@ -1,6 +1,6 @@
 import { Box, Button, Link } from "@mui/material";
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import vars from '../../theme/variables';
 import MediaQuery from 'react-responsive';
 import { History, Logo, Menu as MenuIcon, QueryStats } from "../../icons";
@@ -8,6 +8,8 @@ import Menu from '@metacell/geppetto-meta-ui/menu/Menu';
 import { toolbarMenu } from "../../components/configuration/VFBToolbar/vfbtoolbarMenuConfiguration";
 import { showComponent } from "../../reducers/actions/layout";
 import { WidgetStatus } from "@metacell/geppetto-meta-client/common/layout/model";
+import { selectInstance, focusInstance } from '../../reducers/actions/instances';
+import { getQueries } from '../../reducers/actions/queries';
 
 const { primaryBg, headerBoxShadow, headerBorderColor } = vars;
 const ACTIONS = toolbarMenu.actions;
@@ -27,6 +29,7 @@ const Header = ({setBottomNav}) => {
 
   const [navShow, setNavShow] = useState(false)
   const dispatch = useDispatch();
+  const recentSearches = useSelector(state => state.globalInfo.recentSearches)
 
   const handleLogoClick = () => {
     console.log('Logo Clicked!')
@@ -60,6 +63,36 @@ const Header = ({setBottomNav}) => {
           window.open(item, '_blank');
         })
         break;
+      case ACTIONS.SELECT_INSTANCE:
+        //selectInstance(action.parameters[0])
+        focusInstance(action.parameters[0])
+        break;
+      case ACTIONS.RUN_QUERY:{
+        let matchQuery = queries?.find( q => q.short_form === action.parameters[0] );
+        if ( matchQuery ) {
+          setBottomNav(2);
+        } else {
+          getQueries({ short_form : action.parameters[0] })
+        }
+        break;
+      }
+      case ACTIONS.HISTORY_MENU_INJECTOR:{
+        var historyList = [];
+        // Add instances to history menu
+        recentSearches?.forEach( i => {
+          historyList.push(
+            {
+              label: i?.label,
+              icon: "fa fa-eye", // TODO : replace with figma icon
+              action: {
+                handlerAction: i?.type === "Query" ? ACTIONS.RUN_QUERY : ACTIONS.SELECT_INSTANCE,
+                parameters: [i?.short_form]
+              }
+            },
+          );
+        })
+        return historyList;
+      }
     }
   }
 

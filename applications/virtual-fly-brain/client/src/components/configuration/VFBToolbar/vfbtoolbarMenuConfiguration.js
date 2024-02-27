@@ -13,7 +13,10 @@ const ACTIONS = {
   CLICK_ABOUT : 'CLICK_ABOUT',
   CLICK_FEEDBACK : 'CLICK_FEEDBACK',
   CLICK_CONTRIBUTE : 'CLICK_CONTRIBUTE',
-  CLICK_QUICK_HELP : 'CLICK_QUICK_HELP'
+  CLICK_QUICK_HELP : 'CLICK_QUICK_HELP',
+  HISTORY_MENU_INJECTOR : 'HISTORY_MENU_INJECTOR',
+  SELECT_INSTANCE : 'SELECT_INSTANCE',
+  RUN_QUERY : 'RUN_QUERY'
 };
 
 export const toolbarMenu = {
@@ -198,7 +201,7 @@ export const toolbarMenu = {
         },
         {
           label: "Query",
-          icon: "fa fa-quora",
+          icon: "fa fa-list",
           action: {
             handlerAction: ACTIONS.SHOW_COMPONENT,
             parameters: [2]
@@ -529,24 +532,10 @@ export const toolbarMenu = {
       icon: "",
       action: {},
       position: "bottom-start",
-      list: [
-        {
-          label: "JRC_FlyEM_Hemibrain",
-          icon: "",
-          action: {
-            handlerAction: "",
-            parameters: [""]
-          }
-        },
-        {
-          label: "V_ilPN(FlyEM-HB:2064165421)",
-          icon: "",
-          action: {
-            handlerAction: "",
-            parameters: [""]
-          }
-        },
-      ]
+      dynamicListInjector: {
+        handlerAction: ACTIONS.HISTORY_MENU_INJECTOR,
+        parameters: [""]
+      }
     },
     {
       label: "Templates",

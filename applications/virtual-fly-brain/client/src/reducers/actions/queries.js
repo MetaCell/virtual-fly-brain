@@ -44,7 +44,6 @@ export const getQueries = async (instance) => {
   try {
     response = await get_queries(instance.short_form);
     newInstance.queries = response
-    console.log("queries ", newInstance.queries)
   } catch (error) {
     store.dispatch(getQueriesFailure(error.message))
   }

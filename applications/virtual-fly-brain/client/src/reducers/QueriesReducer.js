@@ -33,7 +33,7 @@ const QueriesReducer = (state = initialStateQueriesReducer, response) => {
       case getQueriesTypes.GET_QUERIES_FAILURE:
         return Object.assign({}, state, {
           error: true,
-          errorMessage: response.payload,
+          errorMessage: response.payload.error,
         })
      default:
         return state;

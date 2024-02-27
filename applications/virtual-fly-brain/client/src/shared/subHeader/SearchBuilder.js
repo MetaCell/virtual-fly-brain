@@ -14,7 +14,8 @@ import { ResultSelectionOptions } from './ResultSelectionOptions';
 import  { getResultsSOLR } from '../../components/configuration/SOLRclient'
 import { DatasourceTypes } from '@metacell/geppetto-meta-ui/search/datasources/datasources';
 import { getInstanceByID } from './../../reducers/actions/instances';
-import { useSelector } from 'react-redux'
+import { addRecentSearch } from '../../reducers/actions/globals';
+import { useSelector, useDispatch } from 'react-redux'
 import { getQueries, deleteQuery, updateQueries } from '../../reducers/actions/queries';
 
 const QUERIES = "Queries";
@@ -138,12 +139,13 @@ export default function SearchBuilder(props) {
 
   const [value, setValue] = React.useState([]);
   const [retrievingResults, setRetrievingResults] = React.useState(false)
-  const [recentSearch, setRecentSearch] = React.useState([]);
   const [groupedOptions, setGroupedOptions] = React.useState([]);
   const [isOpen, setIsOpen] = React.useState(false);
   const [lastSearch, setLastSearch] = React.useState("");
   const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances);
   const queries = useSelector(state => state.queries.queries);
+  const globalRecentSearches = useSelector( state => state.globalInfo.recentSearches)
+  const dispatch = useDispatch();
 
   const addQueryTag = () => { 
     if ( !value.find( v => v.label === QUERIES )){
@@ -188,10 +190,8 @@ export default function SearchBuilder(props) {
         getQueries(option);
       } 
       setValue([...value, option])
-      let recentSearches = [...recentSearch];
-      if ( !recentSearches?.find( recent => recent.id === option.id ) ){
-        recentSearches.push(option);
-        setRecentSearch(recentSearches);
+      if ( !globalRecentSearches?.find( recent => recent.id === option.id ) ){
+        dispatch(addRecentSearch(option));
       }
     }
   };
@@ -330,9 +330,9 @@ export default function SearchBuilder(props) {
             loadResults={loadResults}
           />) : null }
 
-          { recentSearch?.length >= 1 ? <RecentSearch
+          { globalRecentSearches?.length >= 1 ? <RecentSearch
             facets_annotations_colors={facets_annotations_colors}
-            recentSearches={recentSearch}
+            recentSearches={globalRecentSearches}
             getOptionProps={getOptionProps}
             selectedFilters={props.applyFilters}
             handleResultSelection={handleResultSelection}

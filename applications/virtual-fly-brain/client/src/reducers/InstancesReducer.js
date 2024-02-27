@@ -193,10 +193,12 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       case getInstancesTypes.SELECT_INSTANCE:{
         const allLoadedInstances = [...state.allLoadedInstances]
         const findInstance = allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );
-        findInstance.selected = !findInstance.selected;
-        if ( findInstance.selected ) findInstance.color = SELECTED_COLOR;
-        else {
-          findInstance.color = DESELECTED_COLOR;
+        if ( findInstance ){
+          findInstance.selected = !findInstance.selected;
+          if ( findInstance.selected ) findInstance.color = SELECTED_COLOR;
+          else {
+            findInstance.color = DESELECTED_COLOR;
+          }
         }
 
         if ( findInstance?.simpleInstance ) findInstance.simpleInstance.color = findInstance.color;

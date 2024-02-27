@@ -15,12 +15,14 @@ const GlobalReducer = (state = initialStateGlobalReducer, response) => {
       case getInstancesTypes.GET_INSTANCES_SUCCESS:
       case getGlobalTypes.ADD_RECENT_SEARCH:{
         let updateRecentSearches = [...state.recentSearches];
-        if ( !updateRecentSearches?.find( r => r.id === response.payload.Id ) ) {
+        let matchSearch = updateRecentSearches?.find( r => r.id === response.payload.Id && r.is_query == response.payload.IsQuery);
+        if ( !matchSearch ) {
           updateRecentSearches.push({
             short_form : response.payload.Id,
             label : response.payload.Name,
             id : response.payload.Id,
-            facets_annotation : response.payload.Tags
+            facets_annotation : response.payload.Tags,
+            is_query : response.payload.IsQuery
           })
         }
         return Object.assign({}, state, {

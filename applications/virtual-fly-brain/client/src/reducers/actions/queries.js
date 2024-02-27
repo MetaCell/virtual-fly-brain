@@ -38,17 +38,14 @@ const getQueriesFailure = error => ({
 export const getQueries = async (instance) => {
 
   store.dispatch(getQueriesStarted())
-  let newInstance = instance;
-
   let response;
   try {
     response = await get_queries(instance.short_form);
-    newInstance.queries = response
   } catch (error) {
     store.dispatch(getQueriesFailure(error.message))
   }
 
-  store.dispatch(getQueriesSuccess(newInstance))
+  store.dispatch(getQueriesSuccess(response))
 }
 
 export const deleteQuery = async (instance) => {

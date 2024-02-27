@@ -8,7 +8,7 @@ import Menu from '@metacell/geppetto-meta-ui/menu/Menu';
 import { toolbarMenu } from "../../components/configuration/VFBToolbar/vfbtoolbarMenuConfiguration";
 import { showComponent } from "../../reducers/actions/layout";
 import { WidgetStatus } from "@metacell/geppetto-meta-client/common/layout/model";
-import { selectInstance, focusInstance } from '../../reducers/actions/instances';
+import { selectInstance, focusInstance, getInstanceByID } from '../../reducers/actions/instances';
 import { getQueries } from '../../reducers/actions/queries';
 
 const { primaryBg, headerBoxShadow, headerBorderColor } = vars;
@@ -30,6 +30,8 @@ const Header = ({setBottomNav}) => {
   const [navShow, setNavShow] = useState(false)
   const dispatch = useDispatch();
   const recentSearches = useSelector(state => state.globalInfo.recentSearches)
+  const queries = useSelector(state => state.queries.queries)
+  const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances)
 
   const handleLogoClick = () => {
     console.log('Logo Clicked!')
@@ -64,11 +66,16 @@ const Header = ({setBottomNav}) => {
         })
         break;
       case ACTIONS.SELECT_INSTANCE:
-        //selectInstance(action.parameters[0])
-        focusInstance(action.parameters[0])
+        let matchInstance = allLoadedInstances?.find( q => q.metadata?.Id === action.parameters[0] );
+        if (matchInstance ) {
+          focusInstance(action.parameters[0])
+          selectInstance(action.parameters[0])
+        } else {
+          getInstanceByID(action.parameters[0])
+        }
         break;
       case ACTIONS.RUN_QUERY:{
-        let matchQuery = queries?.find( q => q.short_form === action.parameters[0] );
+        let matchQuery = queries?.find( q => q.Id === action.parameters[0] );
         if ( matchQuery ) {
           setBottomNav(2);
         } else {
@@ -85,7 +92,7 @@ const Header = ({setBottomNav}) => {
               label: i?.label,
               icon: "fa fa-eye", // TODO : replace with figma icon
               action: {
-                handlerAction: i?.type === "Query" ? ACTIONS.RUN_QUERY : ACTIONS.SELECT_INSTANCE,
+                handlerAction: i?.is_query ? ACTIONS.RUN_QUERY : ACTIONS.SELECT_INSTANCE,
                 parameters: [i?.short_form]
               }
             },

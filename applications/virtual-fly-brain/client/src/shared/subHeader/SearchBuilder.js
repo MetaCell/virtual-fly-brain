@@ -159,9 +159,10 @@ export default function SearchBuilder(props) {
     let updatedQueries = [];
     queries.length > 0 ? updatedQueries = [...queries] : []
     updatedQueries.forEach( q => {
-      let match = value?.find( v => v.label === q.label );
+      let match = value?.find( v => v.short_form === q.Id );
       if ( match !== undefined ) {
         q.active = true;
+        dispatch(addRecentSearch(q, true))
       } else {
         q.active = false;
       }
@@ -186,12 +187,12 @@ export default function SearchBuilder(props) {
   const handleResultSelection = async(option) => {
     const doesOptionExist =  obj => obj.label === option.label
     if(!value.some(doesOptionExist)){
-      if (!queries?.find( q => q.label === option.label ) ) { 
+      if (!queries?.find( q => q.Name === option.label ) ) { 
         getQueries(option);
       } 
       setValue([...value, option])
       if ( !globalRecentSearches?.find( recent => recent.id === option.id ) ){
-        dispatch(addRecentSearch(option));
+        dispatch(addRecentSearch(option, false));
       }
     }
   };

@@ -90,7 +90,7 @@ const Header = ({setBottomNav}) => {
           historyList.push(
             {
               label: i?.label,
-              icon: "fa fa-eye", // TODO : replace with figma icon
+              icon: i?.is_query ? "fa fa-quora" : "fa fa-eye", // TODO : replace with figma icon
               action: {
                 handlerAction: i?.is_query ? ACTIONS.RUN_QUERY : ACTIONS.SELECT_INSTANCE,
                 parameters: [i?.short_form]

@@ -102,6 +102,18 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
           isLoading: false
         })
       }
+      case getInstancesTypes.REMOVE_ALL_INSTANCES_SUCCESS:{
+        let loadedInstances = [...state.allLoadedInstances.filter( i => i?.metadata?.IsTemplate )];
+
+        return Object.assign({}, state, {
+          allLoadedInstances: loadedInstances,
+          mappedCanvasData : getMappedCanvasData(loadedInstances),
+          threeDObjects : [],
+          focusedInstance : loadedInstances[0],
+          event : { action : getInstancesTypes.UPDATE_INSTANCES, id : response.payload.query, trigger : Date.now()},
+          isLoading: false
+        })
+      }
       case getInstancesTypes.SHOW_3D:{
         const allLoadedInstances = [...state.allLoadedInstances]
         const matchInstance = allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );

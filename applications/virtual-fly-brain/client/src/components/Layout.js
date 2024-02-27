@@ -220,6 +220,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
             {bottomNav === 0 && < VFBUploader open={true} setBottomNav={setBottomNav} />}
             {bottomNav === 1 && <VFBDownloadContents open={true} setBottomNav={setBottomNav} />}
             {bottomNav === 2 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} />}
+            {bottomNav === 5 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} tabSelected={1}/>}
           </>
         ) : (
           <>
@@ -229,6 +230,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
             {bottomNav === 0 && <VFBUploader open={true} setBottomNav={setBottomNav} />}
             {bottomNav === 1 && <VFBDownloadContents open={true} setBottomNav={setBottomNav} />}
             {bottomNav === 2 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} />}
+            {bottomNav === 5 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} tabSelected={1}/>}
           </>
         )}
       </Box>

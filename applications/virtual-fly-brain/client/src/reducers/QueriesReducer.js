@@ -13,7 +13,7 @@ const QueriesReducer = (state = initialStateQueriesReducer, response) => {
         return Object.assign({}, state, {
            isLoading: true
         })
-     case getQueriesTypes.GET_QUERIES_SUCCESS:
+     case getQueriesTypes.GET_QUERIES_SUCCESS:{
         let updatedQueries = [...state.queries]
         let findQuery = updatedQueries?.find( i => i.Id === response.payload.Id );
         if ( findQuery === undefined ){
@@ -23,6 +23,7 @@ const QueriesReducer = (state = initialStateQueriesReducer, response) => {
           queries: updatedQueries,
           isLoading: false
         })
+      }
       case getQueriesTypes.UPDATE_QUERIES:
         return Object.assign({}, state, {
           queries: response.payload,

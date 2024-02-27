@@ -65,7 +65,7 @@ const Header = ({setBottomNav}) => {
           window.open(item, '_blank');
         })
         break;
-      case ACTIONS.SELECT_INSTANCE:
+      case ACTIONS.SELECT_INSTANCE:{
         let matchInstance = allLoadedInstances?.find( q => q.metadata?.Id === action.parameters[0] );
         if (matchInstance ) {
           focusInstance(action.parameters[0])
@@ -74,6 +74,7 @@ const Header = ({setBottomNav}) => {
           getInstanceByID(action.parameters[0])
         }
         break;
+      }
       case ACTIONS.RUN_QUERY:{
         let matchQuery = queries?.find( q => q.Id === action.parameters[0] );
         if ( matchQuery ) {

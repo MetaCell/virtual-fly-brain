@@ -2,7 +2,7 @@ import React, { useRef } from "react"
 import { Box, Button, Chip, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Menu, MenuItem, Popper, Tooltip, Typography } from "@mui/material"
 import { AddChart, Delete, More, OpenInNew, Search, SplitScreen } from "../../icons";
 import vars from "../../theme/variables";
-
+import { useDispatch, useSelector } from "react-redux";
 const {
   secondaryBg,
   searchBoxBg,
@@ -14,8 +14,13 @@ export const Item = ({
   index,
 }) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances)
 
-  const handleClick = (event) => {
+  const handleClick = (event, isQuery, id) => {
+    setAnchorEl(anchorEl ? null : event.currentTarget);
+  };
+
+  const removeFromHistory = (event, id) => {
     setAnchorEl(anchorEl ? null : event.currentTarget);
   };
 
@@ -42,7 +47,7 @@ export const Item = ({
         flexShrink: 0,
         background: searchBoxBg,
       }}>
-        <SplitScreen size={12} />
+        { search?.is_query ? <SplitScreen size={12} /> : <Search size={12}/> }
       </Box>
 
       <Typography variant="body2" sx={{
@@ -53,7 +58,7 @@ export const Item = ({
         color: searchHeadingColor,
         px: 1
       }}>
-        {search?.title}
+        {search?.label}
       </Typography>
 
       <Box sx={{
@@ -62,11 +67,11 @@ export const Item = ({
         alignItems: 'center',
         columnGap: 0.5
       }}>
-        {search?.tags?.slice(0, 2)?.map((tag, index) => <Chip key={`search-tag-${index}`} sx={{
+        {search?.facets_annotation?.slice(0, 2)?.map((tag, index) => <Chip key={`search-tag-${index}`} sx={{
           lineHeight: '140%',
-          fontSize: '0.625rem', backgroundColor: chipColors[tag.id]
-        }} label={tag.label} />)}
-        {search?.tags.length > 2 ? (
+          fontSize: '0.625rem', backgroundColor: chipColors[tag]?.color
+        }} label={tag} />)}
+        {search?.facets_annotation?.length > 2 ? (
           <Tooltip
             placement="bottom-end"
             arrow
@@ -76,10 +81,10 @@ export const Item = ({
                 alignItems: 'center',
                 columnGap: 0.5
               }}>
-                {search?.tags?.slice(2)?.map((tag, index) => <Chip key={`remaining-tag-${index}`} sx={{
+                {search?.facets_annotation?.slice(2)?.map((tag, index) => <Chip key={`remaining-tag-${index}`} sx={{
                   lineHeight: '140%',
-                  fontSize: '0.625rem', backgroundColor: chipColors[tag.id]
-                }} label={tag.label} />)}
+                  fontSize: '0.625rem', backgroundColor: chipColors[tag]?.color
+                }} label={tag} />)}
               </Box>
             }
           >
@@ -87,7 +92,7 @@ export const Item = ({
               lineHeight: '140%',
               fontSize: '0.625rem',
               backgroundColor: searchBoxBg
-            }} label={`+${search?.tags?.slice(2).length}`} />
+            }} label={`+${search?.facets_annotation?.slice(2).length}`} />
           </Tooltip>) : null
         }
         <IconButton
@@ -113,20 +118,24 @@ export const Item = ({
           anchorEl={anchorEl}
         >
           <List>
+            { !search?.is_query ? 
             <ListItem>
-              <ListItemButton onClick={handleClick}>
+              <ListItemButton onClick={(event) => handleClick(event, false, search?.short_form)}>
                 <ListItemIcon sx={{
                   minWidth: '0.0625rem',
                   padding: '0 0.375rem 0 0'
                 }}>
-                  <AddChart />
+                  { search?.is_query ? <AddChart /> : <Search/> }
                 </ListItemIcon>
                 <ListItemText primary="Load results" />
               </ListItemButton>
             </ListItem>
-
+            :
+            null
+            }
+            { search?.is_query ? 
             <ListItem>
-              <ListItemButton onClick={handleClick}>
+              <ListItemButton onClick={(event) => handleClick(event, true, search?.short_form)}>
                 <ListItemIcon sx={{
                   minWidth: '0.0625rem',
                   padding: '0 0.375rem 0 0'
@@ -136,9 +145,10 @@ export const Item = ({
                 <ListItemText primary="Go to query" />
               </ListItemButton>
             </ListItem>
-
+            :
+            null }
             <ListItem>
-              <ListItemButton onClick={handleClick}>
+              <ListItemButton onClick={(event) => removeFromHistory(event, search?.short_form)}>
                 <ListItemIcon sx={{
                   minWidth: '0.0625rem',
                   padding: '0 0.375rem 0 0'

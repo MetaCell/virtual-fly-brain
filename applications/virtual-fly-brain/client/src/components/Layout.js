@@ -10,6 +10,7 @@ import QueryBuilder from "./queryBuilder";
 import ErrorModal from "./ErrorModal";
 import { getLayoutManagerInstance } from "@metacell/geppetto-meta-client/common/layout/LayoutManager";
 import { addWidget } from '@metacell/geppetto-meta-client/common/layout/actions';
+import { setTermInfoOpened } from './../reducers/actions/globals'
 import { templateLoaded } from './../reducers/actions/instances';
 import { widgets } from "./layout/widgets";
 
@@ -29,8 +30,8 @@ const tabsArr = [
 
 const MainLayout = ({ bottomNav, setBottomNav }) => {
   const theme = useTheme();
-
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  
+  const sidebarOpen = useSelector(state => state.globalInfo.termInfoOpened)
   const [modalOpen, setModalOpen] = useState(false);
   const desktopScreen = useMediaQuery(theme.breakpoints.up('lg'));
   const defaultActiveTab = desktopScreen ? [0, 1, 2, 3, 4] : [0];
@@ -40,8 +41,6 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
   const dispatch = useDispatch();
   let templateRef = window.location.origin + "?id=" + launchTemplate?.metadata?.Id;
   const store = useStore();
-
-  const widget = useSelector(state => state.layout.widget);
 
   //global reducers errors
   const instancesError = useSelector(state => state.instances.error);
@@ -81,7 +80,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
     dispatch(addWidget(widgets.roiBrowserWidget));
     dispatch(addWidget(widgets.termContextWidget));
     dispatch(addWidget(widgets.listViewerWidget));
-  }, [sidebarOpen, setSidebarOpen])
+  }, [sidebarOpen])
 
   const classes = {
     tabs: {
@@ -129,6 +128,11 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
   const handleTabSelect = (id) => {
     setTab([id])
   }
+
+  const setSidebarOpen = (opened) => {
+    dispatch(setTermInfoOpened(opened))
+  }
+
 
   const handleModalClose = (id, openTemplate) => {
     templateLoaded(id, openTemplate);

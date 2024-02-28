@@ -66,7 +66,7 @@ export const QueriesSelectionDropdown = ({option, selectedOption, goBackToInitia
         }
       }}
       key={option.Id}
-      id={option.Name}
+      id={option.Id}
       onClick={deleteQuery}
     >
         <Delete size={12} />

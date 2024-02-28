@@ -9,3 +9,10 @@ export const addRecentSearch = (search, isQuery) => ({
     IsQuery : isQuery
   }
 })
+
+export const setTermInfoOpened = (opened) => ({
+  type: getGlobalTypes.OPEN_TERM_INFO,
+  payload : {
+    opened
+  }
+})

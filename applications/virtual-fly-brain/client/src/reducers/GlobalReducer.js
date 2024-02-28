@@ -2,7 +2,7 @@ import { getGlobalTypes } from './actions/types/GlobalTypes';
 import { getInstancesTypes } from './actions/types/getInstancesTypes';
 
 export const initialStateGlobalReducer = {
-  templateID: "",
+  templateID: "VFB_00101567",
   termInfoOpened : true,
   recentSearches : [],
 };

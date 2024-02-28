@@ -80,7 +80,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
     dispatch(addWidget(widgets.roiBrowserWidget));
     dispatch(addWidget(widgets.termContextWidget));
     dispatch(addWidget(widgets.listViewerWidget));
-  }, [sidebarOpen])
+  }, [])
 
   const classes = {
     tabs: {

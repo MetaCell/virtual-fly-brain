@@ -61,9 +61,10 @@ const Header = ({setBottomNav}) => {
       case ACTIONS.SHOW_COMPONENT:
         setBottomNav(action.parameters[0])
         break;
-      case ACTIONS.SHOW_TERM_INFO:
+      case ACTIONS.SHOW_TERM_INFO:{
         dispatch(setTermInfoOpened(true))
         break;
+      }
       case ACTIONS.OPEN_NEW_TAB:
         action.parameters.map((item, index) => {
           window.open(item, '_blank');

@@ -103,10 +103,8 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         })
       }
       case getInstancesTypes.REMOVE_ALL_INSTANCES_SUCCESS:{
-        let loadedInstances = [...state.allLoadedInstances.filter( i => i?.metadata?.IsTemplate )];
-
         return Object.assign({}, state, {
-          allLoadedInstances: loadedInstances,
+          allLoadedInstances: state.allLoadedInstances.filter( i => i?.metadata?.IsTemplate ),
           mappedCanvasData : getMappedCanvasData(loadedInstances),
           threeDObjects : [],
           focusedInstance : loadedInstances[0],

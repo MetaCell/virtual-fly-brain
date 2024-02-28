@@ -234,7 +234,7 @@ const TermInfo = ({ open, setOpen }) => {
   }
 
   const handleMeshVisibility = () => {
-    if ( allLoadedInstances.find( instance => instance.metadata?.Id == termInfoData?.metadata?.Id )?.simpleInstance?.visibility ) {
+    if ( allLoadedInstances.find( instance => instance.metadata?.Id == termInfoData?.metadata?.Id )?.visible ) {
       hide3DMesh(termInfoData?.metadata?.Id)
     } else {
       show3DMesh(termInfoData?.metadata?.Id)
@@ -487,12 +487,12 @@ const TermInfo = ({ open, setOpen }) => {
                             <Button
                             sx={{ width: 75 }} 
                             onClick={() => setDisplayColorPicker(!displayColorPicker)}>
-                            <RectangleIcon sx={{color : RGBAToHexA( getInstance()?.simpleInstance?.color)}}/><ArrowDown/>
+                            <RectangleIcon sx={{color : RGBAToHexA( getInstance()?.color)}}/><ArrowDown/>
                           </Button>
                           </Tooltip>
                           { displayColorPicker ?
                           <ChromePicker
-                            color={getInstance()?.simpleInstance?.color}
+                            color={getInstance()?.color}
                             onChangeComplete={ (color, event) => {
                               let rgb;
                               if ( color.source === "hsv" ){
@@ -523,9 +523,9 @@ const TermInfo = ({ open, setOpen }) => {
                             <Target />
                           </Button>
                         </Tooltip>
-                        <Tooltip title={getInstance()?.simpleInstance?.visibility ? "Hide 3D Mesh" : "Show 3D Mesh"}>
+                        <Tooltip title={getInstance()?.visible ? "Hide 3D Mesh" : "Show 3D Mesh"}>
                           <Button  onClick={(event) => handleMeshVisibility()}>
-                          { getInstance()?.simpleInstance?.visibility ? <ArViewOff /> : <ArView /> }                          </Button>
+                          { getInstance()?.visible ? <ArViewOff /> : <ArView /> }                          </Button>
                         </Tooltip>
                         { termInfoData?.metadata?.SuperTypes?.find( s => s.toLowerCase() === NEURON.toLowerCase()) ?
                         <Tooltip title={getInstance()?.skeleton?.[SKELETON]?.visible ? "Disable 3D Skeleton" : "Enable 3D Skeleton"}>

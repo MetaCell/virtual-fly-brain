@@ -129,7 +129,7 @@ class ThreeDCanvas extends Component {
   }
 
   onSelection (selectedInstances){
-    applySelection(this.props.mappedCanvasData, selectedInstances);
+    // applySelection(this.props.mappedCanvasData, selectedInstances);
   }
 
   hoverHandler () {}

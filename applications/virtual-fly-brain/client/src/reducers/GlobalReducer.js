@@ -3,6 +3,7 @@ import { getInstancesTypes } from './actions/types/getInstancesTypes';
 
 export const initialStateGlobalReducer = {
   templateID: "",
+  termInfoOpened : true,
   recentSearches : [],
 };
 
@@ -11,6 +12,10 @@ const GlobalReducer = (state = initialStateGlobalReducer, response) => {
      case getGlobalTypes.GET_TEMPLATE_ID:
         return Object.assign({}, state, {
           templateID: response.payload.id
+        })
+      case getGlobalTypes.OPEN_TERM_INFO:
+        return Object.assign({}, state, {
+          termInfoOpened: response.payload.opened
         })
       case getInstancesTypes.GET_INSTANCES_SUCCESS:
       case getGlobalTypes.ADD_RECENT_SEARCH:{

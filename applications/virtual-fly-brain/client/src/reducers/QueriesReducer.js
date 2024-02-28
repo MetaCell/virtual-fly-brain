@@ -16,6 +16,7 @@ const QueriesReducer = (state = initialStateQueriesReducer, response) => {
      case getQueriesTypes.GET_QUERIES_SUCCESS:{
         let updatedQueries = [...state.queries]
         let findQuery = updatedQueries?.find( i => i.Id === response.payload.Id );
+        response.payload.active = true;
         if ( findQuery === undefined ){
           updatedQueries.push(response.payload)
         }
@@ -31,7 +32,7 @@ const QueriesReducer = (state = initialStateQueriesReducer, response) => {
         })
       case getQueriesTypes.DELETE_QUERY:
         return Object.assign({}, state, {
-          queries: state.queries?.filter( i => i.Id !== response.payload.Id ),
+          queries: state.queries?.filter( i => i.Id !== response.payload.id ),
           isLoading: false,
           error: false,
           errorMessage: undefined

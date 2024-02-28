@@ -192,7 +192,7 @@ export const toolbarMenu = {
       position: "bottom-start",
       list: [
         {
-          label: "Search",
+          label: "Search History",
           icon: "fa fa-search",
           action: {
             handlerAction: ACTIONS.SHOW_SEARCH,
@@ -201,7 +201,7 @@ export const toolbarMenu = {
         },
         {
           label: "Query",
-          icon: "fa fa-list",
+          icon: "fa fa-quora",
           action: {
             handlerAction: ACTIONS.SHOW_COMPONENT,
             parameters: [2]
@@ -677,16 +677,16 @@ export const toolbarMenu = {
               label: "Adult Brain Unisex (JRC2018U)",
               icon: "",
               action: {
-                handlerAction: "triggerRunQuery",
-                parameters: ["AlignedDatasets,VFB_00101567,adult brain unisex JRC2018U"]
+                handlerAction: ACTIONS.RUN_QUERY,
+                parameters: ["VFB_00101567"]
               }
             },
             {
               label: "Adult VNC Unisex (JRC2018VU)",
               icon: "",
               action: {
-                handlerAction: "triggerRunQuery",
-                parameters: ["AlignedDatasets,VFB_00200000,adult VNC unisex JRC2018VU"]
+                handlerAction: ACTIONS.RUN_QUERY,
+                parameters: ["VFB_00200000"]
               }
             },
             {
@@ -702,40 +702,40 @@ export const toolbarMenu = {
                   label: "Adult Head (McKellar)",
                   icon: "",
                   action: {
-                    handlerAction: "triggerRunQuery",
-                    parameters: ["AlignedDatasets,VFB_00110000,adult head template McKellar"]
+                    handlerAction: ACTIONS.RUN_QUERY,
+                    parameters: ["VFB_00110000"]
                   }
                 },
                 {
                   label: "Adult Brain (JFRC2/2010)",
                   icon: "",
                   action: {
-                    handlerAction: "triggerRunQuery",
-                    parameters: ["AlignedDatasets,VFB_00017894,adult brain template JFRC2"]
+                    handlerAction: ACTIONS.RUN_QUERY,
+                    parameters: ["VFB_00017894"]
                   }
                 },
                 {
                   label: "Adult VNS (Court2018)",
                   icon: "",
                   action: {
-                    handlerAction: "triggerRunQuery",
-                    parameters: ["AlignedDatasets,VFB_00100000,adult VNS template"]
+                    handlerAction: ACTIONS.RUN_QUERY,
+                    parameters: ["VFB_00100000"]
                   }
                 },
                 {
                   label: "Janelia FlyEM HemiBrain",
                   icon: "",
                   action: {
-                    handlerAction: "triggerRunQuery",
-                    parameters: ["AlignedDatasets,VFB_00101384,Janelia FlyEM HemiBrain"]
+                    handlerAction: ACTIONS.RUN_QUERY,
+                    parameters: ["VFB_00101384"]
                   }
                 },
                 {
                   label: "Ito Half Brain",
                   icon: "",
                   action: {
-                    handlerAction: "triggerRunQuery",
-                    parameters: ["AlignedDatasets,VFB_00030786,Ito Half Brain"]
+                    handlerAction: ACTIONS.RUN_QUERY,
+                    parameters: ["VFB_00030786"]
                   }
                 }
               ]
@@ -755,16 +755,16 @@ export const toolbarMenu = {
               label: "L1 CNS (ssTEM)",
               icon: "",
               action: {
-                handlerAction: "triggerRunQuery",
-                parameters: ["AlignedDatasets,VFB_00050000,L1 CNS"]
+                handlerAction: ACTIONS.RUN_QUERY,
+                parameters: ["VFB_00050000"]
               }
             },
             {
               label: "L3 CNS (Wood2018)",
               icon: "",
               action: {
-                handlerAction: "triggerRunQuery",
-                parameters: ["AlignedDatasets,VFB_00049000,L3 CNS"]
+                handlerAction: ACTIONS.RUN_QUERY,
+                parameters: ["VFB_00049000"]
               }
             }
           ]

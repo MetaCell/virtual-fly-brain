@@ -149,7 +149,7 @@ export default function SearchBuilder(props) {
 
   const addQueryTag = () => { 
     if ( !value.find( v => v.label === QUERIES )){
-      setValue((prevValue) => [{label: 'Queries', tags: []}, ...prevValue])
+      setValue((prevValue) => [{label: 'Queries', tags: [], id : "Queries"}, ...prevValue])
     }
   };
   const checkResults = () => {
@@ -187,7 +187,7 @@ export default function SearchBuilder(props) {
   const handleResultSelection = async(option) => {
     const doesOptionExist =  obj => obj.label === option.label
     if(!value.some(doesOptionExist)){
-      if (!queries?.find( q => q.Name === option.label ) ) { 
+      if (!queries?.find( q => q.Id === option.short_form ) ) { 
         getQueries(option);
       } 
       setValue([...value, option])
@@ -199,7 +199,7 @@ export default function SearchBuilder(props) {
 
   const handleChipDelete = (label) => {
     handleQueryDeletion(label)
-    let filtered = value.filter((chip) => chip.label !== label);
+    let filtered = value.filter((chip) => chip.short_form !== label);
     setValue(filtered);
     if ( filtered.length == 0 || ( filtered.length === 1 && value.find( v => v.label === QUERIES ))){
       setGroupedOptions([]);
@@ -209,9 +209,9 @@ export default function SearchBuilder(props) {
     }
   }
 
-  const handleQueryDeletion = (label) => {
-    let option = value.find((chip) => chip.label === label);
-    deleteQuery(option);
+  const handleQueryDeletion = (id) => {
+    let option = value.find((chip) => chip.short_form === id);
+    deleteQuery(option?.short_form);
   }
 
   const getDatasource = {
@@ -309,7 +309,7 @@ export default function SearchBuilder(props) {
                   {...getTagProps({ index })}
                   deleteIcon={<CloseIcon />}
                   value={value}
-                  onDelete={() => handleChipDelete(option.label)}
+                  onDelete={() => handleChipDelete(option.short_form)}
                 />
               ))}
             </Box>

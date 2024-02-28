@@ -9,10 +9,10 @@ const getQueriesSuccess = query => ({
   }
 });
 
-const deleteQuerySuccess = query => ({
+const deleteQuerySuccess = id => ({
   type: getQueriesTypes.DELETE_QUERY,
   payload: {
-    ...query
+    id
   }
 });
 

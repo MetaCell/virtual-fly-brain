@@ -10,6 +10,7 @@ import { showComponent } from "../../reducers/actions/layout";
 import { WidgetStatus } from "@metacell/geppetto-meta-client/common/layout/model";
 import { selectInstance, focusInstance, getInstanceByID } from '../../reducers/actions/instances';
 import { getQueries } from '../../reducers/actions/queries';
+import { setTermInfoOpened } from "../../reducers/actions/globals";
 
 const { primaryBg, headerBoxShadow, headerBorderColor } = vars;
 const ACTIONS = toolbarMenu.actions;
@@ -60,6 +61,9 @@ const Header = ({setBottomNav}) => {
       case ACTIONS.SHOW_COMPONENT:
         setBottomNav(action.parameters[0])
         break;
+      case ACTIONS.SHOW_TERM_INFO:
+        dispatch(setTermInfoOpened(true))
+        break;
       case ACTIONS.OPEN_NEW_TAB:
         action.parameters.map((item, index) => {
           window.open(item, '_blank');
@@ -78,9 +82,11 @@ const Header = ({setBottomNav}) => {
       case ACTIONS.RUN_QUERY:{
         let matchQuery = queries?.find( q => q.Id === action.parameters[0] );
         if ( matchQuery ) {
+          matchQuery.active = true;
           setBottomNav(2);
         } else {
           getQueries({ short_form : action.parameters[0] })
+          setBottomNav(2)
         }
         break;
       }

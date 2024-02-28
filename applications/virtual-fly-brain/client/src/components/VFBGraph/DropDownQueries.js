@@ -25,7 +25,7 @@ class DropDownQueries extends Component {
 
     return (
       <div>
-        <Tooltip placement="right" title={`Refresh for ${self.props.graphInstanceOnFocus?.metadata.Name}`}>
+        <Tooltip placement="right" title={`Refresh for ${self.props.stateInstanceOnFocus?.metadata.Name}`}>
           <LoopIcon key="tooltip-icon"
             onClick={ self.props.sync } style={{fontSize: '1.3rem', zIndex : "1000",
               cursor : "pointer",
@@ -72,7 +72,7 @@ class DropDownQueries extends Component {
         >
           {self.props.stylingConfiguration.dropDownQueries.map(item => (
             <MenuItem
-              key={item.label(self.props.graphInstanceOnFocus?.metadata.Id)}
+              key={item.label(self.props.stateInstanceOnFocus?.metadata.Id)}
               onClick={() => self.handleMenuClick(item)}
               style={{
                 fontSize : "14px",
@@ -89,7 +89,7 @@ class DropDownQueries extends Component {
               }
               }
             >
-              {item.label(self.props.graphInstanceOnFocus?.metadata.Name)}
+              {item.label(self.props.stateInstanceOnFocus?.metadata.Name)}
             </MenuItem>
           ))}
         </Menu>

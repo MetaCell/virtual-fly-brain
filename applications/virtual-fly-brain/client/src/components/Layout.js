@@ -11,7 +11,7 @@ import ErrorModal from "./ErrorModal";
 import { getLayoutManagerInstance } from "@metacell/geppetto-meta-client/common/layout/LayoutManager";
 import { addWidget } from '@metacell/geppetto-meta-client/common/layout/actions';
 import { setTermInfoOpened } from './../reducers/actions/globals'
-import { templateLoaded } from './../reducers/actions/instances';
+import { templateLoaded,  removeAllInstances } from './../reducers/actions/instances';
 import { widgets } from "./layout/widgets";
 
 const {
@@ -47,6 +47,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
   const instancesErrorMessage = useSelector(state => state.instances.errorMessage);
   const queriesError = useSelector(state => state.queries.error);
   const queriesErrorMessage = useSelector(state => state.queries.errorMessage);
+  const allLoadedInstances = useSelector( state => state.instances.allLoadedInstances);
 
   const modalError = instancesError || queriesError;
   const modalErrorMessage = instancesErrorMessage || queriesErrorMessage;
@@ -224,6 +225,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
             {bottomNav === 0 && < VFBUploader open={true} setBottomNav={setBottomNav} />}
             {bottomNav === 1 && <VFBDownloadContents open={true} setBottomNav={setBottomNav} />}
             {bottomNav === 2 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} />}
+            {bottomNav === 4 && ( allLoadedInstances?.length > 1 && removeAllInstances())}
             {bottomNav === 5 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} tabSelected={1}/>}
           </>
         ) : (
@@ -234,6 +236,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
             {bottomNav === 0 && <VFBUploader open={true} setBottomNav={setBottomNav} />}
             {bottomNav === 1 && <VFBDownloadContents open={true} setBottomNav={setBottomNav} />}
             {bottomNav === 2 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} />}
+            {bottomNav === 4 && ( allLoadedInstances?.length > 1 && removeAllInstances())}
             {bottomNav === 5 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} tabSelected={1}/>}
           </>
         )}

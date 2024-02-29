@@ -59,6 +59,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       let stackViewerData = state.stackViewerData;
       if ( newInstance.metadata?.IsTemplate ){
         newInstance.color = TEMPLATE_COLOR;
+        newInstance.userSetColor = TEMPLATE_COLOR;
         stackViewerData = newInstance;
       } else {
         newInstance.color = DESELECTED_COLOR;
@@ -164,7 +165,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         const allLoadedInstances = [...state.allLoadedInstances]
         let matchInstance = allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );
         matchInstance.color = response.payload.color;
-
+        matchInstance.userSetColor = response.payload.color;
         const threeDObjects = [...state.threeDObjects];
         const matchObjects = threeDObjects.filter( o => o.name.includes(response.payload.id));
         if ( matchObjects?.length > 0 ) {
@@ -196,9 +197,16 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         const findInstance = allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );
         if ( findInstance ){
           findInstance.selected = !findInstance.selected;
-          if ( findInstance.selected ) findInstance.color = SELECTED_COLOR;
-          else {
-            findInstance.color = DESELECTED_COLOR;
+          if ( findInstance.selected ) {
+            findInstance.color = SELECTED_COLOR
+            allLoadedInstances?.forEach( i => { 
+              if ( i.metadata?.Id !== findInstance.metadata?.Id ) {
+                i.color = i.userSetColor || DESELECTED_COLOR
+                i.selected = false;
+              }
+            })
+          } else {
+            findInstance.color = findInstance.userSetColor || DESELECTED_COLOR
           }
         }
 

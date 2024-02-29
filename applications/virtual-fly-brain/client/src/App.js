@@ -39,12 +39,10 @@ const App = () => {
   React.useEffect( () => {
     if ( allLoadedInstances?.find( i => i?.metadata?.IsTemplate ) && !templateLoaded) {
       setTemplateLoaded(true);
-      const ids = queryString("id")?.split(",");
-      ids?.forEach( id => {
-        if ( id != templateID && id != undefined && id != "" ){
-          getInstanceByID(id, true);
-        }
-      });
+      const id = queryString("id");
+      if ( id != templateID && id != undefined && id != "" ){
+        getInstanceByID(id, true);
+      }
     }
   }, [allLoadedInstances])
 

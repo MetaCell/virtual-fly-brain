@@ -769,7 +769,7 @@ const TermInfo = ({ open, setOpen }) => {
         >
           {open && <Typography>Collapse</Typography>}
           <Button
-            onClick={() => setOpen((prev) => !prev)}
+            onClick={() => setOpen(!open)}
             sx={{
               height: 'auto',
               minWidth: '0.0625rem',

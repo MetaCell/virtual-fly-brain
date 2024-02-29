@@ -13,11 +13,18 @@ const QueriesReducer = (state = initialStateQueriesReducer, response) => {
         return Object.assign({}, state, {
            isLoading: true
         })
-     case getQueriesTypes.GET_QUERIES_SUCCESS:
+     case getQueriesTypes.GET_QUERIES_SUCCESS:{
+        let updatedQueries = [...state.queries]
+        let findQuery = updatedQueries?.find( i => i.Id === response.payload.Id );
+        response.payload.active = true;
+        if ( findQuery === undefined ){
+          updatedQueries.push(response.payload)
+        }
         return Object.assign({}, state, {
-          queries: !state.queries?.find( i => i.short_form === response.payload.short_form ) !== undefined && [...state.queries, response.payload],
+          queries: updatedQueries,
           isLoading: false
         })
+      }
       case getQueriesTypes.UPDATE_QUERIES:
         return Object.assign({}, state, {
           queries: response.payload,
@@ -25,7 +32,7 @@ const QueriesReducer = (state = initialStateQueriesReducer, response) => {
         })
       case getQueriesTypes.DELETE_QUERY:
         return Object.assign({}, state, {
-          queries: state.queries?.filter( i => i.short_form !== response.payload.short_form ),
+          queries: state.queries?.filter( i => i.Id !== response.payload.id ),
           isLoading: false,
           error: false,
           errorMessage: undefined
@@ -33,7 +40,7 @@ const QueriesReducer = (state = initialStateQueriesReducer, response) => {
       case getQueriesTypes.GET_QUERIES_FAILURE:
         return Object.assign({}, state, {
           error: true,
-          errorMessage: response.payload,
+          errorMessage: response.payload.error,
         })
      default:
         return state;

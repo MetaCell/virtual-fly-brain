@@ -1,10 +1,6 @@
 import { getInstancesTypes } from './actions/types/getInstancesTypes';
 import {SELECTED_COLOR, DESELECTED_COLOR, TEMPLATE_COLOR, SKELETON, CYLINDERS } from './../utils/constants';
-import { loadInstances, getProxyInstances } from './../utils/instancesHelper'
-import { SkeletonOff } from '../icons';
-import { on } from 'events';
-import { find } from '@nosferatu500/react-sortable-tree';
-import { get3DMesh } from './actions/instances';
+import { loadInstances } from './../utils/instancesHelper'
 
 export const initialStateInstancesReducer = {
   allPotentialInstances : [],
@@ -106,6 +102,18 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
           isLoading: false
         })
       }
+      case getInstancesTypes.REMOVE_ALL_INSTANCES_SUCCESS:{
+        let loadedInstances = state.allLoadedInstances.filter( i => i?.metadata?.IsTemplate );
+
+        return Object.assign({}, state, {
+          allLoadedInstances: loadedInstances,
+          mappedCanvasData : getMappedCanvasData(loadedInstances),
+          threeDObjects : [],
+          focusedInstance : loadedInstances[0],
+          event : { action : getInstancesTypes.UPDATE_INSTANCES, id : response.payload.query, trigger : Date.now()},
+          isLoading: false
+        })
+      }
       case getInstancesTypes.SHOW_3D:{
         const allLoadedInstances = [...state.allLoadedInstances]
         const matchInstance = allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );
@@ -185,10 +193,12 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       case getInstancesTypes.SELECT_INSTANCE:{
         const allLoadedInstances = [...state.allLoadedInstances]
         const findInstance = allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );
-        findInstance.selected = !findInstance.selected;
-        if ( findInstance.selected ) findInstance.color = SELECTED_COLOR;
-        else {
-          findInstance.color = DESELECTED_COLOR;
+        if ( findInstance ){
+          findInstance.selected = !findInstance.selected;
+          if ( findInstance.selected ) findInstance.color = SELECTED_COLOR;
+          else {
+            findInstance.color = DESELECTED_COLOR;
+          }
         }
 
         if ( findInstance?.simpleInstance ) findInstance.simpleInstance.color = findInstance.color;

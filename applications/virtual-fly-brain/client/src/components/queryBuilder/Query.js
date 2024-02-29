@@ -17,16 +17,16 @@ export const dividerStyle = {
 const Query = ({ fullWidth, queries }) => {
   let count = 0;
   queries?.filter(q => q.active).forEach( query => {
-    if ( query.queries?.Examples) {
-      count = count + Object.keys(query.queries?.Examples)?.length;
-    } else if ( query.queries?.Images) {
-      count = count + Object.keys(query.queries?.Images)?.length;
+    if ( query.Examples) {
+      count = count + Object.keys(query.Examples)?.length;
+    } else if ( query.Images) {
+      count = count + Object.keys(query.Images)?.length;
     }
   });
   const title = count + " Query results";
   const tags = [];
   queries?.filter(q => q.active).forEach( (query, index ) => {
-    query.facets_annotation?.forEach( tag => {
+    query.Tags?.forEach( tag => {
       if ( !tags.includes(tag) ){
         tags.push(tag);
       }
@@ -144,10 +144,10 @@ const Query = ({ fullWidth, queries }) => {
         <Grid container spacing={1.5}>
           {queries?.filter(q => q.active).map( (query, index ) => {
             let examples = {};
-            if ( query?.queries?.Examples ){
-              examples = query?.queries?.Examples;
-            } else if ( query?.queries?.Images ){
-              examples = query?.queries?.Images;
+            if ( query?.Examples ){
+              examples = query?.Examples;
+            } else if ( query?.Images ){
+              examples = query?.Images;
             }
             return ( Object.keys(examples)?.map((item, index) => {
               return (
@@ -160,7 +160,7 @@ const Query = ({ fullWidth, queries }) => {
                   lg={fullWidth ? 4 : 3}
                   xl={3}
                 >
-                  <QueryCard facets_annotation={query.facets_annotation} query={query?.queries?.Examples?.[item][0] || query?.queries?.Images?.[item][0]} fullWidth={fullWidth} />
+                  <QueryCard facets_annotation={query.Tags} query={query?.Examples?.[item][0] || query?.Images?.[item][0]} fullWidth={fullWidth} />
                 </Grid>
               )
             }))

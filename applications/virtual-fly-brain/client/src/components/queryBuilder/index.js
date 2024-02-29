@@ -44,8 +44,8 @@ function a11yProps(index) {
   };
 }
 
-const QueryBuilder = ({ fullWidth, bottomNav, setBottomNav }) => {
-  const [value, setValue] = React.useState(0);
+const QueryBuilder = ({ fullWidth, bottomNav, setBottomNav, tabSelected }) => {
+  const [value, setValue] = React.useState(tabSelected || 0);
   const queries = useSelector(state => state.queries.queries);
 
   const handleChange = (event, newValue) => {

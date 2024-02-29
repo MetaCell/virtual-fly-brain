@@ -250,7 +250,7 @@ const ROIBrowser = (props) => {
         let that = this;
         setState({ ...state, loading : true, errors : undefined });
         if ( instance === undefined ) return
-        let queryCypher = treeCypherQuery(instance.Id);
+        let queryCypher = treeCypherQuery(instance.metadata?.Id);
         restPost(queryCypher).then((data) => {
             /*
              * we take the data provided by the cypher query and consume the until we obtain the treeData that can be given
@@ -498,8 +498,9 @@ const ROIBrowser = (props) => {
     };
 
     React.useEffect(() => {
-        if (templateID !== undefined) {
-            if ( state.dataTree === undefined ) initTree(templateID)
+        const template = allLoadedInstances?.find( i => i.metadata?.Id === templateID);
+        if (template !== undefined) {
+            if ( state.dataTree === undefined ) initTree(template)
 
         } else {
             setState({ ...state, errors : "Template not loaded yet." });

@@ -195,8 +195,8 @@ export const toolbarMenu = {
           label: "Search History",
           icon: "fa fa-search",
           action: {
-            handlerAction: ACTIONS.SHOW_SEARCH,
-            parameters: [widgets.circuitBrowserWidget.id]
+            handlerAction: ACTIONS.SHOW_COMPONENT,
+            parameters: [5]
           }
         },
         {

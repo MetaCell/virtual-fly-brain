@@ -28,7 +28,18 @@ const vfbMiddleware = store => next => (action) => {
         }
         case getInstancesTypes.GET_INSTANCES_SUCCESS : {
             next(action)
-            get3DMesh(action.payload);
+            if ( action.payload.get3DMesh  ){
+                get3DMesh(action.payload);
+            }
+            break;
+        }
+        case getInstancesTypes.SHOW_3D_MESH:
+        case getInstancesTypes.SHOW_3D : {
+            let matchInstance = store.getState().instances.allLoadedInstances.find( i => i.metadata?.Id === action.payload.id );
+            if ( matchInstance && !matchInstance?.meshCreated  ){
+                get3DMesh(matchInstance?.metadata);
+            }
+            next(action)
             break;
         }
         default:

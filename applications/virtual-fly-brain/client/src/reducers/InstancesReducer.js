@@ -18,11 +18,11 @@ export const initialStateInstancesReducer = {
 };
 
 const getMappedCanvasData = (loadedInstances) => {
-  let updatedCanvasData = loadedInstances?.filter( m => m.instanceCreated)?.map( instance => {
-    let { color, visible, metadata } = instance;
+  let updatedCanvasData = loadedInstances?.filter( m => m.meshCreated)?.map( instance => {
+    let { color, visibleMesh, metadata } = instance;
     return {
       instancePath : metadata?.Id,
-      visibility : visible || false,
+      visibility : visibleMesh || false,
       color,
       selected : instance.selected || false
     }
@@ -56,7 +56,6 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       }
      case getInstancesTypes.GET_INSTANCES_SUCCESS:{
       const newInstance = { metadata : response.payload };
-      newInstance.visible = true;
       let stackViewerData = state.stackViewerData;
       if ( newInstance.metadata?.IsTemplate ){
         newInstance.color = TEMPLATE_COLOR;
@@ -119,6 +118,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         const allLoadedInstances = [...state.allLoadedInstances]
         const matchInstance = allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );
         matchInstance.visible = true;
+        matchInstance.visibleMesh = true;
         return Object.assign({}, state, {
           allLoadedInstances: allLoadedInstances,
           mappedCanvasData : getMappedCanvasData(allLoadedInstances),
@@ -130,6 +130,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         const allLoadedInstances = [...state.allLoadedInstances]
         const matchInstance = allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );
         matchInstance.visible = false;
+        matchInstance.visibleMesh = false;
         return Object.assign({}, state, {
           allLoadedInstances: allLoadedInstances,
           mappedCanvasData : getMappedCanvasData(allLoadedInstances),
@@ -140,7 +141,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       case getInstancesTypes.SHOW_3D_MESH:{
         const allLoadedInstances = [...state.allLoadedInstances]
         const matchInstance = allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );
-        matchInstance.visible = true;
+        matchInstance.visibleMesh = true;
         return Object.assign({}, state, {
           allLoadedInstances: allLoadedInstances,
           mappedCanvasData : getMappedCanvasData(allLoadedInstances),
@@ -151,7 +152,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       case getInstancesTypes.HIDE_3D_MESH:{
         const allLoadedInstances = [...state.allLoadedInstances]
         const matchInstance = allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );
-        matchInstance.visible = false;
+        matchInstance.visibleMesh = false;
         return Object.assign({}, state, {
           allLoadedInstances: allLoadedInstances,
           mappedCanvasData : getMappedCanvasData(allLoadedInstances),
@@ -183,6 +184,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       case getInstancesTypes.FOCUS_INSTANCE:{
         const loadedInstances = [...state.allLoadedInstances]
         const findInstance = loadedInstances?.find( i => i.metadata?.Id === response.payload.id );
+        console.log("State ", state)
         return Object.assign({}, state, {
           focusedInstance: findInstance,
           event : { action : getInstancesTypes.FOCUS_INSTANCE, id : response.payload.id, trigger : Date.now()},
@@ -227,9 +229,10 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         const matchLoadedInstance = loadedInstances.find( i => i.metadata?.Id === response.payload.id );
         const simpleInstance = response.payload;
         simpleInstance.color = matchLoadedInstance?.color;
+        matchLoadedInstance.visible = true;
+        matchLoadedInstance.visibleMesh = true;
         loadInstances(simpleInstance, state.allLoadedInstances)
-        simpleInstance.visible = true;
-        matchLoadedInstance.instanceCreated = true;
+        matchLoadedInstance.meshCreated = true;
 
         return Object.assign({}, state, {
           allLoadedInstances : loadedInstances,

@@ -2,10 +2,11 @@ import store from '../../store';
 import { get_3d_mesh, get_instance } from "../../network/query"
 import { getInstancesTypes } from './types/getInstancesTypes';
 
-const getInstancesSuccess = query => ({
+const getInstancesSuccess = ( query, mesh) => ({
   type: getInstancesTypes.GET_INSTANCES_SUCCESS,
   payload: {
-    ...query
+    ...query,
+    get3DMesh : mesh
   }
 });
 
@@ -166,7 +167,7 @@ const templateLoadedMessage = (id, openTemplate) => ({
   }
 });
 
-export const getInstanceByID = async (queryId) => {
+export const getInstanceByID = async (queryId, get3DMesh) => {
 
   store.dispatch(getInstancesStarted())
 
@@ -179,13 +180,16 @@ export const getInstanceByID = async (queryId) => {
     return
   }
 
-  store.dispatch(getInstancesSuccess(response))
+  store.dispatch(getInstancesSuccess(response, get3DMesh))
 }
 
 export const get3DMesh = async (instance) => {
   let mesh_response;
   try {
-    mesh_response = await get_3d_mesh(instance);
+    let objURL = instance?.Images?.[Object.keys(instance?.Images)[0]][0].obj;
+    if ( objURL ) {
+      mesh_response = await get_3d_mesh(instance, objURL);
+    }
   } catch (error) {
     console.log("Error ", error)
     store.dispatch(get3DOBJFailure(error.message))

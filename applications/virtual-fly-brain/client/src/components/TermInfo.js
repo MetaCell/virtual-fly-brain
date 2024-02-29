@@ -234,7 +234,7 @@ const TermInfo = ({ open, setOpen }) => {
   }
 
   const handleMeshVisibility = () => {
-    if ( allLoadedInstances.find( instance => instance.metadata?.Id == termInfoData?.metadata?.Id )?.visible ) {
+    if ( allLoadedInstances.find( instance => instance.metadata?.Id == termInfoData?.metadata?.Id )?.visibleMesh ) {
       hide3DMesh(termInfoData?.metadata?.Id)
     } else {
       show3DMesh(termInfoData?.metadata?.Id)
@@ -523,9 +523,9 @@ const TermInfo = ({ open, setOpen }) => {
                             <Target />
                           </Button>
                         </Tooltip>
-                        <Tooltip title={getInstance()?.visible ? "Hide 3D Mesh" : "Show 3D Mesh"}>
+                        <Tooltip title={getInstance()?.visibleMesh ? "Hide 3D Mesh" : "Show 3D Mesh"}>
                           <Button  onClick={(event) => handleMeshVisibility()}>
-                          { getInstance()?.visible ? <ArViewOff /> : <ArView /> }                          </Button>
+                          { getInstance()?.visibleMesh ? <ArViewOff /> : <ArView /> }                          </Button>
                         </Tooltip>
                         { termInfoData?.metadata?.SuperTypes?.find( s => s.toLowerCase() === NEURON.toLowerCase()) ?
                         <Tooltip title={getInstance()?.skeleton?.[SKELETON]?.visible ? "Disable 3D Skeleton" : "Enable 3D Skeleton"}>

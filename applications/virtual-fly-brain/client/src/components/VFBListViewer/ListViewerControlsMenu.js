@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import Menu from "@metacell/geppetto-meta-ui/menu/Menu";
 import { connect } from 'react-redux';
 import { ChromePicker } from 'react-color';
-import { getInstanceByID, removeInstanceByID, selectInstance, changeColor,
+import { removeInstanceByID, selectInstance, changeColor,
   show3DMesh, hide3DMesh, focusInstance, show3DSkeleton, hide3DSkeleton } from '../../reducers/actions/instances';
 import { NEURON , RGBAToHexA} from "./../../utils/constants"
 

@@ -20,21 +20,21 @@ export const QueriesSelectionDropdown = ({option, selectedOption, goBackToInitia
 
   const handleSelect = (option, query) => {
     let count = 0;
-    if ( query.queries?.Examples && !selectedOption[query.short_form]) {
-        count = Object.keys(query.queries?.Examples)?.length;
-    } else if ( query.queries?.Images && !selectedOption[query.short_form]) {
-      count = Object.keys(query.queries?.Images)?.length;
+    if ( query.Examples && !selectedOption[query.Id]) {
+        count = Object.keys(query.Examples)?.length;
+    } else if ( query.Images && !selectedOption[query.Id]) {
+      count = Object.keys(query.Images)?.length;
     }
     Object.keys(selectedOption)?.forEach( o => {
         if ( typeof selectedOption[o] === 'object' ) {
           count = count + ( selectedOption[o].count || 0 )
         } 
     })
-    let updatedSelectedOption = {...selectedOption, [query.short_form]: option, count : count};
-    if ( query.queries?.Examples) {
-      updatedSelectedOption[query.short_form].count =  Object.keys(query.queries?.Examples)?.length || 0;
-    } else if ( query.queries?.Images) {
-      updatedSelectedOption[query.short_form].count =  Object.keys(query.queries?.Images)?.length || 0;
+    let updatedSelectedOption = {...selectedOption, [query.Id]: option, count : count};
+    if ( query.Examples) {
+      updatedSelectedOption[query.Id].count =  Object.keys(query.Examples)?.length || 0;
+    } else if ( query.Images) {
+      updatedSelectedOption[query.Id].count =  Object.keys(query.Images)?.length || 0;
     }
     setSelectedOption(updatedSelectedOption)
     setPopoverAnchorEl(null);
@@ -46,7 +46,7 @@ export const QueriesSelectionDropdown = ({option, selectedOption, goBackToInitia
   return (
   <Box
     display='flex'
-    key={option.label}
+    key={option.Name}
     columnGap={1}
   >
     <Button
@@ -65,8 +65,8 @@ export const QueriesSelectionDropdown = ({option, selectedOption, goBackToInitia
             background: searchBoxBg,
         }
       }}
-      key={option.short_form}
-      id={option.label}
+      key={option.Id}
+      id={option.Id}
       onClick={deleteQuery}
     >
         <Delete size={12} />
@@ -85,7 +85,7 @@ export const QueriesSelectionDropdown = ({option, selectedOption, goBackToInitia
           flexGrow={1}
           display='flex'
         >
-            {selectedOption[option.short_form] ? 
+            {selectedOption[option.Id] ? 
               (<Typography sx={{
                 width: 'calc(100% - 1.875rem)',
                 px: 1,
@@ -98,7 +98,7 @@ export const QueriesSelectionDropdown = ({option, selectedOption, goBackToInitia
                 overflow: 'hidden',
                 textOverflow: 'ellipsis'
               }}>
-                { selectedOption[option.short_form].label }
+                { selectedOption[option.Id].label }
               </Typography>)
               :
               (<Typography sx={{
@@ -113,11 +113,11 @@ export const QueriesSelectionDropdown = ({option, selectedOption, goBackToInitia
                 overflow: 'hidden',
                 textOverflow: 'ellipsis'
               }}>
-               Select query for { option.label }
+               Select query for { option.Name }
               </Typography>) }
               <Button
                 aria-describedby={id}
-                id={option.short_form}
+                id={option.Id}
                 onClick={popoverHandleClick}
                 sx={{
                   borderLeft: `0.0625rem solid ${queryBorderColor}`,
@@ -148,13 +148,13 @@ export const QueriesSelectionDropdown = ({option, selectedOption, goBackToInitia
                 }}
               >
                 <List>
-                  {!option.queries.Queries.length && <ListItem>
-                      <ListItemButton onClick={() => goBack(option.short_form )}>
-                        <ListItemText primary={`Select query for ${option.label}`}/>
+                  {!option.Queries.length && <ListItem>
+                      <ListItemButton onClick={() => goBack(option.Id )}>
+                        <ListItemText primary={`Select query for ${option.Name}`}/>
                       </ListItemButton>
                     </ListItem>
                   }
-                  { option.queries?.Queries?.map((query, index) => (<ListItem key={query.short_form+index}>
+                  { option.Queries?.map((query, index) => (<ListItem key={query.short_form+index}>
                     <ListItemButton onClick={() => handleSelect(query, option)}>
                       <ListItemText primary={query.label} />
                     </ListItemButton>

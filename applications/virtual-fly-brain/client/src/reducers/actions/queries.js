@@ -9,10 +9,10 @@ const getQueriesSuccess = query => ({
   }
 });
 
-const deleteQuerySuccess = query => ({
+const deleteQuerySuccess = id => ({
   type: getQueriesTypes.DELETE_QUERY,
   payload: {
-    ...query
+    id
   }
 });
 
@@ -38,18 +38,14 @@ const getQueriesFailure = error => ({
 export const getQueries = async (instance) => {
 
   store.dispatch(getQueriesStarted())
-  let newInstance = instance;
-
   let response;
   try {
     response = await get_queries(instance.short_form);
-    newInstance.queries = response
-    console.log("queries ", newInstance.queries)
   } catch (error) {
     store.dispatch(getQueriesFailure(error.message))
   }
 
-  store.dispatch(getQueriesSuccess(newInstance))
+  store.dispatch(getQueriesSuccess(response))
 }
 
 export const deleteQuery = async (instance) => {

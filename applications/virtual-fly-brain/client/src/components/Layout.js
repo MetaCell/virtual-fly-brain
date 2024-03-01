@@ -1,7 +1,6 @@
 
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from 'react-redux';
-import MediaQuery from 'react-responsive';
+import { useDispatch, useSelector, useStore } from 'react-redux';
 import { Box, Button,Modal, useMediaQuery, useTheme, Typography, CircularProgress, Link } from "@mui/material";
 import TermInfo from "./TermInfo"
 import vars from "../theme/variables";
@@ -11,10 +10,9 @@ import QueryBuilder from "./queryBuilder";
 import ErrorModal from "./ErrorModal";
 import { getLayoutManagerInstance } from "@metacell/geppetto-meta-client/common/layout/LayoutManager";
 import { addWidget } from '@metacell/geppetto-meta-client/common/layout/actions';
-import { threeDCanvasWidget, stackViewerWidget, roiBrowserWidget, termContextWidget, circuitBrowserWidget, listViewerWidget } from "./layout/widgets";
-import { templateLoaded } from './../reducers/actions/instances';
-import store from "../store";
-import VFBListViewer from "./VFBListViewer"
+import { setTermInfoOpened } from './../reducers/actions/globals'
+import { templateLoaded,  removeAllInstances } from './../reducers/actions/instances';
+import { widgets } from "./layout/widgets";
 
 const {
   secondaryBg,
@@ -32,8 +30,8 @@ const tabsArr = [
 
 const MainLayout = ({ bottomNav, setBottomNav }) => {
   const theme = useTheme();
-
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  
+  const sidebarOpen = useSelector(state => state.globalInfo.termInfoOpened)
   const [modalOpen, setModalOpen] = useState(false);
   const desktopScreen = useMediaQuery(theme.breakpoints.up('lg'));
   const defaultActiveTab = desktopScreen ? [0, 1, 2, 3, 4] : [0];
@@ -42,12 +40,14 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
   const launchTemplate = useSelector(state => state.instances.launchTemplate)
   const dispatch = useDispatch();
   let templateRef = window.location.origin + "?id=" + launchTemplate?.metadata?.Id;
+  const store = useStore();
 
   //global reducers errors
   const instancesError = useSelector(state => state.instances.error);
   const instancesErrorMessage = useSelector(state => state.instances.errorMessage);
   const queriesError = useSelector(state => state.queries.error);
   const queriesErrorMessage = useSelector(state => state.queries.errorMessage);
+  const allLoadedInstances = useSelector( state => state.instances.allLoadedInstances);
 
   const modalError = instancesError || queriesError;
   const modalErrorMessage = instancesErrorMessage || queriesErrorMessage;
@@ -75,15 +75,13 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
   }, [store])
 
   useEffect(() => {
-    dispatch(addWidget(threeDCanvasWidget));
-    // TODO: fix stack viewer
-    dispatch(addWidget(stackViewerWidget));
-    //dispatch(addWidget(sideBarWidget(sidebarOpen, setSidebarOpen)));
-    dispatch(addWidget(circuitBrowserWidget));
-    dispatch(addWidget(roiBrowserWidget));
-    dispatch(addWidget(termContextWidget));
-    dispatch(addWidget(listViewerWidget));
-  }, [sidebarOpen, setSidebarOpen])
+    dispatch(addWidget(widgets.threeDCanvasWidget));
+    dispatch(addWidget(widgets.stackViewerWidget));
+    dispatch(addWidget(widgets.circuitBrowserWidget));
+    dispatch(addWidget(widgets.roiBrowserWidget));
+    dispatch(addWidget(widgets.termContextWidget));
+    dispatch(addWidget(widgets.listViewerWidget));
+  }, [])
 
   const classes = {
     tabs: {
@@ -132,6 +130,11 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
     setTab([id])
   }
 
+  const setSidebarOpen = (opened) => {
+    dispatch(setTermInfoOpened(opened))
+  }
+
+
   const handleModalClose = (id, openTemplate) => {
     templateLoaded(id, openTemplate);
     setModalOpen(false)
@@ -155,7 +158,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
 
   return (
     <>
-      <MediaQuery maxWidth={1199}>
+      {/*<MediaQuery maxWidth={1199}>
         {!bottomNav ? (
           <Box display='flex' sx={classes.tabs}>
             {tabsArr.map((el) => (
@@ -166,6 +169,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
           </Box>
         ) : null}
       </MediaQuery>
+      */}
       <ErrorModal display={modalError} message={modalErrorMessage} />
       <Modal
         open={modalOpen}
@@ -221,6 +225,8 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
             {bottomNav === 0 && < VFBUploader open={true} setBottomNav={setBottomNav} />}
             {bottomNav === 1 && <VFBDownloadContents open={true} setBottomNav={setBottomNav} />}
             {bottomNav === 2 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} />}
+            {bottomNav === 4 && ( allLoadedInstances?.length > 1 && removeAllInstances())}
+            {bottomNav === 5 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} tabSelected={1}/>}
           </>
         ) : (
           <>
@@ -230,6 +236,8 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
             {bottomNav === 0 && <VFBUploader open={true} setBottomNav={setBottomNav} />}
             {bottomNav === 1 && <VFBDownloadContents open={true} setBottomNav={setBottomNav} />}
             {bottomNav === 2 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} />}
+            {bottomNav === 4 && ( allLoadedInstances?.length > 1 && removeAllInstances())}
+            {bottomNav === 5 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} tabSelected={1}/>}
           </>
         )}
       </Box>

@@ -14,7 +14,8 @@ import { ResultSelectionOptions } from './ResultSelectionOptions';
 import  { getResultsSOLR } from '../../components/configuration/SOLRclient'
 import { DatasourceTypes } from '@metacell/geppetto-meta-ui/search/datasources/datasources';
 import { getInstanceByID } from './../../reducers/actions/instances';
-import { useSelector } from 'react-redux'
+import { addRecentSearch } from '../../reducers/actions/globals';
+import { useSelector, useDispatch } from 'react-redux'
 import { getQueries, deleteQuery, updateQueries } from '../../reducers/actions/queries';
 
 const QUERIES = "Queries";
@@ -138,16 +139,17 @@ export default function SearchBuilder(props) {
 
   const [value, setValue] = React.useState([]);
   const [retrievingResults, setRetrievingResults] = React.useState(false)
-  const [recentSearch, setRecentSearch] = React.useState([]);
   const [groupedOptions, setGroupedOptions] = React.useState([]);
   const [isOpen, setIsOpen] = React.useState(false);
   const [lastSearch, setLastSearch] = React.useState("");
   const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances);
   const queries = useSelector(state => state.queries.queries);
+  const globalRecentSearches = useSelector( state => state.globalInfo.recentSearches)
+  const dispatch = useDispatch();
 
   const addQueryTag = () => { 
     if ( !value.find( v => v.label === QUERIES )){
-      setValue((prevValue) => [{label: 'Queries', tags: []}, ...prevValue])
+      setValue((prevValue) => [{label: 'Queries', tags: [], id : "Queries"}, ...prevValue])
     }
   };
   const checkResults = () => {
@@ -157,9 +159,10 @@ export default function SearchBuilder(props) {
     let updatedQueries = [];
     queries.length > 0 ? updatedQueries = [...queries] : []
     updatedQueries.forEach( q => {
-      let match = value?.find( v => v.label === q.label );
+      let match = value?.find( v => v.short_form === q.Id );
       if ( match !== undefined ) {
         q.active = true;
+        dispatch(addRecentSearch(q, true))
       } else {
         q.active = false;
       }
@@ -184,21 +187,19 @@ export default function SearchBuilder(props) {
   const handleResultSelection = async(option) => {
     const doesOptionExist =  obj => obj.label === option.label
     if(!value.some(doesOptionExist)){
-      if (!queries?.find( q => q.label === option.label ) ) { 
+      if (!queries?.find( q => q.Id === option.short_form ) ) { 
         getQueries(option);
       } 
       setValue([...value, option])
-      let recentSearches = [...recentSearch];
-      if ( !recentSearches?.find( recent => recent.id === option.id ) ){
-        recentSearches.push(option);
-        setRecentSearch(recentSearches);
+      if ( !globalRecentSearches?.find( recent => recent.id === option.id ) ){
+        dispatch(addRecentSearch(option, false));
       }
     }
   };
 
   const handleChipDelete = (label) => {
     handleQueryDeletion(label)
-    let filtered = value.filter((chip) => chip.label !== label);
+    let filtered = value.filter((chip) => chip.short_form !== label);
     setValue(filtered);
     if ( filtered.length == 0 || ( filtered.length === 1 && value.find( v => v.label === QUERIES ))){
       setGroupedOptions([]);
@@ -208,9 +209,9 @@ export default function SearchBuilder(props) {
     }
   }
 
-  const handleQueryDeletion = (label) => {
-    let option = value.find((chip) => chip.label === label);
-    deleteQuery(option);
+  const handleQueryDeletion = (id) => {
+    let option = value.find((chip) => chip.short_form === id);
+    deleteQuery(option?.short_form);
   }
 
   const getDatasource = {
@@ -305,7 +306,7 @@ export default function SearchBuilder(props) {
                   {...getTagProps({ index })}
                   deleteIcon={<CloseIcon />}
                   value={value}
-                  onDelete={() => handleChipDelete(option.label)}
+                  onDelete={() => handleChipDelete(option.short_form)}
                 />
               ))}
             </Box>
@@ -327,9 +328,9 @@ export default function SearchBuilder(props) {
             loadResults={loadResults}
           />) : null }
 
-          { recentSearch?.length >= 1 ? <RecentSearch
+          { globalRecentSearches?.length >= 1 ? <RecentSearch
             facets_annotations_colors={facets_annotations_colors}
-            recentSearches={recentSearch}
+            recentSearches={globalRecentSearches}
             getOptionProps={getOptionProps}
             selectedFilters={props.applyFilters}
             handleResultSelection={handleResultSelection}

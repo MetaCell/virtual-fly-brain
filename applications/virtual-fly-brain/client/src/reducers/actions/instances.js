@@ -45,6 +45,11 @@ const removeInstancesSuccess = query => ({
   }
 });
 
+const removeAllInstancesSuccess = () => ({
+  type: getInstancesTypes.REMOVE_ALL_INSTANCES_SUCCESS,
+  payload: {}
+});
+
 const selectInstanceMessage = id => ({
   type: getInstancesTypes.SELECT_INSTANCE,
   payload: {
@@ -195,6 +200,15 @@ export const get3DMesh = async (instance) => {
 export const removeInstanceByID = async (queryId) => {
   try {
     store.dispatch(removeInstancesSuccess(queryId))
+  } catch (error) {
+    store.dispatch(removeInstancesFailure(error.message))
+    return
+  }
+}
+
+export const removeAllInstances = async () => {
+  try {
+    store.dispatch(removeAllInstancesSuccess())
   } catch (error) {
     store.dispatch(removeInstancesFailure(error.message))
     return

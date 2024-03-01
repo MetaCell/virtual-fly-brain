@@ -1,11 +1,19 @@
 import { Box, Button, Link } from "@mui/material";
 import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import vars from '../../theme/variables';
 import MediaQuery from 'react-responsive';
 import { History, Logo, Menu as MenuIcon, QueryStats } from "../../icons";
 import Menu from '@metacell/geppetto-meta-ui/menu/Menu';
 import { toolbarMenu } from "../../components/configuration/VFBToolbar/vfbtoolbarMenuConfiguration";
+import { showComponent } from "../../reducers/actions/layout";
+import { WidgetStatus } from "@metacell/geppetto-meta-client/common/layout/model";
+import { selectInstance, focusInstance, getInstanceByID } from '../../reducers/actions/instances';
+import { getQueries } from '../../reducers/actions/queries';
+import { setTermInfoOpened } from "../../reducers/actions/globals";
+
 const { primaryBg, headerBoxShadow, headerBorderColor } = vars;
+const ACTIONS = toolbarMenu.actions;
 
 const Header = ({setBottomNav}) => {
   const classes = {
@@ -21,6 +29,10 @@ const Header = ({setBottomNav}) => {
   };
 
   const [navShow, setNavShow] = useState(false)
+  const dispatch = useDispatch();
+  const recentSearches = useSelector(state => state.globalInfo.recentSearches)
+  const queries = useSelector(state => state.queries.queries)
+  const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances)
 
   const handleLogoClick = () => {
     console.log('Logo Clicked!')
@@ -36,6 +48,67 @@ const Header = ({setBottomNav}) => {
 
   const handleMenuClick = () => {
     setNavShow(prev => !prev)
+  }
+
+  /**
+   * Handler function triggered when a Menu item is clicked.
+   */
+  const menuHandler = (action, component) => {
+    switch (action.handlerAction){
+      case ACTIONS.SHOW_WIDGET:
+        dispatch(showComponent(action.parameters[0], { status : WidgetStatus.ACTIVE }))
+        break;
+      case ACTIONS.SHOW_COMPONENT:
+        setBottomNav(action.parameters[0])
+        break;
+      case ACTIONS.SHOW_TERM_INFO:{
+        dispatch(setTermInfoOpened(true))
+        break;
+      }
+      case ACTIONS.OPEN_NEW_TAB:
+        action.parameters.map((item, index) => {
+          window.open(item, '_blank');
+        })
+        break;
+      case ACTIONS.SELECT_INSTANCE:{
+        let matchInstance = allLoadedInstances?.find( q => q.metadata?.Id === action.parameters[0] );
+        if (matchInstance ) {
+          focusInstance(action.parameters[0])
+          selectInstance(action.parameters[0])
+        } else {
+          getInstanceByID(action.parameters[0])
+        }
+        break;
+      }
+      case ACTIONS.RUN_QUERY:{
+        let matchQuery = queries?.find( q => q.Id === action.parameters[0] );
+        if ( matchQuery ) {
+          matchQuery.active = true;
+          setBottomNav(2);
+        } else {
+          getQueries({ short_form : action.parameters[0] })
+          setBottomNav(2)
+        }
+        break;
+      }
+      case ACTIONS.HISTORY_MENU_INJECTOR:{
+        var historyList = [];
+        // Add instances to history menu
+        recentSearches?.forEach( i => {
+          historyList.push(
+            {
+              label: i?.label,
+              icon: i?.is_query ? "fa fa-quora" : "fa fa-eye", // TODO : replace with figma icon
+              action: {
+                handlerAction: i?.is_query ? ACTIONS.RUN_QUERY : ACTIONS.SELECT_INSTANCE,
+                parameters: [i?.short_form]
+              }
+            },
+          );
+        })
+        return historyList;
+      }
+    }
   }
 
   return (
@@ -129,7 +202,7 @@ const Header = ({setBottomNav}) => {
         >
           <Menu
             configuration={toolbarMenu}
-            menuHandler={() => {}}
+            menuHandler={menuHandler}
           />
         </Box>
       </Box>

@@ -761,7 +761,7 @@ theme = createTheme({
         root: {
           fontFamily: primaryFont,
           height: '1.5rem',
-          padding: '0 0.5rem',
+          padding: '0.5rem',
           fontWeight: 400,
           fontSize: '0.625rem',
           lineHeight: '133%',

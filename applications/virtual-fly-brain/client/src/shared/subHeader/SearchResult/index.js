@@ -1,8 +1,8 @@
-import { Box, Typography, Chip, Button } from "@mui/material";
+import { Box, Typography, Chip, Tooltip } from "@mui/material";
 import React from "react";
 import vars from "../../../theme/variables";
 import { Search } from "../../../icons";
-import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
+// import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
 
 const facets_annotations_colors = require("../../../components/configuration/VFBColors").facets_annotations_colors;
 
@@ -19,6 +19,26 @@ export const SearchResult = ({ getOptionProps, selectedFilters, groupedOptions, 
 
     return hasTag;
   }
+
+  const renderTooltipChips = (option) => {
+    return <Box display="grid" gridTemplateColumns="auto auto" gap={0.5}>
+      {
+        option?.facets_annotation
+        .slice(chips_cutoff)
+        .map((tag, index) => (
+          <Chip
+            key={tag + index}
+            sx={{
+              lineHeight: '140%',
+              fontSize: '0.625rem',
+              backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color,
+            }}
+            label={tag}
+          />
+        ))
+      }
+    </Box>
+  };
 
   return (
     <Box sx={{
@@ -58,6 +78,7 @@ export const SearchResult = ({ getOptionProps, selectedFilters, groupedOptions, 
               '&:hover': {
                 backgroundColor: secondaryBg,
                 cursor: 'pointer',
+                borderRadius: '0.5rem'
               }
             }}>
               <Box sx={{
@@ -104,17 +125,24 @@ export const SearchResult = ({ getOptionProps, selectedFilters, groupedOptions, 
                 }
                 )}
                 {
-                  option?.facets_annotation?.length > 3 && <Chip sx={{
-                    lineHeight: '140%',
-                    fontSize: '0.625rem',
-                    backgroundColor: searchBoxBg
-                  }} 
-                  label={`+${option?.facets_annotation?.length - chips_cutoff}`}
-                  />
+                  option?.facets_annotation?.length > 3 && <Tooltip 
+                    title={renderTooltipChips(option)} 
+                    placement="bottom-end" 
+                    arrow
+                  >
+                    <Chip 
+                      sx={{
+                        lineHeight: '140%',
+                        fontSize: '0.625rem',
+                        backgroundColor: searchBoxBg
+                      }} 
+                      label={`+${option?.facets_annotation?.length - chips_cutoff}`}
+                    />
+                  </Tooltip>
                 }
               </Box>
 
-              <Button sx={{
+              {/* <Button sx={{
                 color: whiteColor,
                 zIndex: 9,
                 justifyContent: 'flex-end',
@@ -135,7 +163,7 @@ export const SearchResult = ({ getOptionProps, selectedFilters, groupedOptions, 
                   fontSize: '0.75rem',
                   m: 0,
                 }} />
-              </Button>
+              </Button> */}
 
             </Box>
           </Box> : null

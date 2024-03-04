@@ -7,7 +7,8 @@ import vars from "../theme/variables";
 import VFBDownloadContents from "./VFBDownloadContents/VFBDownloadContents";
 import VFBUploader from "./VFBUploader/VFBUploader";
 import QueryBuilder from "./queryBuilder";
-import ErrorModal from "./ErrorModal";
+// import ErrorModal from "./ErrorModal";
+import ErrorDialog from "./ErrorDialog";
 import { getLayoutManagerInstance } from "@metacell/geppetto-meta-client/common/layout/LayoutManager";
 import { addWidget } from '@metacell/geppetto-meta-client/common/layout/actions';
 import { setTermInfoOpened } from './../reducers/actions/globals'
@@ -170,7 +171,8 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
         ) : null}
       </MediaQuery>
       */}
-      <ErrorModal display={modalError} message={modalErrorMessage} />
+      {/* <ErrorModal display={modalError} message={modalErrorMessage} /> */}
+      <ErrorDialog display={modalError} message={modalErrorMessage}/>
       <Modal
         open={modalOpen}
         aria-labelledby="modal-modal-title"

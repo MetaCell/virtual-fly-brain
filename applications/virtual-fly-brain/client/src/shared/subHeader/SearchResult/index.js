@@ -2,7 +2,6 @@ import { Box, Typography, Chip, Tooltip } from "@mui/material";
 import React from "react";
 import vars from "../../../theme/variables";
 import { Search } from "../../../icons";
-// import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
 
 const facets_annotations_colors = require("../../../components/configuration/VFBColors").facets_annotations_colors;
 
@@ -21,7 +20,7 @@ export const SearchResult = ({ getOptionProps, selectedFilters, groupedOptions, 
   }
 
   const renderTooltipChips = (option) => {
-    return <Box display="grid" gridTemplateColumns="auto auto" gap={0.5}>
+    return <>
       {
         option?.facets_annotation
         .slice(chips_cutoff)
@@ -32,12 +31,14 @@ export const SearchResult = ({ getOptionProps, selectedFilters, groupedOptions, 
               lineHeight: '140%',
               fontSize: '0.625rem',
               backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color,
+              marginRight: '0.25rem',
+              marginBottom: '0.25rem'
             }}
             label={tag}
           />
         ))
       }
-    </Box>
+    </>
   };
 
   return (
@@ -125,7 +126,7 @@ export const SearchResult = ({ getOptionProps, selectedFilters, groupedOptions, 
                 }
                 )}
                 {
-                  option?.facets_annotation?.length > 3 && <Tooltip 
+                  option?.facets_annotation?.length > 3 && <Tooltip
                     title={renderTooltipChips(option)} 
                     placement="bottom-end" 
                     arrow
@@ -141,30 +142,6 @@ export const SearchResult = ({ getOptionProps, selectedFilters, groupedOptions, 
                   </Tooltip>
                 }
               </Box>
-
-              {/* <Button sx={{
-                color: whiteColor,
-                zIndex: 9,
-                justifyContent: 'flex-end',
-                background: listHover,
-                borderRadius: '0.25rem',
-                width: '5.8125rem',
-                minWidth: '0.0625rem',
-                p: '0 0.75rem 0 0',
-                height: '100%',
-                position: 'absolute',
-                right: 0,
-                top: 0,
-                '&:hover': {
-                  background: listHover
-                }
-              }} variant='text'>
-                <ArrowOutwardIcon sx={{
-                  fontSize: '0.75rem',
-                  m: 0,
-                }} />
-              </Button> */}
-
             </Box>
           </Box> : null
         ))}

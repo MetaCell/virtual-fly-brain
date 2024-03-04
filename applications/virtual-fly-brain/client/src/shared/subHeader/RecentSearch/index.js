@@ -1,4 +1,4 @@
-import { Box, Typography, Chip, Button } from "@mui/material";
+import { Box, Typography, Chip, Tooltip } from "@mui/material";
 import React from "react";
 import vars from "../../../theme/variables";
 import { Search } from "../../../icons";
@@ -18,6 +18,28 @@ export const RecentSearch = ({ getOptionProps, selectedFilters, recentSearches, 
 
     return hasTag;
   }
+
+  const renderTooltipChips = (option) => {
+    return <>
+      {
+        option?.facets_annotation
+        .slice(chips_cutoff)
+        .map((tag, index) => (
+          <Chip
+            key={tag + index}
+            sx={{
+              lineHeight: '140%',
+              fontSize: '0.625rem',
+              backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color,
+              marginRight: '0.25rem',
+              marginBottom: '0.25rem'
+            }}
+            label={tag}
+          />
+        ))
+      }
+    </>
+  };
 
   return (
     <Box sx={{
@@ -106,37 +128,21 @@ export const RecentSearch = ({ getOptionProps, selectedFilters, recentSearches, 
                     />
                 }
                 )}
-                <Chip sx={{
-                  lineHeight: '140%',
-                  fontSize: '0.625rem',
-                  backgroundColor: searchBoxBg
-                }} label={`+${option?.facets_annotation?.length - chips_cutoff}`}
-                />
-              </Box>
-
-              <Button sx={{
-                color: whiteColor,
-                zIndex: 9,
-                justifyContent: 'flex-end',
-                background: listHover,
-                borderRadius: '0.25rem',
-                width: '5.8125rem',
-                minWidth: '0.0625rem',
-                p: '0 0.75rem 0 0',
-                height: '100%',
-                position: 'absolute',
-                right: 0,
-                top: 0,
-                '&:hover': {
-                  background: listHover
+                {
+                  option?.facets_annotation?.length > 3 && <Tooltip
+                  arrow
+                  placement="bottom-end"
+                  title={renderTooltipChips(option)}
+                >
+                  <Chip sx={{
+                    lineHeight: '140%',
+                    fontSize: '0.625rem',
+                    backgroundColor: searchBoxBg
+                  }} label={`+${option?.facets_annotation?.length - chips_cutoff}`}
+                  />
+                </Tooltip>
                 }
-              }} variant='text'>
-                <ArrowOutwardIcon sx={{
-                  fontSize: '0.75rem',
-                  m: 0,
-                }} />
-              </Button>
-
+              </Box>
             </Box>
           </Box>
         ))}

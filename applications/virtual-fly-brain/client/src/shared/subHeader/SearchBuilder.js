@@ -144,6 +144,7 @@ export default function SearchBuilder(props) {
   const [lastSearch, setLastSearch] = React.useState("");
   const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances);
   const queries = useSelector(state => state.queries.queries);
+  const [hasFocus,setHasFocus] = React.useState(false);
   const globalRecentSearches = useSelector( state => state.globalInfo.recentSearches)
   const dispatch = useDispatch();
 
@@ -254,7 +255,7 @@ export default function SearchBuilder(props) {
   }
 
   const handleFocused = (focused) => {
-    props.setFocused(focused);
+    setHasFocus(focused)
   }
 
   const {
@@ -270,13 +271,25 @@ export default function SearchBuilder(props) {
     multiple: true,
     open: isOpen,
     options: searchResults,
+    onBlur : (event) => console.log("Event blur ", event),
+    clearOnBlur: false,
     getOptionLabel: (option) => option?.label,
     onInputChange : event => handleSearch(event.target.value)
   });
 
   React.useEffect(() => {
     handleFocused(focused);
+    setIsOpen(focused)
   }, [focused])
+
+  React.useEffect(() => {
+    handleFocused(props.filterOpened);
+    setIsOpen(props.filterOpened)
+  }, [props.filterOpened])
+
+  React.useEffect(() => {
+    handleFocused(props.filterOpened);
+  }, [!props.filterOpened])
 
   return (
     <Box flexGrow={1}>
@@ -314,7 +327,7 @@ export default function SearchBuilder(props) {
           <input placeholder='Find something...' {...getInputProps()}/>
         </InputWrapper>
       </Box>
-      { focused && isOpen ? (
+      { isOpen ? (
         <Listbox
           className='scrollbar'
           {...getListboxProps()}

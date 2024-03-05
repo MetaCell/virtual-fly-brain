@@ -7,17 +7,22 @@ import { filters } from "./configuration";
 
 const { primaryBg, outlinedBtnTextColor, bottomNavBg, tabActiveColor, whiteColor } = vars;
 
-export const FilterMenu  = ({ classes , setSelectedFilters }) => {
+export const FilterMenu  = ({ classes , setSelectedFilters, setFilterOpened }) => {
   const [filterAnchorEl, setFilterAnchorEl] = React.useState(null);
   const [selection, setSelection] = React.useState({})
   const tags = filters[0].values;
-  const filterhandleClick = (event) => {
+  const filterhandleClick = (event, closePanel) => {
+    let opened = true;
+    filterAnchorEl ? opened = false : opened = true;
+
+    setFilterOpened(closePanel)
     setFilterAnchorEl(filterAnchorEl ? null : event.currentTarget);
     setSelectedFilters(selection)
   };
 
   const cleanAll = (event) => {
     let updatedSelection = {};
+    filterhandleClick(event, true)
     setSelection(updatedSelection)
   };
 
@@ -46,7 +51,7 @@ export const FilterMenu  = ({ classes , setSelectedFilters }) => {
     >
       <Button
         aria-describedby={filterId}
-        onClick={(e) => filterhandleClick(e)}
+        onClick={(e) => filterhandleClick(e, true)}
         sx={{
           ...classes.shortcut,
           flexShrink: 0,
@@ -80,7 +85,9 @@ export const FilterMenu  = ({ classes , setSelectedFilters }) => {
             minWidth: '0.0625rem'
           }}
           onClick={() => {
+            setFilterOpened(false)
             setFilterAnchorEl(null)
+            setSelectedFilters(selection)
             }
           }
         >
@@ -113,7 +120,7 @@ export const FilterMenu  = ({ classes , setSelectedFilters }) => {
               lineHeight: '133%',
             }}
           >Filters</Typography>
-          <IconButton size="small" onClick={(e) => filterhandleClick(e)}>
+          <IconButton size="small" onClick={(e) => filterhandleClick(e, true)}>
             <Undo />
           </IconButton>
         </Box>
@@ -159,7 +166,7 @@ export const FilterMenu  = ({ classes , setSelectedFilters }) => {
             Clean all
           </Button>
           <Button
-            onClick={(e) => filterhandleClick(e)}
+            onClick={(e) => filterhandleClick(e, true)}
             variant="outlined"
             color="primary"
             sx={{

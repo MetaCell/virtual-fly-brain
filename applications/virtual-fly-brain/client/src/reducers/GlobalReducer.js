@@ -35,6 +35,13 @@ const GlobalReducer = (state = initialStateGlobalReducer, response) => {
           recentSearches: updateRecentSearches
       })
     }
+    case getGlobalTypes.REMOVE_RECENT_SEARCH:{
+      let updateRecentSearches = [...state.recentSearches];
+      let update = updateRecentSearches?.filter( r => r.id !== response.payload.id);
+      return Object.assign({}, state, {
+        recentSearches: update
+    })
+    }
      default:
         return state;
   }

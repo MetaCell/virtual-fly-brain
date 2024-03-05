@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import Menu from "@metacell/geppetto-meta-ui/menu/Menu";
 import { connect } from 'react-redux';
 import { ChromePicker } from 'react-color';
-import { getInstanceByID, removeInstanceByID, selectInstance, changeColor,
+import { removeInstanceByID, selectInstance, changeColor,
   show3DMesh, hide3DMesh, focusInstance, show3DSkeleton, hide3DSkeleton } from '../../reducers/actions/instances';
 import { NEURON , RGBAToHexA} from "./../../utils/constants"
 
@@ -153,7 +153,7 @@ class ListViewerControlsMenu extends Component {
     let updatedButtons = buttons.map((button, index) => {
       const updatedButton = {...button}
       if ( self.props.allLoadedInstances?.find( i => i.metadata?.Id == self.props.instance) !== undefined ) {
-        updatedButton.activeColor = RGBAToHexA(self.props.allLoadedInstances?.find( i => i.metadata?.Id == self.props.instance)?.simpleInstance?.color);
+        updatedButton.activeColor = RGBAToHexA(self.props.allLoadedInstances?.find( i => i.metadata?.Id == self.props.instance)?.color);
         updatedButton.list.map(item => {
           // Iterate through button list in configuration, store new configuration in 'list' array
           this.iterateConfList(list, item);

@@ -3,6 +3,10 @@ import { Box, Button, Chip, IconButton, List, ListItem, ListItemButton, ListItem
 import { AddChart, Delete, More, OpenInNew, Search, SplitScreen } from "../../icons";
 import vars from "../../theme/variables";
 import { useDispatch, useSelector } from "react-redux";
+import { selectInstance } from "../../reducers/actions/instances";
+import { getQueries } from "../../reducers/actions/queries"
+import { removeRecentSearch } from "../../reducers/actions/globals";
+
 const {
   secondaryBg,
   searchBoxBg,
@@ -14,14 +18,20 @@ export const Item = ({
   index,
 }) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances)
+  const dispatch = useDispatch();
 
   const handleClick = (event, isQuery, id) => {
     setAnchorEl(anchorEl ? null : event.currentTarget);
+    if(isQuery){
+      getQueries({ short_form : id })
+    } else if ( !isQuery && id ) {
+      selectInstance(id)
+    }
   };
 
   const removeFromHistory = (event, id) => {
     setAnchorEl(anchorEl ? null : event.currentTarget);
+    dispatch(removeRecentSearch(id))
   };
 
   const open = Boolean(anchorEl);
@@ -102,7 +112,7 @@ export const Item = ({
             padding: 0
           }}
           size="small"
-          onClick={handleClick}
+          onClick={(event) => handleClick(event)}
           aria-describedby={id}
         >
           <More />

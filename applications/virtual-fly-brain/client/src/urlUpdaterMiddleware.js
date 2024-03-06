@@ -2,13 +2,24 @@ import { getInstancesTypes } from './reducers/actions/types/getInstancesTypes';
 import { getQueriesTypes } from './reducers/actions/types/getQueriesTypes';
 import { getInstanceByID } from './reducers/actions/instances';
 import { get3DMesh } from './reducers/actions/instances';
+import { show3DMesh } from './reducers/actions/instances';
 import { get_instance } from './network/query';
 
 function updateUrlParameterWithCurrentUrl(param, value) {
   const urlObj = new URL(window.location.href);
-  urlObj.searchParams.set(param, value);
+  if (urlObj.searchParams.has(param)) {
+    const existingValue = urlObj.searchParams.get(param);
+    const existingValuesArray = existingValue.split(',');
+    const newValuesArray = value.split(',');
+    const mergedValuesArray = [...new Set(existingValuesArray.concat(newValuesArray))];
+    const updatedValue = mergedValuesArray.join(',');
+    urlObj.search = urlObj.search.replace(new RegExp(`${param}=[^&]*`), `${param}=${updatedValue}`);
+  } else {
+    urlObj.searchParams.set(param, value);
+  }
   window.history.replaceState(null, '', urlObj.toString());
 }
+
 async function fetchAndDispatchMeshes(threeDMeshes) {
   for (const id of threeDMeshes) {
     const instance = await get_instance(id);
@@ -87,7 +98,9 @@ export const urlUpdaterMiddleware = store => next => action => {
   }
 
   if (action.type === getInstancesTypes.GET_3D_OBJ_TYPE_SUCCESS) {
-    updateUrlParameterWithCurrentUrl("i", action.payload.id);
+    const threeDMeshId = action.payload.id ;
+    updateUrlParameterWithCurrentUrl("i", threeDMeshId);
+    show3DMesh(threeDMeshId);
   }
 
   if (action.type === getQueriesTypes.UPDATE_QUERIES || action.type === getQueriesTypes.GET_QUERIES_SUCCESS) {

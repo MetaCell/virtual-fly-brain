@@ -22,8 +22,8 @@ function updateUrlParameterWithCurrentUrl(param, value) {
 
 async function fetchAndDispatchMeshes(threeDMeshes) {
   for (const id of threeDMeshes) {
-    const instance = await get_instance(id);
-    get3DMesh(instance);
+    //const instance = await get_instance(id);
+    getInstanceByID(id);
   }
 }
 
@@ -95,6 +95,7 @@ export const urlUpdaterMiddleware = store => next => action => {
   if (action.type === getInstancesTypes.GET_INSTANCES_SUCCESS) {
     let idToUpdate = action.payload.Id;
     updateUrlParameterWithCurrentUrl("id", idToUpdate);
+    get3DMesh(action.payload);
   }
 
   if (action.type === getInstancesTypes.GET_3D_OBJ_TYPE_SUCCESS) {

@@ -481,9 +481,9 @@ const ROIBrowser = (props) => {
                                 }
                                 
                                 if ( instanceFound ) {
-                                    getInstanceByID(rowInfo.node.instanceId);
+                                    getInstanceByID(rowInfo.node.instanceId, true);
                                 } else {
-                                    getInstanceByID(rowInfo.node.instanceId);
+                                    getInstanceByID(rowInfo.node.instanceId, true);
                                 }
                                 setState({ ...state, nodeSelected : rowInfo.node });
                             }}

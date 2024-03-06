@@ -37,8 +37,8 @@ export const get_instance = async (short_form) => {
   return response;
 }
 
-export const get_3d_mesh = async (targetInstance) => {
-  let response = await fetch(targetInstance?.Images?.[Object.keys(targetInstance?.Images)[0]][0].obj)
+export const get_3d_mesh = async (targetInstance, objURL) => {
+  let response = await fetch(objURL)
     .then(response => response.text())
     .then(base64Content => {
       const instance = {

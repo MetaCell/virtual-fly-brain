@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 // import CameraControls from "@metacell/geppetto-meta-ui/camera-controls/CameraControls";
-import SimpleInstance from "@metacell/geppetto-meta-core/model/SimpleInstance";
 import { withStyles } from '@material-ui/core';
 import { applySelection, mapToCanvasData } from "@metacell/geppetto-meta-ui/3d-canvas/utils/SelectionUtils"
 import { connect } from 'react-redux';
@@ -11,9 +10,7 @@ import Canvas from "@metacell/geppetto-meta-ui/3d-canvas/Canvas";
 import { getInstancesTypes } from '../reducers/actions/types/getInstancesTypes';
 import SharkViewer, { swcParser } from '@janelia/sharkviewer';
 import * as THREE from 'three';
-import { SKELETON, CYLINDERS } from "./../utils/constants"
-import { get3DMesh, add3DSkeleton } from '../reducers/actions/instances';
-import Resources from '@metacell/geppetto-meta-core/Resources';
+import { add3DSkeleton } from '../reducers/actions/instances';
 
 const {
   whiteColor,

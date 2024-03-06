@@ -19,7 +19,7 @@ export const getProxyInstances = (loadedInstances, instances) => {
   return window.Instances.map(i => (
     { ...i,
       instancePath: i.getId(),
-      visibility : loadedInstances?.find( cd => cd.metadata?.Id === i.getId())?.visible,
+      visibility : loadedInstances?.find( cd => cd.metadata?.Id === i.getId())?.visibleMesh,
       color : instances?.find( cd => cd.metadata?.Id === i.getId())?.color
     }
   ))

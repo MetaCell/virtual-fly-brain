@@ -10,6 +10,8 @@ import layout from './components/layout/layout';
 import componentMap from './components/layout/componentMap'; 
 import GraphReducer, { initialStateGraphReducer} from './reducers/GraphReducer';
 
+import vfbMiddleware from './reducers/middleware/vfbMiddleware';
+
 const INIT_STATE = {
   globalInfo: initialStateGlobalReducer,
   instances: initialStateInstancesReducer,
@@ -28,7 +30,7 @@ const isMinimizeEnabled = true;
 const store = createStore(
   reducers,
   INIT_STATE,
-  [urlUpdaterMiddleware],
+  [vfbMiddleware, urlUpdaterMiddleware],
   { layout, componentMap, isMinimizeEnabled }
 )
 

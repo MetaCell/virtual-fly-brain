@@ -50,7 +50,7 @@ class VFBListViewer extends Component {
   }
   
   render () {
-    const instances = this.props.allLoadedInstances.map(instance => ({
+    const instances = this.props.allLoadedInstances.filter(i => i.meshCreated).map(instance => ({
       "path": instance.metadata.Id,
       "name": instance.metadata.Name,
       "types" : instance.metadata.Meta.Types,
@@ -66,7 +66,7 @@ class VFBListViewer extends Component {
         instances={instances}
         className = "vfbListViewer"
         handler={this}
-        filter={() => true}
+        filter={(instance) => true }
         filterFn={() => console.log("Filtering")}
         columnConfiguration={this.getColumnConfiguration()}
         infiniteScroll={true}

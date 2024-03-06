@@ -3,9 +3,9 @@ import { Box, Button, Chip, IconButton, List, ListItem, ListItemButton, ListItem
 import { AddChart, Delete, More, OpenInNew, Search, SplitScreen } from "../../icons";
 import vars from "../../theme/variables";
 import { useDispatch, useSelector } from "react-redux";
-import { selectInstance } from "../../reducers/actions/instances";
+import { selectInstance, getInstanceByID,focusInstance  } from "../../reducers/actions/instances";
 import { getQueries } from "../../reducers/actions/queries"
-import { removeRecentSearch } from "../../reducers/actions/globals";
+import { removeRecentSearch, setQueryComponentOpened } from "../../reducers/actions/globals";
 
 const {
   secondaryBg,
@@ -19,19 +19,33 @@ export const Item = ({
 }) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const dispatch = useDispatch();
-
+  const queries = useSelector(state => state.queries.queries);
+  const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances);
+  
   const handleClick = (event, isQuery, id) => {
     setAnchorEl(anchorEl ? null : event.currentTarget);
     if(isQuery){
-      getQueries({ short_form : id })
+      let matchQuery = queries?.find( q => q.Id === id );
+      if ( matchQuery ) {
+        matchQuery.active = true;
+      } else {
+        getQueries({ short_form : id })
+      }
+      dispatch(setQueryComponentOpened(true));
     } else if ( !isQuery && id ) {
-      selectInstance(id)
+      let matchInstance = allLoadedInstances?.find( q => q.metadata?.Id === id );
+      if (matchInstance ) {
+        focusInstance(id)
+        selectInstance(id)
+      } else {
+        getInstanceByID(id, true)
+      }
     }
   };
 
-  const removeFromHistory = (event, id) => {
+  const removeFromHistory = (event, id, isQuery) => {
     setAnchorEl(anchorEl ? null : event.currentTarget);
-    dispatch(removeRecentSearch(id))
+    dispatch(removeRecentSearch(id, isQuery))
   };
 
   const open = Boolean(anchorEl);
@@ -84,6 +98,7 @@ export const Item = ({
         {search?.facets_annotation?.length > 2 ? (
           <Tooltip
             placement="bottom-end"
+            componentsProps={{ tooltip: { sx: { overflow : "auto" } } }} 
             arrow
             title={
               <Box sx={{
@@ -158,7 +173,7 @@ export const Item = ({
             :
             null }
             <ListItem>
-              <ListItemButton onClick={(event) => removeFromHistory(event, search?.short_form)}>
+              <ListItemButton onClick={(event) => removeFromHistory(event, search?.short_form,  search?.is_query )}>
                 <ListItemIcon sx={{
                   minWidth: '0.0625rem',
                   padding: '0 0.375rem 0 0'

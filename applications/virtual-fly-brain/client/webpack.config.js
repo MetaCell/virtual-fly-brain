@@ -17,7 +17,7 @@ module.exports = function webpacking(envVariables) {
   }
 
   const API_URL = {
-    production: JSON.stringify('https://vfb.dev.metacell.us/'),
+    production: JSON.stringify('http://localhost:8080/'),
     development: JSON.stringify('http://localhost:8080/')
   }
   

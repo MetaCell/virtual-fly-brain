@@ -106,8 +106,4 @@ export const urlUpdaterMiddleware = store => next => action => {
   if (action.type === getQueriesTypes.UPDATE_QUERIES || action.type === getQueriesTypes.GET_QUERIES_SUCCESS) {
     updateUrlParameterWithCurrentUrl("q", action.payload.shortform);
   }
-
-  if (action.type === getQueriesTypes.UPDATE_QUERIES || action.type === getQueriesTypes.GET_QUERIES_SUCCESS) {
-    updateUrlParameterWithCurrentUrl("q", action.payload.shortform);
-  }
 };

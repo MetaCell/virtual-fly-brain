@@ -16,19 +16,7 @@ const {
 
 
 const VFBStackViewer = (props) => {
-  const classes = {
-    root: {
-      height: 'calc(100% - 0.5rem)',
-      width : '400px',
-      color: whiteColor
-    }
-  }
-
   const stackViewerData = useSelector(state => state.instances.stackViewerData)
-  const fields = useSelector((state) => state.WHATEVER_REDUCER);
-  const stackRef = useRef();
-  const layout = props.layout;
-  const stackMD = "/org.geppetto.frontend/geppetto/extensions/geppetto-vfb/mdHelpFiles/stack.md";
   let config = {
     serverUrl: 'http://www.virtualflybrain.org/fcgi/wlziipsrv.fcgi',
     templateId: 'NOTSET'
@@ -38,15 +26,6 @@ const VFBStackViewer = (props) => {
   const [stackData, setStackData] = React.useState({
     id: props.id, height: props.size?.height, width: props.size?.width, instances: [], selected: []
   });
-
-  const [prevData, setPrevData]= React.useState(false)
-
-  const [canvasRef, setCanvasRef] = React.useState(props.canvasRef);
-  
-  // TODO : Ref or redux?
-  const updateCanvasRef = (newRef) => {
-    setCanvasRef(newRef);
-  }
 
   const addSlices = (instances) => {
     let added = undefined;
@@ -73,22 +52,6 @@ const VFBStackViewer = (props) => {
     setStackData(data);
   }
 
-  const removeSlice = (path) => {
-    let data = stackData;
-    data?.instances?.forEach( i => {
-      try {
-        if (data?.instances[i]?.parent?.getId() == path?.split('.')?.[0]){
-          data.instances.splice(i,1);
-        }
-      } catch (ignore){ // handling already deleted instance
-      }
-    });
-    setStackData(data);
-  }
-  
-  // TODO : Handle if connection is closed, and reload page.
-  const checkConnection = () => {}
-
   const updateStackWidget = () => {
     addSlices(getSliceInstances());
   }
@@ -99,8 +62,8 @@ const VFBStackViewer = (props) => {
     let instances = stackData.instances;
     let potentialInstances = instances;
     // window.GEPPETTO.ModelFactory.getAllPotentialInstancesEndingWith('_slices');
-    var sliceInstances = [];
-    var instance;
+    let sliceInstances = [];
+    let instance;
     // FIXME
     if (templateID !== undefined) {
       // Template ID must always be on top
@@ -108,7 +71,7 @@ const VFBStackViewer = (props) => {
         return x.includes(templateID) ? -1 : y.includes(templateID) ? 1 : 0;
       });
 
-      for (var i = 0; i < potentialInstances?.length; i++) {
+      for (let i = 0; i < potentialInstances?.length; i++) {
         instance = potentialInstances[i];
         if (instance) {
           sliceInstances.push(instance);
@@ -123,7 +86,6 @@ const VFBStackViewer = (props) => {
   // FIXME
   useEffect( () => {
     let instances = stackData.instances;
-    let match = instances?.find( i => i.wrappedObj.id?.includes(stackViewerData?.metadata?.Id) );
     if (stackViewerData?.metadata?.Id !== stackData?.id && stackViewerData?.metadata?.Images && stackViewerData?.metadata?.IsTemplate) {
       let keys = Object.keys(stackViewerData.metadata?.Images);
 
@@ -213,39 +175,12 @@ const VFBStackViewer = (props) => {
 
   const StackComponent = StackViewerComponent();
   return (
-    <Box
-      sx={{
-        ...classes.root,
-        background: {
-          lg: blackColor
-        },
-        p: {
-          xs: 2,
-          lg: 0
-        },
-        borderColor: {
-          lg: secondaryBg
-        },
-        borderStyle: {
-          lg: 'solid'
-        },
-        borderRadius: {
-          lg: 2
-        },
-        borderWidth: {
-          xs: 0,
-          lg: '0.0625rem 0.0625rem 0 0'
-        }
-      }}
-    >
-      Stack Viewer
-      { stackData?.instances?.length > 0 ? <StackComponent
+      stackData?.instances?.length > 0 ? <StackComponent
       data={stackData}
       height={stackData.height}
       width={stackData.width}
       config={config}
-      voxel={voxelSize}/> : null }
-    </Box>
+      voxel={voxelSize}/> : null
   )
 }
 

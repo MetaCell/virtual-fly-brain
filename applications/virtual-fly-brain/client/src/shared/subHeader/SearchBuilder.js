@@ -271,25 +271,18 @@ export default function SearchBuilder(props) {
     multiple: true,
     open: isOpen,
     options: searchResults,
-    onBlur : (event) => console.log("Event blur ", event),
-    clearOnBlur: false,
     getOptionLabel: (option) => option?.label,
     onInputChange : event => handleSearch(event.target.value)
   });
 
   React.useEffect(() => {
+    console.log("Focused changed ", focused)
     handleFocused(focused);
-    setIsOpen(focused)
   }, [focused])
 
   React.useEffect(() => {
     handleFocused(props.filterOpened);
-    setIsOpen(props.filterOpened)
   }, [props.filterOpened])
-
-  React.useEffect(() => {
-    handleFocused(props.filterOpened);
-  }, [!props.filterOpened])
 
   return (
     <Box flexGrow={1}>
@@ -327,7 +320,7 @@ export default function SearchBuilder(props) {
           <input placeholder='Find something...' {...getInputProps()}/>
         </InputWrapper>
       </Box>
-      { isOpen ? (
+      { hasFocus && isOpen ? (
         <Listbox
           className='scrollbar'
           {...getListboxProps()}

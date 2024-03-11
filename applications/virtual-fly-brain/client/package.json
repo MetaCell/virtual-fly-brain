@@ -41,7 +41,7 @@
     "html-to-image": "^1.10.4",
     "pixi.js": "^7.2.3",
     "react": "^18.2.0",
-    "react-color" : "2.19.3",
+    "react-color" : "^3.0.0-beta.3",
     "react-dom": "^18.2.0",
     "react-fontawesome": "^1.6.1",
     "react-force-graph-2d": ">=1.23.8",

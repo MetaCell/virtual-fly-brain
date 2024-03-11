@@ -493,16 +493,14 @@ const TermInfo = ({ open, setOpen }) => {
                           { displayColorPicker ?
                           <ChromePicker
                             color={getInstance()?.simpleInstance?.color}
+                            disableAlpha={true}
                             onChangeComplete={ (color, event) => {
                               let rgb;
-                              if ( color.source === "hsv" ){
+                              if ( event.target.className != 'hue-horizontal' ) {
                                 rgb = { r:color.rgb.r/255, g:color.rgb.g/255, b:color.rgb.b/255, a:color.rgb.a }
                                 changeColor(termInfoData?.metadata?.Id, rgb)
                                 setDisplayColorPicker(false)
-                              } else if ( color.source === "hsl" ) {
-                                rgb = color.rgb;
-                                changeColor(termInfoData?.metadata?.Id, rgb)
-                              }                              
+                              }                           
                             }}
                             style={{ zIndex: 10 }}/>
                             : null

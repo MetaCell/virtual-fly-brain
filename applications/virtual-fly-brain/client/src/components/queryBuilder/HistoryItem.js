@@ -26,6 +26,7 @@ export const Item = ({
     setAnchorEl(anchorEl ? null : event.currentTarget);
     if(isQuery){
       let matchQuery = queries?.find( q => q.Id === id );
+      queries?.forEach( q => q.active = false )
       if ( matchQuery ) {
         matchQuery.active = true;
       } else {

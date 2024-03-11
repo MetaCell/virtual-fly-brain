@@ -5,8 +5,8 @@ import { Box, Button, ButtonGroup, IconButton, InputAdornment, Pagination, Pagin
 import Query from "./Query";
 import History from "./History";
 import vars from "../../theme/variables";
-import { useSelector } from 'react-redux'
-
+import { useDispatch, useSelector } from 'react-redux'
+import { setQueryComponentOpened } from "../../reducers/actions/globals";
 
 const { secondaryBg, outlinedBtnTextColor, headerBorderColor, blackColor, queryBuilderBg, whiteColor, primaryBg } = vars;
 
@@ -47,10 +47,17 @@ function a11yProps(index) {
 const QueryBuilder = ({ fullWidth, bottomNav, setBottomNav, tabSelected }) => {
   const [value, setValue] = React.useState(tabSelected || 0);
   const queries = useSelector(state => state.queries.queries);
-
+  const dispatch = useDispatch();
+  
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+
+  const handleClose = (event) => {
+    dispatch(setQueryComponentOpened(false));
+    setBottomNav(undefined);
+  }
+
   const classes = {
     root: {
       display: 'flex',
@@ -124,7 +131,7 @@ const QueryBuilder = ({ fullWidth, bottomNav, setBottomNav, tabSelected }) => {
 
         }}>
           <Button
-            onClick={() => setBottomNav(undefined)}
+            onClick={handleClose}
             sx={{
               height: 'auto',
               borderRight: `0.0625rem solid ${primaryBg}`,

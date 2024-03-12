@@ -3,14 +3,14 @@ import Menu from "@metacell/geppetto-meta-ui/menu/Menu";
 import { connect } from 'react-redux';
 import { ChromePicker } from 'react-color';
 import { removeInstanceByID, selectInstance, changeColor,
-  show3DMesh, hide3DMesh, focusInstance, show3DSkeleton, hide3DSkeleton } from '../../reducers/actions/instances';
+  show3DMesh, hide3DMesh, focusInstance, show3DSkeleton, hide3DSkeleton, show3D, hide3D } from '../../reducers/actions/instances';
 import { NEURON , RGBAToHexA} from "./../../utils/constants"
 
 const controlsConfiguration = require('../configuration/VFBListViewer/controlsMenuConfiguration').default;
 const ACTIONS = controlsConfiguration.actions;
 
 /**
- * Menu component to display controls for VFB List Viewer
+ * Menu component to display controls for VFB Layers
  */
 class ListViewerControlsMenu extends Component {
   constructor (props) {
@@ -48,10 +48,10 @@ class ListViewerControlsMenu extends Component {
   menuHandler (action, component) {
     switch (action.handlerAction){
     case ACTIONS.SHOW:
-      show3DMesh(this.props.instance)
+      show3D(this.props.instance)
       break;
     case ACTIONS.HIDE:
-      hide3DMesh(this.props.instance)
+      hide3D(this.props.instance)
       break;
     case ACTIONS.SELECT:
       selectInstance(this.props.instance);

@@ -3,6 +3,8 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Chip from '@material-ui/core/Chip';
 import ListViewerControlsMenu from '../../VFBListViewer/ListViewerControlsMenu';
 import { Typography } from '@mui/material';
+import Link from '@mui/material/Link';
+import { focusInstance } from '../../../reducers/actions/instances';
 
 const facets_annotations_colors = require("../VFBColors").facets_annotations_colors;
 
@@ -41,9 +43,24 @@ const conf = [
     id: "name",
     title: "Name",
     customComponent: component => {
-      const entityName = component.value._root.entries.find( e=> e[0] == "name")[1] ;
-      return <div  style={{ width: "100%", textAlign: "left", float: "left" }} onClick={e => click(e)}>
-          <Typography variant="subtitle1">{entityName}</Typography>
+      const entityName = component.value._root.entries.find( e=> e[0] == "name")[1];
+      const entityPath = component.value._root.entries.find( e=> e[0] == "path")[1];
+
+      console.log(component.value._root.entries)
+      return <div style={{ width: "100%", textAlign: "left", float: "left" }}>
+          <Link 
+            component="button"
+            underline='none'
+            variant="subtitle1"
+            sx={{
+              textAlign : "left",
+              float : "left"
+            }}
+            onClick={() => {
+              focusInstance(entityPath);
+            }}>
+            {entityName}
+          </Link>
         </div>
     },
     source : entity => entity
@@ -54,13 +71,22 @@ const conf = [
     customComponent: component => {
 
       const entityType = component.value._root.entries.find( e=> e[0] == "types")[1]?.match(/\[(.*?)\]/)[1];
+      const entityPath = component.value._root.entries.find( e=> e[0] == "path")[1];
       const tags = component.value._root.entries.find( e=> e[0] == "tags")[1];
       const chips_cutoff = 3;
-      return <div style={{ width: "100%" }}>
+      return <div style={{ width: "100%", textAlign: "left", float: "left" }}>
         <div style={{ textAlign: "left", float: "left" }}>
-          <Typography variant="subtitle1">{entityType}</Typography>
+          <Link 
+            component="button"
+            underline='none'
+            variant="subtitle1"
+            onClick={() => {
+              focusInstance(entityPath);
+            }}>
+            {entityType}
+          </Link>
         </div>
-        <div style={{ textAlign: "right", float: "right" }}> 
+        <div style={{ textAlign: "left", float: "left" }}> 
         {tags?.slice(0,chips_cutoff).map((tag, index) => {
           return (<Chip
             key={tag + index}

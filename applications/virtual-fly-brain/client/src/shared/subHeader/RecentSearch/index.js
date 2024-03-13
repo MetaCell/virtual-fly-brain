@@ -31,6 +31,7 @@ export const RecentSearch = ({ getOptionProps, selectedFilters, recentSearches, 
               lineHeight: '140%',
               fontSize: '0.625rem',
               backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color,
+              color: facets_annotations_colors[tag]?.textColor || facets_annotations_colors?.default?.textColor,
               marginRight: '0.25rem',
               marginBottom: '0.25rem'
             }}
@@ -122,7 +123,8 @@ export const RecentSearch = ({ getOptionProps, selectedFilters, recentSearches, 
                       sx={{
                         lineHeight: '140%',
                         fontSize: '0.625rem',
-                        backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color
+                        backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color,
+                        color: facets_annotations_colors[tag]?.textColor || facets_annotations_colors?.default?.textColor
                       }}
                       label={tag}
                     />

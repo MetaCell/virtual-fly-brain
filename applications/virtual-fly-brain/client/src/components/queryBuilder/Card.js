@@ -6,6 +6,7 @@ import { useState } from "react";
 import FullScreenViewer from "./FullScreenViewer";
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import { Compare } from "../../icons";
+import { getUpdatedTags } from "../../utils/utils";
 
 const {
   listHeadingColor,
@@ -17,7 +18,8 @@ const {
   outlinedBtnTextColor
 } = vars;
 
-const facets_annotations_colors = require("../configuration/VFBColors").facets_annotations_colors;
+const colors_config = require("../configuration/VFBColors").facets_annotations_colors;
+const facets_annotations_colors = getUpdatedTags(colors_config)
 
 const QueryCard = ({ fullWidth, facets_annotation, query }) => {
   const [toggleReadMore, setToggleReadMore] = useState(false);
@@ -263,7 +265,8 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
                   sx={{
                     lineHeight: '140%',
                     fontSize: '0.625rem',
-                    backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color
+                    backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color,
+                    color: facets_annotations_colors[tag]?.textColor || facets_annotations_colors?.default?.textColor
                   }}
                   label={tag} />
                 ))}
@@ -278,7 +281,8 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
                           sx={{
                             lineHeight: '140%',
                             fontSize: '0.625rem',
-                            backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color
+                            backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color,
+                            color: facets_annotations_colors[tag]?.textColor || facets_annotations_colors?.default?.textColor
                           }}
                           label={tag} />
                       ))}

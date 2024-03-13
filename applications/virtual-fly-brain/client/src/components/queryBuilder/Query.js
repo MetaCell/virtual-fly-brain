@@ -5,10 +5,11 @@ import { Cross } from "../../icons";
 import QueryHeader from "./QueryHeader";
 import vars from "../../theme/variables";
 import Filter from "./Filter";
+import { getUpdatedTags } from "../../utils/utils";
 
 const { headerBorderColor, searchHeadingColor, secondaryBg, listHeadingColor, primaryBg } = vars;
-const facets_annotations_colors = require("../configuration/VFBColors").facets_annotations_colors;
-
+const colors_config = require("../configuration/VFBColors").facets_annotations_colors;
+const facets_annotations_colors = getUpdatedTags(colors_config)
 
 export const dividerStyle = {
   height: '0.875rem', width: '0.0625rem', background: listHeadingColor, borderRadius: '0.125rem'
@@ -71,8 +72,10 @@ const Query = ({ fullWidth, queries }) => {
                   fontSize: '0.625rem',
                   backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color,
                   height: '1.25rem',
+                  color: facets_annotations_colors[tag]?.textColor || facets_annotations_colors?.default?.textColor,
                   '&:hover': {
-                    backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color
+                    backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color,
+                    color: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.textColor
                   }
                 }}
                 label={tag} />
@@ -96,7 +99,8 @@ const Query = ({ fullWidth, queries }) => {
                         sx={{
                           lineHeight: '140%',
                           fontSize: '0.625rem',
-                          backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color
+                          backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color,
+                          color: facets_annotations_colors[tag]?.textColor || facets_annotations_colors?.default?.textColor
                         }}
                         label={tag} />
                     ))}

@@ -3,8 +3,10 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Chip from '@material-ui/core/Chip';
 import ListViewerControlsMenu from '../../VFBListViewer/ListViewerControlsMenu';
 import { Typography } from '@mui/material';
+import { getUpdatedTags } from '../../../utils/utils';
 
-const facets_annotations_colors = require("../VFBColors").facets_annotations_colors;
+const colors_config = require("../VFBColors").facets_annotations_colors;
+const facets_annotations_colors = getUpdatedTags(colors_config)
 
 /**
  * Create component to display controls
@@ -74,7 +76,8 @@ const conf = [
               height : 'auto',
               width : 'auto',
               maxWidth: '5.9375rem',
-              backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color
+              backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color,
+              color: facets_annotations_colors[tag]?.textColor || facets_annotations_colors?.default?.textColor
             }}
             label={tag}
           />)

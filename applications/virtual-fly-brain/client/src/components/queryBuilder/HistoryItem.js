@@ -94,7 +94,9 @@ export const Item = ({
       }}>
         {search?.facets_annotation?.slice(0, 2)?.map((tag, index) => <Chip key={`search-tag-${index}`} sx={{
           lineHeight: '140%',
-          fontSize: '0.625rem', backgroundColor: chipColors[tag]?.color
+          fontSize: '0.625rem', 
+          backgroundColor: chipColors[tag]?.color,
+          color: chipColors[tag]?.textColor,
         }} label={tag} />)}
         {search?.facets_annotation?.length > 2 ? (
           <Tooltip

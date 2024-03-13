@@ -17,6 +17,7 @@ import { getInstanceByID } from './../../reducers/actions/instances';
 import { addRecentSearch } from '../../reducers/actions/globals';
 import { useSelector, useDispatch } from 'react-redux'
 import { getQueries, deleteQuery, updateQueries } from '../../reducers/actions/queries';
+import { getUpdatedTags } from '../../utils/utils';
 
 const QUERIES = "Queries";
 
@@ -133,7 +134,8 @@ const searchResults = [
 
 ];
 
-const facets_annotations_colors = require("../../components/configuration/VFBColors").facets_annotations_colors;
+const colors_config = require("../../components/configuration/VFBColors").facets_annotations_colors;
+const facets_annotations_colors = getUpdatedTags(colors_config)
 
 export default function SearchBuilder(props) {
 

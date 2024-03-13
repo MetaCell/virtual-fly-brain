@@ -95,7 +95,7 @@ const Header = ({setBottomNav}) => {
       case ACTIONS.HISTORY_MENU_INJECTOR:{
         var historyList = [];
         // Add instances to history menu
-        recentSearches?.forEach( i => {
+        recentSearches?.reverse()?.forEach( i => {
           historyList.push(
             {
               label: i?.label,

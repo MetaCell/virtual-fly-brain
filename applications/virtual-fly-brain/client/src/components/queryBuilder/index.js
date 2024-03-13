@@ -47,9 +47,21 @@ function a11yProps(index) {
 const QueryBuilder = ({ fullWidth, bottomNav, setBottomNav, tabSelected }) => {
   const [value, setValue] = React.useState(tabSelected || 0);
   const queries = useSelector(state => state.queries.queries);
+  const recentSearches = useSelector(state => state.globalInfo.recentSearches);
+  const [page, setPage] = React.useState(1);
+  const count = 10;
+  const [historyItems, setHistoryItems] = React.useState(recentSearches.slice(page * count - count, count))
+  
+  const handlePageChange = (event, value) => {
+    if ( value * count - count < recentSearches?.length ) {
+      setPage(value);
+      setHistoryItems(recentSearches.slice(value * count - count, value * count))
+    }
+  };
+
   const dispatch = useDispatch();
   
-  const handleChange = (event, newValue) => {
+  const handleTabChange = (event, newValue) => {
     setValue(newValue);
   };
 
@@ -144,7 +156,7 @@ const QueryBuilder = ({ fullWidth, bottomNav, setBottomNav, tabSelected }) => {
           >
             <Cross />
           </Button>
-          <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
+          <Tabs value={value} onChange={handleTabChange} aria-label="basic tabs example">
             <Tab disableRipple label="Query" {...a11yProps(0)} />
             <Tab disableRipple label="History" {...a11yProps(1)} />
           </Tabs>
@@ -156,7 +168,7 @@ const QueryBuilder = ({ fullWidth, bottomNav, setBottomNav, tabSelected }) => {
           <Query fullWidth={fullWidth} queries={queries} />
         </TabPanel>
         <TabPanel value={value} index={1}>
-          <History />
+          <History recentSearches={historyItems} />
         </TabPanel>
       </Box>
 
@@ -236,7 +248,9 @@ const QueryBuilder = ({ fullWidth, bottomNav, setBottomNav, tabSelected }) => {
           </>
         ) : (
             <Pagination
-              count={10}
+              count={Math.ceil(recentSearches?.length / 10) }
+              page={page}
+              onChange={handlePageChange}
               renderItem={(item) => (
                 <PaginationItem
                   slots={{ previous: Prev, next: Next }}

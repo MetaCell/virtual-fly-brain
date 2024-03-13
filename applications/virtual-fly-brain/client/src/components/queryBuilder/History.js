@@ -7,8 +7,7 @@ import { useSelector } from 'react-redux'
 
 const facets_annotations_colors = require("../configuration/VFBColors").facets_annotations_colors;
 
-const History = () => {
-  const recentSearches = useSelector(state => state.globalInfo.recentSearches);
+const History = ({recentSearches}) => {
 
   return (
     <>
@@ -22,7 +21,7 @@ const History = () => {
             chipColors={facets_annotations_colors}
             index={index}
           />
-        ))}
+        )).reverse()}
       </Box>
     </>
   )

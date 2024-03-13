@@ -7,6 +7,7 @@ export const initialStateInstancesReducer = {
   allLoadedInstances : [],
   focusedInstance : undefined,
   threeDObjects : [],
+  mappedCanvasData : [],
   stackViewerData : null,
   focusedInstance : "",
   event : {},
@@ -17,13 +18,13 @@ export const initialStateInstancesReducer = {
 };
 
 const getMappedCanvasData = (loadedInstances) => {
-  let updatedCanvasData = loadedInstances?.filter( m => m?.simpleInstance )?.map( instance => {
-    let { color, visibility, id } = instance.simpleInstance;
+  let updatedCanvasData = loadedInstances?.filter( m => m.meshCreated)?.map( instance => {
+    let { color, visibleMesh, metadata } = instance;
     return {
-      instancePath : id,
-      visibility,
+      instancePath : metadata?.Id,
+      visibility : visibleMesh || false,
       color,
-      selected : instance.selected
+      selected : instance.selected || false
     }
   })
 
@@ -55,10 +56,10 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       }
      case getInstancesTypes.GET_INSTANCES_SUCCESS:{
       const newInstance = { metadata : response.payload };
-      newInstance.visible = true;
       let stackViewerData = state.stackViewerData;
       if ( newInstance.metadata?.IsTemplate ){
         newInstance.color = TEMPLATE_COLOR;
+        newInstance.userSetColor = TEMPLATE_COLOR;
         stackViewerData = newInstance;
       } else {
         newInstance.color = DESELECTED_COLOR;
@@ -118,7 +119,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         const allLoadedInstances = [...state.allLoadedInstances]
         const matchInstance = allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );
         matchInstance.visible = true;
-        if ( matchInstance?.simpleInstance ) matchInstance.simpleInstance.visibility = true;
+        matchInstance.visibleMesh = true;
         return Object.assign({}, state, {
           allLoadedInstances: allLoadedInstances,
           mappedCanvasData : getMappedCanvasData(allLoadedInstances),
@@ -130,7 +131,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         const allLoadedInstances = [...state.allLoadedInstances]
         const matchInstance = allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );
         matchInstance.visible = false;
-        if ( matchInstance?.simpleInstance ) matchInstance.simpleInstance.visibility = false;
+        matchInstance.visibleMesh = false;
         return Object.assign({}, state, {
           allLoadedInstances: allLoadedInstances,
           mappedCanvasData : getMappedCanvasData(allLoadedInstances),
@@ -140,8 +141,8 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       }
       case getInstancesTypes.SHOW_3D_MESH:{
         const allLoadedInstances = [...state.allLoadedInstances]
-        const matchSimpleInstance = allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id )?.simpleInstance;
-        matchSimpleInstance.visibility = true;
+        const matchInstance = allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );
+        matchInstance.visibleMesh = true;
         return Object.assign({}, state, {
           allLoadedInstances: allLoadedInstances,
           mappedCanvasData : getMappedCanvasData(allLoadedInstances),
@@ -151,8 +152,8 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       }
       case getInstancesTypes.HIDE_3D_MESH:{
         const allLoadedInstances = [...state.allLoadedInstances]
-        const matchSimpleInstance = allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id )?.simpleInstance;
-        matchSimpleInstance.visibility = false;
+        const matchInstance = allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );
+        matchInstance.visibleMesh = false;
         return Object.assign({}, state, {
           allLoadedInstances: allLoadedInstances,
           mappedCanvasData : getMappedCanvasData(allLoadedInstances),
@@ -162,9 +163,9 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       }
       case getInstancesTypes.CHANGE_COLOR:{
         const allLoadedInstances = [...state.allLoadedInstances]
-        let matchSimpleInstance = allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id )?.simpleInstance;
-        matchSimpleInstance.color = response.payload.color;
-
+        let matchInstance = allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );
+        matchInstance.color = response.payload.color;
+        matchInstance.userSetColor = response.payload.color;
         const threeDObjects = [...state.threeDObjects];
         const matchObjects = threeDObjects.filter( o => o.name.includes(response.payload.id));
         if ( matchObjects?.length > 0 ) {
@@ -184,6 +185,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       case getInstancesTypes.FOCUS_INSTANCE:{
         const loadedInstances = [...state.allLoadedInstances]
         const findInstance = loadedInstances?.find( i => i.metadata?.Id === response.payload.id );
+        console.log("State ", state)
         return Object.assign({}, state, {
           focusedInstance: findInstance,
           event : { action : getInstancesTypes.FOCUS_INSTANCE, id : response.payload.id, trigger : Date.now()},
@@ -195,14 +197,19 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         const findInstance = allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );
         if ( findInstance ){
           findInstance.selected = !findInstance.selected;
-          if ( findInstance.selected ) findInstance.color = SELECTED_COLOR;
-          else {
-            findInstance.color = DESELECTED_COLOR;
+          if ( findInstance.selected ) {
+            findInstance.color = SELECTED_COLOR
+            allLoadedInstances?.forEach( i => { 
+              if ( i.metadata?.Id !== findInstance.metadata?.Id ) {
+                i.color = i.userSetColor || DESELECTED_COLOR
+                i.selected = false;
+              }
+            })
+          } else {
+            findInstance.color = findInstance.userSetColor || DESELECTED_COLOR
           }
         }
 
-        if ( findInstance?.simpleInstance ) findInstance.simpleInstance.color = findInstance.color;
-        
         const threeDObjects = [...state.threeDObjects];
         const matchObject = threeDObjects.find( o => o.name === response.payload.id );
         if ( matchObject ) {
@@ -230,9 +237,10 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         const matchLoadedInstance = loadedInstances.find( i => i.metadata?.Id === response.payload.id );
         const simpleInstance = response.payload;
         simpleInstance.color = matchLoadedInstance?.color;
+        matchLoadedInstance.visible = true;
+        matchLoadedInstance.visibleMesh = true;
         loadInstances(simpleInstance, state.allLoadedInstances)
-        simpleInstance.visibility = true;
-        matchLoadedInstance.simpleInstance = simpleInstance;
+        matchLoadedInstance.meshCreated = true;
 
         return Object.assign({}, state, {
           allLoadedInstances : loadedInstances,

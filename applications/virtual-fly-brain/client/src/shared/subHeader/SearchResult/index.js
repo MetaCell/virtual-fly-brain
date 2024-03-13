@@ -1,8 +1,7 @@
-import { Box, Typography, Chip, Button } from "@mui/material";
+import { Box, Typography, Chip, Tooltip } from "@mui/material";
 import React from "react";
 import vars from "../../../theme/variables";
 import { Search } from "../../../icons";
-import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
 
 const facets_annotations_colors = require("../../../components/configuration/VFBColors").facets_annotations_colors;
 
@@ -19,6 +18,28 @@ export const SearchResult = ({ getOptionProps, selectedFilters, groupedOptions, 
 
     return hasTag;
   }
+
+  const renderTooltipChips = (option) => {
+    return <>
+      {
+        option?.facets_annotation
+        .slice(chips_cutoff)
+        .map((tag, index) => (
+          <Chip
+            key={tag + index}
+            sx={{
+              lineHeight: '140%',
+              fontSize: '0.625rem',
+              backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color,
+              marginRight: '0.25rem',
+              marginBottom: '0.25rem'
+            }}
+            label={tag}
+          />
+        ))
+      }
+    </>
+  };
 
   return (
     <Box sx={{
@@ -58,6 +79,7 @@ export const SearchResult = ({ getOptionProps, selectedFilters, groupedOptions, 
               '&:hover': {
                 backgroundColor: secondaryBg,
                 cursor: 'pointer',
+                borderRadius: '0.5rem'
               }
             }}>
               <Box sx={{
@@ -104,39 +126,22 @@ export const SearchResult = ({ getOptionProps, selectedFilters, groupedOptions, 
                 }
                 )}
                 {
-                  option?.facets_annotation?.length > 3 && <Chip sx={{
-                    lineHeight: '140%',
-                    fontSize: '0.625rem',
-                    backgroundColor: searchBoxBg
-                  }} 
-                  label={`+${option?.facets_annotation?.length - chips_cutoff}`}
-                  />
+                  option?.facets_annotation?.length > 3 && <Tooltip
+                    title={renderTooltipChips(option)} 
+                    placement="bottom-end" 
+                    arrow
+                  >
+                    <Chip 
+                      sx={{
+                        lineHeight: '140%',
+                        fontSize: '0.625rem',
+                        backgroundColor: searchBoxBg
+                      }} 
+                      label={`+${option?.facets_annotation?.length - chips_cutoff}`}
+                    />
+                  </Tooltip>
                 }
               </Box>
-
-              <Button sx={{
-                color: whiteColor,
-                zIndex: 9,
-                justifyContent: 'flex-end',
-                background: listHover,
-                borderRadius: '0.25rem',
-                width: '5.8125rem',
-                minWidth: '0.0625rem',
-                p: '0 0.75rem 0 0',
-                height: '100%',
-                position: 'absolute',
-                right: 0,
-                top: 0,
-                '&:hover': {
-                  background: listHover
-                }
-              }} variant='text'>
-                <ArrowOutwardIcon sx={{
-                  fontSize: '0.75rem',
-                  m: 0,
-                }} />
-              </Button>
-
             </Box>
           </Box> : null
         ))}

@@ -4,6 +4,7 @@ import { getInstancesTypes } from './actions/types/getInstancesTypes';
 export const initialStateGlobalReducer = {
   templateID: "VFB_00101567",
   termInfoOpened : true,
+  queryComponentOpened : false,
   recentSearches : [],
 };
 
@@ -17,23 +18,38 @@ const GlobalReducer = (state = initialStateGlobalReducer, response) => {
         return Object.assign({}, state, {
           termInfoOpened: response.payload.opened
         })
+      case getGlobalTypes.OPEN_QUERY_COMPONENT:
+        return Object.assign({}, state, {
+          queryComponentOpened: response.payload.opened
+        })
       case getInstancesTypes.GET_INSTANCES_SUCCESS:
       case getGlobalTypes.ADD_RECENT_SEARCH:{
         let updateRecentSearches = [...state.recentSearches];
         let isQuery = response.payload.IsQuery || false;
-        let matchSearch = updateRecentSearches?.find( r => r.id === response.payload.Id && r.is_query == isQuery);
-        if ( !matchSearch ) {
+        let matchSearch = updateRecentSearches?.find( r => r.id === response.payload.Id);
+        if ( !matchSearch || ( isQuery && matchSearch )) {
           updateRecentSearches.push({
             short_form : response.payload.Id,
             label : response.payload.Name,
             id : response.payload.Id,
             facets_annotation : response.payload.Tags,
-            is_query : response.payload.IsQuery
+            is_query : response.payload.IsQuery || false
           })
         }
         return Object.assign({}, state, {
           recentSearches: updateRecentSearches
       })
+    }
+    case getGlobalTypes.REMOVE_RECENT_SEARCH:{
+      let updateRecentSearches = [...state.recentSearches];
+      if ( response.payload.isQuery ){
+        updateRecentSearches = updateRecentSearches?.filter( r => !r.is_query || r.id !== response.payload.id );
+      } else {
+        updateRecentSearches = updateRecentSearches?.filter( r => r.id !== response.payload.id || r.is_query );
+      }
+      return Object.assign({}, state, {
+        recentSearches: updateRecentSearches
+    })
     }
      default:
         return state;

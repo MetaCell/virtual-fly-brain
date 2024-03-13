@@ -10,8 +10,23 @@ export const addRecentSearch = (search, isQuery) => ({
   }
 })
 
+export const removeRecentSearch = (id, isQuery) => ({
+  type: getGlobalTypes.REMOVE_RECENT_SEARCH,
+  payload : {
+    id : id,
+    isQuery : isQuery
+  }
+})
+
 export const setTermInfoOpened = (opened) => ({
   type: getGlobalTypes.OPEN_TERM_INFO,
+  payload : {
+    opened
+  }
+})
+
+export const setQueryComponentOpened = (opened) => ({
+  type: getGlobalTypes.OPEN_QUERY_COMPONENT,
   payload : {
     opened
   }

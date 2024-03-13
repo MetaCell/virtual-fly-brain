@@ -365,7 +365,7 @@ const ROIBrowser = (props) => {
                 buttons.push(
                     <IconButton disableRipple color="primary" aria-label="delete" size="small" onClick={(e) => {
                         e.stopPropagation();
-                        getInstanceByID(rowInfo.node.instanceId);
+                        getInstanceByID(rowInfo.node.instanceId, true);
                         setState({ ...state, nodeSelected : rowInfo.node });
                     }}>
                         <Eye />
@@ -481,9 +481,9 @@ const ROIBrowser = (props) => {
                                 }
                                 
                                 if ( instanceFound ) {
-                                    getInstanceByID(rowInfo.node.instanceId);
+                                    getInstanceByID(rowInfo.node.instanceId, true);
                                 } else {
-                                    getInstanceByID(rowInfo.node.instanceId);
+                                    getInstanceByID(rowInfo.node.instanceId, true);
                                 }
                                 setState({ ...state, nodeSelected : rowInfo.node });
                             }}

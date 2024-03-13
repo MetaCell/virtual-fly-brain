@@ -75,6 +75,14 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
     }
   }, [store])
 
+  const queryComponentOpened = useSelector( state => state.globalInfo?.queryComponentOpened );
+
+  useEffect( () => {
+    if ( queryComponentOpened ){
+      setBottomNav(2);
+    }
+  }, [queryComponentOpened]);
+
   useEffect(() => {
     dispatch(addWidget(widgets.threeDCanvasWidget));
     dispatch(addWidget(widgets.stackViewerWidget));

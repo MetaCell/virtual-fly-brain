@@ -111,7 +111,7 @@ const controlsMenuConf = {
         {
           list : [
               { toggle : {
-                condition : entity => { return entity.simpleInstance?.visibility ? true : false},
+                condition : entity => { return entity.visibleMesh ? true : false},
                 isVisible : entity => { return true },
                 options : {
                   false : {
@@ -148,7 +148,7 @@ const controlsMenuConf = {
           list: [
             {
               toggle : {
-                condition : entity => { return entity?.simpleInstance?.visibility ? true : false },
+                condition : entity => { return entity?.visibleMesh ? true : false },
                 isVisible : entity => { return true },
                 options : {
                   false : {

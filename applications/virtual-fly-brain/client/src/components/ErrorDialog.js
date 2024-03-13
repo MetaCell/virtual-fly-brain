@@ -16,12 +16,12 @@ const ErrorDialog = ({ display, message }) => {
 
     return (
         <Modal
-            open={open}
+            open={true}
             handleClose={handleClose}
             title={
                 <Fragment>
                     <ModalErrorIcon />
-                    Something went wrong
+                    Something went wrong!
                 </Fragment>
             }
             description={message}
@@ -36,11 +36,11 @@ const ErrorDialog = ({ display, message }) => {
                 }
             }}
         >
-            <Button variant='outlined' onClick={handleClose}>
+            <Button variant='outlined' href={`mailto:support@virtualflybrain.org?subject=Issue reported from the UI error dialog`}>
                 <MailIcon />
                 Contact us
             </Button>
-            <Button variant='contained' onClick={handleClose}>
+            <Button variant='contained' href={'https://github.com/VirtualFlyBrain/VFB2/issues/new'} target='_blank'>
                 <BugIcon />
                 Report on Github
             </Button>

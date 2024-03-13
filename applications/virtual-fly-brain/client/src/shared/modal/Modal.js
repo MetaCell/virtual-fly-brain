@@ -80,7 +80,8 @@ const Modal = ({ open, handleClose, title, description, children, sx }) => {
                     right: 16,
                     top: 16,
                     borderRadius: '1.125rem',
-                    border: `1px solid ${primaryBg}`
+                    border: `1px solid ${primaryBg}`,
+                    cursor: 'pointer'
                 }}
             >
                 <ModalCloseIcon />

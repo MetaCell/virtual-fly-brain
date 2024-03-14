@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import Menu from "@metacell/geppetto-meta-ui/menu/Menu";
 import { connect } from 'react-redux';
 import { ChromePicker } from 'react-color';
-import { removeInstanceByID, selectInstance, changeColor,
+import { removeInstanceByID, selectInstance, changeColor, zoomToInstance,
   show3DMesh, hide3DMesh, focusInstance, show3DSkeleton, hide3DSkeleton, show3D, hide3D } from '../../reducers/actions/instances';
 import { NEURON , RGBAToHexA} from "./../../utils/constants"
 
@@ -60,7 +60,7 @@ class ListViewerControlsMenu extends Component {
       selectInstance(this.props.instance);
       break;
     case ACTIONS.ZOOM_TO:
-      focusInstance(this.props.instance)
+      zoomToInstance(this.props.instance)
       break;
     case ACTIONS.DELETE:
       removeInstanceByID(this.props.instance);

@@ -4,7 +4,9 @@ import Chip from '@material-ui/core/Chip';
 import ListViewerControlsMenu from '../../VFBListViewer/ListViewerControlsMenu';
 import { Typography } from '@mui/material';
 import Link from '@mui/material/Link';
-import { focusInstance } from '../../../reducers/actions/instances';
+import { focusInstance, selectInstance } from '../../../reducers/actions/instances';
+import { useSelector } from 'react-redux';
+import { State } from 'pixi.js';
 
 const facets_annotations_colors = require("../VFBColors").facets_annotations_colors;
 
@@ -45,19 +47,22 @@ const conf = [
     customComponent: component => {
       const entityName = component.value._root.entries.find( e=> e[0] == "name")[1];
       const entityPath = component.value._root.entries.find( e=> e[0] == "path")[1];
-
       console.log(component.value._root.entries)
+      const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances);
+
       return <div style={{ width: "100%", textAlign: "left", float: "left" }}>
           <Link 
             component="button"
             underline='none'
             variant="subtitle1"
+            color={allLoadedInstances?.find( i => i.metadata?.Id === entityPath)?.selected ? "yellow" : "white"}
             sx={{
               textAlign : "left",
               float : "left"
             }}
             onClick={() => {
-              focusInstance(entityPath);
+              selectInstance(entityPath);
+              focusInstance(entityPath)
             }}>
             {entityName}
           </Link>
@@ -80,6 +85,7 @@ const conf = [
             component="button"
             underline='none'
             variant="subtitle1"
+            color="#428bca"
             onClick={() => {
               focusInstance(entityPath);
             }}>

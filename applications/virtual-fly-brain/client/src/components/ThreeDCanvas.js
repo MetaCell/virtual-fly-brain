@@ -60,7 +60,7 @@ class ThreeDCanvas extends Component {
     if(this.props.event.trigger !== prevProps.event.trigger){ 
       switch(this.props.event.action){
         // TODO : Remove and let custom camera handler control this action. Issue #VFB-136
-        case getInstancesTypes.FOCUS_INSTANCE:{
+        case getInstancesTypes.ZOOM_TO_INSTANCE:{
           let match = this.props.mappedCanvasData?.find ( inst => inst.instancePath === this.props.event.id );
           if ( match ){
             window.Instances[match.instancePath]?.wrappedObj?.visible && this.canvasRef.current.threeDEngine.cameraManager.zoomTo([window.Instances[match.instancePath]])

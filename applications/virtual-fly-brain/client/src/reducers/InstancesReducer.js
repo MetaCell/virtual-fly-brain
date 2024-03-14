@@ -185,10 +185,18 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       case getInstancesTypes.FOCUS_INSTANCE:{
         const loadedInstances = [...state.allLoadedInstances]
         const findInstance = loadedInstances?.find( i => i.metadata?.Id === response.payload.id );
-        console.log("State ", state)
         return Object.assign({}, state, {
           focusedInstance: findInstance,
           event : { action : getInstancesTypes.FOCUS_INSTANCE, id : response.payload.id, trigger : Date.now()},
+          isLoading: false
+        })
+      }
+      case getInstancesTypes.ZOOM_TO_INSTANCE:{
+        const loadedInstances = [...state.allLoadedInstances]
+        const findInstance = loadedInstances?.find( i => i.metadata?.Id === response.payload.id );
+        return Object.assign({}, state, {
+          focusedInstance: findInstance,
+          event : { action : getInstancesTypes.ZOOM_TO_INSTANCE, id : response.payload.id, trigger : Date.now()},
           isLoading: false
         })
       }

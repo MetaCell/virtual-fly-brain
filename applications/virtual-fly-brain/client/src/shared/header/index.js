@@ -9,7 +9,7 @@ import { toolbarMenu } from "../../components/configuration/VFBToolbar/vfbtoolba
 import { showComponent } from "../../reducers/actions/layout";
 import { WidgetStatus } from "@metacell/geppetto-meta-client/common/layout/model";
 import { selectInstance, focusInstance, getInstanceByID } from '../../reducers/actions/instances';
-import { getQueries } from '../../reducers/actions/queries';
+import { getQueries, updateQueries } from '../../reducers/actions/queries';
 import { setTermInfoOpened } from "../../reducers/actions/globals";
 
 const { primaryBg, headerBoxShadow, headerBorderColor } = vars;
@@ -81,11 +81,13 @@ const Header = ({setBottomNav}) => {
         break;
       }
       case ACTIONS.RUN_QUERY:{
-        let matchQuery = queries?.find( q => q.Id === action.parameters[0] );
-        queries?.forEach( q => q.active = false )
+        let updatedQueries = [...queries];
+        let matchQuery = updatedQueries?.find( q => q.Id === action.parameters[0] );
+        updatedQueries?.forEach( q => q.active = false )
         if ( matchQuery ) {
           matchQuery.active = true;
-          setBottomNav(2);
+          updateQueries(updatedQueries);
+          setBottomNav(2)
         } else {
           getQueries({ short_form : action.parameters[0] })
           setBottomNav(2)

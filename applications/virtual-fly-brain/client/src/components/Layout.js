@@ -10,7 +10,7 @@ import QueryBuilder from "./queryBuilder";
 import ErrorModal from "./ErrorModal";
 import { getLayoutManagerInstance } from "@metacell/geppetto-meta-client/common/layout/LayoutManager";
 import { addWidget } from '@metacell/geppetto-meta-client/common/layout/actions';
-import { setTermInfoOpened } from './../reducers/actions/globals'
+import { setTermInfoOpened, setQueryComponentOpened } from './../reducers/actions/globals'
 import { templateLoaded,  removeAllInstances } from './../reducers/actions/instances';
 import { widgets } from "./layout/widgets";
 
@@ -77,10 +77,16 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
   const queryComponentOpened = useSelector( state => state.globalInfo?.queryComponentOpened );
 
   useEffect( () => {
-    if ( queryComponentOpened ){
-      setBottomNav(2);
+    if ( queryComponentOpened && bottomNav !== 5 ){
+      dispatch(setQueryComponentOpened(true));
     }
   }, [queryComponentOpened]);
+
+  useEffect( () => {
+    if ( bottomNav === 5 ){
+      dispatch(setQueryComponentOpened(false));
+    }
+  }, [bottomNav]);
 
   useEffect(() => {
     dispatch(addWidget(widgets.threeDCanvasWidget));
@@ -232,7 +238,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
             {tabContent}
             {bottomNav === 0 && < VFBUploader open={true} setBottomNav={setBottomNav} />}
             {bottomNav === 1 && <VFBDownloadContents open={true} setBottomNav={setBottomNav} />}
-            {bottomNav === 2 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} />}
+            {bottomNav === 2 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} tabSelected={0}/>}
             {bottomNav === 4 && ( allLoadedInstances?.length > 1 && removeAllInstances())}
             {bottomNav === 5 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} tabSelected={1}/>}
           </>
@@ -243,7 +249,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
             }
             {bottomNav === 0 && <VFBUploader open={true} setBottomNav={setBottomNav} />}
             {bottomNav === 1 && <VFBDownloadContents open={true} setBottomNav={setBottomNav} />}
-            {bottomNav === 2 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} />}
+            {bottomNav === 2 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} tabSelected={0}/>}
             {bottomNav === 4 && ( allLoadedInstances?.length > 1 && removeAllInstances())}
             {bottomNav === 5 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} tabSelected={1}/>}
           </>

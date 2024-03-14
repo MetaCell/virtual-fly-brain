@@ -7,11 +7,11 @@ import { getUpdatedTags } from "../../utils/utils";
 
 const facets_annotations_colors = require("../configuration/VFBColors").facets_annotations_colors;
 
-const History = ({recentSearches}) => {
+const History = ({recentSearches, totalResults}) => {
 
   return (
     <>
-      <QueryHeader title={recentSearches?.length + " results in history"} />
+      <QueryHeader title={totalResults + " results in history"} />
 
       <Box p={1}>
         {recentSearches?.map((search, index) => (

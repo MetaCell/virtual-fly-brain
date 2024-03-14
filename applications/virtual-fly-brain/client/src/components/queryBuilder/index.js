@@ -46,12 +46,23 @@ function a11yProps(index) {
 
 const QueryBuilder = ({ fullWidth, bottomNav, setBottomNav, tabSelected }) => {
   const [value, setValue] = React.useState(tabSelected || 0);
-  const queries = useSelector(state => state.queries.queries);
+  const storeQueries = useSelector(state => state.queries.queries);
+  const [queries, setQueries ] = React.useState(storeQueries);
   const recentSearches = useSelector(state => state.globalInfo.recentSearches);
   const [page, setPage] = React.useState(1);
   const count = 10;
   const [historyItems, setHistoryItems] = React.useState(recentSearches.slice(page * count - count, count))
   
+  const queryComponentOpened = useSelector( state => state.globalInfo?.queryComponentOpened );
+
+  React.useEffect( () => {
+    queryComponentOpened && setValue(0);
+  }, [queryComponentOpened]);
+
+  React.useEffect( () => {
+    setQueries(storeQueries);
+  }, [storeQueries]);
+
   const handlePageChange = (event, value) => {
     if ( value * count - count < recentSearches?.length ) {
       setPage(value);
@@ -63,6 +74,9 @@ const QueryBuilder = ({ fullWidth, bottomNav, setBottomNav, tabSelected }) => {
   
   const handleTabChange = (event, newValue) => {
     setValue(newValue);
+    if ( newValue == 1 && queryComponentOpened ) {
+      dispatch(setQueryComponentOpened(false));
+    }
   };
 
   const handleClose = (event) => {
@@ -168,7 +182,7 @@ const QueryBuilder = ({ fullWidth, bottomNav, setBottomNav, tabSelected }) => {
           <Query fullWidth={fullWidth} queries={queries} />
         </TabPanel>
         <TabPanel value={value} index={1}>
-          <History recentSearches={historyItems} />
+          <History recentSearches={historyItems} totalResults={recentSearches?.length}/>
         </TabPanel>
       </Box>
 

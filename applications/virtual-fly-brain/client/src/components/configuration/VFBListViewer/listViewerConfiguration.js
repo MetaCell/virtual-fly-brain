@@ -9,12 +9,11 @@ import { useSelector } from 'react-redux';
 import { State } from 'pixi.js';
 
 const facets_annotations_colors = require("../VFBColors").facets_annotations_colors;
-
 /**
  * Create component to display controls
  */
 const ControlsMenu = component => {
-  const path = component.value._root.entries.find( e=> e[0] == "path")[1] ;
+  const path = component.value._root.nodes.find( e=> e.entry?.[0] == "path").entry[1] ;
   //let instance = Instances.getInstance(path); anti pattern fix: we don't pass the full instance anymore as we have an indirection level through the reducer
   //actions should be executed through the reducer, given an instance path 
   return <ListViewerControlsMenu instance={ path }/>;
@@ -45,17 +44,16 @@ const conf = [
     id: "name",
     title: "Name",
     customComponent: component => {
-      const entityName = component.value._root.entries.find( e=> e[0] == "name")[1];
-      const entityPath = component.value._root.entries.find( e=> e[0] == "path")[1];
-      console.log(component.value._root.entries)
-      const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances);
+      const entityName = component.value._root.nodes.find( e=> e.entry?.[0] == "name").entry[1];
+      const entityPath = component.value._root.nodes.find( e=> e.entry?.[0] == "path").entry[1];
+      const entitySelected = component.value._root.nodes.find( e=> e.entry?.[0] == "selected").entry[1];
 
       return <div style={{ width: "100%", textAlign: "left", float: "left" }}>
           <Link 
             component="button"
             underline='none'
             variant="subtitle1"
-            color={allLoadedInstances?.find( i => i.metadata?.Id === entityPath)?.selected ? "yellow" : "white"}
+            color={entitySelected ? "yellow" : "white"}
             sx={{
               textAlign : "left",
               float : "left"
@@ -75,9 +73,15 @@ const conf = [
     title: "Type",
     customComponent: component => {
 
-      const entityType = component.value._root.entries.find( e=> e[0] == "types")[1]?.match(/\[(.*?)\]/)[1];
-      const entityPath = component.value._root.entries.find( e=> e[0] == "path")[1];
-      const tags = component.value._root.entries.find( e=> e[0] == "tags")[1];
+      //const entityType = component.value._root.nodes.find( e=> e.entry?.[0] == "types").entry[1]?.match(/\[(.*?)\]/)[1];
+      let entityType = null;
+      component.value._root.nodes.forEach( e=> e.nodes?.forEach( n=> { if ( n.entry?.[0] == "types" ) { entityType = n.entry?.[1] } }))
+      entityType = entityType.match(/\[(.*?)\]/)[1];
+      const entityPath = component.value._root.nodes.find( e=> e.entry?.[0] == "path").entry[1];
+      
+      let tags = null;
+      component.value._root.nodes.forEach( e=> e.nodes?.forEach( n=> { if ( n.entry?.[0] == "tags" ) { tags = n.entry?.[1] } }))
+      
       const chips_cutoff = 3;
       return <div style={{ width: "100%", textAlign: "left", float: "left" }}>
         <div style={{ textAlign: "left", float: "left" }}>

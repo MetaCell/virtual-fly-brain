@@ -1,7 +1,7 @@
 // import './App.css';
 import Main from './components/Main'
 import React from 'react';
-import { getInstanceByID } from './reducers/actions/instances';
+import { getInstanceByID, show3D } from './reducers/actions/instances';
 import { queryString } from './utils/queryString';
 import { useSelector } from 'react-redux'
 import { termInfoSchemma } from './schemma/termInfoSchemma';
@@ -15,7 +15,7 @@ const App = () => {
   const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances)
   const templateID = "VFB_00101567";
   if ( !focusedInstance ){
-    getInstanceByID(templateID);
+    getInstanceByID(templateID, true);
   }
 
   if ( focusedInstance ) // load initial 3d model TODO: proper instance, class treatement
@@ -41,7 +41,7 @@ const App = () => {
       setTemplateLoaded(true);
       const id = queryString("id");
       if ( id != templateID && id != undefined && id != "" ){
-        getInstanceByID(id);
+        getInstanceByID(id, true);
       }
     }
   }, [allLoadedInstances])

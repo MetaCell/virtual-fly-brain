@@ -41,7 +41,10 @@ const vars = {
   queryChipBg: 'rgba(10, 183, 254, 0.8)',
   queryBuilderBg: 'rgba(34, 34, 34, 0.80)',
   btnDisabledColor: 'rgba(255, 255, 255, 0.4)',
-  sliderRailBgColor: '#EEF9FF'
+  sliderRailBgColor: '#EEF9FF',
+  dialogBgColor: 'rgba(58, 58, 58, 0.80)',
+  dialogContentTextColor: 'rgba(255, 255, 255, 0.80)',
+  dialogBoxShadow: '0px 0px 80px 0px rgba(0, 0, 0, 0.60), 0px 4px 94px 0px rgba(0, 0, 0, 0.20)'
 };
 
 export default vars;

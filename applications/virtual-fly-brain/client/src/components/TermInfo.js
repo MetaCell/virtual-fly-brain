@@ -492,14 +492,13 @@ const TermInfo = ({ open, setOpen }) => {
                           </Tooltip>
                           { displayColorPicker ?
                           <ChromePicker
-                            color={getInstance()?.simpleInstance?.color}
                             disableAlpha={true}
+                            color={getInstance()?.simpleInstance?.color}
                             onChangeComplete={ (color, event) => {
                               let rgb;
-                              if ( event.target.className != 'hue-horizontal' ) {
+                              if ( event.target.className == "saturation-black" ) {
                                 rgb = { r:color.rgb.r/255, g:color.rgb.g/255, b:color.rgb.b/255, a:color.rgb.a }
                                 changeColor(termInfoData?.metadata?.Id, rgb)
-                                setDisplayColorPicker(false)
                               }                           
                             }}
                             style={{ zIndex: 10 }}/>

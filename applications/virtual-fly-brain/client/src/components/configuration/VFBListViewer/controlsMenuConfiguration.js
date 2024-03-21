@@ -86,13 +86,13 @@ const controlsMenuConf = {
         {
           label: "Show Info",
           icon: "fa fa-info",
-          action: { handlerAction: ACTIONS.INFO }
+          action: { handlerAction: ACTIONS.INFO },
         },
         {
           list : [  
             { toggle : {
               condition : entity => { return entity.selected ? true : false }, //entity.isSelected(),
-              isVisible : entity => { return true },
+              isVisible : entity => { return entity.visible },
               options : {
                 false : {
                   label: "Select",
@@ -111,18 +111,18 @@ const controlsMenuConf = {
         {
           list : [
               { toggle : {
-                condition : entity => { return entity.visibleMesh ? true : false},
+                condition : entity => { return entity.visible ? true : false},
                 isVisible : entity => { return true },
                 options : {
                   false : {
                     label: "Show",
                     icon: "fa fa-eye",
-                    action: { handlerAction: ACTIONS.SHOW_VOLUME }
+                    action: { handlerAction: ACTIONS.SHOW }
                   },
                   true : {
                     label: "Hide",
                     icon: "fa fa-eye-slash",
-                    action: { handlerAction: ACTIONS.HIDE_VOLUME }
+                    action: { handlerAction: ACTIONS.HIDE }
                   }
                 }
             }}
@@ -131,7 +131,8 @@ const controlsMenuConf = {
         {
           label: "Color",
           icon: "fa fa-color",
-          action: { handlerAction: ACTIONS.COLOR, }
+          action: { handlerAction: ACTIONS.COLOR, },
+          isVisible : entity => { return entity.visible }
         },
         {
           label: "Delete",
@@ -143,13 +144,13 @@ const controlsMenuConf = {
           label: "Zoom To",
           icon: "fa fa-search-plus",
           action: { handlerAction: ACTIONS.ZOOM_TO },
+          isVisible : entity => { return entity.visible }
         },
         {
           list: [
             {
               toggle : {
                 condition : entity => { return entity?.visibleMesh ? true : false },
-                isVisible : entity => { return true },
                 options : {
                   false : {
                     label: "Enable 3D Volume",

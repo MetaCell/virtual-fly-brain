@@ -185,7 +185,6 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       case getInstancesTypes.FOCUS_INSTANCE:{
         const loadedInstances = [...state.allLoadedInstances]
         const findInstance = loadedInstances?.find( i => i.metadata?.Id === response.payload.id );
-        console.log("State ", state)
         return Object.assign({}, state, {
           focusedInstance: findInstance,
           event : { action : getInstancesTypes.FOCUS_INSTANCE, id : response.payload.id, trigger : Date.now()},
@@ -237,10 +236,13 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         const matchLoadedInstance = loadedInstances.find( i => i.metadata?.Id === response.payload.id );
         const simpleInstance = response.payload;
         simpleInstance.color = matchLoadedInstance?.color;
-        matchLoadedInstance.visible = true;
-        matchLoadedInstance.visibleMesh = true;
+        if ( matchLoadedInstance ) {
+          matchLoadedInstance.visible = true;
+          matchLoadedInstance.visibleMesh = true;
+          matchLoadedInstance.meshCreated = true;
+        }
+
         loadInstances(simpleInstance, state.allLoadedInstances)
-        matchLoadedInstance.meshCreated = true;
 
         return Object.assign({}, state, {
           allLoadedInstances : loadedInstances,

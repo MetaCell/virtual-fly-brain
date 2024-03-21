@@ -37,9 +37,10 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
   const defaultActiveTab = desktopScreen ? [0, 1, 2, 3, 4] : [0];
   const [tab, setTab] = useState([]);
   const [LayoutComponent, setLayoutComponent] = useState(undefined);
-  const launchTemplate = useSelector(state => state.instances.launchTemplate)
+  const misalignedTemplate = useSelector(state => state.globalInfo.misalignedTemplate)
+  const alignedTemplates = useSelector( state => state.globalInfo.alignedTemplates)
   const dispatch = useDispatch();
-  let templateRef = window.location.origin + "?id=" + launchTemplate?.metadata?.Id;
+  let templateRef = window.location.origin + "?id=" + misalignedTemplate;
   const store = useStore();
 
   //global reducers errors
@@ -55,6 +56,10 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
   useEffect(() => {
     setTab(defaultActiveTab)
   }, [desktopScreen])
+
+  useEffect(() => {
+    setModalOpen(!alignedTemplates)
+  }, [alignedTemplates])
 
   useEffect(() => {
     if (LayoutComponent === undefined) {
@@ -138,7 +143,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
   const handleModalClose = (id, openTemplate) => {
     templateLoaded(id, openTemplate);
     setModalOpen(false)
-    templateRef = window.location.origin + "?id=" + id
+    templateRef = window.location.href.replace(id + ",", "")
   }
 
   const tabContent = (
@@ -184,8 +189,8 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
             The image you requested is aligned to another template. Click Okay
             to open in a new tab or Cancel to just view the image metadata.
           </Typography>
-          <Button variant="contained" color="primary" onClick={() => handleModalClose(launchTemplate?.metadata?.Id, true )} target="_blank" href={templateRef}>Okay</Button>
-          <Button variant="outlined" color="secondary" onClick={() => handleModalClose(launchTemplate?.metadata?.Id, false )}>Cancel</Button>
+          <Button variant="contained" color="primary" onClick={() => handleModalClose(misalignedTemplate, true )} target="_blank" href={window.location.href.replace(misalignedTemplate + ",", "")}>Okay</Button>
+          <Button variant="outlined" color="secondary" onClick={() => handleModalClose(misalignedTemplate, false )}>Cancel</Button>
         </Box>
       </Modal>
       <Box

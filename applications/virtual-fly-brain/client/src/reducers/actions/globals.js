@@ -30,6 +30,16 @@ export const setFirstIDLoaded = () => ({
   payload : {}
 })
 
+export const setAlignTemplates = (aligned, templateID) => ({
+  type: getGlobalTypes.ALIGN_TEMPLATES,
+  payload : { aligned, templateID }
+})
+
+export const setTemplateID = (id) => ({
+  type: getGlobalTypes.SET_TEMPLATE_ID,
+  payload : { id }
+})
+
 export const setQueryComponentOpened = (opened) => ({
   type: getGlobalTypes.OPEN_QUERY_COMPONENT,
   payload : {

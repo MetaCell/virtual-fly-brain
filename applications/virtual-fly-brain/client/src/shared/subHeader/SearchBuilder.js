@@ -148,6 +148,11 @@ export default function SearchBuilder(props) {
   const dispatch = useDispatch();
 
   const addQueryTag = () => { 
+    value.forEach( v => {
+      if (!queries?.find( q => q.Id === v.short_form )) { 
+        getQueries(v);
+      } 
+    })
     if ( !value.find( v => v.label === QUERIES )){
       setValue((prevValue) => [{label: 'Queries', tags: [], id : "Queries"}, ...prevValue])
     }
@@ -187,7 +192,7 @@ export default function SearchBuilder(props) {
   const handleResultSelection = async(option) => {
     const doesOptionExist =  obj => obj.label === option.label
     if(!value.some(doesOptionExist)){
-      if (!queries?.find( q => q.Id === option.short_form ) ) { 
+      if (!queries?.find( q => q.Id === option.short_form ) && value.find((chip) => chip.short_form === QUERIES)) { 
         getQueries(option);
       } 
       setValue([...value, option])

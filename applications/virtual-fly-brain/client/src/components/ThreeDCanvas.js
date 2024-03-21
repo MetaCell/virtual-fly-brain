@@ -161,17 +161,7 @@ class ThreeDCanvas extends Component {
             />
           </>
         </div>
-      ) : (
-        <Box>
-          <Button
-            variant="outlined"
-            color="primary"
-            onClick={this.handleToggle}
-          >
-            Show Example
-          </Button>
-        </Box>
-      )}
+      ) : null }
     </Box>
   }
 }

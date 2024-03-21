@@ -28,7 +28,7 @@ const vfbMiddleware = store => next => (action) => {
         }
         case getInstancesTypes.GET_INSTANCES_SUCCESS : {
             next(action)
-            if ( action.payload.get3DMesh  ){
+            if ( action.payload.get3DMesh && !action.payload?.IsClass ){
                 get3DMesh(action.payload);
             }
             break;

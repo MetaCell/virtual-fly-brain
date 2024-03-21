@@ -2,12 +2,14 @@ import { Box, Typography, Chip, Tooltip } from "@mui/material";
 import React from "react";
 import vars from "../../../theme/variables";
 import { Search } from "../../../icons";
+import { getUpdatedTags } from "../../../utils/utils";
 
-const facets_annotations_colors = require("../../../components/configuration/VFBColors").facets_annotations_colors;
+const colors_config = require("../../../components/configuration/VFBColors").facets_annotations_colors;
+const facets_annotations_colors = getUpdatedTags(colors_config)
 
 const { secondaryBg, searchBoxBg, whiteColor, searchHeadingColor, listHover } = vars;
 const chips_cutoff = 3;
-export const SearchResult = ({ getOptionProps, selectedFilters, groupedOptions, facets_annotations_colors, handleResultSelection }) => {
+export const SearchResult = ({ getOptionProps, selectedFilters, groupedOptions, handleResultSelection }) => {
   const hasTag = (facets_annotations) => {
     let hasTag = true;
     facets_annotations?.forEach( annotation => {
@@ -31,6 +33,7 @@ export const SearchResult = ({ getOptionProps, selectedFilters, groupedOptions, 
               lineHeight: '140%',
               fontSize: '0.625rem',
               backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color,
+              color: facets_annotations_colors[tag]?.textColor || facets_annotations_colors?.default?.textColor,
               marginRight: '0.25rem',
               marginBottom: '0.25rem'
             }}
@@ -119,7 +122,8 @@ export const SearchResult = ({ getOptionProps, selectedFilters, groupedOptions, 
                       sx={{
                         lineHeight: '140%',
                         fontSize: '0.625rem',
-                        backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color
+                        backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color,
+                        color: facets_annotations_colors[tag]?.textColor || facets_annotations_colors?.default?.textColor
                       }}
                       label={tag}
                     />

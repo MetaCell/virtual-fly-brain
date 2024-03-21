@@ -5,6 +5,7 @@ import { Compare, LinkIcon } from "../../icons";
 import vars from "../../theme/variables";
 import TerminfoSlider from "./TerminfoSlider";
 import FullScreenViewer from "../queryBuilder/FullScreenViewer";
+import { getUpdatedTags } from "../../utils/utils";
 
 const {
   whiteColor,
@@ -15,7 +16,8 @@ const {
   descriptionBg
 } = vars;
 
-const facets_annotations_colors = require("../../components/configuration/VFBColors").facets_annotations_colors;
+const colors_config = require("../../components/configuration/VFBColors").facets_annotations_colors;
+const facets_annotations_colors = getUpdatedTags(colors_config)
 
 const GeneralInformation = ({data, classes}) => {
   const [ toggleReadMore, setToggleReadMore ] = useState( false );
@@ -67,7 +69,7 @@ const GeneralInformation = ({data, classes}) => {
               <Typography sx={classes.heading}>Tags</Typography>
                 <Box display='flex' gap={'0.188rem'}>
                   {
-                    data?.metadata?.Tags?.map((tag, i) => ( <Chip key={tag} sx={{backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color}} label={tag} /> ) )
+                    data?.metadata?.Tags?.map((tag, i) => ( <Chip key={tag} sx={{backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color, color: facets_annotations_colors[tag]?.textColor || facets_annotations_colors?.default?.textColor}} label={tag} /> ) )
                   }
                 { data?.metadata?.Tags?.length > 2 && <Chip label={`+${data?.metadata?.Tags?.length - 2}`} /> }
               </Box>

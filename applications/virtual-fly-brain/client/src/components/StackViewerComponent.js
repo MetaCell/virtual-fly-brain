@@ -508,7 +508,6 @@ import React from 'react';
     listObjects: function () {
       if (!this.state.loadingLabels || this.state.lastLabelCall < (Date.now() - 500)) {
         this.state.lastLabelCall = Date.now();
-        this.state.objects = [];
         var i, j, result;
         var that = this;
         var callX = that.state.posX.toFixed(0), callY = that.state.posY.toFixed(0);
@@ -535,11 +534,15 @@ import React from 'react';
                       if (i !== 0 || index !== 0) { // don't select template
                         if (index == 0) {
                           if (!shift) {
-                            that.state.objects.push(that.state.label[i]);
+                            let updatedObjects = [...that.state.objects];
+                            updatedObjects[that.state.label[i]] === undefined && updatedObjects.push(that.state.label[i]);
+                            that.setState({ objects : updatedObjects})
                           }
                         } else {
                           if (typeof that.props.templateDomainIds !== 'undefined' && typeof that.props.templateDomainNames !== 'undefined' && typeof that.props.templateDomainIds[index] !== 'undefined' && typeof that.props.templateDomainNames[index] !== 'undefined' && that.props.templateDomainNames[index] !== null) {
-                            that.state.objects.push(that.props.templateDomainNames[index]);
+                            let updatedObjects = [...that.state.objects];
+                            updatedObjects[that.props.templateDomainNames[index]] === undefined &&  updatedObjects.push(that.props.templateDomainNames[index]);
+                            that.setState({ objects : updatedObjects})
                             break;
                           }
                         }
@@ -904,7 +907,7 @@ import React from 'react';
         });
         this.checkStack();
       }
-      if (nextProps.scl !== this.state.scl){
+      if (nextProps.scl !== this.state.scl || nextProps.zoomLevel !== this.props.zoomLevel || nextProps.width !== this.props.width || nextProps.height !== this.props.height || nextProps.stackX !== this.stack.position.x || nextProps.stackY !== this.stack.position.y){
         if (nextProps.scl < this.state.scl) {
           // wipe the stack if image is getting smaller
           this.state.images = [];
@@ -963,6 +966,7 @@ import React from 'react';
      *
      */
     updateStatusText: function (props) {
+      console.log("updateStatusText ", props)
       this.setStatusText(props.statusText);
     },
 
@@ -999,6 +1003,7 @@ import React from 'react';
     },
 
     setStatusText: function (text) {
+      console.log("setStatusText ", text)
       this.state.buffer[-1].x = (40);
       this.state.buffer[-1].y = (8);
       this.state.buffer[-1].text = text;
@@ -1007,6 +1012,7 @@ import React from 'react';
     },
 
     setHoverText: function (x,y,text) {
+      console.log("setHoverText ", text)
       this.state.buffer[-1].x = this.disp.position.x + (this.stack.position.x * this.disp.scale.x) + (Number(x) * this.disp.scale.x) - 10;
       this.state.buffer[-1].y = this.disp.position.y + (this.stack.position.y * this.disp.scale.y) + (Number(y) * this.disp.scale.y) + 15;
       this.state.buffer[-1].text = text;
@@ -1297,12 +1303,18 @@ const StackViewerComponent = () => createClass({
         this.onWheelEvent(e);
       });
 
-      if ( this.state.ids?.find( i => i != this.prop.data.id) === undefined && this.props.data && this.props.data != null && this.props.data.instances && this.props.data.instances != null) {
+      if (this.props.data && this.props.data != null && this.props.data.instances && this.props.data.instances != null) {
         this.setState(this.handleInstances(this.props.data.instances));
       }
 
       setTimeout(this.onHome, 5000);
 
+    },
+
+    componentDidUpdate: function (prevProps, prevState) {
+      if (prevProps.data != undefined && prevProps.data != null && prevProps.data.instances != undefined) {
+        this.setState(this.handleInstances(this.props.data.instances));
+      } 
     },
 
     handleInstances: function (instances) {
@@ -1622,112 +1634,110 @@ const StackViewerComponent = () => createClass({
       }
       var startOffset = 5;
       var displayArea = this.props.data.id + 'displayArea';
-
       var markup = '';
-      if( !this.state.id?.includes(this.props.data.id) ) {
-        if (this.state.stack.length > 0 ) {
-          markup = (
-            <div id={displayArea} style={{ position: 'absolute'}}>
-              <div  onClick={this.onHome} >
-              <button style={{
-                position: 'absolute',
-                left: 15,
-                top: startOffset + 20,
-                padding: 0,
-                border: 0,
-                id : "home",
-                background: 'transparent'
-              }} className={homeClass} title={'Center Stack'} /></div>
-              <div  onClick={this.onZoomIn} >
-              <button style={{
-                position: 'absolute',
-                left: 15,
-                top: startOffset + 82,
-                padding: 0,
-                border: 0,
-                background: 'transparent'
-              }} className={zoomInClass} title={'Zoom In'} />
-              </div>
-              <div  onClick={this.onZoomOut} >
-              <button style={{
-                position: 'absolute',
-                left: 15,
-                top: startOffset + 104,
-                padding: 0,
-                border: 0,
-                background: 'transparent'
-              }} className={zoomOutClass} title={'Zoom Out'} />
-              </div>
-              <div  onClick={this.onStepIn} >
-              <button style={{
-                position: 'absolute',
-                left: 15,
-                top: startOffset + 40,
-                padding: 0,
-                border: 0,
-                background: 'transparent'
-              }} className={stepInClass} title={'Step Into Stack'} />
-              </div>
-              <div  onClick={this.onStepOut} >
-              <button style={{
-                position: 'absolute',
-                left: 15,
-                top: startOffset,
-                padding: 0,
-                border: 0,
-                background: 'transparent'
-              }} className={stepOutClass} title={'Step Out Of Stack'} />
-              </div>
-              <button style={{
-                position: 'absolute',
-                left: 15,
-                top: startOffset + 60,
-                padding: 0,
-                paddingTop: 3,
-                border: 0,
-                background: 'transparent'
-              }} className={orthClass} onClick={this.toggleOrth} title={'Change Slice Plane Through Stack'} />
-              <button style={{
-                position: 'absolute',
-                left: 15,
-                top: startOffset + 130,
-                padding: 0,
-                border: 0,
-                background: 'transparent'
-              }} className={toggleSliceClass} onClick={this.toggleSlice} title={'Toggle the 3D slice display'} />
-              <Canvas zoomLevel={this.state.zoomLevel} dst={this.state.dst}
-                serverUrl={this.props.config.serverUrl} canvasRef={this.props.canvasRef}
-                fxp={this.state.fxp} pit={this.state.pit} yaw={this.state.yaw} rol={this.state.rol}
-                stack={this.state.stack} color={this.state.color} setExtent={this.onExtentChange}
-                statusText={this.state.text} stackX={this.state.stackX} stackY={this.state.stackY}
-                scl={this.state.scl} orth={this.state.orth}
-                label={this.state.label} id={this.state.id} height={this.props.data.height}
-                width={this.props.data.width} voxelX={this.state.voxelX}
-                voxelY={this.state.voxelY} voxelZ={this.state.voxelZ} displayArea={displayArea}
-                templateId={this.props.config.templateId}
-                templateDomainIds={this.state.tempId}
-                templateDomainTypeIds={this.state.tempType}
-                templateDomainNames={this.state.tempName}
-                slice={this.state.slice} onHome={this.onHome} onZoomIn={this.onZoomIn}
-                onResize={this.onResize} />
+      if (this.state.stack.length > 0) {
+        markup = (
+          <div id={displayArea} style={{ position: 'absolute'}}>
+            <div  onClick={this.onHome} >
+            <button style={{
+              position: 'absolute',
+              left: 15,
+              top: startOffset + 20,
+              padding: 0,
+              border: 0,
+              id : "home",
+              background: 'transparent'
+            }} className={homeClass} title={'Center Stack'} /></div>
+            <div  onClick={this.onZoomIn} >
+            <button style={{
+              position: 'absolute',
+              left: 15,
+              top: startOffset + 82,
+              padding: 0,
+              border: 0,
+              background: 'transparent'
+            }} className={zoomInClass} title={'Zoom In'} />
             </div>
-          );
-        } else {
-          markup = (
-            <div
-              id={displayArea}
-              style={{
-                position: 'relative',
-                top: 1,
-                left: 1,
-                background: 'transparent',
-                width: this.props.data.width,
-                height: this.props.data.height
-              }}>
+            <div  onClick={this.onZoomOut} >
+            <button style={{
+              position: 'absolute',
+              left: 15,
+              top: startOffset + 104,
+              padding: 0,
+              border: 0,
+              background: 'transparent'
+            }} className={zoomOutClass} title={'Zoom Out'} />
             </div>
-          );
-        }
-    }
+            <div  onClick={this.onStepIn} >
+            <button style={{
+              position: 'absolute',
+              left: 15,
+              top: startOffset + 40,
+              padding: 0,
+              border: 0,
+              background: 'transparent'
+            }} className={stepInClass} title={'Step Into Stack'} />
+            </div>
+            <div  onClick={this.onStepOut} >
+            <button style={{
+              position: 'absolute',
+              left: 15,
+              top: startOffset,
+              padding: 0,
+              border: 0,
+              background: 'transparent'
+            }} className={stepOutClass} title={'Step Out Of Stack'} />
+            </div>
+            <button style={{
+              position: 'absolute',
+              left: 15,
+              top: startOffset + 60,
+              padding: 0,
+              paddingTop: 3,
+              border: 0,
+              background: 'transparent'
+            }} className={orthClass} onClick={this.toggleOrth} title={'Change Slice Plane Through Stack'} />
+            <button style={{
+              position: 'absolute',
+              left: 15,
+              top: startOffset + 130,
+              padding: 0,
+              border: 0,
+              background: 'transparent'
+            }} className={toggleSliceClass} onClick={this.toggleSlice} title={'Toggle the 3D slice display'} />
+            <Canvas zoomLevel={this.state.zoomLevel} dst={this.state.dst}
+              serverUrl={this.props.config.serverUrl} canvasRef={this.props.canvasRef}
+              fxp={this.state.fxp} pit={this.state.pit} yaw={this.state.yaw} rol={this.state.rol}
+              stack={this.state.stack} color={this.state.color} setExtent={this.onExtentChange}
+              statusText={this.state.text} stackX={this.state.stackX} stackY={this.state.stackY}
+              scl={this.state.scl} orth={this.state.orth}
+              label={this.state.label} id={this.state.id} height={this.props.data.height}
+              width={this.props.data.width} voxelX={this.state.voxelX}
+              voxelY={this.state.voxelY} voxelZ={this.state.voxelZ} displayArea={displayArea}
+              templateId={this.props.config.templateId}
+              templateDomainIds={this.state.tempId}
+              templateDomainTypeIds={this.state.tempType}
+              templateDomainNames={this.state.tempName}
+              slice={this.state.slice} onHome={this.onHome} onZoomIn={this.onZoomIn}
+              onResize={this.onResize} />
+          </div>
+        );
+      } else {
+        markup = (
+          <div
+            id={displayArea}
+            style={{
+              position: 'relative',
+              top: 1,
+              left: 1,
+              background: 'transparent',
+              width: this.props.data.width,
+              height: this.props.data.height
+            }}>
+          </div>
+        );
+      }
+
       return markup;
     }
   });

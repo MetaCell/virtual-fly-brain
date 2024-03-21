@@ -161,7 +161,9 @@ class ThreeDCanvas extends Component {
             />
           </>
         </div>
-      ) : null }
+      ) : (
+        null
+      )}
     </Box>
   }
 }

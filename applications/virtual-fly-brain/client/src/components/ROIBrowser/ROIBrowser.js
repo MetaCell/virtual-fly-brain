@@ -407,20 +407,25 @@ const ROIBrowser = (props) => {
                 );
                 buttons.push(
                         <IconButton style={{ color: 'white' }} aria-label="color" size="small" onClick={(e) => {
-                            e.stopPropagation();
-                            nodeWithColorPicker = rowInfo.node;
-                            rowInfo.node.showColorPicker = true;
-                            setDisplayColorPicker({[rowInfo.node.instanceId] : true});
+                            if ( !rowInfo.node.showColorPicker ){
+                                e.stopPropagation();
+                                nodeWithColorPicker = rowInfo.node;
+                                rowInfo.node.showColorPicker = true;
+                                setDisplayColorPicker({[rowInfo.node.instanceId] : true});
+                            }
                         }}>
                             <ColorLensIcon/>
-                        {displayColorPicker[rowInfo.node.instanceId] && rowInfo.node.showColorPicker ? (
+                        {displayColorPicker[rowInfo.node.instanceId] ? (
                                 <div style={{ width: '100%' }} ref={popover}><ChromePicker
+                                    disableAlpha={true}    
                                     color={match.color}
                                     onChangeComplete={(color, event) => {
                                         let rgb;
-                                        if ( color.source === "hsv" ){
+                                        if ( event.target.className == 'saturation-black' ) {
                                             rgb = { r:color.rgb.r/255, g:color.rgb.g/255, b:color.rgb.b/255, a:color.rgb.a }
                                             changeColor(rowInfo.node.instanceId, rgb)
+                                            rowInfo.node.showColorPicker = false;
+                                            setDisplayColorPicker({[rowInfo.node.instanceId] : false});
                                         }
                                     }}
                                     style={{ zIndex: 10 }}

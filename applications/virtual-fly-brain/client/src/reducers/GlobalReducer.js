@@ -6,6 +6,7 @@ export const initialStateGlobalReducer = {
   termInfoOpened : true,
   queryComponentOpened : false,
   recentSearches : [],
+  firstIDLoaded : false,
 };
 
 const GlobalReducer = (state = initialStateGlobalReducer, response) => {
@@ -18,6 +19,10 @@ const GlobalReducer = (state = initialStateGlobalReducer, response) => {
         return Object.assign({}, state, {
           termInfoOpened: response.payload.opened
         })
+      case getGlobalTypes.FIRST_ID_LOADED:
+          return Object.assign({}, state, {
+            firstIDLoaded: true
+          })
       case getGlobalTypes.OPEN_QUERY_COMPONENT:
         return Object.assign({}, state, {
           queryComponentOpened: response.payload.opened

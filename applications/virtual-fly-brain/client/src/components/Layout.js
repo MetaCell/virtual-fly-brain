@@ -57,14 +57,6 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
   }, [desktopScreen])
 
   useEffect(() => {
-    if ( launchTemplate !== null ) {
-      setModalOpen(true)
-    } else {
-      setModalOpen(false)
-    }
-  }, [launchTemplate])
-
-  useEffect(() => {
     if (LayoutComponent === undefined) {
       const myManager = getLayoutManagerInstance();
       if (myManager) {

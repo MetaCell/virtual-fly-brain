@@ -1,9 +1,8 @@
 import { getInstancesTypes } from './reducers/actions/types/getInstancesTypes';
 import { getQueriesTypes } from './reducers/actions/types/getQueriesTypes';
-import { getInstanceByID } from './reducers/actions/instances';
-import { get3DMesh } from './reducers/actions/instances';
-import { show3DMesh } from './reducers/actions/instances';
-import { get_instance } from './network/query';
+import { getInstanceByID, selectInstance, focusInstance } from './reducers/actions/instances';
+import { getQueries } from './reducers/actions/queries';
+import { setQueryComponentOpened, setFirstIDLoaded } from './reducers/actions/globals';
 
 function updateUrlParameterWithCurrentUrl(param, value) {
   const urlObj = new URL(window.location.href);
@@ -20,25 +19,25 @@ function updateUrlParameterWithCurrentUrl(param, value) {
   window.history.replaceState(null, '', urlObj.toString());
 }
 
-async function fetchAndDispatchMeshes(threeDMeshes) {
-  for (const id of threeDMeshes) {
-    //const instance = await get_instance(id);
-    getInstanceByID(id);
-  }
-}
-
 const DEFAULT_ID = "VFB_00101567"; 
 const APP_LOADED_FLAG_KEY = "CURRENT_LOADED_URL";
 
-const isFirstTimeLoad = () => {
+const isFirstTimeLoad = (allLoadedInstances) => {
   const appLoadedUrl = localStorage.getItem(APP_LOADED_FLAG_KEY);
   const currentUrl = window.location.href ;
   if ( currentUrl != appLoadedUrl )
   {
     localStorage.setItem(APP_LOADED_FLAG_KEY, currentUrl);
-    return true ;
+    // Load id parameter from URL and dispatch action
+    const idFromUrl = getUrlParameter("id");
+    let idToUpdate = DEFAULT_ID;
+    
+    if (idFromUrl) {
+      idToUpdate = idFromUrl?.split(',')?.[0];
+    }
+    
+    getInstance(allLoadedInstances,idToUpdate);
   }
-  return false ;
 };
 
 const getUrlParameter = (param) => {
@@ -46,65 +45,63 @@ const getUrlParameter = (param) => {
   return urlParams.get(param);
 };
 
-export const urlUpdaterMiddleware = store => next => action => {
+const getInstance = (allLoadedInstances, id) => {
+  if ( !allLoadedInstances?.find( i => i.metadata?.Id === id ) ){
+    getInstanceByID(id, true);
+  }
+}
+
+export const urlUpdaterMiddleware = store => next => (action) => {
   next(action);
+  const allLoadedInstances = store.getState().instances.allLoadedInstances;
 
-  if (isFirstTimeLoad()) {
-    // Load id parameter from URL and dispatch action
-    const idFromUrl = getUrlParameter("id");
-    let idToUpdate = undefined;
+  isFirstTimeLoad(allLoadedInstances)
 
-    if (idFromUrl) {
-      if (typeof idFromUrl === 'string' && idFromUrl.includes(',')) {
-        const firstIdToUpdate = idFromUrl.split(',')[0];
-        idToUpdate = firstIdToUpdate;
-      } else {
-        idToUpdate = idFromUrl;
-      }
+  switch (action.type) {
+    case getInstancesTypes.GET_3D_OBJ_TYPE_SUCCESS : {
+        const threeDMeshId = action.payload.id ;
+        updateUrlParameterWithCurrentUrl("i", threeDMeshId);
+        break;
     }
-    if (!idToUpdate) {
-      idToUpdate = DEFAULT_ID;
+    case getInstancesTypes.GET_INSTANCES_SUCCESS : {
+        const threeDMeshId = action.payload.Id ;
+        const firstIDLoaded = store.getState().globalInfo.firstIDLoaded;
+        const singleInstanceLoaded = allLoadedInstances?.length === 1;
+
+        if ( !action.payload.IsTemplate && !firstIDLoaded && singleInstanceLoaded){
+          getInstanceByID(Object.keys(action.payload.Images)?.[0], true)
+          updateUrlParameterWithCurrentUrl("i", Object.keys(action.payload.Images)?.[0]);
+        }
+
+        if ( !firstIDLoaded && singleInstanceLoaded) {
+            const iFromUrl = getUrlParameter("i");
+
+            if (iFromUrl) {
+              const idList = iFromUrl.split(',')
+              idList?.forEach( m => getInstance(allLoadedInstances,m));
+            }
+            // Load q parameter from URL and dispatch action
+            const qFromUrl = getUrlParameter("q");
+            if (qFromUrl) {
+              const queryList = qFromUrl.split(';')
+              queryList?.forEach( q => {
+                const query = q.split(",");
+                getQueries({ short_form : query[0], type : query[1]})
+              })
+            }
+            store.dispatch(setFirstIDLoaded())
+            selectInstance(threeDMeshId)
+        }
+        const id = getUrlParameter("id")?.split(",")?.[0];
+        allLoadedInstances?.find( a => a.metadata?.Id === id ) && focusInstance(id)
+        break;
     }
-
-    getInstanceByID(idToUpdate);
-
-    // Load i parameter from URL and dispatch action
-    const iFromUrl = getUrlParameter("i");
-    let threeDMeshes = [];
-
-    if (iFromUrl) {
-      if (typeof iFromUrl === 'string' && iFromUrl.includes(',')) {
-        threeDMeshes = iFromUrl.split(',');
-      } else {
-        threeDMeshes.push(iFromUrl);
-      }
+    case getQueriesTypes.UPDATE_QUERIES:
+    case getQueriesTypes.GET_QUERIES_SUCCESS : {
+        store.dispatch(setQueryComponentOpened(true));
+        break;
     }
-
-    if ((threeDMeshes.length == 0 && idToUpdate) || (threeDMeshes.length > 0 && threeDMeshes.indexOf(idToUpdate) == -1))
-      threeDMeshes.push(idToUpdate);
-    
-    fetchAndDispatchMeshes(threeDMeshes);
-
-    // Load q parameter from URL and dispatch action
-    // const qFromUrl = getUrlParameter("q");
-    // if (qFromUrl) {
-
-    // }
-  }
-
-  if (action.type === getInstancesTypes.GET_INSTANCES_SUCCESS) {
-    let idToUpdate = action.payload.Id;
-    updateUrlParameterWithCurrentUrl("id", idToUpdate);
-    get3DMesh(action.payload);
-  }
-
-  if (action.type === getInstancesTypes.GET_3D_OBJ_TYPE_SUCCESS) {
-    const threeDMeshId = action.payload.id ;
-    updateUrlParameterWithCurrentUrl("i", threeDMeshId);
-    show3DMesh(threeDMeshId);
-  }
-
-  if (action.type === getQueriesTypes.UPDATE_QUERIES || action.type === getQueriesTypes.GET_QUERIES_SUCCESS) {
-    updateUrlParameterWithCurrentUrl("q", action.payload.shortform);
-  }
+    default:
+        break;
+    }
 };

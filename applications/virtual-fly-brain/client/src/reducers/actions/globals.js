@@ -25,6 +25,11 @@ export const setTermInfoOpened = (opened) => ({
   }
 })
 
+export const setFirstIDLoaded = () => ({
+  type: getGlobalTypes.FIRST_ID_LOADED,
+  payload : {}
+})
+
 export const setQueryComponentOpened = (opened) => ({
   type: getGlobalTypes.OPEN_QUERY_COMPONENT,
   payload : {

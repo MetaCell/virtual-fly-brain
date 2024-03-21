@@ -61,7 +61,7 @@ class ThreeDCanvas extends Component {
       switch(this.props.event.action){
         // TODO : Remove and let custom camera handler control this action. Issue #VFB-136
         case getInstancesTypes.FOCUS_INSTANCE:
-          this.canvasRef.current.defaultCameraControlsHandler("cameraHome")
+          this.canvasRef.current?.defaultCameraControlsHandler("cameraHome")
           break;
         case getInstancesTypes.UPDATE_SKELETON:
         // Called to create the Neuron skeleton using the THREED Renderer  

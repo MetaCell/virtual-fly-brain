@@ -119,8 +119,8 @@ export const urlUpdaterMiddleware = store => next => (action) => {
         store.dispatch(addRecentSearch(action.payload, true));
       }  
       if ( !firstIDLoaded ){
-          store.dispatch(setFirstIDLoaded())
           store.dispatch(setQueryComponentOpened(true));
+          store.dispatch(setFirstIDLoaded())
         }
         break;
     }

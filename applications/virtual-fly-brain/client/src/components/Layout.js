@@ -74,9 +74,11 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
   const queryComponentOpened = useSelector( state => state.globalInfo?.queryComponentOpened );
 
   useEffect( () => {
-    if ( queryComponentOpened && bottomNav !== 5 ){
+    if ( queryComponentOpened && bottomNav == undefined ){
+      setBottomNav(5);
+    } else if ( queryComponentOpened && bottomNav !== 5 ){
       dispatch(setQueryComponentOpened(true));
-    }
+    } 
   }, [queryComponentOpened]);
 
   useEffect( () => {

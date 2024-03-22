@@ -21,7 +21,6 @@ const GeneralInformation = ({data, classes}) => {
   const [ toggleReadMore, setToggleReadMore ] = useState( false );
   const [fullScreen, setFullScreen] = useState(false)
   const MAX_LENGTH = 120;
-  console.log( data );
   return (
     <>
       <Grid container columnSpacing={1.5}>

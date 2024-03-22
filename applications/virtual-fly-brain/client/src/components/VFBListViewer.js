@@ -33,7 +33,8 @@ class VFBListViewer extends Component {
       "path": instance.getPath(),
       "metaType": "VisualType", //instance.getMetaType(),
       "type": instance.getType(),
-      "static": true
+      "static": true,
+      "selected" : instance.selected
     })) || [];
     instances.forEach(instance => {
       const { path, metaType, type } = instance;
@@ -58,7 +59,8 @@ class VFBListViewer extends Component {
       "metaType": VISUAL_TYPE, //instance.getMetaType(),
       "type": COMPOSITE_VISUAL_TYPE,
       "thumbnail": instance.metadata?.Images ? instance.metadata?.Images[Object.keys(instance.metadata?.Images)[0]][0].thumbnail : undefined,
-      "static": true
+      "static": true,
+      "selected" : instance.selected,
     })) || [] ;
 
     return instances?.length > 0 ? <div id="VFBLayers_component" style= { { backgroundColor : "rgb(53, 51, 51)" } } >

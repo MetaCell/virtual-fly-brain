@@ -64,16 +64,16 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       } else {
         newInstance.color = DESELECTED_COLOR;
       }
-      if ( newInstance.IsTemplate && state.allLoadedInstances?.find( i => i?.metadata?.IsTemplate )) {
-        return Object.assign({}, state, {
-          launchTemplate: newInstance
-        })
+      let launchTemplate = state.launchTemplate
+      if ( newInstance.metadata.IsTemplate && !state.allLoadedInstances?.find( i => i?.metadata?.IsTemplate )) {
+        launchTemplate = newInstance
       }
       let loadedInstances = state.allLoadedInstances?.find( i => i?.metadata?.Id === response.payload.Id ) ? [...state.allLoadedInstances] : [...state.allLoadedInstances, newInstance]
 
       return Object.assign({}, state, {
           allLoadedInstances: loadedInstances,
           stackViewerData : stackViewerData,
+          launchTemplate : launchTemplate,
           focusedInstance : loadedInstances?.find( i => i?.metadata?.Id === response.payload.Id ),
           event : { action : getInstancesTypes.ADD_INSTANCE, id : response.payload.Id, trigger : Date.now()},
           isLoading: false,
@@ -185,10 +185,18 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       case getInstancesTypes.FOCUS_INSTANCE:{
         const loadedInstances = [...state.allLoadedInstances]
         const findInstance = loadedInstances?.find( i => i.metadata?.Id === response.payload.id );
-        console.log("State ", state)
         return Object.assign({}, state, {
           focusedInstance: findInstance,
           event : { action : getInstancesTypes.FOCUS_INSTANCE, id : response.payload.id, trigger : Date.now()},
+          isLoading: false
+        })
+      }
+      case getInstancesTypes.ZOOM_TO_INSTANCE:{
+        const loadedInstances = [...state.allLoadedInstances]
+        const findInstance = loadedInstances?.find( i => i.metadata?.Id === response.payload.id );
+        return Object.assign({}, state, {
+          focusedInstance: findInstance,
+          event : { action : getInstancesTypes.ZOOM_TO_INSTANCE, id : response.payload.id, trigger : Date.now()},
           isLoading: false
         })
       }
@@ -237,10 +245,13 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         const matchLoadedInstance = loadedInstances.find( i => i.metadata?.Id === response.payload.id );
         const simpleInstance = response.payload;
         simpleInstance.color = matchLoadedInstance?.color;
-        matchLoadedInstance.visible = true;
-        matchLoadedInstance.visibleMesh = true;
+        if ( matchLoadedInstance ) {
+          matchLoadedInstance.visible = true;
+          matchLoadedInstance.visibleMesh = true;
+          matchLoadedInstance.meshCreated = true;
+        }
+
         loadInstances(simpleInstance, state.allLoadedInstances)
-        matchLoadedInstance.meshCreated = true;
 
         return Object.assign({}, state, {
           allLoadedInstances : loadedInstances,

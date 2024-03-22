@@ -152,6 +152,13 @@ const focusInstanceMessage = (id) => ({
   }
 });
 
+const zoomToInstanceMessage = (id) => ({
+  type: getInstancesTypes.ZOOM_TO_INSTANCE,
+  payload: {
+    id
+  }
+});
+
 const removeInstancesFailure = error => ({
   type: getInstancesTypes.REMOVE_INSTANCES_FAILURE,
   payload: {
@@ -267,6 +274,10 @@ export const changeColor = async (id, color) => {
 
 export const focusInstance = async (id) => {
   store.dispatch(focusInstanceMessage(id))
+}
+
+export const zoomToInstance = async (id) => {
+  store.dispatch(zoomToInstanceMessage(id))
 }
 
 export const templateLoaded = async (id, openTemplate) => {

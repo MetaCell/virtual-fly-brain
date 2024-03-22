@@ -6,6 +6,9 @@ export const initialStateGlobalReducer = {
   termInfoOpened : true,
   queryComponentOpened : false,
   recentSearches : [],
+  firstIDLoaded : false,
+  alignedTemplates : true,
+  misalignedTemplate : null
 };
 
 const GlobalReducer = (state = initialStateGlobalReducer, response) => {
@@ -14,9 +17,22 @@ const GlobalReducer = (state = initialStateGlobalReducer, response) => {
         return Object.assign({}, state, {
           templateID: response.payload.id
         })
+      case getGlobalTypes.SET_TEMPLATE_ID:
+        return Object.assign({}, state, {
+          templateID: response.payload.id
+        })
       case getGlobalTypes.OPEN_TERM_INFO:
         return Object.assign({}, state, {
           termInfoOpened: response.payload.opened
+        })
+      case getGlobalTypes.FIRST_ID_LOADED:
+          return Object.assign({}, state, {
+            firstIDLoaded: true
+          })
+      case getGlobalTypes.ALIGN_TEMPLATES:
+        return Object.assign({}, state, {
+          alignedTemplates: response.payload.aligned,
+          misalignedTemplate : response.payload.templateID
         })
       case getGlobalTypes.OPEN_QUERY_COMPONENT:
         return Object.assign({}, state, {

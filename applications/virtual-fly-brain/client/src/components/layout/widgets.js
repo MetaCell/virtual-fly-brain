@@ -12,7 +12,7 @@ export const widgets = {
 
     stackViewerWidget : {
         id: 'stackViewerWidget',
-        name: "Stack Viewer",
+        name: "Slice Viewer",
         component: "stackViewer",
         panelName: "left",
         hideOnClose: false,
@@ -54,7 +54,7 @@ export const widgets = {
 
     listViewerWidget : {
     id: 'listViewerWidget',
-    name: "List Viewer",
+    name: "Layers",
     component: "listViewer",
     panelName: "left",
     enableClose: false,

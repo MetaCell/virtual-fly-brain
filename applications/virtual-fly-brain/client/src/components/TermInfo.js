@@ -495,14 +495,10 @@ const TermInfo = ({ open, setOpen }) => {
                             color={getInstance()?.color}
                             onChangeComplete={ (color, event) => {
                               let rgb;
-                              if ( color.source === "hsv" ){
+                              if ( event.target.className == "saturation-black" ) {
                                 rgb = { r:color.rgb.r/255, g:color.rgb.g/255, b:color.rgb.b/255, a:color.rgb.a }
                                 changeColor(termInfoData?.metadata?.Id, rgb)
-                                setDisplayColorPicker(false)
-                              } else if ( color.source === "hsl" ) {
-                                rgb = color.rgb;
-                                changeColor(termInfoData?.metadata?.Id, rgb)
-                              }                              
+                              }                           
                             }}
                             style={{ zIndex: 10 }}/>
                             : null

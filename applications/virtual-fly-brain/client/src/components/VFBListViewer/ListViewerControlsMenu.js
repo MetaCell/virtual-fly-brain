@@ -172,6 +172,7 @@ class ListViewerControlsMenu extends Component {
     // Update Menu Configuration
     let configuration = this.updateControlsConfiguration();
     let matchInstance = this.props.allLoadedInstances.find( instance => instance.metadata?.Id === this.props.instance);
+    let self = this;
     return (
       <div id="LayersControls_Menu">
         <Menu
@@ -185,17 +186,13 @@ class ListViewerControlsMenu extends Component {
             style={{ left: this.state.pickerPosition }}>
             <ChromePicker
               color={ matchInstance.color }
+              disableAlpha={true}
               onChangeComplete={ (color, event) => {
                 let rgb;
-                if ( color.source === "hsv" ){
+                if ( event.target.className != 'hue-horizontal' ) {
                   rgb = { r:color.rgb.r/255, g:color.rgb.g/255, b:color.rgb.b/255, a:color.rgb.a }
                   changeColor(this.props.instance, rgb)
-                  this.setState({ displayColorPicker: false });     
-                } else if ( color.source === "hsl" ) {
-                  rgb = color.rgb;
-                  changeColor(this.props.instance, rgb)
                 }
-                this.setState({ displayColorPicker: true });                              
               }}
               style={{ zIndex: 10 }}/>
           </div>

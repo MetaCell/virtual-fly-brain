@@ -19,7 +19,7 @@ import ListAltIcon from '@mui/icons-material/ListAlt';
 import RectangleIcon from '@mui/icons-material/Rectangle';
 import GeneralInformation from "./TermInfo/GeneralInformation";
 import { getInstanceByID, selectInstance, hide3DMesh, hide3D, show3D, show3DMesh, removeInstanceByID,
-  changeColor, focusInstance, show3DSkeleton, hide3DSkeleton, show3DSkeletonLines, show3DSkeletonCylinders } from './../reducers/actions/instances';
+  changeColor, focusInstance, show3DSkeleton, hide3DSkeleton, show3DSkeletonLines, show3DSkeletonCylinders, zoomToInstance } from './../reducers/actions/instances';
 import Ribbon from '@flybase/react-ontology-ribbon';
 import { ChromePicker } from 'react-color';
 import Link from '@mui/material/Link';
@@ -242,7 +242,7 @@ const TermInfo = ({ open, setOpen }) => {
   }
 
   const handleFocus = (event) => {
-    focusInstance(termInfoData?.metadata?.Id)
+    zoomToInstance(termInfoData?.metadata?.Id)
   }
 
   const handleSelection = (event) => {

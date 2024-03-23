@@ -4,7 +4,7 @@ import { AddChart, Delete, More, OpenInNew, Search, SplitScreen } from "../../ic
 import vars from "../../theme/variables";
 import { useDispatch, useSelector } from "react-redux";
 import { selectInstance, getInstanceByID,focusInstance  } from "../../reducers/actions/instances";
-import { getQueries } from "../../reducers/actions/queries"
+import { getQueries, updateQueries } from "../../reducers/actions/queries"
 import { removeRecentSearch, setQueryComponentOpened } from "../../reducers/actions/globals";
 
 const {
@@ -25,9 +25,12 @@ export const Item = ({
   const handleClick = (event, isQuery, id) => {
     setAnchorEl(anchorEl ? null : event.currentTarget);
     if(isQuery){
-      let matchQuery = queries?.find( q => q.Id === id );
+      let updatedQueries = [...queries];
+      let matchQuery = updatedQueries?.find( q => q.Id === id );
+      updatedQueries?.forEach( q => q.active = false )
       if ( matchQuery ) {
         matchQuery.active = true;
+        updateQueries(updatedQueries);
       } else {
         getQueries({ short_form : id })
       }
@@ -93,7 +96,9 @@ export const Item = ({
       }}>
         {search?.facets_annotation?.slice(0, 2)?.map((tag, index) => <Chip key={`search-tag-${index}`} sx={{
           lineHeight: '140%',
-          fontSize: '0.625rem', backgroundColor: chipColors[tag]?.color
+          fontSize: '0.625rem', 
+          backgroundColor: chipColors[tag]?.color,
+          color: chipColors[tag]?.textColor,
         }} label={tag} />)}
         {search?.facets_annotation?.length > 2 ? (
           <Tooltip

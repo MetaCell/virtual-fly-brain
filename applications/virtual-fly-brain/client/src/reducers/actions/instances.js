@@ -2,11 +2,12 @@ import store from '../../store';
 import { get_3d_mesh, get_instance } from "../../network/query"
 import { getInstancesTypes } from './types/getInstancesTypes';
 
-const getInstancesSuccess = ( query, mesh) => ({
+const getInstancesSuccess = ( query, mesh, focus) => ({
   type: getInstancesTypes.GET_INSTANCES_SUCCESS,
   payload: {
     ...query,
-    get3DMesh : mesh
+    get3DMesh : mesh,
+    focus : focus
   }
 });
 
@@ -174,7 +175,7 @@ const templateLoadedMessage = (id, openTemplate) => ({
   }
 });
 
-export const getInstanceByID = async (queryId, get3DMesh) => {
+export const getInstanceByID = async (queryId, get3DMesh, focus) => {
 
   store.dispatch(getInstancesStarted())
 
@@ -187,7 +188,7 @@ export const getInstanceByID = async (queryId, get3DMesh) => {
     return
   }
 
-  store.dispatch(getInstancesSuccess(response, get3DMesh))
+  store.dispatch(getInstancesSuccess(response, get3DMesh || true, focus || true))
 }
 
 export const get3DMesh = async (instance) => {

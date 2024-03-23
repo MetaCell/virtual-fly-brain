@@ -37,7 +37,7 @@ const isFirstTimeLoad = (allLoadedInstances) => {
       idToUpdate = idFromUrl?.split(',')?.[0];
     }
     
-    getInstance(allLoadedInstances,idToUpdate);
+    getInstance(allLoadedInstances,idToUpdate, true);
   }
 };
 
@@ -47,7 +47,7 @@ const loaded = (store, firstIDLoaded, allLoadedInstances) => {
 
     if (iFromUrl) {
       const idList = iFromUrl.split(',')
-      idList?.forEach( m => getInstance(allLoadedInstances,m));
+      idList?.forEach( m => getInstance(allLoadedInstances,m, false));
     }
     // Load q parameter from URL and dispatch action
     const qFromUrl = getUrlParameter("q");
@@ -75,9 +75,9 @@ const getUrlParameter = (param) => {
   return urlParams.get(param);
 };
 
-const getInstance = (allLoadedInstances, id) => {
+const getInstance = (allLoadedInstances, id, focus) => {
   if ( !allLoadedInstances?.find( i => i.metadata?.Id === id ) ){
-    getInstanceByID(id, true);
+    getInstanceByID(id, true, focus);
   }
 }
 
@@ -89,16 +89,26 @@ export const urlUpdaterMiddleware = store => next => (action) => {
 
   const firstIDLoaded = store.getState().globalInfo.firstIDLoaded;
   switch (action.type) {
+    case getInstancesTypes.GET_3D_OBJ_TYPE_SUCCESS : {
+      const idFromUrl = getUrlParameter("id")?.split(',')?.[0];
+      if ( action.payload.id === idFromUrl ){
+        focusInstance(idFromUrl);
+        selectInstance(idFromUrl)
+      }
+      break;
+    }
     case getInstancesTypes.GET_INSTANCES_SUCCESS : {
         const launchTemplate = store.getState().instances.launchTemplate;
         const templateLookup = action.payload?.Images || {} ;
 
         if ( !action.payload?.IsClass ) {
           if ( !action.payload.IsTemplate && !firstIDLoaded ){
-            let template = Object.keys(action.payload.Images)?.[0];
-            getInstanceByID(template, true)
+            let template = Object.keys(templateLookup)?.[0];
+            getInstanceByID(template, true, false)
             store.dispatch(setTemplateID(template))
             updateUrlParameterWithCurrentUrl("i", template);
+            selectInstance(action.payload.Id)
+            focusInstance(idFromUrl);
           } else if ( !action.payload.IsTemplate && Object.keys(templateLookup)?.[0] != launchTemplate?.metadata?.Id ) {
             store.dispatch(setAlignTemplates(false, action.payload.Id))
             break;

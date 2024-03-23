@@ -69,12 +69,15 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         launchTemplate = newInstance
       }
       let loadedInstances = state.allLoadedInstances?.find( i => i?.metadata?.Id === response.payload.Id ) ? [...state.allLoadedInstances] : [...state.allLoadedInstances, newInstance]
-
+      let focused = state.focusedInstance;
+      if ( response.payload.focus ) {
+        focused = loadedInstances?.find( i => i?.metadata?.Id === response.payload.Id )
+      }
       return Object.assign({}, state, {
           allLoadedInstances: loadedInstances,
           stackViewerData : stackViewerData,
           launchTemplate : launchTemplate,
-          focusedInstance : loadedInstances?.find( i => i?.metadata?.Id === response.payload.Id ),
+          focusedInstance : focused,
           event : { action : getInstancesTypes.ADD_INSTANCE, id : response.payload.Id, trigger : Date.now()},
           isLoading: false,
           error: false,

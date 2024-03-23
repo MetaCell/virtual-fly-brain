@@ -5,8 +5,8 @@ import { Box, Button, ButtonGroup, IconButton, InputAdornment, Pagination, Pagin
 import Query from "./Query";
 import History from "./History";
 import vars from "../../theme/variables";
-import { useSelector } from 'react-redux'
-
+import { useDispatch, useSelector } from 'react-redux'
+import { setQueryComponentOpened } from "../../reducers/actions/globals";
 
 const { secondaryBg, outlinedBtnTextColor, headerBorderColor, blackColor, queryBuilderBg, whiteColor, primaryBg } = vars;
 
@@ -46,11 +46,44 @@ function a11yProps(index) {
 
 const QueryBuilder = ({ fullWidth, bottomNav, setBottomNav, tabSelected }) => {
   const [value, setValue] = React.useState(tabSelected || 0);
-  const queries = useSelector(state => state.queries.queries);
+  const storeQueries = useSelector(state => state.queries.queries);
+  const [queries, setQueries ] = React.useState(storeQueries);
+  const recentSearches = useSelector(state => state.globalInfo.recentSearches);
+  const [page, setPage] = React.useState(1);
+  const count = 10;
+  const [historyItems, setHistoryItems] = React.useState(recentSearches.slice(page * count - count, count))
+  
+  const queryComponentOpened = useSelector( state => state.globalInfo?.queryComponentOpened );
 
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
+  React.useEffect( () => {
+    queryComponentOpened && setValue(0);
+  }, [queryComponentOpened]);
+
+  React.useEffect( () => {
+    setQueries(storeQueries);
+  }, [storeQueries]);
+
+  const handlePageChange = (event, value) => {
+    if ( value * count - count < recentSearches?.length ) {
+      setPage(value);
+      setHistoryItems(recentSearches.slice(value * count - count, value * count))
+    }
   };
+
+  const dispatch = useDispatch();
+  
+  const handleTabChange = (event, newValue) => {
+    setValue(newValue);
+    if ( newValue == 1 && queryComponentOpened ) {
+      dispatch(setQueryComponentOpened(false));
+    }
+  };
+
+  const handleClose = (event) => {
+    dispatch(setQueryComponentOpened(false));
+    setBottomNav(undefined);
+  }
+
   const classes = {
     root: {
       display: 'flex',
@@ -124,7 +157,7 @@ const QueryBuilder = ({ fullWidth, bottomNav, setBottomNav, tabSelected }) => {
 
         }}>
           <Button
-            onClick={() => setBottomNav(undefined)}
+            onClick={handleClose}
             sx={{
               height: 'auto',
               borderRight: `0.0625rem solid ${primaryBg}`,
@@ -137,7 +170,7 @@ const QueryBuilder = ({ fullWidth, bottomNav, setBottomNav, tabSelected }) => {
           >
             <Cross />
           </Button>
-          <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
+          <Tabs value={value} onChange={handleTabChange} aria-label="basic tabs example">
             <Tab disableRipple label="Query" {...a11yProps(0)} />
             <Tab disableRipple label="History" {...a11yProps(1)} />
           </Tabs>
@@ -149,7 +182,7 @@ const QueryBuilder = ({ fullWidth, bottomNav, setBottomNav, tabSelected }) => {
           <Query fullWidth={fullWidth} queries={queries} />
         </TabPanel>
         <TabPanel value={value} index={1}>
-          <History />
+          <History recentSearches={historyItems} totalResults={recentSearches?.length}/>
         </TabPanel>
       </Box>
 
@@ -229,7 +262,9 @@ const QueryBuilder = ({ fullWidth, bottomNav, setBottomNav, tabSelected }) => {
           </>
         ) : (
             <Pagination
-              count={10}
+              count={Math.ceil(recentSearches?.length / 10) }
+              page={page}
+              onChange={handlePageChange}
               renderItem={(item) => (
                 <PaginationItem
                   slots={{ previous: Prev, next: Next }}

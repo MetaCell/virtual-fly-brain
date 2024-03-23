@@ -657,14 +657,6 @@ export const toolbarMenu = {
       position: "bottom-start",
       list: [
         {
-          label: "All Available Datasets",
-          icon: "",
-          action: {
-            handlerAction: "triggerRunQuery",
-            parameters: ["AllDatasets,VFB_00017894,adult brain template JFRC2"]
-          }
-        },
-        {
           label: "Adult",
           icon: "",
           position: "right-start",

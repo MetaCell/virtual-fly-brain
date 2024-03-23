@@ -107,8 +107,8 @@ export const urlUpdaterMiddleware = store => next => (action) => {
             getInstanceByID(template, true, false)
             store.dispatch(setTemplateID(template))
             updateUrlParameterWithCurrentUrl("i", template);
-            selectInstance(action.payload.Id)
-            focusInstance(idFromUrl);
+            selectInstance(action.payload?.Id)
+            focusInstance(action.payload?.Id);
           } else if ( !action.payload.IsTemplate && Object.keys(templateLookup)?.[0] != launchTemplate?.metadata?.Id ) {
             store.dispatch(setAlignTemplates(false, action.payload.Id))
             break;

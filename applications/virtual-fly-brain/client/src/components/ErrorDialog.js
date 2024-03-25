@@ -16,7 +16,7 @@ const ErrorDialog = ({ display, message }) => {
 
     return (
         <Modal
-            open={false}
+            open={open}
             handleClose={handleClose}
             title={
                 <Fragment>

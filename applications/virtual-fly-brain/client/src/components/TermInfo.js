@@ -493,6 +493,7 @@ const TermInfo = ({ open, setOpen }) => {
                           { displayColorPicker ?
                           <ChromePicker
                             color={getInstance()?.color}
+                            disableAlpha={true} 
                             onChangeComplete={ (color, event) => {
                               let rgb;
                               if ( event.target.className == "saturation-black" ) {

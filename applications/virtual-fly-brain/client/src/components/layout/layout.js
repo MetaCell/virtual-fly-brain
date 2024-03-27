@@ -8,7 +8,7 @@ export default {
   borders: [
     {
       type: 'border',
-      location: 'top',
+      location: 'bottom',
       children: [],
       config: {
         isMinimizedPanel: true
@@ -20,19 +20,18 @@ export default {
     id: "root",
     weight: 100,
     children: [{
-      "type": "tab",
-      "id": "left",
-      "component": "panel"
-    }
-    ,{
-      "type": "tab",
-      "id": "center",
-      "component": "panel"
-    }
-  ,{
-    "type": "tab",
-    "id": "right",
-    "component": "panel"
-  }]
+      type: "tabset",
+      id: "left",
+      weight: 60,
+      enableDeleteWhenEmpty: false,
+      tabSetEnableMaximize: true,
+    },
+    {
+      type: "tabset",
+      id: "right",
+      weight: 40,
+      enableDeleteWhenEmpty: false,
+      tabSetEnableMaximize: true,
+    }]
   }
 };

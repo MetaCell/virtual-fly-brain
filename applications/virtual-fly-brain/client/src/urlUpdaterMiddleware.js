@@ -77,7 +77,7 @@ const getUrlParameter = (param) => {
 
 const getInstance = (allLoadedInstances, id, focus) => {
   if ( !allLoadedInstances?.find( i => i.metadata?.Id === id ) ){
-    getInstanceByID(id, true, focus);
+    getInstanceByID(id, true, focus, focus);
   }
 }
 
@@ -104,7 +104,7 @@ export const urlUpdaterMiddleware = store => next => (action) => {
         if ( !action.payload?.IsClass ) {
           if ( !action.payload.IsTemplate && !firstIDLoaded ){
             let template = Object.keys(templateLookup)?.[0];
-            getInstanceByID(template, true, false)
+            getInstanceByID(template, true, false, false)
             store.dispatch(setTemplateID(template))
             updateUrlParameterWithCurrentUrl("i", template);
             selectInstance(action.payload?.Id)

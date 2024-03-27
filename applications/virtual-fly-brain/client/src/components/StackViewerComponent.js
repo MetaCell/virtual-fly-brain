@@ -3,7 +3,7 @@ import React from 'react';
   import * as PIXI from 'pixi.js';
   var createClass = require('create-react-class');
   import { useRef, useEffect } from 'react';
-import { getInstanceByID } from '../reducers/actions/instances';
+import { getInstanceByID, selectInstance } from '../reducers/actions/instances';
 
   const Canvas = createClass({
     _isMounted: false,
@@ -439,7 +439,7 @@ import { getInstanceByID } from '../reducers/actions/instances';
                           if (!isSelected){
                             console.log(that.state.label[i] + ' clicked');
                             try {
-                              getInstanceByID(that.props.templateDomainIds[index]);
+                              getInstanceByID(that.props.templateDomainIds[index], true, true);
                               that.setStatusText(that.state.label[i] + ' selected');
                               isSelected = true;
                             } catch (err) {
@@ -452,23 +452,22 @@ import { getInstanceByID } from '../reducers/actions/instances';
                           if (typeof that.props.templateDomainIds !== 'undefined' && typeof that.props.templateDomainNames !== 'undefined' && typeof that.props.templateDomainIds[index] !== 'undefined' && typeof that.props.templateDomainNames[index] !== 'undefined' && that.props.templateDomainIds[index] !== null && that.props.templateDomainNames[index] !== null) {
                             if (!isSelected && window.shiftDown ) {
                               try {
-                                getInstanceByID(that.props.templateDomainIds[index]);
+                                getInstanceByID(that.props.templateDomainIds[index], true, true, true);
+                                selectInstance(that.props.templateDomainIds[index]);
                                 console.log(that.props.templateDomainNames[index] + ' clicked');
                                 that.setStatusText(that.props.templateDomainNames[index] + ' selected');
                                 break;
                               } catch (ignore) {
                                 console.log(that.props.templateDomainNames[index] + ' requested');
                                 that.setStatusText(that.props.templateDomainNames[index] + ' requested');
-                                if (window.shiftDown) {
+                                if (!window.shiftDown) {
                                   console.log('Adding ' + that.props.templateDomainNames[index]);
                                   that.setStatusText('Adding ' + that.props.templateDomainNames[index]);
                                   var varriableId = that.props.templateDomainIds[index];
-                                  //window.stackViewerRequest(varriableId); // window.stackViewerRequest must be configured in init script
                                   isSelected = true;
                                   break;
                                 } else {
                                   that.setStatusText(that.props.templateDomainNames[index] + ' (⇧click to add)');
-                                  //window.stackViewerRequest(that.props.templateDomainTypeIds[index]);
                                   break;
                                 }
                               }
@@ -543,7 +542,7 @@ import { getInstanceByID } from '../reducers/actions/instances';
                         if (index == 0) {
                           if (!window.shiftDown) {
                             let updatedObjects = [...that.state.objects];
-                            updatedObjects[that.state.label[i]] === undefined && updatedObjects.push(that.state.label[i]);
+                            updatedObjects[that.state.label[i]] === undefined && updatedObjects.push(that.props.templateDomainNames[i]);
                             that.setState({ objects : updatedObjects})
                           }
                         } else {

@@ -4,6 +4,7 @@ import { augmentInstancesArray } from '@metacell/geppetto-meta-core/Instances';
 export const loadInstances = (instance, loadedInstances) =>{
   const instance1 = new SimpleInstance(instance)
   instance1.color = instance.color;
+  instance1.wrappedObj.visualValue.obj = window[instance1.wrappedObj.visualValue.obj];
   let instances = window.Instances;
   if ( instances === undefined ){
     instances = [];

@@ -48,13 +48,16 @@ export const get_3d_mesh = async (targetInstance, objURL) => {
         "type": { "eClass": "SimpleType" },
         "visualValue": {
           "eClass": Resources.OBJ,
-          'obj': base64Content
+          "obj" : objURL
         }, 
         "visible" : true,
         "color" : targetInstance?.color
       }
 
+      window[objURL] = base64Content;
+
       return instance;
+
     });
 
     return response;

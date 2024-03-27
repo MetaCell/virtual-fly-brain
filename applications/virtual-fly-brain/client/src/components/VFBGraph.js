@@ -182,7 +182,7 @@ class VFBGraph extends Component {
 
     if (isDoubleClick) {
       const title = node.title ;
-      getInstanceByID(title);
+      getInstanceByID(title, false, false);
     } else {
       this.graphRef.current.ggv.current.zoomToFit()
     }

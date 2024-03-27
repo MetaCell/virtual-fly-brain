@@ -189,6 +189,11 @@ export const getInstanceByID = async (queryId, get3DMesh, focus, select) => {
     return
   }
 
+  if ( response === undefined || response === null ) {
+    store.dispatch(getInstancesFailure("ID not found : " + queryId))
+    return
+  }
+
   store.dispatch(getInstancesSuccess(response, get3DMesh, focus, select ))
 }
 
@@ -205,6 +210,10 @@ export const get3DMesh = async (instance) => {
     return
   }
 
+  if ( mesh_response === undefined ) {
+    store.dispatch(get3DOBJFailure("ID not found : " + queryId))
+    return
+  }
   store.dispatch(get3DOBJSuccess(mesh_response))
 }
 

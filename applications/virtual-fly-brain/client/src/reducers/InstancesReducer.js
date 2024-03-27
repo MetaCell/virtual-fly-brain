@@ -19,12 +19,12 @@ export const initialStateInstancesReducer = {
 
 const getMappedCanvasData = (loadedInstances) => {
   let updatedCanvasData = loadedInstances?.filter( m => m.meshCreated)?.map( instance => {
-    let { color, visibleMesh, metadata } = instance;
+    let { color, visibleMesh, metadata, selected } = instance;
     return {
       instancePath : metadata?.Id,
       visibility : visibleMesh || false,
       color,
-      selected : instance.selected || false
+      selected : selected || false
     }
   })
 
@@ -265,6 +265,10 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
           matchLoadedInstance.visible = true;
           matchLoadedInstance.visibleMesh = true;
           matchLoadedInstance.meshCreated = true;
+        }
+
+        if ( matchLoadedInstance.selected ) {
+          matchLoadedInstance.color = SELECTED_COLOR
         }
 
         loadInstances(simpleInstance, state.allLoadedInstances)

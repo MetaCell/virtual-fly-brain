@@ -222,7 +222,7 @@ const TermInfo = ({ open, setOpen }) => {
   }
 
   const addId = (id) => {
-    getInstanceByID(id);
+    getInstanceByID(id, false);
   }
 
   const handleVisibility = () => {
@@ -268,7 +268,7 @@ const TermInfo = ({ open, setOpen }) => {
   const handleTermClick = (term, evt) => {
     const regExp = /\(([^)]+)\)/g;
     const matches = [...term.id.matchAll(regExp)].flat();
-    getInstanceByID(matches[1]);
+    getInstanceByID(matches[1], false);
   }
 
   const customColorCalculation = ({numTerms, baseRGB, heatLevels, itemData }) => {

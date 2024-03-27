@@ -76,7 +76,7 @@ const Header = ({setBottomNav}) => {
           focusInstance(action.parameters[0])
           selectInstance(action.parameters[0])
         } else {
-          getInstanceByID(action.parameters[0], true)
+          getInstanceByID(action.parameters[0], true, true, true)
         }
         break;
       }

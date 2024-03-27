@@ -479,7 +479,6 @@ const ROIBrowser = (props) => {
                             }
                             onClick={(e) => {
                                 e.stopPropagation();
-                                colorPickerContainer = undefined;
                                 let instanceFound = false;
                                 if ( Instances[rowInfo.node.instanceId] ) {
                                     instanceFound = true;

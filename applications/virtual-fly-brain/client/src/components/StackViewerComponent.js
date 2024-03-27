@@ -419,14 +419,8 @@ import { getInstanceByID } from '../reducers/actions/instances';
       var i, j, result, id, label;
       var that = this;
       var isSelected = false;
-      // FIXME
-      // while (window.GEPPETTO.SceneController.getSelection()[0] != undefined) {
-      //   window.GEPPETTO.SceneController.getSelection()[0].deselect();
-      // }
       [this.state.stack[0]]?.forEach( (item,i) => {
         (function (i, that, shift) {
-          // FIXME
-          // var shift = window.GEPPETTO.isKeyPressed("shift");
           var image = that.state.serverUrl.toString() + '?wlz=' + item + '&sel=0,255,255,255&mod=zeta&fxp=' + that.props.fxp.join(',') + '&scl=' + Number(that.state.scl).toFixed(1) + '&dst=' + Number(that.state.dst).toFixed(1) + '&pit=' + Number(that.state.pit).toFixed(0) + '&yaw=' + Number(that.state.yaw).toFixed(0) + '&rol=' + Number(that.state.rol).toFixed(0);
           // get image size;
           let file = image + '&prl=-1,' + that.state.posX.toFixed(0) + ',' + that.state.posY.toFixed(0) + '&obj=Wlz-foreground-objects';
@@ -533,8 +527,6 @@ import { getInstanceByID } from '../reducers/actions/instances';
             if (i == 0) {
               that.state.loadingLabels = true;
             }
-            // FIXME
-            // var shift = window.GEPPETTO.isKeyPressed("shift");
             var image = that.state.serverUrl.toString() + '?wlz=' + item + '&sel=0,255,255,255&mod=zeta&fxp=' + that.props.fxp.join(',') + '&scl=' + Number(that.state.scl).toFixed(1) + '&dst=' + Number(that.state.dst).toFixed(1) + '&pit=' + Number(that.state.pit).toFixed(0) + '&yaw=' + Number(that.state.yaw).toFixed(0) + '&rol=' + Number(that.state.rol).toFixed(0);
             let file = image + '&prl=-1,' + callX + ',' + callY + '&obj=Wlz-foreground-objects';
             fetch(file,{ method : "POST", url : file})
@@ -1019,7 +1011,6 @@ import { getInstanceByID } from '../reducers/actions/instances';
     },
 
     setStatusText: function (text) {
-      console.log("setStatusText ", text)
       this.state.buffer[-1].x = (40);
       this.state.buffer[-1].y = (8);
       this.state.buffer[-1].text = text;
@@ -1028,7 +1019,6 @@ import { getInstanceByID } from '../reducers/actions/instances';
     },
 
     setHoverText: function (x,y,text) {
-      console.log("setHoverText ", text)
       this.state.buffer[-1].x = this.disp.position.x + (this.stack.position.x * this.disp.scale.x) + (Number(x) * this.disp.scale.x) - 10;
       this.state.buffer[-1].y = this.disp.position.y + (this.stack.position.y * this.disp.scale.y) + (Number(y) * this.disp.scale.y) + 15;
       this.state.buffer[-1].text = text;

@@ -46,6 +46,13 @@ def init_webapp_routes(app):
       data = vfb.get_term_info(id)
       data_formatted = json.dumps(data, cls=NumpyEncoder)
       return data_formatted
+    
+    @app.route('/get_queries', methods=['GET'])
+    @cross_origin(supports_credentials=True)
+    def get_queries():
+      queries = vfb.get_instances(request.args.get('short_form'), return_dataframe=False)
+      info_data = json.dumps(queries, cls=NumpyEncoder)
+      return info_data
 
 app = init_flask(title="VFB index API", webapp=True, init_app_fn=init_webapp_routes)
 

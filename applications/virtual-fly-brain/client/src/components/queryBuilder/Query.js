@@ -16,23 +16,31 @@ export const dividerStyle = {
 }
 
 const Query = ({ fullWidth, queries }) => {
+  
+  const getTags = (tags) => {
+    return tags.split("|")
+  }
+  
   let count = 0;
   queries?.filter(q => q.active).forEach( query => {
-    if ( query.Examples) {
-      count = count + Object.keys(query.Examples)?.length;
-    } else if ( query.Images) {
-      count = count + Object.keys(query.Images)?.length;
+    if ( query.rows) {
+      count = count + Object.keys(query.rows)?.length;
     }
   });
   const title = count + " Query results";
   const tags = [];
   queries?.filter(q => q.active).forEach( (query, index ) => {
-    query.Tags?.forEach( tag => {
-      if ( !tags.includes(tag) ){
-        tags.push(tag);
-      }
+    query.rows?.forEach( row => {
+      const newTags = getTags(row.tags);
+      newTags?.forEach( n => {
+        if ( !tags.includes(n) ){
+          tags.push(n);
+        }
+      })
     })
   })
+
+
   return (
     <>
       <QueryHeader title={title} />
@@ -147,13 +155,11 @@ const Query = ({ fullWidth, queries }) => {
       <Box overflow='auto' height='calc(100% - 5.375rem)' p={1.5}>
         <Grid container spacing={1.5}>
           {queries?.filter(q => q.active).map( (query, index ) => {
-            let examples = {};
-            if ( query?.Examples ){
-              examples = query?.Examples;
-            } else if ( query?.Images ){
-              examples = query?.Images;
-            }
-            return ( Object.keys(examples)?.map((item, index) => {
+            let rows = {};
+            if ( query?.rows ){
+              rows = query?.rows;
+            } 
+            return ( Object.keys(rows)?.map((item, index) => {
               return (
                 <Grid
                   key={index}
@@ -164,7 +170,7 @@ const Query = ({ fullWidth, queries }) => {
                   lg={fullWidth ? 4 : 3}
                   xl={3}
                 >
-                  <QueryCard facets_annotation={query.Tags} query={query?.Examples?.[item][0] || query?.Images?.[item][0]} fullWidth={fullWidth} />
+                  <QueryCard facets_annotation={getTags(query?.rows?.[item]?.tags)} query={query?.rows?.[item]} fullWidth={fullWidth} />
                 </Grid>
               )
             }))

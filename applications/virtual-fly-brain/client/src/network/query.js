@@ -13,7 +13,7 @@ export const get_term_info = async (queryId) => {
 }
 
 export const get_queries = async (queryId) => {
-  const url =`${API_URL}/get_term_info?id=${queryId}`;
+  const url =`${API_URL}/get_queries?short_form=${queryId}`;
   let response = await fetch(url)
   .then(response => { 
     return response.json() 

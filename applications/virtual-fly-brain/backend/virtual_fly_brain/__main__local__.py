@@ -74,10 +74,17 @@ def init_webapp_routes(app):
     def loading_manager():
       pass
 
+    @app.route('/get_queries', methods=['GET'])
+    @cross_origin(supports_credentials=True)
+    def get_queries():
+      term_info_data = vfb.get_instances(request.args.get('short_form'), return_dataframe=False)
+      info_data = json.dumps(term_info_data, cls=NumpyEncoder)
+      return info_data
+
     @app.route('/get_instances', methods=['GET'])
     @cross_origin(supports_credentials=True)
     def instances():
-      return get_instances(request.args.get('short_form'))
+      return vfb.get_instances(request.args.get('short_form'))
       
     @app.route('/test', methods=['GET'])
     def test():

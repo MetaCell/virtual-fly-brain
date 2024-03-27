@@ -97,6 +97,14 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
       }
     }
   }
+
+  const getThumbnail = (thumbnail) => {
+    const matches = thumbnail.match(/\bhttps?::\/\/\S+/gi) || thumbnail.match(/\bhttps?:\/\/\S+/gi);
+
+    console.log("Thumbnail " , matches);
+    return matches;
+  }
+
   return (
     <>
       <Card sx={{
@@ -118,7 +126,7 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
           sx={{
             height: '100%',
           }}
-          image={query.thumbnail}
+          image={getThumbnail(query.thumbnail)}
         >
           <IconButton onClick={(e) => {
             e.stopPropagation();
@@ -303,7 +311,7 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
       </Card>
 
       {showFullScreen && (
-        <FullScreenViewer sx={classes.slider} open={ showFullScreen } onClose={ () => setShowFullScreen( false ) } images={[{ url : query?.thumbnail }]}>
+        <FullScreenViewer sx={classes.slider} open={ showFullScreen } onClose={ () => setShowFullScreen( false ) } images={[{ url : getThumbnail(query.thumbnail) }]}>
           <Button sx={ { position: 'absolute', zIndex: 9, gap: '0.25rem', right: '1.75rem', top: '1.75rem' } } variant="contained" color="info">
             <Compare />
             Compare images with current

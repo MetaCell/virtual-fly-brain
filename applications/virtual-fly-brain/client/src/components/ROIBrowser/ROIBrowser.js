@@ -1,5 +1,5 @@
 /* eslint-disable no-prototype-builtins */
-import React from "react";
+import React, { useEffect } from "react";
 import { ChromePicker } from "react-color";
 import { MuiThemeProvider } from "@material-ui/core/styles";
 import Tree from "./Tree";
@@ -63,7 +63,7 @@ const ROIBrowser = (props) => {
     const popover = React.useRef();
 
     const close = React.useCallback(() => setDisplayColorPicker({}), []);
-    useClickOutside(popover, close);
+    // useClickOutside(popover, close);
 
 
     const treeRef = React.useRef();
@@ -80,7 +80,7 @@ const ROIBrowser = (props) => {
 
     const AUTHORIZATION = "Basic " + btoa("neo4j:vfb")
 
-    let colorPickerContainer = undefined;
+    const colorPickerContainer = React.useRef();
     let nodeWithColorPicker = undefined;
     //axios.defaults.headers.common["Authorization"] = this.AUTHORIZATION
     const restPost = (data) => {
@@ -313,9 +313,9 @@ const ROIBrowser = (props) => {
         };
 
         let clickCondition = undefined;
-        if (colorPickerContainer !== undefined && colorPickerContainer !== null) {
+        if (colorPickerContainer?.current !== undefined && colorPickerContainer?.current !== null) {
             clickCondition = clickCoord.PICKER_PRESENT;
-            if (!colorPickerContainer.contains(e.target)) {
+            if (!colorPickerContainer.current?.contains(e.target)) {
                 clickCondition = clickCoord.OUTSIDE;
             }
         }
@@ -326,7 +326,6 @@ const ROIBrowser = (props) => {
                     nodeWithColorPicker.showColorPicker = false;
                     nodeWithColorPicker = undefined;
                 }
-                colorPickerContainer = undefined;
                 setDisplayColorPicker({});
                 break;
         }
@@ -365,7 +364,7 @@ const ROIBrowser = (props) => {
                 buttons.push(
                     <IconButton disableRipple color="primary" aria-label="delete" size="small" onClick={(e) => {
                         e.stopPropagation();
-                        getInstanceByID(rowInfo.node.instanceId, true);
+                        getInstanceByID(rowInfo.node.instanceId, true, true, false);
                         setState({ ...state, nodeSelected : rowInfo.node });
                     }}>
                         <Eye />
@@ -389,15 +388,17 @@ const ROIBrowser = (props) => {
                     </IconButton>
                 );
                 break;
-            case "3dVisible":
-                var color = match.color;
+            case "3dVisible": {
+                let color = match.color;
                 buttons.push(
                     <IconButton disableRipple aria-label="delete" size="small" onClick={(e) => {
                         e.stopPropagation();
                             if (match?.getParent) {
                                 match.getParent().visible = false;
+                                color = match.getParent().color;
                             } else {
                                 match.visible = false;
+                                color = match.color;
                             }
                             hide3DMesh(rowInfo.node.instanceId)
                             setState({ ...state, nodeSelected : rowInfo.node });
@@ -407,25 +408,23 @@ const ROIBrowser = (props) => {
                 );
                 buttons.push(
                         <IconButton style={{ color: 'white' }} aria-label="color" size="small" onClick={(e) => {
-                            if ( !rowInfo.node.showColorPicker ){
-                                e.stopPropagation();
+                            e.stopPropagation();
+                            if ( displayColorPicker[rowInfo.node.instanceId] != true ){
                                 nodeWithColorPicker = rowInfo.node;
-                                rowInfo.node.showColorPicker = true;
                                 setDisplayColorPicker({[rowInfo.node.instanceId] : true});
                             }
                         }}>
                             <ColorLensIcon/>
                         {displayColorPicker[rowInfo.node.instanceId] ? (
-                                <div style={{ width: '100%' }} ref={popover}><ChromePicker
+                                <div style={{ width: '100%' }} ref={colorPickerContainer}><ChromePicker
                                     disableAlpha={true}    
-                                    color={match.color}
+                                    color={color}
                                     onChangeComplete={(color, event) => {
                                         let rgb;
+                                        event.stopPropagation();
                                         if ( event.target.className == 'saturation-black' ) {
                                             rgb = { r:color.rgb.r/255, g:color.rgb.g/255, b:color.rgb.b/255, a:color.rgb.a }
                                             changeColor(rowInfo.node.instanceId, rgb)
-                                            rowInfo.node.showColorPicker = false;
-                                            setDisplayColorPicker({[rowInfo.node.instanceId] : false});
                                         }
                                     }}
                                     style={{ zIndex: 10 }}
@@ -434,6 +433,7 @@ const ROIBrowser = (props) => {
                     </IconButton>
                 );
                 break;
+            }
         }
         return buttons;
     };
@@ -479,16 +479,15 @@ const ROIBrowser = (props) => {
                             }
                             onClick={(e) => {
                                 e.stopPropagation();
-                                colorPickerContainer = undefined;
                                 let instanceFound = false;
                                 if ( Instances[rowInfo.node.instanceId] ) {
                                     instanceFound = true;
                                 }
                                 
                                 if ( instanceFound ) {
-                                    getInstanceByID(rowInfo.node.instanceId, true);
+                                    getInstanceByID(rowInfo.node.instanceId, true, false, false);
                                 } else {
-                                    getInstanceByID(rowInfo.node.instanceId, true);
+                                    getInstanceByID(rowInfo.node.instanceId, true, false, false);
                                 }
                                 setState({ ...state, nodeSelected : rowInfo.node });
                             }}
@@ -502,7 +501,7 @@ const ROIBrowser = (props) => {
         return title;
     };
 
-    React.useEffect(() => {
+    useEffect(() => {
         const template = allLoadedInstances?.find( i => i.metadata?.Id === templateID);
         if (template !== undefined) {
             if ( state.dataTree === undefined ) initTree(template)
@@ -512,13 +511,17 @@ const ROIBrowser = (props) => {
         }
     }, [templateID]);
 
-    React.useEffect( () => {
+    useEffect( () => {
         if ( state.dataTree === undefined ) {
             initTree(data)
         } else {
             updateTree(data)
         }
     },[data]);
+
+    useEffect(() => {
+        document.addEventListener('mousedown', monitorMouseClick, false);
+    }, [])
 
     return(
         <Box

@@ -66,7 +66,6 @@ const loaded = (store, firstIDLoaded, allLoadedInstances) => {
     }
 
     const id = getUrlParameter("id")?.split(",")?.[0];
-    selectInstance(id);
   }
 }
 
@@ -77,7 +76,7 @@ const getUrlParameter = (param) => {
 
 const getInstance = (allLoadedInstances, id, focus) => {
   if ( !allLoadedInstances?.find( i => i.metadata?.Id === id ) ){
-    getInstanceByID(id, true, focus);
+    getInstanceByID(id, true, focus, focus);
   }
 }
 
@@ -92,8 +91,8 @@ export const urlUpdaterMiddleware = store => next => (action) => {
     case getInstancesTypes.GET_3D_OBJ_TYPE_SUCCESS : {
       const idFromUrl = getUrlParameter("id")?.split(',')?.[0];
       if ( action.payload.id === idFromUrl ){
-        focusInstance(idFromUrl);
-        selectInstance(idFromUrl)
+        //focusInstance(idFromUrl);
+        //selectInstance(idFromUrl)
       }
       break;
     }
@@ -104,11 +103,9 @@ export const urlUpdaterMiddleware = store => next => (action) => {
         if ( !action.payload?.IsClass ) {
           if ( !action.payload.IsTemplate && !firstIDLoaded ){
             let template = Object.keys(templateLookup)?.[0];
-            getInstanceByID(template, true, false)
+            getInstanceByID(template, true, false, false)
             store.dispatch(setTemplateID(template))
             updateUrlParameterWithCurrentUrl("i", template);
-            selectInstance(action.payload?.Id)
-            focusInstance(action.payload?.Id);
           } else if ( !action.payload.IsTemplate && Object.keys(templateLookup)?.[0] != launchTemplate?.metadata?.Id ) {
             store.dispatch(setAlignTemplates(false, action.payload.Id))
             break;

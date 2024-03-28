@@ -6,15 +6,34 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import vars from "../../theme/variables";
 import { dividerStyle } from "./Query";
+import { removeAllRecentSearch } from "../../reducers/actions/globals";
+import { useDispatch } from "react-redux";
 
 const { searchHeadingColor, whiteColor, secondaryBg, primaryBg } = vars
 
-const QueryHeader = ({ title }) => {
-  const [age, setAge] = React.useState('0');
+const QueryHeader = ({ title, filters, recentSearches, filteredSearches, setFilteredSearches }) => {
+  const [sort, setSort] = React.useState('Name');
+  const dispatch = useDispatch();
+  const [crescent , setCrescent] = React.useState(1);
 
-  const handleChange = (event) => {
-    setAge(event.target.value);
+  const handleChange = (value) => {
+    setSort(value);
+    const identifier = filters[value];
+    let updatedSearches = [...recentSearches.sort( (a,b) => a?.[identifier]?.localeCompare(b?.[identifier] ))];
+    setFilteredSearches(updatedSearches)
   };
+
+  const handleCrescentChange = () => {
+    const identifier = filters[sort];
+    let updatedSearches = [...recentSearches.sort( (a,b) => (crescent * -1 )* a?.[identifier]?.localeCompare(b?.[identifier] ))];
+    setFilteredSearches(updatedSearches)
+    setCrescent(crescent * -1 );
+  };
+
+  const removeFromHistory = () => {
+    dispatch(removeAllRecentSearch())
+  };
+
   return (
     <Box
       position='sticky'
@@ -51,6 +70,7 @@ const QueryHeader = ({ title }) => {
       } }>
         <Button
           disableRipple
+          onClick={() => handleCrescentChange()}
           variant="text"
           sx={{
             gap: '0.25rem',
@@ -109,19 +129,16 @@ const QueryHeader = ({ title }) => {
           }} fullWidth>
             <Select
               IconComponent={ChevronDown}
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              value={age}
-              onChange={handleChange}
+              labelId="properties-select"
+              id="properties-select"
+              value={sort}
+              onChange={(event) => handleChange(event.target.value)}
             >
-              <MenuItem value={0}>Name</MenuItem>
-              <MenuItem value={1}>Ten</MenuItem>
-              <MenuItem value={2}>Twenty</MenuItem>
-              <MenuItem value={3}>Thirty</MenuItem>
+              { Object.keys(filters || {}).map( (filter, index) => (<MenuItem key={index} value={filter}>{filter}</MenuItem> ))}
             </Select>
           </FormControl>
         </Box>
-        <Button
+        {/* <Button
             disableRipple
             variant="text"
             sx={{
@@ -142,11 +159,12 @@ const QueryHeader = ({ title }) => {
         >
             <Add size={12} opacity={1} color={searchHeadingColor} />
             Add sorting
-          </Button>
+          </Button> */}
         <Divider sx={ dividerStyle } />
         <Button
             disableRipple
             variant="text"
+            onClick={(event) => removeFromHistory()}
             sx={{
               minWidth: '0.0625rem',
               padding: 0,

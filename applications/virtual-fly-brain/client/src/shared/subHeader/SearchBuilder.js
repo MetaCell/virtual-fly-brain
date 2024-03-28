@@ -184,7 +184,7 @@ export default function SearchBuilder(props) {
       let id = v.id?.split("/");
       id = id?.[id?.length - 1];
       if ( !allLoadedInstances?.find( i => i.id === id) && index <= value.length - 1){
-        getInstanceByID(id, true);
+        getInstanceByID(id, true, true, true);
       }
     })
     setIsOpen(false)

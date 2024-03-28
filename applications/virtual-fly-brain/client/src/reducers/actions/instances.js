@@ -2,12 +2,13 @@ import store from '../../store';
 import { get_3d_mesh, get_instance } from "../../network/query"
 import { getInstancesTypes } from './types/getInstancesTypes';
 
-const getInstancesSuccess = ( query, mesh, focus) => ({
+const getInstancesSuccess = ( query, mesh, focus, select) => ({
   type: getInstancesTypes.GET_INSTANCES_SUCCESS,
   payload: {
     ...query,
     get3DMesh : mesh,
-    focus : focus
+    focus : focus,
+    select : select
   }
 });
 
@@ -175,7 +176,7 @@ const templateLoadedMessage = (id, openTemplate) => ({
   }
 });
 
-export const getInstanceByID = async (queryId, get3DMesh, focus) => {
+export const getInstanceByID = async (queryId, get3DMesh, focus, select) => {
 
   store.dispatch(getInstancesStarted())
 
@@ -188,7 +189,12 @@ export const getInstanceByID = async (queryId, get3DMesh, focus) => {
     return
   }
 
-  store.dispatch(getInstancesSuccess(response, get3DMesh || true, focus || true))
+  if ( response === undefined || response === null ) {
+    store.dispatch(getInstancesFailure("ID not found : " + queryId))
+    return
+  }
+
+  store.dispatch(getInstancesSuccess(response, get3DMesh, focus, select ))
 }
 
 export const get3DMesh = async (instance) => {
@@ -204,6 +210,10 @@ export const get3DMesh = async (instance) => {
     return
   }
 
+  if ( mesh_response === undefined ) {
+    store.dispatch(get3DOBJFailure("ID not found : " + queryId))
+    return
+  }
   store.dispatch(get3DOBJSuccess(mesh_response))
 }
 

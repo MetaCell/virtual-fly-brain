@@ -1,4 +1,6 @@
-var modelJson = {
+/* eslint-disable babel/require-config-file */
+
+const modelJson = {
   global: {
     tabEnableClose: true,
     sideBorders: 8,

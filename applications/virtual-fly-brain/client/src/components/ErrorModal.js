@@ -13,7 +13,7 @@ const style = {
   bgcolor: 'background.paper',
   boxShadow: 24,
   p: 4,
-  outline: 'none', 
+  outline: 'none',
 };
 
 const ErrorModal = ({ display, message }) => {
@@ -30,7 +30,7 @@ const ErrorModal = ({ display, message }) => {
   return (
     <Modal
       open={open}
-      onClose={handleClose} 
+      onClose={handleClose}
       aria-labelledby="error-modal-title"
       aria-describedby="error-modal-description"
     >

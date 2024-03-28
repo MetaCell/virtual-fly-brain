@@ -1,13 +1,17 @@
 import React, { Fragment } from 'react';
+import { useDispatch } from 'react-redux';
 import Button from '@mui/material/Button';
 import { MailIcon, BugIcon, ModalErrorIcon } from '../icons';
 import Modal from '../shared/modal/Modal';
+import { resetErrors } from '../reducers/actions/globals';
 
 const ErrorDialog = ({ display, message }) => {
+    const dispatch = useDispatch();
     const [open, setOpen] = React.useState(display);
 
     const handleClose = () => {
-        setOpen(false);
+        console.log('clicked')
+        dispatch(resetErrors());
     };
 
     React.useEffect(() => {

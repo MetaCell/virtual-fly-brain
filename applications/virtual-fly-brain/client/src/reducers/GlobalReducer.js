@@ -13,7 +13,7 @@ export const initialStateGlobalReducer = {
 
 const GlobalReducer = (state = initialStateGlobalReducer, response) => {
   switch (response.type) {
-     case getGlobalTypes.GET_TEMPLATE_ID:
+      case getGlobalTypes.GET_TEMPLATE_ID:
         return Object.assign({}, state, {
           templateID: response.payload.id
         })
@@ -54,20 +54,20 @@ const GlobalReducer = (state = initialStateGlobalReducer, response) => {
         }
         return Object.assign({}, state, {
           recentSearches: updateRecentSearches
-      })
-    }
-    case getGlobalTypes.REMOVE_RECENT_SEARCH:{
-      let updateRecentSearches = [...state.recentSearches];
-      if ( response.payload.isQuery ){
-        updateRecentSearches = updateRecentSearches?.filter( r => !r.is_query || r.id !== response.payload.id );
-      } else {
-        updateRecentSearches = updateRecentSearches?.filter( r => r.id !== response.payload.id || r.is_query );
+        })
       }
-      return Object.assign({}, state, {
-        recentSearches: updateRecentSearches
-    })
-    }
-     default:
+      case getGlobalTypes.REMOVE_RECENT_SEARCH:{
+        let updateRecentSearches = [...state.recentSearches];
+        if ( response.payload.isQuery ){
+          updateRecentSearches = updateRecentSearches?.filter( r => !r.is_query || r.id !== response.payload.id );
+        } else {
+          updateRecentSearches = updateRecentSearches?.filter( r => r.id !== response.payload.id || r.is_query );
+        }
+        return Object.assign({}, state, {
+          recentSearches: updateRecentSearches
+        })
+      }
+      default:
         return state;
   }
 }

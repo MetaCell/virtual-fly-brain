@@ -3,6 +3,7 @@ import React from 'react';
   import * as PIXI from 'pixi.js';
   var createClass = require('create-react-class');
   import { useRef, useEffect } from 'react';
+import { getInstanceByID, selectInstance } from '../reducers/actions/instances';
 
   const Canvas = createClass({
     _isMounted: false,
@@ -125,6 +126,21 @@ import React from 'react';
       this.callPlaneEdges();
 
       setTimeout(this.bufferStack, 30000);
+
+      let setShiftDown = function(event){
+          if(event.keyCode === 16 || event.charCode === 16){
+              window.shiftDown = true;
+          }
+      };
+
+      let setShiftUp = function(event){
+          if(event.keyCode === 16 || event.charCode === 16){
+              window.shiftDown = false;
+          }
+      };
+
+      window.addEventListener? document.addEventListener('keydown', setShiftDown) : document.attachEvent('keydown', setShiftDown);
+      window.addEventListener? document.addEventListener('keyup', setShiftUp) : document.attachEvent('keyup', setShiftUp);
 
     },
 
@@ -403,14 +419,8 @@ import React from 'react';
       var i, j, result, id, label;
       var that = this;
       var isSelected = false;
-      // FIXME
-      // while (window.GEPPETTO.SceneController.getSelection()[0] != undefined) {
-      //   window.GEPPETTO.SceneController.getSelection()[0].deselect();
-      // }
       [this.state.stack[0]]?.forEach( (item,i) => {
         (function (i, that, shift) {
-          // FIXME
-          // var shift = window.GEPPETTO.isKeyPressed("shift");
           var image = that.state.serverUrl.toString() + '?wlz=' + item + '&sel=0,255,255,255&mod=zeta&fxp=' + that.props.fxp.join(',') + '&scl=' + Number(that.state.scl).toFixed(1) + '&dst=' + Number(that.state.dst).toFixed(1) + '&pit=' + Number(that.state.pit).toFixed(0) + '&yaw=' + Number(that.state.yaw).toFixed(0) + '&rol=' + Number(that.state.rol).toFixed(0);
           // get image size;
           let file = image + '&prl=-1,' + that.state.posX.toFixed(0) + ',' + that.state.posY.toFixed(0) + '&obj=Wlz-foreground-objects';
@@ -425,11 +435,11 @@ import React from 'react';
                     if (result[j].trim() !== '') {
                       var index = Number(result[j]);
                       if (i !== 0 || index !== 0) { // don't select template
-                        if (index == 0 && !shift) {
-                          if (!isSelected){
+                        if (index == 0 ) {
+                          if (!window.shiftDown){
                             console.log(that.state.label[i] + ' clicked');
                             try {
-                              eval(that.state.id[i][Number(result[j])]).select();
+                              getInstanceByID(that.props.templateDomainIds[index], true, true);
                               that.setStatusText(that.state.label[i] + ' selected');
                               isSelected = true;
                             } catch (err) {
@@ -442,23 +452,22 @@ import React from 'react';
                           if (typeof that.props.templateDomainIds !== 'undefined' && typeof that.props.templateDomainNames !== 'undefined' && typeof that.props.templateDomainIds[index] !== 'undefined' && typeof that.props.templateDomainNames[index] !== 'undefined' && that.props.templateDomainIds[index] !== null && that.props.templateDomainNames[index] !== null) {
                             if (!isSelected) {
                               try {
-                                eval(that.state.id[i][Number(result[j])]).select();
+                                getInstanceByID(that.props.templateDomainIds[index], true, true, true);
+                                selectInstance(that.props.templateDomainIds[index]);
                                 console.log(that.props.templateDomainNames[index] + ' clicked');
                                 that.setStatusText(that.props.templateDomainNames[index] + ' selected');
                                 break;
                               } catch (ignore) {
                                 console.log(that.props.templateDomainNames[index] + ' requested');
                                 that.setStatusText(that.props.templateDomainNames[index] + ' requested');
-                                if (shift) {
+                                if (window.shiftDown) {
                                   console.log('Adding ' + that.props.templateDomainNames[index]);
                                   that.setStatusText('Adding ' + that.props.templateDomainNames[index]);
                                   var varriableId = that.props.templateDomainIds[index];
-                                  //window.stackViewerRequest(varriableId); // window.stackViewerRequest must be configured in init script
                                   isSelected = true;
                                   break;
                                 } else {
                                   that.setStatusText(that.props.templateDomainNames[index] + ' (⇧click to add)');
-                                  //window.stackViewerRequest(that.props.templateDomainTypeIds[index]);
                                   break;
                                 }
                               }
@@ -497,7 +506,7 @@ import React from 'react';
         this._initialized = true;
         this.props.onHome();
       }
-      if (this.state.text.indexOf('Buffering stack') > -1) {
+      if (this.state.text?.indexOf('Buffering stack') > -1) {
         this.state.buffer[-1].text = '';
       }
       this.state.bufferRunning = false;
@@ -508,6 +517,7 @@ import React from 'react';
     listObjects: function () {
       if (!this.state.loadingLabels || this.state.lastLabelCall < (Date.now() - 500)) {
         this.state.lastLabelCall = Date.now();
+        this.state.objects = [];
         var i, j, result;
         var that = this;
         var callX = that.state.posX.toFixed(0), callY = that.state.posY.toFixed(0);
@@ -517,8 +527,6 @@ import React from 'react';
             if (i == 0) {
               that.state.loadingLabels = true;
             }
-            // FIXME
-            // var shift = window.GEPPETTO.isKeyPressed("shift");
             var image = that.state.serverUrl.toString() + '?wlz=' + item + '&sel=0,255,255,255&mod=zeta&fxp=' + that.props.fxp.join(',') + '&scl=' + Number(that.state.scl).toFixed(1) + '&dst=' + Number(that.state.dst).toFixed(1) + '&pit=' + Number(that.state.pit).toFixed(0) + '&yaw=' + Number(that.state.yaw).toFixed(0) + '&rol=' + Number(that.state.rol).toFixed(0);
             let file = image + '&prl=-1,' + callX + ',' + callY + '&obj=Wlz-foreground-objects';
             fetch(file,{ method : "POST", url : file})
@@ -533,16 +541,22 @@ import React from 'react';
                       var index = Number(result[j]);
                       if (i !== 0 || index !== 0) { // don't select template
                         if (index == 0) {
-                          if (!shift) {
+                          if (!window.shiftDown) {
                             let updatedObjects = [...that.state.objects];
-                            updatedObjects[that.state.label[i]] === undefined && updatedObjects.push(that.state.label[i]);
+                            if ( !updatedObjects?.find( o => o === that.state.label[i] ) ){
+                              updatedObjects.push(that.props.templateDomainNames[index]);
+                            }
                             that.setState({ objects : updatedObjects})
+                            that.state.objects = updatedObjects
                           }
                         } else {
                           if (typeof that.props.templateDomainIds !== 'undefined' && typeof that.props.templateDomainNames !== 'undefined' && typeof that.props.templateDomainIds[index] !== 'undefined' && typeof that.props.templateDomainNames[index] !== 'undefined' && that.props.templateDomainNames[index] !== null) {
                             let updatedObjects = [...that.state.objects];
-                            updatedObjects[that.props.templateDomainNames[index]] === undefined &&  updatedObjects.push(that.props.templateDomainNames[index]);
+                            if ( !updatedObjects?.find( o => o === that.props.templateDomainNames[index] ) ){
+                              updatedObjects.push(that.props.templateDomainNames[index]);
+                            }
                             that.setState({ objects : updatedObjects})
+                            that.state.objects = updatedObjects
                             break;
                           }
                         }
@@ -553,7 +567,7 @@ import React from 'react';
                     return index === arr.indexOf(el);
                   }).sort();
                   var objects = '';
-                  if (shift) {
+                  if (window.shiftDown) {
                     objects = 'Click to add: ';
                   }
                   for (j in list) {
@@ -860,7 +874,7 @@ import React from 'react';
     createStatusText: function () {
       if (!this.state.buffer[-1]) {
         var style = {
-          font: '12px Helvetica',
+          font: '8px Helvetica',
           fill: '#ffffff',
           stroke: '#000000',
           strokeThickness: 2,
@@ -905,6 +919,7 @@ import React from 'react';
           id: nextProps.id,
           serverUrl: nextProps.serverUrl.replace('http:', window.location.protocol).replace('https:', window.location.protocol)
         });
+        console.log("Next label ", nextProps.label)
         this.checkStack();
       }
       if (nextProps.scl !== this.state.scl || nextProps.zoomLevel !== this.props.zoomLevel || nextProps.width !== this.props.width || nextProps.height !== this.props.height || nextProps.stackX !== this.stack.position.x || nextProps.stackY !== this.stack.position.y){
@@ -1003,7 +1018,6 @@ import React from 'react';
     },
 
     setStatusText: function (text) {
-      console.log("setStatusText ", text)
       this.state.buffer[-1].x = (40);
       this.state.buffer[-1].y = (8);
       this.state.buffer[-1].text = text;
@@ -1012,7 +1026,6 @@ import React from 'react';
     },
 
     setHoverText: function (x,y,text) {
-      console.log("setHoverText ", text)
       this.state.buffer[-1].x = this.disp.position.x + (this.stack.position.x * this.disp.scale.x) + (Number(x) * this.disp.scale.x) - 10;
       this.state.buffer[-1].y = this.disp.position.y + (this.stack.position.y * this.disp.scale.y) + (Number(y) * this.disp.scale.y) + 15;
       this.state.buffer[-1].text = text;
@@ -1037,7 +1050,6 @@ import React from 'react';
        * the reason for this is because of multitouch
        * we want to track the movement of this particular touch
        */
-      this.state.data = event.data;
       this.stack.alpha = 0.7;
       this.state.dragging = true;
       var offPosition = this.state.data.global;
@@ -1076,11 +1088,12 @@ import React from 'react';
     },
 
     onHoverEvent: function (event) {
-      if (!this.state.loadingLabels && !this.state.dragging) {
+      this.state.data = event.data;
+      if (this.state.data !== null && typeof this.state.data.getLocalPosition === "function" && !this.state.loadingLabels && !this.state.dragging) {
         if (this.app === null ) {
           return;
         }
-        var currentPosition = this.app.renderer.plugins.interaction.rootPointerEvent?.screen;
+        var currentPosition = this.state.data.getLocalPosition(this.stack);
         // update new position:
         this.state.posX = Number(currentPosition?.x?.toFixed(0));
         this.state.posY = Number(currentPosition?.y?.toFixed(0));
@@ -1141,8 +1154,8 @@ const StackViewerComponent = () => createClass({
         text: '',
         stackX: 0,
         stackY: 0,
-        imageX: 10240,
-        imageY: 10240,
+        imageX: 1024,
+        imageY: 1024,
         fxp: [511, 255, 108],
         pit: 0,
         yaw: 0,
@@ -1365,9 +1378,9 @@ const StackViewerComponent = () => createClass({
               if (typeof this.props.config.templateId !== 'undefined' && typeof this.props.config.templateDomainIds !== 'undefined' && instances[instance].parent.getId() == this.props.config.templateId) {
                 ids.push(this.props.config.templateDomainIds);
               } else {
-                ids.push([instances[instance].parent.getId()]);
+                ids.push([instances[instance].getId()]);
               }
-              labels.push(instances[instance].parent.getName());
+              labels.push(instances[instance].getName());
             }
           } catch (err) {
             console.log('Error handling ' + instance);
@@ -1384,6 +1397,7 @@ const StackViewerComponent = () => createClass({
         }
         if (labels && labels != null && labels.length > 0 && labels.toString() != this.state.label.toString()) {
           newState.label = labels;
+          console.log("New labels ", labels)
         }
         if (ids && ids != null && ids.length > 0 && ids.toString() != this.state.id.toString()) {
           newState.id = ids;
@@ -1410,7 +1424,7 @@ const StackViewerComponent = () => createClass({
       var newDst = Number(this.state.dst);
       var stackX = this.state.stackX;
       var stackY = this.state.stackY;
-      if (window.GEPPETTO?.isKeyPressed("shift")) {
+      if (window.shiftDown) {
         zoomLevel = Number((this.state.zoomLevel += 1).toFixed(1));
       } else {
         zoomLevel = Number((this.state.zoomLevel += 0.1).toFixed(1));
@@ -1482,7 +1496,7 @@ const StackViewerComponent = () => createClass({
       var newDst = Number(this.state.dst);
       var stackX = this.state.stackX;
       var stackY = this.state.stackY;
-      if (window.GEPPETTO?.isKeyPressed("shift")) {
+      if (window.shiftDown) {
         zoomLevel = Number((this.state.zoomLevel -= 1).toFixed(1));
       } else {
         zoomLevel = Number((this.state.zoomLevel -= 0.1).toFixed(1));
@@ -1516,9 +1530,8 @@ const StackViewerComponent = () => createClass({
      *
      */
     onStepIn: function () {
-      var shift = window.GEPPETTO?.isKeyPressed("shift");
       var newdst = this.state.dst
-      if (shift) {
+      if (window.shiftDown) {
         newdst += (this.state.voxelZ * this.state.scl) * 10;
       } else {
         newdst += (this.state.voxelZ * this.state.scl);
@@ -1538,9 +1551,8 @@ const StackViewerComponent = () => createClass({
      *
      */
     onStepOut: function () {
-      var shift = window.GEPPETTO?.isKeyPressed("shift");
       var newdst = this.state.dst
-      if (shift) {
+      if (window.shiftDown) {
         newdst -= (this.state.voxelZ * this.state.scl) * 10;
       } else {
         newdst -= (this.state.voxelZ * this.state.scl);
@@ -1632,7 +1644,7 @@ const StackViewerComponent = () => createClass({
       } else {
         toggleSliceClass += 'gpt-showplane';
       }
-      var startOffset = 5;
+      var startOffset = 45;
       var displayArea = this.props.data.id + 'displayArea';
       var markup = '';
       if (this.state.stack.length > 0) {
@@ -1641,7 +1653,7 @@ const StackViewerComponent = () => createClass({
             <div  onClick={this.onHome} >
             <button style={{
               position: 'absolute',
-              left: 15,
+              left: 13,
               top: startOffset + 20,
               padding: 0,
               border: 0,

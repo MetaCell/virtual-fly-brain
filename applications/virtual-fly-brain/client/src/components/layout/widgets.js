@@ -17,7 +17,7 @@ export const widgets = {
         panelName: "left",
         hideOnClose: false,
         status: WidgetStatus.ACTIVE,
-        props: { size: { height: 400, width: 600 } }
+        props: { size: { height: 600, width: 600 } }
     },
 
     roiBrowserWidget : {

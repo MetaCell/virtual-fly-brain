@@ -14,6 +14,7 @@ const {
   blackColor
 } = vars;
 
+let StackComponent = null;
 
 const VFBStackViewer = (props) => {
   const data = useSelector(state => state.instances.allLoadedInstances)
@@ -22,6 +23,10 @@ const VFBStackViewer = (props) => {
     templateId: 'NOTSET'
   };
   let voxelSize = { x:0.622088, y:0.622088, z:0.622088 };
+
+  if ( StackComponent == null ){
+    StackComponent = StackViewerComponent()
+  }
 
   const [stackData, setStackData] = React.useState({
     id: props.id, height: props.size?.height, width: props.size?.width, instances: [], selected: []
@@ -73,7 +78,7 @@ const VFBStackViewer = (props) => {
 
       for (let i = 0; i < potentialInstances?.length; i++) {
         instance = potentialInstances[i];
-        if (instance) {
+        if (instance && sliceInstances?.find( i => i.wrappedObj?.id == instance?.wrappedObj?.id ) === undefined ) {
           sliceInstances.push(instance);
         }
       }
@@ -87,7 +92,7 @@ const VFBStackViewer = (props) => {
   useEffect( () => {
     let instances = stackData.instances;
     data?.forEach( stackViewerData => {
-      if (stackViewerData?.metadata?.Id !== stackData?.id && stackViewerData?.stackInstance) {
+      if (stackViewerData?.stackInstance) {
         let keys = Object.keys(stackViewerData.metadata?.Images);
 
         const instancespec = {
@@ -105,6 +110,7 @@ const VFBStackViewer = (props) => {
           "eClass": "SimpleInstance",
           "id": stackViewerData.metadata?.Id + "_slices",
           "name": stackViewerData.metadata?.Name + "_slices",
+          "color" : stackViewerData.color,
           "type": { "eClass": "SimpleType" },
           "visualValue": {
             "eClass": Resources.IMAGE,
@@ -115,7 +121,16 @@ const VFBStackViewer = (props) => {
         const slices = new SimpleInstance(instance1spec);
         slices.parent = parent;
         parent[stackViewerData.metadata?.Id + "_slices"] = slices;
-        instances.push(slices);
+        if ( instances.find( i => i.wrappedObj.id == slices.wrappedObj.id ) === undefined  ){
+          instances.push(slices);
+        } else {
+          let instance = instances.find( i => i.wrappedObj.id == slices.wrappedObj.id );
+          instance.wrappedObj.color = stackViewerData.color;
+          if ( !stackViewerData.visible ){
+            let instanceIndex = instances.findIndex( i => i.wrappedObj.id == slices.wrappedObj.id );
+            instances.splice(instanceIndex, 1);
+          }
+        }
       }
   });
   const newData = {
@@ -144,7 +159,7 @@ const VFBStackViewer = (props) => {
   // Update config and voxel size before re-rendering
   useMemo(() => {
     data?.forEach( stackViewerData => {
-    if (stackViewerData?.metadata?.Images) {
+    if (stackViewerData?.metadata?.IsTemplate) {
       let keys = Object.keys(stackViewerData.metadata?.Images);
       config = stackViewerData.metadata?.Images[keys[0]]?.[0];
       config.serverUrl = 'http://www.virtualflybrain.org/fcgi/wlziipsrv.fcgi';
@@ -177,7 +192,6 @@ const VFBStackViewer = (props) => {
   });
   }, [stackData]);
 
-  const StackComponent = StackViewerComponent();
   return (
       stackData?.instances?.length > 0 ? <StackComponent
       data={stackData}

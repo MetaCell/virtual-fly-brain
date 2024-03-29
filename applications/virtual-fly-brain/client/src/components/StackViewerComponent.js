@@ -1,9 +1,17 @@
 import React from 'react';
-  import { Application, Container, Assets, Sprite, Text, utils, extensions, ExtensionType, Texture , Resource, BLEND_MODES } from 'pixi.js';
-  import * as PIXI from 'pixi.js';
-  var createClass = require('create-react-class');
-  import { useRef, useEffect } from 'react';
+import { Application, Container, Assets, Sprite, Text, utils, extensions, ExtensionType, Texture , Resource, BLEND_MODES } from 'pixi.js';
+var createClass = require('create-react-class');
 import { getInstanceByID, selectInstance } from '../reducers/actions/instances';
+
+
+const componentToHex = (c) => {
+  const hex = (c*255).toString(16);
+  return hex.length == 1 ? "0" + hex : hex;
+}
+
+const rgbToHex = (color) => {
+  return "#" + componentToHex(color.r) + componentToHex(color.g) + componentToHex(color.b);
+}
 
   const Canvas = createClass({
     _isMounted: false,
@@ -86,6 +94,7 @@ import { getInstanceByID, selectInstance } from '../reducers/actions/instances';
       this.disp.scale.y = this.props.zoomLevel / this.props.scl;
       this.app.stage.addChild(this.disp);
       this.stack = new Container();
+      console.log("New mount")
       this.stack.pivot.x = 0;
       this.stack.pivot.y = 0;
       this.stack.position.x = 0;
@@ -439,7 +448,7 @@ import { getInstanceByID, selectInstance } from '../reducers/actions/instances';
                           if (!window.shiftDown){
                             console.log(that.state.label[i] + ' clicked');
                             try {
-                              getInstanceByID(that.props.templateDomainIds[index], true, true);
+                              getInstanceByID(that.props.templateDomainIds[index], true, true, true);
                               that.setStatusText(that.state.label[i] + ' selected');
                               isSelected = true;
                             } catch (err) {
@@ -452,7 +461,7 @@ import { getInstanceByID, selectInstance } from '../reducers/actions/instances';
                           if (typeof that.props.templateDomainIds !== 'undefined' && typeof that.props.templateDomainNames !== 'undefined' && typeof that.props.templateDomainIds[index] !== 'undefined' && typeof that.props.templateDomainNames[index] !== 'undefined' && that.props.templateDomainIds[index] !== null && that.props.templateDomainNames[index] !== null) {
                             if (!isSelected && window.shiftDown ) {
                               try {
-                                getInstanceByID(that.props.templateDomainIds[index], true, true, true);
+                                getInstanceByID(that.props.templateDomainIds[index], true, true, true, true);
                                 selectInstance(that.props.templateDomainIds[index]);
                                 console.log(that.props.templateDomainNames[index] + ' clicked');
                                 that.setStatusText(that.props.templateDomainNames[index] + ' selected');
@@ -1331,7 +1340,7 @@ const StackViewerComponent = () => createClass({
     },
 
     handleInstances: function (instances) {
-      var newState = this.state;
+      var newState = {...this.state};
       if (instances && instances != null && instances.length > 0) {
         var instance;
         var data, vals;
@@ -1381,6 +1390,7 @@ const StackViewerComponent = () => createClass({
                 ids.push([instances[instance].getId()]);
               }
               labels.push(instances[instance].getName());
+              colors.push(rgbToHex(instances[instance].wrappedObj.color))
             }
           } catch (err) {
             console.log('Error handling ' + instance);
@@ -1397,7 +1407,6 @@ const StackViewerComponent = () => createClass({
         }
         if (labels && labels != null && labels.length > 0 && labels.toString() != this.state.label.toString()) {
           newState.label = labels;
-          console.log("New labels ", labels)
         }
         if (ids && ids != null && ids.length > 0 && ids.toString() != this.state.id.toString()) {
           newState.id = ids;

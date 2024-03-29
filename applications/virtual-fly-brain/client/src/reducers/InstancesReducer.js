@@ -8,7 +8,6 @@ export const initialStateInstancesReducer = {
   focusedInstance : undefined,
   threeDObjects : [],
   mappedCanvasData : [],
-  stackViewerData : null,
   focusedInstance : "",
   event : {},
   isLoading: false,
@@ -56,14 +55,15 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       }
      case getInstancesTypes.GET_INSTANCES_SUCCESS:{
       const newInstance = { metadata : response.payload };
-      let stackViewerData = state.stackViewerData;
+      newInstance.stackInstance = response.payload.stackInstance;
       if ( newInstance.metadata?.IsTemplate ){
         newInstance.color = TEMPLATE_COLOR;
         newInstance.userSetColor = TEMPLATE_COLOR;
-        stackViewerData = newInstance;
+        newInstance.stackInstance = true;
       } else {
         newInstance.color = DESELECTED_COLOR;
       }
+      
       let launchTemplate = state.launchTemplate
       if ( newInstance.metadata.IsTemplate && !state.allLoadedInstances?.find( i => i?.metadata?.IsTemplate )) {
         launchTemplate = newInstance
@@ -88,7 +88,6 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       
       return Object.assign({}, state, {
           allLoadedInstances: loadedInstances,
-          stackViewerData : stackViewerData,
           launchTemplate : launchTemplate,
           focusedInstance : focused,
           event : { action : getInstancesTypes.ADD_INSTANCE, id : response.payload.Id, trigger : Date.now()},

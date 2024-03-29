@@ -1,5 +1,5 @@
 import React from 'react';
-import { Application, Container, Assets, Sprite, Text, utils, extensions, ExtensionType, Texture , Resource, BLEND_MODES } from 'pixi.js';
+import { Application, Container, Assets, Sprite, Text, TextStyle, utils, extensions, ExtensionType, Texture , Resource, BLEND_MODES } from 'pixi.js';
 var createClass = require('create-react-class');
 import { getInstanceByID, selectInstance } from '../reducers/actions/instances';
 
@@ -75,8 +75,6 @@ const rgbToHex = (color) => {
      *
      */
     componentDidMount: function () {
-      console.log("Component is mounted ")
-
       // signal component mounted (used to avoid calling isMounted() deprecated method)
       this._isMounted = true;
 
@@ -94,7 +92,6 @@ const rgbToHex = (color) => {
       this.disp.scale.y = this.props.zoomLevel / this.props.scl;
       this.app.stage.addChild(this.disp);
       this.stack = new Container();
-      console.log("New mount")
       this.stack.pivot.x = 0;
       this.stack.pivot.y = 0;
       this.stack.position.x = 0;
@@ -213,7 +210,6 @@ const rgbToHex = (color) => {
 
 
     componentWillUnmount: function () {
-      console.log("Component is unmounted ")
       // this.refs.stackCanvas?.removeChild(this.app.view);
       // this.app.destroy(true,true);
       // this.app = null;
@@ -257,7 +253,7 @@ const rgbToHex = (color) => {
             that.setState({ minDst: min, maxDst: max });
             let extent = { minDst: min, maxDst: max };
             that.props.setExtent(extent);
-            console.log('Stack Depth: ' + ((max - min) / 10.0).toFixed(0));
+            //console.log('Stack Depth: ' + ((max - min) / 10.0).toFixed(0));
             that.checkStack();
             that.callPlaneEdges();
             that.iBuffer = {};
@@ -446,7 +442,7 @@ const rgbToHex = (color) => {
                       if (i !== 0 || index !== 0) { // don't select template
                         if (index == 0 ) {
                           if (!window.shiftDown){
-                            console.log(that.state.label[i] + ' clicked');
+                            //console.log(that.state.label[i] + ' clicked');
                             try {
                               getInstanceByID(that.props.templateDomainIds[index], true, true, true);
                               that.setStatusText(that.state.label[i] + ' selected');
@@ -463,14 +459,14 @@ const rgbToHex = (color) => {
                               try {
                                 getInstanceByID(that.props.templateDomainIds[index], true, true, true, true);
                                 selectInstance(that.props.templateDomainIds[index]);
-                                console.log(that.props.templateDomainNames[index] + ' clicked');
+                                //console.log(that.props.templateDomainNames[index] + ' clicked');
                                 that.setStatusText(that.props.templateDomainNames[index] + ' selected');
                                 break;
                               } catch (ignore) {
-                                console.log(that.props.templateDomainNames[index] + ' requested');
+                                //console.log(that.props.templateDomainNames[index] + ' requested');
                                 that.setStatusText(that.props.templateDomainNames[index] + ' requested');
                                 if (window.shiftDown) {
-                                  console.log('Adding ' + that.props.templateDomainNames[index]);
+                                  //console.log('Adding ' + that.props.templateDomainNames[index]);
                                   that.setStatusText('Adding ' + that.props.templateDomainNames[index]);
                                   var varriableId = that.props.templateDomainIds[index];
                                   isSelected = true;
@@ -664,12 +660,12 @@ const rgbToHex = (color) => {
               }
             }
           } else {
-            console.log('Buffering neighbouring layers (' + this.state.numTiles.toString() + ') tiles...');
+            //console.log('Buffering neighbouring layers (' + this.state.numTiles.toString() + ') tiles...');
             for (j = 0; j < this.state.numTiles; j++) {
               for (i in this.state.stack) {
                 image = this.state.serverUrl.toString() + '?wlz=' + this.state.stack[i] + '&sel=0,255,255,255&mod=zeta&fxp=' + this.props.fxp.join(',') + '&scl=' + Number(this.state.scl).toFixed(1) + '&dst=' + Number(this.state.dst).toFixed(1) + '&pit=' + Number(this.state.pit).toFixed(0) + '&yaw=' + Number(this.state.yaw).toFixed(0) + '&rol=' + Number(this.state.rol).toFixed(0) + '&qlt=80&jtl=' + j.toString();
                 if (!this.state.iBuffer[image]) {
-                  console.log('buffering ' + this.state.stack[i].toString() + '...');
+                  // console.log('buffering ' + this.state.stack[i].toString() + '...');
                   loadList.add(image);
                   buffMax -= 1;
                 }
@@ -686,7 +682,7 @@ const rgbToHex = (color) => {
 
         if (loadList.size > 0) {
           this.state.bufferRunning = true;
-          console.log('Loading ' + loadList.size + ' slices/tiles...');
+          // console.log('Loading ' + loadList.size + ' slices/tiles...');
 
           const imageDelivery = {
             extension: ExtensionType.LoadParser,
@@ -830,7 +826,7 @@ const rgbToHex = (color) => {
                   // this.state.images[d].alpha = 0.9;
                   this.state.images[d].blendMode = BLEND_MODES.SCREEN;
                 }
-                console.log("adding image ", this.state.images[d])
+                // console.log("adding image ", this.state.images[d])
                 this.stack.addChild(this.state.images[d]);
               } else {
                 if (this.state.imagesUrl[d] != image) {
@@ -882,8 +878,8 @@ const rgbToHex = (color) => {
 
     createStatusText: function () {
       if (!this.state.buffer[-1]) {
-        var style = {
-          font: '8px Helvetica',
+        const style = {
+          fontSize: 16,
           fill: '#ffffff',
           stroke: '#000000',
           strokeThickness: 2,
@@ -895,7 +891,8 @@ const rgbToHex = (color) => {
           wordWrapWidth: this.app.view.width,
           textAlign: 'right'
         };
-        this.state.buffer[-1] = new Text(this.state.text, style);
+        const textStyle = new TextStyle(style);
+        this.state.buffer[-1] = new Text(this.state.text, textStyle);
         this.app.stage.addChild(this.state.buffer[-1]);
         // fix position
         this.state.buffer[-1].x = 0
@@ -928,7 +925,6 @@ const rgbToHex = (color) => {
           id: nextProps.id,
           serverUrl: nextProps.serverUrl.replace('http:', window.location.protocol).replace('https:', window.location.protocol)
         });
-        console.log("Next label ", nextProps.label)
         this.checkStack();
       }
       if (nextProps.scl !== this.state.scl || nextProps.zoomLevel !== this.props.zoomLevel || nextProps.width !== this.props.width || nextProps.height !== this.props.height || nextProps.stackX !== this.stack.position.x || nextProps.stackY !== this.stack.position.y){
@@ -990,7 +986,6 @@ const rgbToHex = (color) => {
      *
      */
     updateStatusText: function (props) {
-      console.log("updateStatusText ", props)
       this.setStatusText(props.statusText);
     },
 
@@ -1010,16 +1005,16 @@ const rgbToHex = (color) => {
       this.state.images = [];
       this.stack.removeChildren();
       if (props.orth == 0) {
-        console.log('Frontal');
+        // console.log('Frontal');
         this.setStatusText('Frontal');
       } else if (props.orth == 1) {
-        console.log('Transverse');
+        // console.log('Transverse');
         this.setStatusText('Transverse');
       } else if (props.orth == 2) {
-        console.log('Sagittal');
+        // console.log('Sagittal');
         this.setStatusText('Sagittal');
       } else {
-        console.log('Orth:' + props.orth);
+        // console.log('Orth:' + props.orth);
         this.setStatusText('...');
       }
       this.callDstRange();

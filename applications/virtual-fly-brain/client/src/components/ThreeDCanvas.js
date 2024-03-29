@@ -10,7 +10,7 @@ import Canvas from "@metacell/geppetto-meta-ui/3d-canvas/Canvas";
 import { getInstancesTypes } from '../reducers/actions/types/getInstancesTypes';
 import SharkViewer, { swcParser } from '@janelia/sharkviewer';
 import * as THREE from 'three';
-import { add3DSkeleton } from '../reducers/actions/instances';
+import { add3DSkeleton, focusInstance, selectInstance } from '../reducers/actions/instances';
 
 const {
   whiteColor,
@@ -135,7 +135,11 @@ class ThreeDCanvas extends Component {
   }
 
   onSelection (selectedInstances){
-    applySelection(this.props.mappedCanvasData, selectedInstances);
+    console.log("Selected instances ", selectedInstances);
+    selectedInstances?.forEach( id => {
+      selectInstance(id);
+      focusInstance(id)
+    })
   }
 
   hoverHandler () {}

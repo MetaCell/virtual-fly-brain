@@ -450,7 +450,7 @@ import { getInstanceByID, selectInstance } from '../reducers/actions/instances';
                           break;
                         } else {
                           if (typeof that.props.templateDomainIds !== 'undefined' && typeof that.props.templateDomainNames !== 'undefined' && typeof that.props.templateDomainIds[index] !== 'undefined' && typeof that.props.templateDomainNames[index] !== 'undefined' && that.props.templateDomainIds[index] !== null && that.props.templateDomainNames[index] !== null) {
-                            if (!isSelected) {
+                            if (!isSelected && window.shiftDown ) {
                               try {
                                 getInstanceByID(that.props.templateDomainIds[index], true, true, true);
                                 selectInstance(that.props.templateDomainIds[index]);

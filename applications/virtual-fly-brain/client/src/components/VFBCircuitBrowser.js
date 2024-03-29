@@ -183,7 +183,7 @@ class VFBCircuitBrowser extends Component {
   handleNodeLeftClick (node, event) {
     const id = node.title ;
     if (confirm("The image is aligned to another template. Click OK to open in a new tab or Cancel to just view the image metadata")) {
-      getInstanceByID(id, true);
+      getInstanceByID(id, true, true);
     }
   }
   

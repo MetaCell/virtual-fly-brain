@@ -19,12 +19,12 @@ export const initialStateInstancesReducer = {
 
 const getMappedCanvasData = (loadedInstances) => {
   let updatedCanvasData = loadedInstances?.filter( m => m.meshCreated)?.map( instance => {
-    let { color, visibleMesh, metadata } = instance;
+    let { color, visibleMesh, metadata, selected } = instance;
     return {
       instancePath : metadata?.Id,
       visibility : visibleMesh || false,
       color,
-      selected : instance.selected || false
+      selected : selected || false
     }
   })
 
@@ -68,11 +68,24 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       if ( newInstance.metadata.IsTemplate && !state.allLoadedInstances?.find( i => i?.metadata?.IsTemplate )) {
         launchTemplate = newInstance
       }
+      
       let loadedInstances = state.allLoadedInstances?.find( i => i?.metadata?.Id === response.payload.Id ) ? [...state.allLoadedInstances] : [...state.allLoadedInstances, newInstance]
       let focused = state.focusedInstance;
       if ( response.payload.focus ) {
         focused = loadedInstances?.find( i => i?.metadata?.Id === response.payload.Id )
       }
+      if ( response.payload.select ) {
+        focused = loadedInstances?.find( i => i?.metadata?.Id === response.payload.Id )
+        focused.selected = true;
+        focused.color = SELECTED_COLOR
+        loadedInstances?.forEach( i => { 
+          if ( i.metadata?.Id !== focused.metadata?.Id ) {
+            i.color = i.userSetColor || DESELECTED_COLOR
+            i.selected = false;
+          }
+        })
+      }
+      
       return Object.assign({}, state, {
           allLoadedInstances: loadedInstances,
           stackViewerData : stackViewerData,
@@ -252,6 +265,10 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
           matchLoadedInstance.visible = true;
           matchLoadedInstance.visibleMesh = true;
           matchLoadedInstance.meshCreated = true;
+        }
+
+        if ( matchLoadedInstance.selected ) {
+          matchLoadedInstance.color = SELECTED_COLOR
         }
 
         loadInstances(simpleInstance, state.allLoadedInstances)

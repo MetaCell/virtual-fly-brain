@@ -16,7 +16,7 @@ const {
 
 
 const VFBStackViewer = (props) => {
-  const stackViewerData = useSelector(state => state.instances.stackViewerData)
+  const data = useSelector(state => state.instances.allLoadedInstances)
   let config = {
     serverUrl: 'http://www.virtualflybrain.org/fcgi/wlziipsrv.fcgi',
     templateId: 'NOTSET'
@@ -86,46 +86,48 @@ const VFBStackViewer = (props) => {
   // FIXME
   useEffect( () => {
     let instances = stackData.instances;
-    if (stackViewerData?.metadata?.Id !== stackData?.id && stackViewerData?.metadata?.Images && stackViewerData?.metadata?.IsTemplate) {
-      let keys = Object.keys(stackViewerData.metadata?.Images);
+    data?.forEach( stackViewerData => {
+      if (stackViewerData?.metadata?.Id !== stackData?.id && stackViewerData?.stackInstance) {
+        let keys = Object.keys(stackViewerData.metadata?.Images);
 
-      const instancespec = {
-        "eClass": "SimpleInstance",
-        "id": stackViewerData.metadata?.Id,
-        "name": stackViewerData.Name,
-        "type": { "eClass": "SimpleType" },
-        "visualValue": {
-          "eClass": Resources.IMAGE,
-          data :stackViewerData.metadata?.Images[keys[0]]?.[0].wlz.replace("https://www.virtualflybrain.org/data/","/disk/data/VFB/IMAGE_DATA/")
-        }
-      };
+        const instancespec = {
+          "eClass": "SimpleInstance",
+          "id": stackViewerData.metadata?.Id,
+          "name": stackViewerData.Name,
+          "type": { "eClass": "SimpleType" },
+          "visualValue": {
+            "eClass": Resources.IMAGE,
+            data :stackViewerData.metadata?.Images[keys[0]]?.[0].wlz.replace("https://www.virtualflybrain.org/data/","/disk/data/VFB/IMAGE_DATA/")
+          }
+        };
 
-      const instance1spec = {
-        "eClass": "SimpleInstance",
-        "id": stackViewerData.metadata?.Id + "_slices",
-        "name": stackViewerData.metadata?.Name + "_slices",
-        "type": { "eClass": "SimpleType" },
-        "visualValue": {
-          "eClass": Resources.IMAGE,
-          data :stackViewerData.metadata?.Images[keys[0]]?.[0].wlz.replace("https://www.virtualflybrain.org/data/","/disk/data/VFB/IMAGE_DATA/")
-        }
-      };
-      const parent = new SimpleInstance(instancespec);
-      const slices = new SimpleInstance(instance1spec);
-      slices.parent = parent;
-      parent[stackViewerData.metadata?.Id + "_slices"] = slices;
-      instances.push(slices);
+        const instance1spec = {
+          "eClass": "SimpleInstance",
+          "id": stackViewerData.metadata?.Id + "_slices",
+          "name": stackViewerData.metadata?.Name + "_slices",
+          "type": { "eClass": "SimpleType" },
+          "visualValue": {
+            "eClass": Resources.IMAGE,
+            data :stackViewerData.metadata?.Images[keys[0]]?.[0].wlz.replace("https://www.virtualflybrain.org/data/","/disk/data/VFB/IMAGE_DATA/")
+          }
+        };
+        const parent = new SimpleInstance(instancespec);
+        const slices = new SimpleInstance(instance1spec);
+        slices.parent = parent;
+        parent[stackViewerData.metadata?.Id + "_slices"] = slices;
+        instances.push(slices);
+      }
+  });
+  const newData = {
+    ...stackData ,
+    id : "VFB",
+    height: props.size.height,
+    width: props.size.width,
+    instances : instances };
 
-      const newData = {
-        ...stackData ,
-        id : stackViewerData?.metadata?.Id,
-        height: props.size.height,
-        width: props.size.width,
-        instances : instances };
-      setStackData(newData);
-    }
-    
-  },[stackViewerData]);
+  setStackData(newData);
+
+  },[data]);
 
   // Update height and width of the stackwidget, happens when flex layout resizes tabs
   useEffect( () => {
@@ -141,6 +143,7 @@ const VFBStackViewer = (props) => {
 
   // Update config and voxel size before re-rendering
   useMemo(() => {
+    data?.forEach( stackViewerData => {
     if (stackViewerData?.metadata?.Images) {
       let keys = Object.keys(stackViewerData.metadata?.Images);
       config = stackViewerData.metadata?.Images[keys[0]]?.[0];
@@ -171,6 +174,7 @@ const VFBStackViewer = (props) => {
         templateId: 'NOTSET'
       };
     }
+  });
   }, [stackData]);
 
   const StackComponent = StackViewerComponent();

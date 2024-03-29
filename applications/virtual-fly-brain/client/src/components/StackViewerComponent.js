@@ -1061,17 +1061,19 @@ const rgbToHex = (color) => {
        */
       this.stack.alpha = 0.7;
       this.state.dragging = true;
-      var offPosition = this.state.data.global;
-      this.state.dragOffset = {
-        x: offPosition.x,
-        y: offPosition.y
-      };
-      // console.log('DragStartOffset:'+JSON.stringify(this.state.dragOffset));
-      var startPosition = this.state.data.getLocalPosition(this.stack);
-      // console.log([startPosition.x,this.state.imageX*0.5,1/this.disp.scale.x]);
-      this.state.posX = Number(startPosition.x.toFixed(0));
-      this.state.posY = Number(startPosition.y.toFixed(0));
-      // console.log('DragStart:'+JSON.stringify(startPosition));
+      var offPosition = this.state.data?.global;
+      if ( offPosition ) {
+        this.state.dragOffset = {
+          x: offPosition.x,
+          y: offPosition.y
+        };
+        // console.log('DragStartOffset:'+JSON.stringify(this.state.dragOffset));
+        var startPosition = this.state.data?.getLocalPosition(this.stack);
+        // console.log([startPosition.x,this.state.imageX*0.5,1/this.disp.scale.x]);
+        this.state.posX = Number(startPosition?.x?.toFixed(0));
+        this.state.posY = Number(startPosition?.y?.toFixed(0));
+        // console.log('DragStart:'+JSON.stringify(startPosition));
+      }
     },
 
     onDragEnd: function () {
@@ -1120,16 +1122,16 @@ const rgbToHex = (color) => {
     },
 
     onDragMove: function (event) {
-      if (this.state.dragging) {
-        var newPosition = this.state.data.global;
-        var xmove = (newPosition.x - this.state.dragOffset.x) / this.disp.scale.x;
-        var ymove = (newPosition.y - this.state.dragOffset.y) / this.disp.scale.y;
-        this.state.dragOffset.x = newPosition.x;
-        this.state.dragOffset.y = newPosition.y;
+      if (this.state.dragging && this.state.data?.global) {
+        var newPosition = this.state.data?.global;
+        var xmove = (newPosition?.x - this.state?.dragOffset?.x) / this.disp.scale?.x;
+        var ymove = (newPosition?.y - this.state?.dragOffset?.y) / this.disp.scale?.y;
+        this.state.dragOffset.x = newPosition?.x;
+        this.state.dragOffset.y = newPosition?.y;
         this.stack.position.x += xmove;
         this.stack.position.y += ymove;
         // console.log('Moving :'+xmove+','+ymove);
-        this.state.buffer[-1].text = 'Moving stack... (X:' + Number(this.stack.position.x).toFixed(2) + ',Y:' + Number(this.stack.position.y).toFixed(2) + ')';
+        this.state.buffer[-1].text = 'Moving stack... (X:' + Number(this.stack.position?.x).toFixed(2) + ',Y:' + Number(this.stack.position?.y).toFixed(2) + ')';
         // update slice view
         this.createImages();
       } else {

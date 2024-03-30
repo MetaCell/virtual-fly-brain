@@ -6,21 +6,20 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import vars from "../../theme/variables";
 import { dividerStyle } from "./Query";
-import { removeAllRecentSearch } from "../../reducers/actions/globals";
-import { useDispatch } from "react-redux";
+
 
 const { searchHeadingColor, whiteColor, secondaryBg, primaryBg } = vars
 
-const QueryHeader = ({ title, filters, recentSearches, filteredSearches, setFilteredSearches }) => {
+const QueryHeader = ({ title, filters, recentSearches, clearAll, setFilteredSearches }) => {
   const [sort, setSort] = React.useState('Name');
-  const dispatch = useDispatch();
   const [crescent , setCrescent] = React.useState(1);
 
   const handleChange = (value) => {
     setSort(value);
     const identifier = filters[value];
-    let updatedSearches = [...recentSearches.sort( (a,b) => a?.[identifier]?.localeCompare(b?.[identifier] ))];
+    let updatedSearches = [...recentSearches.sort( (a,b) => (crescent * -1 )* a?.[identifier]?.localeCompare(b?.[identifier] ))];
     setFilteredSearches(updatedSearches)
+    setCrescent(crescent * -1 );
   };
 
   const handleCrescentChange = () => {
@@ -28,10 +27,6 @@ const QueryHeader = ({ title, filters, recentSearches, filteredSearches, setFilt
     let updatedSearches = [...recentSearches.sort( (a,b) => (crescent * -1 )* a?.[identifier]?.localeCompare(b?.[identifier] ))];
     setFilteredSearches(updatedSearches)
     setCrescent(crescent * -1 );
-  };
-
-  const removeFromHistory = () => {
-    dispatch(removeAllRecentSearch())
   };
 
   return (
@@ -164,7 +159,7 @@ const QueryHeader = ({ title, filters, recentSearches, filteredSearches, setFilt
         <Button
             disableRipple
             variant="text"
-            onClick={(event) => removeFromHistory()}
+            onClick={clearAll}
             sx={{
               minWidth: '0.0625rem',
               padding: 0,

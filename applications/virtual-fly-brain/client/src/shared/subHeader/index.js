@@ -176,6 +176,8 @@ const SubHeader = ({ setBottomNav, bottomNav }) => {
               aria-label={item.name}
               onClick={() => {
                 setBottomNav(index)
+                // TODO: Jesus this needs to be removed, it is just a placeholder to run a query
+                // since I noticed this button was not used yet
                 if (3 === index) {
                   let results = get_query_results('FBbt_00003748', 'ListAllAvailableImages');
                   console.log(results);

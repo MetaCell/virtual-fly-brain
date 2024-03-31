@@ -63,7 +63,7 @@ def init_webapp_routes(app):
 
     @app.route('/run_query', methods=['GET'])
     @cross_origin(supports_credentials=True)
-    def run_query():
+    def get_query_results():
         id = flask.request.args.get('id')
         query_type = flask.request.args.get('query_type')
         return run_query(id, query_type)

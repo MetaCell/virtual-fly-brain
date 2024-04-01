@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import QueryHeader from "./QueryHeader";
 import { Item } from "./HistoryItem";
 import { Box } from "@mui/material";
@@ -12,10 +12,26 @@ const History = () => {
   const recentSearches = useSelector(state => state.globalInfo.recentSearches);
   const [filteredSearches, setFilteredSearches] = React.useState(recentSearches);
   const dispatch = useDispatch();
-  const [filters, setFilters] = React.useState({
-    "Id" : "short_form",
-    "Name" : "label"
-  });
+  const initialFilters = {
+    "filters" : {
+      "Id" : "short_form",
+      "Name" : "label"
+    },
+    "tags" : "facets_annotation"
+  };
+  const [filters, setFilters] = React.useState(initialFilters);
+
+  useEffect( () => {
+    let tags = {...initialFilters.filters};
+    recentSearches?.forEach( (query, index ) => {
+      query.facets_annotation?.forEach( tag => {
+        if ( tags?.[tag] == undefined ){
+          tags[tag] = tag;
+        }
+      })
+    })
+    setFilters({...filters, filters : tags});
+  }, [recentSearches])
 
   const updateFilters = (searches) => {
     setFilteredSearches(searches)

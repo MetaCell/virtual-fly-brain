@@ -16,34 +16,65 @@ export const dividerStyle = {
   height: '0.875rem', width: '0.0625rem', background: listHeadingColor, borderRadius: '0.125rem'
 }
 
+const getQueries = (newQueries) => {
+  let examples = {};
+  let updatedQueries = []
+  newQueries?.filter(q => q.active).forEach( (query, index ) => {
+    if ( query?.Examples ){
+      examples = query?.Examples;
+    } else if ( query?.Images ){
+      examples = query?.Images;
+    }
+
+    Object.keys(examples).map( key => {
+      const example = examples[key][0];
+      example.tags = query.Tags
+
+      updatedQueries.push(example)
+    });
+  })
+  
+  return updatedQueries;
+}
+
 const Query = ({ fullWidth, queries }) => {
   const [chipTags , setChipTags] = useState([]);
   const [count, setCount] = useState(0)
-  const [filteredSearches, setFilteredSearches] = React.useState(queries);
-  const [filters, setFilters] = React.useState({
-    "Id" : "Id",
-    "Name" : "Name"
-  });
+  const [filteredSearches, setFilteredSearches] = React.useState(getQueries(queries));
+  const initialFilters = {
+    "filters" : {
+      "Id" : "id",
+      "Name" : "label"
+    },
+    "tags" : "tags"
+  };
+  const [filters, setFilters] = React.useState(initialFilters);
 
   const updateFilters = (searches) => {
     setFilteredSearches(searches)
   }
 
+  useEffect( () => {
+    let tags = {...initialFilters.filters};
+    queries?.filter( q => q.active ).forEach( (query, index ) => {
+      query.Tags?.forEach( tag => {
+        if ( tags?.[tag] == undefined ){
+          tags[tag] = tag;
+        }
+      })
+    })
+    setFilters({...filters, filters : tags});
+  }, [queries])
 
   const getCount = () => {
-    let keepCount = 0;
-
-    filteredSearches?.filter(q => q.active).forEach( query => {
-      if ( chipTags?.filter(f => f.active)?.some(v => query.Tags.includes(v.label)) ) {
-        if ( query.Examples) {
-          keepCount = keepCount + Object.keys(query.Examples)?.length;
-        } else if ( query.Images) {
-          keepCount = keepCount + Object.keys(query.Images)?.length;
+    let count = 0;
+    filteredSearches?.forEach( q => {
+        if (chipTags?.filter(f => f.active)?.some(v => q.tags.includes(v.label)) ) {
+          count = count + 1;
         }
-      }
-    });
+    })
 
-    return keepCount;
+    return count;
   }
 
   useEffect( () => {
@@ -56,7 +87,7 @@ const Query = ({ fullWidth, queries }) => {
         }
       })
     })
-    setFilteredSearches(queries)
+    setFilteredSearches(getQueries(queries))
     setChipTags(tags);
   }, [queries])
   
@@ -134,7 +165,6 @@ const Query = ({ fullWidth, queries }) => {
                     {chipTags?.filter(f => f.active)?.slice(fullWidth ? 7 : 10).map((tag, index) => (
                       <Chip
                         onClick={() => null}
-                        disabled={!tag.active}
                         onDelete={() => handleChipDelete(tag.label)}
                         key={tag.label + index}
                         deleteIcon={
@@ -194,16 +224,8 @@ const Query = ({ fullWidth, queries }) => {
 
       <Box overflow='auto' height='calc(100% - 5.375rem)' p={1.5}>
         <Grid container spacing={1.5}>
-          {filteredSearches?.filter(q => q.active).map( (query, index ) => {
-            let examples = {};
-            if ( query?.Examples ){
-              examples = query?.Examples;
-            } else if ( query?.Images ){
-              examples = query?.Images;
-            }
-
-            if ( chipTags?.filter(f => f.active)?.some(v => query.Tags.includes(v.label)) ) {
-              return ( Object.keys(examples)?.map((item, index) => {
+          {filteredSearches?.map( (query, index ) => {
+            if ( chipTags?.filter(f => f.active)?.some(v => query.tags.includes(v.label)) ) {
                 return (
                   <Grid
                     key={index}
@@ -214,10 +236,9 @@ const Query = ({ fullWidth, queries }) => {
                     lg={fullWidth ? 4 : 3}
                     xl={3}
                   >
-                    <QueryCard facets_annotation={query.Tags} query={query?.Examples?.[item][0] || query?.Images?.[item][0]} fullWidth={fullWidth} />
+                    <QueryCard facets_annotation={query.tags} query={query} fullWidth={fullWidth} />
                   </Grid>
                 )
-              }))
             }
           })}
         </Grid>

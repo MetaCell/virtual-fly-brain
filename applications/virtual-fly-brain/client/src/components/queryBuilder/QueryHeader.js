@@ -1,5 +1,5 @@
 import { Box, Button, Divider, Typography } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 import { Add, ChevronDown, ImportExport } from "../../icons";
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -11,20 +11,39 @@ import { dividerStyle } from "./Query";
 const { searchHeadingColor, whiteColor, secondaryBg, primaryBg } = vars
 
 const QueryHeader = ({ title, filters, recentSearches, clearAll, setFilteredSearches }) => {
-  const [sort, setSort] = React.useState('Name');
-  const [crescent , setCrescent] = React.useState(1);
+  const [sort, setSort] = useState('Name');
+  const [crescent , setCrescent] = useState(1);
 
   const handleChange = (value) => {
     setSort(value);
-    const identifier = filters[value];
-    let updatedSearches = [...recentSearches.sort( (a,b) => (crescent * -1 )* a?.[identifier]?.localeCompare(b?.[identifier] ))];
+    const identifier = filters.filters[value];
+    let updatedSearches = [...recentSearches.sort( (a,b) => {
+      if ( a?.[identifier] && b?.[identifier] ){
+        return (crescent)* a?.[identifier]?.localeCompare(b?.[identifier] )
+      } else if ( a?.[filters.tags] && b?.[filters.tags] ) {
+        if ( a?.[filters.tags]?.includes(identifier) ) {
+          return -1;
+        } else {
+          return 0;
+        }
+      }
+    })];
     setFilteredSearches(updatedSearches)
-    setCrescent(crescent * -1 );
   };
 
   const handleCrescentChange = () => {
-    const identifier = filters[sort];
-    let updatedSearches = [...recentSearches.sort( (a,b) => (crescent * -1 )* a?.[identifier]?.localeCompare(b?.[identifier] ))];
+    const identifier = filters.filters[sort];
+    let updatedSearches = [...recentSearches.sort( (a,b) => {
+      if ( a?.[identifier] && b?.[identifier] ){
+        return (crescent * -1 )* a?.[identifier]?.localeCompare(b?.[identifier] )
+      } else if ( a?.[filters.tags] && b?.[filters.tags] ) {
+        if ( a?.[filters.tags]?.includes(identifier) ) {
+          return -1;
+        } else {
+          return 0;
+        }
+      }
+    })];
     setFilteredSearches(updatedSearches)
     setCrescent(crescent * -1 );
   };
@@ -129,7 +148,7 @@ const QueryHeader = ({ title, filters, recentSearches, clearAll, setFilteredSear
               value={sort}
               onChange={(event) => handleChange(event.target.value)}
             >
-              { Object.keys(filters || {}).map( (filter, index) => (<MenuItem key={index} value={filter}>{filter}</MenuItem> ))}
+              { Object.keys(filters.filters || {}).map( (filter, index) => (<MenuItem key={index} value={filter}>{filter}</MenuItem> ))}
             </Select>
           </FormControl>
         </Box>

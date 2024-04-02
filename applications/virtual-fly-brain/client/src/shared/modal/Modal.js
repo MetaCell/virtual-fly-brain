@@ -81,10 +81,11 @@ const Modal = ({ open, handleClose, title, description, children, sx }) => {
                     top: 16,
                     borderRadius: '1.125rem',
                     border: `1px solid ${primaryBg}`,
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    zIndex: '10000'
                 }}
             >
-                <ModalCloseIcon />
+                <ModalCloseIcon/>
             </IconButton>
             <DialogContent sx={{ zIndex: '100000', py: 0 }}>
                 <DialogContentText id="error-dialog-description" sx={{ color: dialogContentTextColor, fontSize: '0.875rem' }}>

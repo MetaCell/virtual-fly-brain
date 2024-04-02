@@ -5,6 +5,7 @@ import { Slide } from 'react-slideshow-image';
 import 'react-slideshow-image/dist/styles.css'
 import { ChevronLeft, FullScreen } from '../../icons';
 import vars from '../../theme/variables';
+import { focusInstance, getInstanceByID, selectInstance } from '../../reducers/actions/instances';
 
 const { whiteColor, listHeadingColor } = vars;
 
@@ -111,12 +112,17 @@ const TerminfoSlider = (props) => {
   };
   const [slideImages, setSlideImages] = useState([]);
 
+  const imageClick = (id) => {
+    getInstanceByID(id, true, true, true);
+  }
+
   useEffect( () => {
     if(props?.examples) {
       const keys = Object.keys(props.examples);
       setSlideImages(keys.map( k => ({
         url: props.examples[k][0].thumbnail,
-        caption: props.examples[k][0].label
+        caption: props.examples[k][0].label,
+        id : k
       })));
     }
   }, [props.examples]);
@@ -129,6 +135,7 @@ const TerminfoSlider = (props) => {
                   key={index}
                   style={imageStyle}
                   src={slideImage.url}
+                  onClick={() => imageClick(slideImage.id)} 
                   alt={slideImage.caption}
                 />
             ))}

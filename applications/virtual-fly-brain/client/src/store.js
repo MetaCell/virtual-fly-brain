@@ -6,8 +6,8 @@ import './index.css';
 import GlobalReducer, { initialStateGlobalReducer } from './reducers/GlobalReducer';
 import InstancesReducer, { initialStateInstancesReducer }  from './reducers/InstancesReducer';
 import QueriesReducer from './reducers/QueriesReducer';
-import layout from './components/layout/layout'; 
-import componentMap from './components/layout/componentMap'; 
+import baseLayout from './components/layout/layout';
+import componentMap from './components/layout/componentMap';
 import GraphReducer, { initialStateGraphReducer} from './reducers/GraphReducer';
 
 import vfbMiddleware from './reducers/middleware/vfbMiddleware';
@@ -31,7 +31,7 @@ const store = createStore(
   reducers,
   INIT_STATE,
   [vfbMiddleware, urlUpdaterMiddleware],
-  { layout, componentMap, isMinimizeEnabled }
+  { undefined, baseLayout, componentMap, isMinimizeEnabled }
 )
 
 export default store; 

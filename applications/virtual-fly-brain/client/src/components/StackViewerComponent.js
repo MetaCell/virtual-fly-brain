@@ -1,9 +1,17 @@
 import React from 'react';
-  import { Application, Container, Assets, Sprite, Text, utils, extensions, ExtensionType, Texture , Resource, BLEND_MODES } from 'pixi.js';
-  import * as PIXI from 'pixi.js';
-  var createClass = require('create-react-class');
-  import { useRef, useEffect } from 'react';
+import { Application, Container, Assets, Sprite, Text, TextStyle, utils, extensions, ExtensionType, Texture , Resource, BLEND_MODES } from 'pixi.js';
+var createClass = require('create-react-class');
 import { getInstanceByID, selectInstance } from '../reducers/actions/instances';
+
+
+const componentToHex = (c) => {
+  const hex = (c*255).toString(16);
+  return hex.length == 1 ? "0" + hex : hex;
+}
+
+const rgbToHex = (color) => {
+  return "#" + componentToHex(color.r) + componentToHex(color.g) + componentToHex(color.b);
+}
 
   const Canvas = createClass({
     _isMounted: false,
@@ -67,8 +75,6 @@ import { getInstanceByID, selectInstance } from '../reducers/actions/instances';
      *
      */
     componentDidMount: function () {
-      console.log("Component is mounted ")
-
       // signal component mounted (used to avoid calling isMounted() deprecated method)
       this._isMounted = true;
 
@@ -204,7 +210,6 @@ import { getInstanceByID, selectInstance } from '../reducers/actions/instances';
 
 
     componentWillUnmount: function () {
-      console.log("Component is unmounted ")
       // this.refs.stackCanvas?.removeChild(this.app.view);
       // this.app.destroy(true,true);
       // this.app = null;
@@ -248,7 +253,7 @@ import { getInstanceByID, selectInstance } from '../reducers/actions/instances';
             that.setState({ minDst: min, maxDst: max });
             let extent = { minDst: min, maxDst: max };
             that.props.setExtent(extent);
-            console.log('Stack Depth: ' + ((max - min) / 10.0).toFixed(0));
+            //console.log('Stack Depth: ' + ((max - min) / 10.0).toFixed(0));
             that.checkStack();
             that.callPlaneEdges();
             that.iBuffer = {};
@@ -435,11 +440,11 @@ import { getInstanceByID, selectInstance } from '../reducers/actions/instances';
                     if (result[j].trim() !== '') {
                       var index = Number(result[j]);
                       if (i !== 0 || index !== 0) { // don't select template
-                        if (index == 0 && window.shiftDown) {
-                          if (!isSelected){
-                            console.log(that.state.label[i] + ' clicked');
+                        if (index == 0 ) {
+                          if (!window.shiftDown){
+                            //console.log(that.state.label[i] + ' clicked');
                             try {
-                              getInstanceByID(that.props.templateDomainIds[index], true, true);
+                              getInstanceByID(that.props.templateDomainIds[index], true, true, true);
                               that.setStatusText(that.state.label[i] + ' selected');
                               isSelected = true;
                             } catch (err) {
@@ -452,16 +457,16 @@ import { getInstanceByID, selectInstance } from '../reducers/actions/instances';
                           if (typeof that.props.templateDomainIds !== 'undefined' && typeof that.props.templateDomainNames !== 'undefined' && typeof that.props.templateDomainIds[index] !== 'undefined' && typeof that.props.templateDomainNames[index] !== 'undefined' && that.props.templateDomainIds[index] !== null && that.props.templateDomainNames[index] !== null) {
                             if (!isSelected && window.shiftDown ) {
                               try {
-                                getInstanceByID(that.props.templateDomainIds[index], true, true, true);
+                                getInstanceByID(that.props.templateDomainIds[index], true, true, true, true);
                                 selectInstance(that.props.templateDomainIds[index]);
-                                console.log(that.props.templateDomainNames[index] + ' clicked');
+                                //console.log(that.props.templateDomainNames[index] + ' clicked');
                                 that.setStatusText(that.props.templateDomainNames[index] + ' selected');
                                 break;
                               } catch (ignore) {
-                                console.log(that.props.templateDomainNames[index] + ' requested');
+                                //console.log(that.props.templateDomainNames[index] + ' requested');
                                 that.setStatusText(that.props.templateDomainNames[index] + ' requested');
-                                if (!window.shiftDown) {
-                                  console.log('Adding ' + that.props.templateDomainNames[index]);
+                                if (window.shiftDown) {
+                                  //console.log('Adding ' + that.props.templateDomainNames[index]);
                                   that.setStatusText('Adding ' + that.props.templateDomainNames[index]);
                                   var varriableId = that.props.templateDomainIds[index];
                                   isSelected = true;
@@ -517,6 +522,7 @@ import { getInstanceByID, selectInstance } from '../reducers/actions/instances';
     listObjects: function () {
       if (!this.state.loadingLabels || this.state.lastLabelCall < (Date.now() - 500)) {
         this.state.lastLabelCall = Date.now();
+        this.state.objects = [];
         var i, j, result;
         var that = this;
         var callX = that.state.posX.toFixed(0), callY = that.state.posY.toFixed(0);
@@ -542,14 +548,20 @@ import { getInstanceByID, selectInstance } from '../reducers/actions/instances';
                         if (index == 0) {
                           if (!window.shiftDown) {
                             let updatedObjects = [...that.state.objects];
-                            updatedObjects[that.state.label[i]] === undefined && updatedObjects.push(that.props.templateDomainNames[i]);
+                            if ( !updatedObjects?.find( o => o === that.state.label[i] ) ){
+                              updatedObjects.push(that.props.templateDomainNames[index]);
+                            }
                             that.setState({ objects : updatedObjects})
+                            that.state.objects = updatedObjects
                           }
                         } else {
                           if (typeof that.props.templateDomainIds !== 'undefined' && typeof that.props.templateDomainNames !== 'undefined' && typeof that.props.templateDomainIds[index] !== 'undefined' && typeof that.props.templateDomainNames[index] !== 'undefined' && that.props.templateDomainNames[index] !== null) {
                             let updatedObjects = [...that.state.objects];
-                            updatedObjects[that.props.templateDomainNames[index]] === undefined &&  updatedObjects.push(that.props.templateDomainNames[index]);
+                            if ( !updatedObjects?.find( o => o === that.props.templateDomainNames[index] ) ){
+                              updatedObjects.push(that.props.templateDomainNames[index]);
+                            }
                             that.setState({ objects : updatedObjects})
+                            that.state.objects = updatedObjects
                             break;
                           }
                         }
@@ -648,12 +660,12 @@ import { getInstanceByID, selectInstance } from '../reducers/actions/instances';
               }
             }
           } else {
-            console.log('Buffering neighbouring layers (' + this.state.numTiles.toString() + ') tiles...');
+            //console.log('Buffering neighbouring layers (' + this.state.numTiles.toString() + ') tiles...');
             for (j = 0; j < this.state.numTiles; j++) {
               for (i in this.state.stack) {
                 image = this.state.serverUrl.toString() + '?wlz=' + this.state.stack[i] + '&sel=0,255,255,255&mod=zeta&fxp=' + this.props.fxp.join(',') + '&scl=' + Number(this.state.scl).toFixed(1) + '&dst=' + Number(this.state.dst).toFixed(1) + '&pit=' + Number(this.state.pit).toFixed(0) + '&yaw=' + Number(this.state.yaw).toFixed(0) + '&rol=' + Number(this.state.rol).toFixed(0) + '&qlt=80&jtl=' + j.toString();
                 if (!this.state.iBuffer[image]) {
-                  console.log('buffering ' + this.state.stack[i].toString() + '...');
+                  // console.log('buffering ' + this.state.stack[i].toString() + '...');
                   loadList.add(image);
                   buffMax -= 1;
                 }
@@ -670,7 +682,7 @@ import { getInstanceByID, selectInstance } from '../reducers/actions/instances';
 
         if (loadList.size > 0) {
           this.state.bufferRunning = true;
-          console.log('Loading ' + loadList.size + ' slices/tiles...');
+          // console.log('Loading ' + loadList.size + ' slices/tiles...');
 
           const imageDelivery = {
             extension: ExtensionType.LoadParser,
@@ -814,7 +826,7 @@ import { getInstanceByID, selectInstance } from '../reducers/actions/instances';
                   // this.state.images[d].alpha = 0.9;
                   this.state.images[d].blendMode = BLEND_MODES.SCREEN;
                 }
-                console.log("adding image ", this.state.images[d])
+                // console.log("adding image ", this.state.images[d])
                 this.stack.addChild(this.state.images[d]);
               } else {
                 if (this.state.imagesUrl[d] != image) {
@@ -866,8 +878,8 @@ import { getInstanceByID, selectInstance } from '../reducers/actions/instances';
 
     createStatusText: function () {
       if (!this.state.buffer[-1]) {
-        var style = {
-          font: '8px Helvetica',
+        const style = {
+          fontSize: 16,
           fill: '#ffffff',
           stroke: '#000000',
           strokeThickness: 2,
@@ -879,7 +891,8 @@ import { getInstanceByID, selectInstance } from '../reducers/actions/instances';
           wordWrapWidth: this.app.view.width,
           textAlign: 'right'
         };
-        this.state.buffer[-1] = new Text(this.state.text, style);
+        const textStyle = new TextStyle(style);
+        this.state.buffer[-1] = new Text(this.state.text, textStyle);
         this.app.stage.addChild(this.state.buffer[-1]);
         // fix position
         this.state.buffer[-1].x = 0
@@ -973,7 +986,6 @@ import { getInstanceByID, selectInstance } from '../reducers/actions/instances';
      *
      */
     updateStatusText: function (props) {
-      console.log("updateStatusText ", props)
       this.setStatusText(props.statusText);
     },
 
@@ -993,16 +1005,16 @@ import { getInstanceByID, selectInstance } from '../reducers/actions/instances';
       this.state.images = [];
       this.stack.removeChildren();
       if (props.orth == 0) {
-        console.log('Frontal');
+        // console.log('Frontal');
         this.setStatusText('Frontal');
       } else if (props.orth == 1) {
-        console.log('Transverse');
+        // console.log('Transverse');
         this.setStatusText('Transverse');
       } else if (props.orth == 2) {
-        console.log('Sagittal');
+        // console.log('Sagittal');
         this.setStatusText('Sagittal');
       } else {
-        console.log('Orth:' + props.orth);
+        // console.log('Orth:' + props.orth);
         this.setStatusText('...');
       }
       this.callDstRange();
@@ -1042,20 +1054,21 @@ import { getInstanceByID, selectInstance } from '../reducers/actions/instances';
        * the reason for this is because of multitouch
        * we want to track the movement of this particular touch
        */
-      this.state.data = event.data;
       this.stack.alpha = 0.7;
       this.state.dragging = true;
-      var offPosition = this.state.data.global;
-      this.state.dragOffset = {
-        x: offPosition.x,
-        y: offPosition.y
-      };
-      // console.log('DragStartOffset:'+JSON.stringify(this.state.dragOffset));
-      var startPosition = this.state.data.getLocalPosition(this.stack);
-      // console.log([startPosition.x,this.state.imageX*0.5,1/this.disp.scale.x]);
-      this.state.posX = Number(startPosition.x.toFixed(0));
-      this.state.posY = Number(startPosition.y.toFixed(0));
-      // console.log('DragStart:'+JSON.stringify(startPosition));
+      var offPosition = this.state.data?.global;
+      if ( offPosition ) {
+        this.state.dragOffset = {
+          x: offPosition.x,
+          y: offPosition.y
+        };
+        // console.log('DragStartOffset:'+JSON.stringify(this.state.dragOffset));
+        var startPosition = this.state.data?.getLocalPosition(this.stack);
+        // console.log([startPosition.x,this.state.imageX*0.5,1/this.disp.scale.x]);
+        this.state.posX = Number(startPosition?.x?.toFixed(0));
+        this.state.posY = Number(startPosition?.y?.toFixed(0));
+        // console.log('DragStart:'+JSON.stringify(startPosition));
+      }
     },
 
     onDragEnd: function () {
@@ -1081,11 +1094,12 @@ import { getInstanceByID, selectInstance } from '../reducers/actions/instances';
     },
 
     onHoverEvent: function (event) {
-      if (!this.state.loadingLabels && !this.state.dragging) {
+      this.state.data = event.data;
+      if (this.state.data !== null && typeof this.state.data.getLocalPosition === "function" && !this.state.loadingLabels && !this.state.dragging) {
         if (this.app === null ) {
           return;
         }
-        var currentPosition = this.app.renderer.plugins.interaction.rootPointerEvent?.screen;
+        var currentPosition = this.state.data.getLocalPosition(this.stack);
         // update new position:
         this.state.posX = Number(currentPosition?.x?.toFixed(0));
         this.state.posY = Number(currentPosition?.y?.toFixed(0));
@@ -1103,16 +1117,16 @@ import { getInstanceByID, selectInstance } from '../reducers/actions/instances';
     },
 
     onDragMove: function (event) {
-      if (this.state.dragging) {
-        var newPosition = this.state.data.global;
-        var xmove = (newPosition.x - this.state.dragOffset.x) / this.disp.scale.x;
-        var ymove = (newPosition.y - this.state.dragOffset.y) / this.disp.scale.y;
-        this.state.dragOffset.x = newPosition.x;
-        this.state.dragOffset.y = newPosition.y;
+      if (this.state.dragging && this.state.data?.global) {
+        var newPosition = this.state.data?.global;
+        var xmove = (newPosition?.x - this.state?.dragOffset?.x) / this.disp.scale?.x;
+        var ymove = (newPosition?.y - this.state?.dragOffset?.y) / this.disp.scale?.y;
+        this.state.dragOffset.x = newPosition?.x;
+        this.state.dragOffset.y = newPosition?.y;
         this.stack.position.x += xmove;
         this.stack.position.y += ymove;
         // console.log('Moving :'+xmove+','+ymove);
-        this.state.buffer[-1].text = 'Moving stack... (X:' + Number(this.stack.position.x).toFixed(2) + ',Y:' + Number(this.stack.position.y).toFixed(2) + ')';
+        this.state.buffer[-1].text = 'Moving stack... (X:' + Number(this.stack.position?.x).toFixed(2) + ',Y:' + Number(this.stack.position?.y).toFixed(2) + ')';
         // update slice view
         this.createImages();
       } else {
@@ -1146,8 +1160,8 @@ const StackViewerComponent = () => createClass({
         text: '',
         stackX: 0,
         stackY: 0,
-        imageX: 10240,
-        imageY: 10240,
+        imageX: 1024,
+        imageY: 1024,
         fxp: [511, 255, 108],
         pit: 0,
         yaw: 0,
@@ -1323,7 +1337,7 @@ const StackViewerComponent = () => createClass({
     },
 
     handleInstances: function (instances) {
-      var newState = this.state;
+      var newState = {...this.state};
       if (instances && instances != null && instances.length > 0) {
         var instance;
         var data, vals;
@@ -1370,9 +1384,10 @@ const StackViewerComponent = () => createClass({
               if (typeof this.props.config.templateId !== 'undefined' && typeof this.props.config.templateDomainIds !== 'undefined' && instances[instance].parent.getId() == this.props.config.templateId) {
                 ids.push(this.props.config.templateDomainIds);
               } else {
-                ids.push([instances[instance].parent.getId()]);
+                ids.push([instances[instance].getId()]);
               }
-              labels.push(instances[instance].parent.getName());
+              labels.push(instances[instance].getName());
+              colors.push(rgbToHex(instances[instance].wrappedObj.color))
             }
           } catch (err) {
             console.log('Error handling ' + instance);

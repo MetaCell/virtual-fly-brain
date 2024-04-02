@@ -173,7 +173,9 @@ const SubHeader = ({ setBottomNav, bottomNav }) => {
           {navArr.map((item, index) => (
             <Button
               aria-label={item.name}
-              onClick={() => setBottomNav(index)}
+              onClick={() => {
+                setBottomNav(index)
+              }}
               sx={{
                 minWidth: '0.0625rem'
               }}

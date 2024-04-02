@@ -1,5 +1,5 @@
 import store from '../../store';
-import { get_queries, get_queries_function } from "../../network/query"
+import { get_queries, get_query_results } from "../../network/query"
 import { getQueriesTypes } from './types/getQueriesTypes';
 
 const getQueriesSuccess = (query, short_form) => ({
@@ -54,7 +54,7 @@ export const getQueriesFunction = async (short_form, func) => {
   store.dispatch(getQueriesStarted())
   let response;
   try {
-    response = await get_queries_function(short_form, func);
+    response = await get_query_results(short_form, func);
   } catch (error) {
     store.dispatch(getQueriesFailure(error.message))
   }

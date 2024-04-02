@@ -50,4 +50,9 @@ export const setQueryComponentOpened = (opened) => ({
   payload : {
     opened
   }
-})
+});
+
+export const resetErrors = () => ({
+  type: getGlobalTypes.RESET_ERRORS,
+  payload : {}
+});

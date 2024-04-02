@@ -52,10 +52,10 @@ class VFBListViewer extends Component {
   
   render () {
     const instances = this.props.allLoadedInstances.filter(i => i.meshCreated).map(instance => ({
-      "path": instance.metadata.Id,
-      "name": instance.metadata.Name,
-      "types" : instance.metadata.Meta.Types,
-      "tags" : instance.metadata.Tags,
+      "path": instance.metadata?.Id,
+      "name": instance.metadata?.Name,
+      "types" : instance.metadata?.Meta?.Types,
+      "tags" : instance.metadata?.Tags,
       "metaType": VISUAL_TYPE, //instance.getMetaType(),
       "type": COMPOSITE_VISUAL_TYPE,
       "thumbnail": instance.metadata?.Images ? instance.metadata?.Images[Object.keys(instance.metadata?.Images)[0]][0].thumbnail : undefined,

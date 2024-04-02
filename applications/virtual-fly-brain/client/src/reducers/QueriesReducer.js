@@ -1,3 +1,4 @@
+import { getGlobalTypes } from './actions/types/GlobalTypes';
 import { getQueriesTypes } from './actions/types/getQueriesTypes';
 
 export const initialStateQueriesReducer = {
@@ -44,7 +45,13 @@ const QueriesReducer = (state = initialStateQueriesReducer, response) => {
           error: true,
           errorMessage: response.payload.error,
         })
-     default:
+      case getGlobalTypes.RESET_ERRORS: {
+        return Object.assign({}, state, {
+          error: false,
+          errorMessage: undefined
+        })
+      }
+      default:
         return state;
   }
 }

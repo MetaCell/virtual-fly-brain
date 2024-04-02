@@ -52,11 +52,11 @@ const loaded = (store, firstIDLoaded, allLoadedInstances) => {
     // Load q parameter from URL and dispatch action
     const qFromUrl = getUrlParameter("q");
     if (qFromUrl) {
-      const queryList = qFromUrl.split(';')
+      const queryList = qFromUrl.split(',')
       if ( queryList?.length > 0 ) {
         queryList?.forEach( q => {
-          const query = q.split(",");
-          getQueriesFunction( query[0], "get_instances")
+          const query = q.split(";");
+          getQueriesFunction( query[0], query[1])
         })
       } else {
         store.dispatch(setFirstIDLoaded())

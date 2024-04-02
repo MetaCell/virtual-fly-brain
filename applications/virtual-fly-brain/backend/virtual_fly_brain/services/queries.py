@@ -6,10 +6,13 @@ def run_query(id, query_type):
         data = vfb.get_term_info(id)
         queries = data['Queries']
         to_run = next((query for query in queries if query['query'] == query_type), None)
-        if to_run:
+        if to_run is not None:
             func = getattr(vfb, to_run['function'])
             return func(id,return_dataframe=False)
         else:
-            return ""
+            if data['Examples'] is not None:
+                return data['Examples']
+            elif data['Images'] is not None:
+                return data['Images']
     except Exception as e:
         return str(e)

@@ -32,7 +32,7 @@ export const Item = ({
         matchQuery.active = true;
         updateQueries(updatedQueries);
       } else {
-        getQueries(id, "get_instances")
+        getQueries(id, "ListAllAvailableImages")
       }
       dispatch(setQueryComponentOpened(true));
     } else if ( !isQuery && id ) {

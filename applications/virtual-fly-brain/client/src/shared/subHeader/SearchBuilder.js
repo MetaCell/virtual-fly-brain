@@ -152,8 +152,8 @@ export default function SearchBuilder(props) {
 
   const addQueryTag = () => { 
     value.forEach( v => {
-      if (!queries?.find( q => q.Id === v.short_form )) { 
-        getQueries(v, "get_instances");
+      if (!queries?.find( q => q.short_form === v.short_form )) { 
+        getQueries(v.short_form);
       } 
     })
     if ( !value.find( v => v.label === QUERIES )){
@@ -167,7 +167,7 @@ export default function SearchBuilder(props) {
     let updatedQueries = [];
     queries.length > 0 ? updatedQueries = [...queries] : []
     updatedQueries.forEach( q => {
-      let match = value?.find( v => v.short_form === q.Id );
+      let match = value?.find( v => v.short_form === q.short_form );
       if ( match !== undefined ) {
         q.active = true;
         dispatch(addRecentSearch(q, true))
@@ -195,8 +195,8 @@ export default function SearchBuilder(props) {
   const handleResultSelection = async(option) => {
     const doesOptionExist =  obj => obj.label === option.label
     if(!value.some(doesOptionExist)){
-      if (!queries?.find( q => q.Id === option.short_form ) && value.find((chip) => chip.short_form === QUERIES)) { 
-        getQueries(option, "get_instances");
+      if (!queries?.find( q => q.short_form === option.short_form ) && value.find((chip) => chip.short_form === QUERIES)) { 
+        getQueries(option.short_form);
       } 
       setValue([...value, option])
       if ( !globalRecentSearches?.find( recent => recent.id === option.id ) ){

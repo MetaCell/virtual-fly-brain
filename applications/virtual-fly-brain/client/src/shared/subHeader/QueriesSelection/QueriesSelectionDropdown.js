@@ -20,21 +20,17 @@ export const QueriesSelectionDropdown = ({option, selectedOption, goBackToInitia
 
   const handleSelect = (option, query) => {
     let count = 0;
-    if ( query.Examples && !selectedOption[query.Id]) {
-        count = Object.keys(query.Examples)?.length;
-    } else if ( query.Images && !selectedOption[query.Id]) {
-      count = Object.keys(query.Images)?.length;
+    if ( !selectedOption[query.short_form]) {
+        count = query.rows.length;
     }
     Object.keys(selectedOption)?.forEach( o => {
         if ( typeof selectedOption[o] === 'object' ) {
           count = count + ( selectedOption[o].count || 0 )
         } 
     })
-    let updatedSelectedOption = {...selectedOption, [query.Id]: option, count : count};
-    if ( query.Examples) {
-      updatedSelectedOption[query.Id].count =  Object.keys(query.Examples)?.length || 0;
-    } else if ( query.Images) {
-      updatedSelectedOption[query.Id].count =  Object.keys(query.Images)?.length || 0;
+    let updatedSelectedOption = {...selectedOption, [query.short_form]: option, count : count};
+    if ( query.rows) {
+      updatedSelectedOption[query.short_form].count =  query.rows.length || 0;
     }
     setSelectedOption(updatedSelectedOption)
     setPopoverAnchorEl(null);
@@ -148,15 +144,15 @@ export const QueriesSelectionDropdown = ({option, selectedOption, goBackToInitia
                 }}
               >
                 <List>
-                  {!option.Queries.length && <ListItem>
+                  {!option.queries?.length && <ListItem>
                       <ListItemButton onClick={() => goBack(option.Id )}>
                         <ListItemText primary={`Select query for ${option.Name}`}/>
                       </ListItemButton>
                     </ListItem>
                   }
-                  { option.Queries?.map((query, index) => (<ListItem key={query.short_form+index}>
-                    <ListItemButton onClick={() => handleSelect(query, option)}>
-                      <ListItemText primary={query.label} />
+                  { Object.keys(option.queries)?.length && Object.keys(option.queries)?.map((query, index) => (<ListItem key={query.short_form+index}>
+                    <ListItemButton onClick={() => handleSelect(option.queries[query], option)}>
+                      <ListItemText primary={option.queries[query].label} />
                     </ListItemButton>
                   </ListItem>) )}
                 </List>

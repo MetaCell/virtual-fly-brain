@@ -13,16 +13,16 @@ export const QueriesSelection = ({ checkResults, handleQueryDeletion, recentSear
   const [selectedOption, setSelectedOption] = React.useState({ count : 0});
   const [selectedQueryIndex, setSelectedQueryIndex] = React.useState("");
   React.useEffect(() => {
-    let matchQuery = recentSearch.filter( query => queriesRequested?.find( q => query.Id === q.short_form ) );
+    let matchQuery = recentSearch.filter( query => queriesRequested?.find( q => query.short_form === q.short_form ) );
     setSearchQueries(matchQuery)
   }, [recentSearch])
 
   const deleteQuery = (event) => {
-    let matchQuery = searchQueries.find( q => event.currentTarget.id === q.Id);
-    let queries = searchQueries.filter( q => event.currentTarget.id !== q.Id);
+    let matchQuery = searchQueries.find( q => event.currentTarget.id === q.short_form);
+    let queries = searchQueries.filter( q => event.currentTarget.id !== q.short_form);
     setSearchQueries(queries);
     handleQueryDeletion(event.currentTarget.id);
-    delete selectedOption[matchQuery.Id];
+    delete selectedOption[matchQuery.short_form];
     let updateSelection = selectedOption;
     let count = 0;
     Object.keys(selectedOption)?.forEach( o => {

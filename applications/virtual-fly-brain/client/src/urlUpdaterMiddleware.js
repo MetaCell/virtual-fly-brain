@@ -56,7 +56,11 @@ const loaded = (store, firstIDLoaded, allLoadedInstances) => {
       if ( queryList?.length > 0 ) {
         queryList?.forEach( q => {
           const query = q.split(",");
-          getQueries( query[0], query[1])
+          let type = query[1];
+          if ( type === undefined ) {
+            type = "ListAllAvailableImages";
+          }
+          getQueries( query[0], type)
         })
       } else {
         store.dispatch(setFirstIDLoaded())

@@ -1,69 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { CheckBoxDefault, CheckBoxGreen, CheckBoxRed, CleaningServices, FilterIcon, Tick, Undo } from "../../icons";
 import { Box, Button, Checkbox, FormControlLabel, FormGroup, IconButton, Popper, Typography } from "@mui/material";
 import vars from "../../theme/variables";
-
-const DUMMY_FILTERS = [
-  {
-    id: 0,
-    label: 'Adult'
-  },
-  {
-    id: 1,
-    label: 'Image'
-  },
-  {
-    id: 2,
-    label: 'Split Expression'
-  },
-  {
-    id: 3,
-    label: 'Expression Pattern'
-  },
-  {
-    id: 4,
-    label: 'Expression Pattern Fragment'
-  },
-  {
-    id: 5,
-    label: 'Anatomy'
-  },
-  {
-    id: 6,
-    label: 'Neuron with Connectivity'
-  },
-  {
-    id: 7,
-    label: 'Nervous system'
-  },
-  {
-    id: 8,
-    label: 'Neuron'
-  },
-  {
-    id: 9,
-    label: 'Neuron Similarity (NBLAST)'
-  },
-  {
-    id: 10,
-    label: 'Synaptic Neuropil'
-  },
-  {
-    id: 11,
-    label: 'Nervous projection bundle'
-  },
-  {
-    id: 12,
-    label: 'Larva'
-  }
-]
-
 
 const { primaryBg, outlinedBtnTextColor, bottomNavBg, tabActiveColor, whiteColor, searchHeadingColor } = vars;
 
 const Filter = (props) => {
   const [filterAnchorEl, setFilterAnchorEl] = React.useState(null);
-  const [filtersApplied, setFiltersApplied] = useState(true)
+  const [filtersApplied, setFiltersApplied] = useState(props.tags)
 
   const filterhandleClick = (event) => {
     setFilterAnchorEl(filterAnchorEl ? null : event.currentTarget);
@@ -71,6 +15,13 @@ const Filter = (props) => {
 
   const filterOpen = Boolean(filterAnchorEl);
   const filterId = filterOpen ? 'simple-popper' : undefined;
+
+  const handleFilterCheck = (event) => {
+    let tags = [...props.tags];
+    tags.find( t => t.label === event.target.name ).active = event.target.checked;
+    props.setChipTags(tags); 
+  }
+
   return (
     <>
       <Button
@@ -136,7 +87,7 @@ const Filter = (props) => {
             alignItems: 'flex-start',
             rowGap: 1.5
           }}>
-            {DUMMY_FILTERS.map((tag, index) => (
+            {props.tags?.map((tag, index) => (
               <FormControlLabel sx={{
                 height: '20px',
                 borderRadius: '50px',
@@ -152,7 +103,7 @@ const Filter = (props) => {
                   fontSize: '0.625rem'
                 }
 
-              }} key={tag.id} control={<Checkbox checkedIcon={<Tick color={whiteColor} />} icon={<></>} />} label={tag.label} />
+              }} key={tag.label} control={<Checkbox checked={tag.active} onChange={handleFilterCheck} checkedIcon={<Tick color={whiteColor} />} icon={<></>} />} label={tag.label} name={tag.label} />
             ))}
           </FormGroup>
         </Box>
@@ -166,7 +117,7 @@ const Filter = (props) => {
           display: 'flex'
         }}>
           <Button
-            onClick={filterhandleClick}
+            onClick={() => props.clearAllTags()}
             variant="text"
             sx={{
               px: 0,

@@ -1,4 +1,4 @@
-var modelJson = {
+const modelJson = {
   global: {
     tabEnableClose: true,
     sideBorders: 8,

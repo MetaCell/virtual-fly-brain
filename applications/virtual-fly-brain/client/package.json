@@ -1,6 +1,6 @@
 {
-  "name": "vfb-poc",
-  "version": "0.1.0",
+  "name": "Virtual-fly-brain-3",
+  "version": "3.0.0",
   "private": true,
   "dependencies": {
     "@babel/eslint-parser": "^7.21.3",
@@ -104,7 +104,7 @@
     "build-dev": "webpack --config webpack.config.dev.js",
     "prestart": "eslint . --color --fix",
     "start": "webpack serve --progress --config webpack.config.dev.js",
-    "start:dev": "webpack serve --progress --config webpack.config.dev.js"
+    "start:dev": "webpack serve --env mode=development --progress --config webpack.config.dev.js"
   },
   "eslintConfig": {
     "extends": [

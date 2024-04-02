@@ -5,6 +5,7 @@ import vars from "../../theme/variables";
 import MediaQuery from 'react-responsive'
 import SearchBuilder from "./SearchBuilder";
 import { FilterMenu } from "./FilterMenu";
+import { get_query_results } from "../../network/query";
 
 const navArr = [
   {
@@ -173,7 +174,15 @@ const SubHeader = ({ setBottomNav, bottomNav }) => {
           {navArr.map((item, index) => (
             <Button
               aria-label={item.name}
-              onClick={() => setBottomNav(index)}
+              onClick={() => {
+                setBottomNav(index)
+                // TODO: Jesus this needs to be removed, it is just a placeholder to run a query
+                // since I noticed this button was not used yet
+                if (3 === index) {
+                  let results = get_query_results('FBbt_00003748', 'ListAllAvailableImages');
+                  console.log(results);
+                }
+              }}
               sx={{
                 minWidth: '0.0625rem'
               }}

@@ -9,7 +9,6 @@ const PORT = 3300;
 module.exports = env => {
 
   const theDomain = env && env.DOMAIN ? env.DOMAIN : 'localhost:5000';
-  
   console.log('Dev server address: ', theDomain);
 
   const proxyTarget = theDomain;
@@ -21,7 +20,7 @@ module.exports = env => {
 
   const devServer = {
     contentBase: path.join(__dirname, 'dist'),
-    compress: true,
+    compress: false,
     port: Number(env.devPort),
     disableHostCheck: true,
     historyApiFallback: true,

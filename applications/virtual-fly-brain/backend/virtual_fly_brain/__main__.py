@@ -84,6 +84,7 @@ def init_webapp_routes(app):
 
 
 def main():
+    app = None
     if dev_mode:
         app = app = flask.Flask(__name__)
         CORS(app, support_credentials=True)

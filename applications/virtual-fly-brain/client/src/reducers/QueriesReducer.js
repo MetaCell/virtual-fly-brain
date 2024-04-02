@@ -15,11 +15,13 @@ const QueriesReducer = (state = initialStateQueriesReducer, response) => {
         })
      case getQueriesTypes.GET_QUERIES_SUCCESS:{
         let updatedQueries = [...state.queries]
-        let findQuery = updatedQueries?.find( i => i.Id === response.payload.Id );
+        let findQuery = updatedQueries?.find( i => i.short_form === response.payload.short_form );
         response.payload.active = true;
         if ( findQuery === undefined ){
-          updatedQueries.push(response.payload)
+          const newQuery = { ...response.payload}
+          updatedQueries.push(newQuery)
         }
+        console.log("Updated queries ", updatedQueries);
         return Object.assign({}, state, {
           queries: updatedQueries,
           isLoading: false

@@ -89,7 +89,7 @@ const Header = ({setBottomNav}) => {
           updateQueries(updatedQueries);
           setBottomNav(2)
         } else {
-          getQueries({ short_form : action.parameters[0] })
+          getQueries(action.parameters[0], "get_instances")
           setBottomNav(2)
         }
         break;

@@ -153,7 +153,7 @@ export default function SearchBuilder(props) {
   const addQueryTag = () => { 
     value.forEach( v => {
       if (!queries?.find( q => q.Id === v.short_form )) { 
-        getQueries(v);
+        getQueries(v, "get_instances");
       } 
     })
     if ( !value.find( v => v.label === QUERIES )){
@@ -196,7 +196,7 @@ export default function SearchBuilder(props) {
     const doesOptionExist =  obj => obj.label === option.label
     if(!value.some(doesOptionExist)){
       if (!queries?.find( q => q.Id === option.short_form ) && value.find((chip) => chip.short_form === QUERIES)) { 
-        getQueries(option);
+        getQueries(option, "get_instances");
       } 
       setValue([...value, option])
       if ( !globalRecentSearches?.find( recent => recent.id === option.id ) ){

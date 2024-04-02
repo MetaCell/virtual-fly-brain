@@ -18,7 +18,7 @@ import { TreeItem } from "@mui/lab";
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import RectangleIcon from '@mui/icons-material/Rectangle';
 import GeneralInformation from "./TermInfo/GeneralInformation";
-import { getQueries, getQueriesFunction } from './../reducers/actions/queries';
+import { getQueries } from './../reducers/actions/queries';
 import { setQueryComponentOpened } from './../reducers/actions/globals';
 import { getInstanceByID, selectInstance, hide3DMesh, hide3D, show3D, show3DMesh, removeInstanceByID,
   changeColor, focusInstance, show3DSkeleton, hide3DSkeleton, show3DSkeletonLines, show3DSkeletonCylinders, zoomToInstance } from './../reducers/actions/instances';
@@ -294,10 +294,14 @@ const TermInfo = ({ open, setOpen }) => {
     return queriesCount;
   }
 
-  const setToggleMore = (prev) => {
-    getQueriesFunction(termInfoData.metadata.Id, 'get_similar_neurons')
-    dispatch(setQueryComponentOpened(true));
-    setToggleReadMore((prev) => !prev)
+  const setToggleMore = (prev, id, type) => {
+    if ( !toggleReadMore ){
+      getQueries(id, type)
+      dispatch(setQueryComponentOpened(true));
+    } else {
+      dispatch(setQueryComponentOpened(false));
+    }
+    setToggleReadMore(prev)
   }
 
   const termInfoHeading = (
@@ -677,7 +681,7 @@ const TermInfo = ({ open, setOpen }) => {
                                   </TableBody>
                                 </Table>
                                 <Button
-                                  onClick={() => setToggleMore((prev) => !prev)}
+                                  onClick={() => setToggleMore((prev) => !prev, termInfoData.metadata?.Id, query.query)}
                                   disableRipple
                                   sx={{
                                     padding: 0,

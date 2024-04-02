@@ -36,20 +36,7 @@ const getQueriesFailure = error => ({
   }
 });
 
-export const getQueries = async (instance) => {
-
-  store.dispatch(getQueriesStarted())
-  let response;
-  try {
-    response = await get_queries(instance.short_form);
-  } catch (error) {
-    store.dispatch(getQueriesFailure(error.message))
-  }
-
-  store.dispatch(getQueriesSuccess(response, instance.short_form))
-}
-
-export const getQueriesFunction = async (short_form, func) => {
+export const getQueries = async (short_form, func) => {
 
   store.dispatch(getQueriesStarted())
   let response;

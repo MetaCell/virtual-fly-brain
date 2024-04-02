@@ -32,7 +32,7 @@ export const Item = ({
         matchQuery.active = true;
         updateQueries(updatedQueries);
       } else {
-        getQueries({ short_form : id })
+        getQueries(id, "get_instances")
       }
       dispatch(setQueryComponentOpened(true));
     } else if ( !isQuery && id ) {

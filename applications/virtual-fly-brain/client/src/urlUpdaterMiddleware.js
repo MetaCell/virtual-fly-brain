@@ -1,7 +1,7 @@
 import { getInstancesTypes } from './reducers/actions/types/getInstancesTypes';
 import { getQueriesTypes } from './reducers/actions/types/getQueriesTypes';
 import { getInstanceByID, selectInstance, focusInstance } from './reducers/actions/instances';
-import { getQueries, getQueriesFunction } from './reducers/actions/queries';
+import { getQueries } from './reducers/actions/queries';
 import { addRecentSearch } from './reducers/actions/globals'
 import { setQueryComponentOpened, setFirstIDLoaded, setAlignTemplates, setTemplateID } from './reducers/actions/globals';
 
@@ -52,11 +52,11 @@ const loaded = (store, firstIDLoaded, allLoadedInstances) => {
     // Load q parameter from URL and dispatch action
     const qFromUrl = getUrlParameter("q");
     if (qFromUrl) {
-      const queryList = qFromUrl.split(',')
+      const queryList = qFromUrl.split(';')
       if ( queryList?.length > 0 ) {
         queryList?.forEach( q => {
-          const query = q.split(";");
-          getQueriesFunction( query[0], query[1])
+          const query = q.split(",");
+          getQueries( query[0], query[1])
         })
       } else {
         store.dispatch(setFirstIDLoaded())

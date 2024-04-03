@@ -162,7 +162,7 @@ const Query = ({ fullWidth, queries }) => {
         <Grid container spacing={1.5}>
           {queries?.filter(q => q.active).map( (query, index ) => {
             return Object.keys(query.queries)?.map( q => {
-              let rows = {};
+              let rows = [];
               if ( query.queries[q]?.rows ){
                 rows = query.queries[q]?.rows;
               } 

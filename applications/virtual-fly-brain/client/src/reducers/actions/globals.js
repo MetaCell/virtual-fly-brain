@@ -4,8 +4,8 @@ export const addRecentSearch = (search, isQuery) => ({
   type: getGlobalTypes.ADD_RECENT_SEARCH,
   payload : {
     Id : search.short_form || search.Id,
-    Name : search.label || search.Name,
-    Tags : search.facets_annotation || search.Tags,
+    Name : search.label || search.Name || search.query?.label,
+    Tags : search.facets_annotation || search.Tags || search.query?.Tags,
     IsQuery : isQuery
   }
 })

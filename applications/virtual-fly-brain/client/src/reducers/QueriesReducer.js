@@ -22,6 +22,10 @@ const QueriesReducer = (state = initialStateQueriesReducer, response) => {
             if ( findQuery === undefined ){
               const newQuery = { short_form : response.payload.short_form, active : true, queries : { [query["query"]] : query }}
               updatedQueries.push(newQuery)
+            } else {
+              if ( findQuery.queries?.[response.payload.type] ) {
+                findQuery.queries[response.payload.type] = Object.assign(findQuery.queries[response.payload.type], response.payload.query) 
+              }
             }
           })
         } else {
@@ -29,6 +33,12 @@ const QueriesReducer = (state = initialStateQueriesReducer, response) => {
           if ( findQuery === undefined ){
             const newQuery = { short_form : response.payload.short_form, active : true, queries : { [response.payload.type] : response.payload.query }}
             updatedQueries.push(newQuery)
+          } else {
+            if ( findQuery.queries?.[response.payload.type] ) {
+              findQuery.type = response.payload.type;
+              //findQuery.label = response.payload.query.label;
+              findQuery.queries[response.payload.type] = response.payload.query 
+            }
           }
         }
         console.log("Updated queries ", updatedQueries);

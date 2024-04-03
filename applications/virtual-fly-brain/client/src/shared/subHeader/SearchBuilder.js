@@ -166,13 +166,18 @@ export default function SearchBuilder(props) {
     props.setFocused(false);
     let updatedQueries = [];
     queries.length > 0 ? updatedQueries = [...queries] : []
+    updatedQueries?.forEach( uq => uq.active = false );
     updatedQueries.forEach( q => {
       let match = value?.find( v => v.short_form === q.short_form );
       if ( match !== undefined ) {
-        q.active = true;
-        dispatch(addRecentSearch(q, true))
-      } else {
-        q.active = false;
+        Object.keys(q.queries)?.forEach( key => {
+          if ( q.queries[key].active ) {
+            q.active = true;
+            if ( q.queries[key].rows === undefined ) {
+              getQueries(q.short_form, key)
+            } 
+          }
+        })
       }
     })
     updateQueries(updatedQueries);
@@ -332,7 +337,7 @@ export default function SearchBuilder(props) {
           className='scrollbar'
           {...getListboxProps()}
         >
-          { value.find( v => v.label === QUERIES ) && value.filter( v => v.label !== QUERIES )?.length >= 1 ? (<QueriesSelection checkResults={checkResults} handleQueryDeletion={handleChipDelete} recentSearch={queries} queriesRequested={value.filter( v => v.label !== QUERIES )}/>) : null }
+          { value.find( v => v.label === QUERIES ) && value.filter( v => v.label !== QUERIES )?.length >= 1 ? (<QueriesSelection checkResults={checkResults} handleQueryDeletion={handleChipDelete} queriesRequested={value.filter( v => v.label !== QUERIES )}/>) : null }
 
           {/* { groupedOptions.length >=1 ? <NarrowSearchFilter chipColors={chipColors} groupedOptions={groupedOptions}/> :null } */}
 

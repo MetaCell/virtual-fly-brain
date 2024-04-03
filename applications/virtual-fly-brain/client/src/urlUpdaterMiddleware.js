@@ -1,7 +1,7 @@
 import { getInstancesTypes } from './reducers/actions/types/getInstancesTypes';
 import { getQueriesTypes } from './reducers/actions/types/getQueriesTypes';
 import { getInstanceByID, selectInstance, focusInstance } from './reducers/actions/instances';
-import { getQueries } from './reducers/actions/queries';
+import { getQueries, getQueriesFailure } from './reducers/actions/queries';
 import { addRecentSearch } from './reducers/actions/globals'
 import { setQueryComponentOpened, setFirstIDLoaded, setAlignTemplates, setTemplateID } from './reducers/actions/globals';
 
@@ -58,9 +58,10 @@ const loaded = (store, firstIDLoaded, allLoadedInstances) => {
           const query = q.split(",");
           let type = query[1];
           if ( type === undefined ) {
-            type = "ListAllAvailableImages";
+            store.dispatch(getQueriesFailure("Missing query type for ID : " + query[0]))
+          } else {
+            getQueries( query[0], type)
           }
-          getQueries( query[0], type)
         })
       } else {
         store.dispatch(setFirstIDLoaded())
@@ -125,8 +126,9 @@ export const urlUpdaterMiddleware = store => next => (action) => {
     case getQueriesTypes.UPDATE_QUERIES:
     case getQueriesTypes.GET_QUERIES_SUCCESS : {
       const globalRecentSearches = store.getState().globalInfo.recentSearches;
-
-      if ( !globalRecentSearches?.find( recent => recent.id === action.payload.Id ) &&  action.payload.Id != undefined){
+      console.log("Global search ", globalRecentSearches);
+      if ( !globalRecentSearches?.find( recent => recent.id === action.payload.short_form ) &&  action.payload.short_form != undefined){
+        console.log("Add recent search ", action.payload);
         store.dispatch(addRecentSearch(action.payload, true));
       }  
       if ( !firstIDLoaded ){

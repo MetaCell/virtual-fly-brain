@@ -1,12 +1,16 @@
 import React from "react";
 import { Box, Typography, Button, Popper, List, ListItem, ListItemButton, ListItemText } from "@mui/material";
 import { ChevronDown, Delete, ChevronUp } from "../../../icons";
+import { useSelector, useDispatch } from 'react-redux'
+import { getQueries, updateQueries } from "../../../reducers/actions/queries"
 import vars from "../../../theme/variables";
 
 const { searchBoxBg, whiteColor, queryBorderColor } = vars;
 
-export const QueriesSelectionDropdown = ({option, selectedOption, goBackToInitialState,  setSelectedOption, selectedQueryIndex, setSelectedQueryIndex, deleteQuery}) => {
+export const QueriesSelectionDropdown = ({option, selectedOption, goBackToInitialState,  setSelectedOption, setSelectedQueryIndex, deleteQuery}) => {
   const [popoverAnchorEl, setPopoverAnchorEl] = React.useState(null);
+  const queries = useSelector(state => state.queries.queries);
+  const dispatch = useDispatch();
 
   const popoverHandleClick = (event) => {
     setSelectedQueryIndex(event.target.parentElement.id || event.target.id)
@@ -21,16 +25,24 @@ export const QueriesSelectionDropdown = ({option, selectedOption, goBackToInitia
   const handleSelect = (option, query) => {
     let count = 0;
     if ( !selectedOption[query.short_form]) {
-        count = query.rows.length;
+        count = option.count;
     }
+
+    let updatedQueries = [...queries];
+    let matchQuery = updatedQueries?.find( q => q.short_form === query.short_form );
+    if (  matchQuery.queries?.[option.query] ){
+      matchQuery.active = true
+      matchQuery.queries[option.query].active = true;
+    }
+    updateQueries(updatedQueries);
     Object.keys(selectedOption)?.forEach( o => {
         if ( typeof selectedOption[o] === 'object' ) {
           count = count + ( selectedOption[o].count || 0 )
         } 
     })
     let updatedSelectedOption = {...selectedOption, [query.short_form]: option, count : count};
-    if ( query.rows) {
-      updatedSelectedOption[query.short_form].count =  query.rows.length || 0;
+    if ( option.rows) {
+      updatedSelectedOption[query.short_form].count =  option.count || 0;
     }
     setSelectedOption(updatedSelectedOption)
     setPopoverAnchorEl(null);
@@ -42,7 +54,7 @@ export const QueriesSelectionDropdown = ({option, selectedOption, goBackToInitia
   return (
   <Box
     display='flex'
-    key={option.Name}
+    key={option.name}
     columnGap={1}
   >
     <Button
@@ -61,8 +73,8 @@ export const QueriesSelectionDropdown = ({option, selectedOption, goBackToInitia
             background: searchBoxBg,
         }
       }}
-      key={option.Id}
-      id={option.Id}
+      key={option.short_form}
+      id={option.short_form}
       onClick={deleteQuery}
     >
         <Delete size={12} />
@@ -81,7 +93,7 @@ export const QueriesSelectionDropdown = ({option, selectedOption, goBackToInitia
           flexGrow={1}
           display='flex'
         >
-            {selectedOption[option.Id] ? 
+            {selectedOption[option.short_form] ? 
               (<Typography sx={{
                 width: 'calc(100% - 1.875rem)',
                 px: 1,
@@ -94,7 +106,7 @@ export const QueriesSelectionDropdown = ({option, selectedOption, goBackToInitia
                 overflow: 'hidden',
                 textOverflow: 'ellipsis'
               }}>
-                { selectedOption[option.Id].label }
+                { selectedOption[option.short_form].label }
               </Typography>)
               :
               (<Typography sx={{
@@ -109,11 +121,11 @@ export const QueriesSelectionDropdown = ({option, selectedOption, goBackToInitia
                 overflow: 'hidden',
                 textOverflow: 'ellipsis'
               }}>
-               Select query for { option.Name }
+               Select query for { option.name }
               </Typography>) }
               <Button
                 aria-describedby={id}
-                id={option.Id}
+                id={option.short_form}
                 onClick={popoverHandleClick}
                 sx={{
                   borderLeft: `0.0625rem solid ${queryBorderColor}`,
@@ -145,8 +157,8 @@ export const QueriesSelectionDropdown = ({option, selectedOption, goBackToInitia
               >
                 <List>
                   {!option.queries?.length && <ListItem>
-                      <ListItemButton onClick={() => goBack(option.Id )}>
-                        <ListItemText primary={`Select query for ${option.Name}`}/>
+                      <ListItemButton onClick={() => goBack(option.short_form )}>
+                        <ListItemText primary={`Select query for ${option.name}`}/>
                       </ListItemButton>
                     </ListItem>
                   }

@@ -30,7 +30,7 @@ const getQueriesStarted = () => ({
   type: getQueriesTypes.GET_QUERIES_STARTED
 });
 
-const getQueriesFailure = error => ({
+export const getQueriesFailure = error => ({
   type: getQueriesTypes.GET_QUERIES_FAILURE,
   payload: {
     error

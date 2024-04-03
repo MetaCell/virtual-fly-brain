@@ -83,13 +83,12 @@ const Header = ({setBottomNav}) => {
       case ACTIONS.RUN_QUERY:{
         let updatedQueries = [...queries];
         let matchQuery = updatedQueries?.find( q => q.Id === action.parameters[0] );
-        updatedQueries?.forEach( q => q.active = false )
         if ( matchQuery ) {
           matchQuery.active = true;
           updateQueries(updatedQueries);
           setBottomNav(2)
         } else {
-          getQueries(action.parameters[0], "get_instances")
+          getQueries(action.parameters[0],action.parameters[1])
           setBottomNav(2)
         }
         break;

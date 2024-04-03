@@ -22,17 +22,16 @@ export const Item = ({
   const queries = useSelector(state => state.queries.queries);
   const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances);
   
-  const handleClick = (event, isQuery, id) => {
+  const handleClick = (event, isQuery, id, type) => {
     setAnchorEl(anchorEl ? null : event.currentTarget);
     if(isQuery){
       let updatedQueries = [...queries];
       let matchQuery = updatedQueries?.find( q => q.Id === id );
-      updatedQueries?.forEach( q => q.active = false )
       if ( matchQuery ) {
         matchQuery.active = true;
         updateQueries(updatedQueries);
       } else {
-        getQueries(id, "ListAllAvailableImages")
+        getQueries(id, type)
       }
       dispatch(setQueryComponentOpened(true));
     } else if ( !isQuery && id ) {

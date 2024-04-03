@@ -101,7 +101,6 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
   const getThumbnail = (thumbnail) => {
     const matches = thumbnail.match(/\bhttps?::\/\/\S+/gi) || thumbnail.match(/\bhttps?:\/\/\S+/gi);
 
-    console.log("Thumbnail " , matches);
     return matches;
   }
 

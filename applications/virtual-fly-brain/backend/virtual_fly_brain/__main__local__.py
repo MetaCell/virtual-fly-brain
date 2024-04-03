@@ -6,6 +6,8 @@ from flask_cors import CORS, cross_origin
 import os
 import json
 import numpy as np
+from services.queries import run_query
+from services.term_info import get_term_info
 
 class NumpyEncoder(json.JSONEncoder):
     """ Custom encoder for numpy data types """
@@ -73,17 +75,6 @@ def init_webapp_routes(app):
     @cross_origin(supports_credentials=True)
     def loading_manager():
       pass
-
-    @app.route('/get_queries', methods=['GET'])
-    @cross_origin(supports_credentials=True)
-    def queries():
-      print("queries")
-      id = request.args.get('short_form')
-      func = request.args.get('function')
-      term_info_data = getattr(vfb, func)(id, return_dataframe=False)
-      info_data = json.dumps(term_info_data, cls=NumpyEncoder)
-      print(info_data)
-      return info_data
       
     @app.route('/test', methods=['GET'])
     def test():
@@ -96,6 +87,15 @@ def init_webapp_routes(app):
     @app.route('/<path:path>', methods=['GET'])
     def send_webapp(path):
         return flask.send_from_directory(www_path, path)
+    
+    @app.route('/run_query', methods=['GET'])
+    @cross_origin(supports_credentials=True)
+    def get_query_results():
+        id = flask.request.args.get('id')
+        query_type = flask.request.args.get('query_type')
+        query_info_data = run_query(id, query_type)
+        info_data = json.dumps(query_info_data, cls=NumpyEncoder)
+        return info_data
 
     @app.errorhandler(404)
     def page_not_found(error):

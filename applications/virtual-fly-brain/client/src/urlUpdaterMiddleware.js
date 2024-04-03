@@ -126,9 +126,7 @@ export const urlUpdaterMiddleware = store => next => (action) => {
     case getQueriesTypes.UPDATE_QUERIES:
     case getQueriesTypes.GET_QUERIES_SUCCESS : {
       const globalRecentSearches = store.getState().globalInfo.recentSearches;
-      console.log("Global search ", globalRecentSearches);
       if ( !globalRecentSearches?.find( recent => recent.id === action.payload.short_form ) &&  action.payload.short_form != undefined){
-        console.log("Add recent search ", action.payload);
         store.dispatch(addRecentSearch(action.payload, true));
       }  
       if ( !firstIDLoaded ){

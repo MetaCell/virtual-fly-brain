@@ -22,18 +22,18 @@ const Query = ({ fullWidth, queries }) => {
   }
   
   let count = 0;
-  queries?.filter(q => q.active).forEach( query => {
+  queries?.forEach( query => {
     Object.keys(query.queries)?.map( q => {
-      if ( query.queries[q].rows) {
+      if ( query.queries[q]?.active && query.queries[q].rows) {
         count = count + Object.keys(query.queries[q].rows)?.length;
       }
     })
   });
   const title = count + " Query results";
   const tags = [];
-  queries?.filter(q => q.active).forEach( (query, index ) => {
+  queries?.forEach( (query, index ) => {
     Object.keys(query.queries)?.forEach( q => {
-      if ( query.queries[q].rows) {
+      if ( query.queries[q]?.active && query.queries[q].rows) {
         query.queries[q].rows?.forEach( row => {
           const newTags = getTags(row.tags);
           newTags?.forEach( n => {
@@ -160,27 +160,30 @@ const Query = ({ fullWidth, queries }) => {
 
       <Box overflow='auto' height='calc(100% - 5.375rem)' p={1.5}>
         <Grid container spacing={1.5}>
-          {queries?.filter(q => q.active).map( (query, index ) => {
+          {queries.map( (query, index ) => {
             return Object.keys(query.queries)?.map( q => {
-              let rows = [];
-              if ( query.queries[q]?.rows ){
-                rows = query.queries[q]?.rows;
-              } 
-              return ( rows?.map((row, index) => {
-                return (
-                  <Grid
-                    key={index}
-                    row
-                    xs={12}
-                    sm={6}
-                    md={4}
-                    lg={fullWidth ? 4 : 3}
-                    xl={3}
-                  >
-                    <QueryCard facets_annotation={getTags(row.tags)} query={row} fullWidth={fullWidth} />
-                  </Grid>
-                )
-              }))
+              if ( query.queries[q]?.active ) {
+                let rows = [];
+                if ( query.queries[q]?.rows ){
+                  rows = query.queries[q]?.rows;
+                } 
+                return ( rows?.map((row, index) => {
+                  return (
+                    <Grid
+                      key={index}
+                      row
+                      xs={12}
+                      sm={6}
+                      spacing={1.5}
+                      md={4}
+                      lg={fullWidth ? 4 : 3}
+                      xl={3}
+                    >
+                      <QueryCard facets_annotation={getTags(row.tags)} query={row} fullWidth={fullWidth} />
+                    </Grid>
+                  )
+                }))
+              }
             });
           })}
         </Grid>

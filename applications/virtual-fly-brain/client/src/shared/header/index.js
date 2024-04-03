@@ -82,9 +82,14 @@ const Header = ({setBottomNav}) => {
       }
       case ACTIONS.RUN_QUERY:{
         let updatedQueries = [...queries];
-        let matchQuery = updatedQueries?.find( q => q.Id === action.parameters[0] );
-        if ( matchQuery ) {
-          matchQuery.active = true;
+        let matchQuery = updatedQueries?.find( q => q.short_form === action.parameters[0] );
+        updatedQueries?.forEach( query => {
+          if( query.queries ){
+            Object.keys(query.queries)?.forEach( q => query.queries[q].active = false );
+          }
+        });
+        if ( matchQuery.queries[action.parameters[1]] ) {
+          matchQuery.queries[action.parameters[1]].active = true;
           updateQueries(updatedQueries);
           setBottomNav(2)
         } else {
@@ -103,7 +108,7 @@ const Header = ({setBottomNav}) => {
               icon: i?.is_query ? "fa fa-quora" : "fa fa-eye", // TODO : replace with figma icon
               action: {
                 handlerAction: i?.is_query ? ACTIONS.RUN_QUERY : ACTIONS.SELECT_INSTANCE,
-                parameters: [i?.short_form]
+                parameters: [i?.short_form, i?.type]
               }
             },
           );

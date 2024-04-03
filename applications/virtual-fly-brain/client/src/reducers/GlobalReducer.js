@@ -49,7 +49,8 @@ const GlobalReducer = (state = initialStateGlobalReducer, response) => {
             label : response.payload.Name,
             id : response.payload.Id,
             facets_annotation : response.payload.Tags,
-            is_query : response.payload.IsQuery || false
+            is_query : response.payload.IsQuery || false,
+            type : response.payload.Type
           })
         }
         return Object.assign({}, state, {

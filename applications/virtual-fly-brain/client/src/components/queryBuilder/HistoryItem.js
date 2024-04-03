@@ -26,9 +26,14 @@ export const Item = ({
     setAnchorEl(anchorEl ? null : event.currentTarget);
     if(isQuery){
       let updatedQueries = [...queries];
-      let matchQuery = updatedQueries?.find( q => q.Id === id );
-      if ( matchQuery ) {
-        matchQuery.active = true;
+      let matchQuery = updatedQueries?.find( q => q.short_form === id );
+      updatedQueries?.forEach( query => {
+        if( query.queries ){
+          Object.keys(query.queries)?.forEach( q => query.queries[q].active = false );
+        }
+      });
+      if ( matchQuery.queries[type] ) {
+        matchQuery.queries[type].active = true;
         updateQueries(updatedQueries);
       } else {
         getQueries(id, type)
@@ -149,7 +154,7 @@ export const Item = ({
           <List>
             { !search?.is_query ? 
             <ListItem>
-              <ListItemButton onClick={(event) => handleClick(event, false, search?.short_form)}>
+              <ListItemButton onClick={(event) => handleClick(event, false, search?.short_form, search?.type)}>
                 <ListItemIcon sx={{
                   minWidth: '0.0625rem',
                   padding: '0 0.375rem 0 0'
@@ -164,7 +169,7 @@ export const Item = ({
             }
             { search?.is_query ? 
             <ListItem>
-              <ListItemButton onClick={(event) => handleClick(event, true, search?.short_form)}>
+              <ListItemButton onClick={(event) => handleClick(event, true, search?.short_form, search?.type)}>
                 <ListItemIcon sx={{
                   minWidth: '0.0625rem',
                   padding: '0 0.375rem 0 0'

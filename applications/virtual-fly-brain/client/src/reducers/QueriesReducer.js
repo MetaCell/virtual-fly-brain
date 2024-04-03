@@ -16,11 +16,13 @@ const QueriesReducer = (state = initialStateQueriesReducer, response) => {
         })
      case getQueriesTypes.GET_QUERIES_SUCCESS:{
         let updatedQueries = [...state.queries]
+        response.payload.query.active = true;
         if ( Array.isArray(response.payload.query) ) {
           response.payload?.query.forEach( query => {
+            query.active = true;
             let findQuery = updatedQueries?.find( i => i.short_form === response.payload.short_form );
             if ( findQuery === undefined ){
-              const newQuery = { short_form : response.payload.short_form, active : true, queries : { [query["query"]] : query }}
+              const newQuery = { short_form : response.payload.short_form, queries : { [query["query"]] : query }}
               updatedQueries.push(newQuery)
             } else {
               if ( findQuery.queries?.[response.payload.type] ) {
@@ -31,17 +33,15 @@ const QueriesReducer = (state = initialStateQueriesReducer, response) => {
         } else {
           let findQuery = updatedQueries?.find( i => i.short_form === response.payload.short_form );
           if ( findQuery === undefined ){
-            const newQuery = { short_form : response.payload.short_form, active : true, queries : { [response.payload.type] : response.payload.query }}
+            const newQuery = { short_form : response.payload.short_form, queries : { [response.payload.type] : response.payload.query }}
             updatedQueries.push(newQuery)
           } else {
             if ( findQuery.queries?.[response.payload.type] ) {
               findQuery.type = response.payload.type;
-              //findQuery.label = response.payload.query.label;
               findQuery.queries[response.payload.type] = response.payload.query 
             }
           }
         }
-        console.log("Updated queries ", updatedQueries);
 
         return Object.assign({}, state, {
           queries: updatedQueries,

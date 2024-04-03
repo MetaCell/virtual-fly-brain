@@ -40,7 +40,6 @@ class NumpyEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 def init_webapp_routes(app):
-
     if dev_mode:
         www_path = os.path.dirname(os.path.abspath(__file__)) + "/www"
 
@@ -81,16 +80,15 @@ def init_webapp_routes(app):
             'error': 'Internal server error'
         }, 500
 
-
+app = None
+if dev_mode:
+    app = app = flask.Flask(__name__)
+    CORS(app, support_credentials=True)
+    init_webapp_routes(app)
+else:
+    app = init_flask(title="Virtual Fly Brain REST API", webapp=True, init_app_fn=init_webapp_routes)
 
 def main():
-    if dev_mode:
-        app = app = flask.Flask(__name__)
-        CORS(app, support_credentials=True)
-        init_webapp_routes(app)
-    else:
-        app = init_flask(title="Virtual Fly Brain REST API", webapp=True, init_app_fn=init_webapp_routes)
-
     app.run(host='0.0.0.0', port=8080)
 
 if __name__ == '__main__':

@@ -13,9 +13,7 @@ import { restPostConfig } from './configuration/VFBGraph/graphConfiguration';
 import { cypherQuery } from './configuration/VFBGraph/graphConfiguration';
 import { stylingConfiguration } from './configuration/VFBGraph/graphConfiguration';
 import { getInstanceByID } from '../reducers/actions/instances';
-
-const UPDATE_GRAPH = 'UPDATE_GRAPH';
-
+import { getGraphTypes } from '../reducers/actions/types/getGraphTypes'
 /**
  * If no configuration is given for queries in graphConfiguration.js, we use this configuration.
  */
@@ -75,6 +73,7 @@ class VFBGraph extends Component {
     this.nodeSelectedID = "";
     this.queryRequests = [];
     this.querySelection = {};
+    this.requestedQuery = { id : "", name : "" }
   }
 
   componentDidMount () {
@@ -92,27 +91,41 @@ class VFBGraph extends Component {
         self.shiftOn = false;
       }
     });
+
+    const graphInstance = this.props.graphInstanceOnFocus ;
+    const graphInstanceSelection = this.props.graphInstanceSelection
+
+    if (graphInstanceSelection && graphInstance)
+    {
+      this.updateSelection(graphInstanceSelection, graphInstance.metadata.Id, graphInstance.metadata.Name )
+    }
   }
 
   componentDidUpdate () {
     const graphInstance = this.props.graphInstanceOnFocus ;
     const stateInstance = this.props.stateInstanceOnFocus
-    if (graphInstance == undefined && stateInstance)
+    const graphInstanceSelection = this.props.graphInstanceSelection
+    if ( graphInstance != undefined && graphInstanceSelection != undefined && graphInstanceSelection?.label(graphInstance?.metadata?.Name) != this.requestedQuery?.name )
     {
-      const instanceId = stateInstance.metadata.Id ;
-      const instanceName = stateInstance.metadata.Name ;
-      this.props.vfbGraph(UPDATE_GRAPH, stateInstance, -1, true, false);
-      this.queryResults(cypherQuery(instanceId), { id : instanceId, name : instanceName });
-    }
+      this.updateSelection(graphInstanceSelection, graphInstance.metadata.Id, graphInstance.metadata.Name )
+    } else {
+      if (graphInstance == undefined && stateInstance)
+      {
+        const instanceId = stateInstance.metadata.Id ;
+        const instanceName = stateInstance.metadata.Name ;
+        this.props.vfbGraph(getGraphTypes.UPDATE_GRAPH, stateInstance, -1, true, false);
+        this.queryResults(cypherQuery(instanceId), { id : instanceId, name : this.querySelection.label(instanceName) });
+      }
 
-    if (!this.resizeObserver && this.containerRef.current)
-    {
-      this.resizeObserver = new ResizeObserver(entries => {
-        this.graphRef.current.ggv.current.zoomToFit();
-      });
-  
-      if (this.containerRef.current) {
-        this.resizeObserver.observe(this.containerRef.current); // Start observing for size changes
+      if (!this.resizeObserver && this.containerRef.current)
+      {
+        this.resizeObserver = new ResizeObserver(entries => {
+          this.graphRef.current.ggv.current.zoomToFit();
+        });
+    
+        if (this.containerRef.current) {
+          this.resizeObserver.observe(this.containerRef.current); // Start observing for size changes
+        }
       }
     }
 
@@ -206,16 +219,23 @@ class VFBGraph extends Component {
     this.updateGraph();
   }
 
+  updateSelection ( selection, id , name) {
+    // Show loading spinner while cypher query search occurs
+    this.loading = true;
+    this.querySelection = selection;
+    let queryId = id || this.state.currentQuery.id ||this.props.stateInstanceOnFocus?.metadata?.Id;
+    let queryName = this.querySelection?.label(name) || this.state?.currentQuery?.name;
+    this.requestedQuery = { id : queryId, name : queryName };
+    // Perform cypher query
+    this.queryResults(selection.query(queryId), { id : queryId, name : queryName } );
+    this.forceUpdate();
+  }
+
   /**
    * Handle Menu drop down clicks
    */
   handleMenuClick (selection) {
-    // Show loading spinner while cypher query search occurs
-    this.loading = true;
-    this.querySelection = selection;
-    this.forceUpdate();
-    // Perform cypher query
-    this.queryResults(selection.query(this.state.currentQuery.id), { id : this.state.currentQuery.id, name : this.state.currentQuery.name } );
+    this.updateSelection(selection)
   }
 
   /**
@@ -229,7 +249,7 @@ class VFBGraph extends Component {
     this.loading = true;
     this.setState({ optionsIconColor : stylingConfiguration.defaultRefreshIconColor });
     // Perform cypher query
-    this.queryResults(cypherQuery(node.title), { id : node.title, name : node.path } );
+    this.queryResults(cypherQuery(node.title), { id : node.title, name : this.querySelection(node.path) } );
   }
 
   selectedNodeLoaded (instance) {
@@ -279,8 +299,8 @@ class VFBGraph extends Component {
     this.setState({ optionsIconColor : stylingConfiguration.defaultRefreshIconColor });
     
     // Perform cypher query
-    this.props.vfbGraph(UPDATE_GRAPH, stateInstance, -1, true, false);
-    this.queryResults(cypherQuery(instanceId), { id : instanceId, name : instanceName });
+    this.props.vfbGraph(getGraphTypes.UPDATE_GRAPH, stateInstance, -1, true, false);
+    this.queryResults(cypherQuery(instanceId), { id : instanceId, name : this.querySelection(instanceName) });
   }
 
   /**
@@ -632,12 +652,13 @@ class VFBGraph extends Component {
 
 function mapStateToProps (state) {
   const graphInstanceOnFocus = state.graph.instanceOnFocus;
+  const graphInstanceSelection = state.graph.selection;
   const stateInstanceOnFocus = state.instances.focusedInstance;
-
   const newProps = {
     graphQueryIndex : graphInstanceOnFocus && stateInstanceOnFocus ? 0 : -1,
     sync : state.graph.sync,
     graphInstanceOnFocus,
+    graphInstanceSelection,
     stateInstanceOnFocus,
     loading: graphInstanceOnFocus !== undefined
   }
@@ -646,7 +667,9 @@ function mapStateToProps (state) {
 }
 
 function mapDispatchToProps (dispatch) {
-  return { vfbGraph: (type, path, index, visible, sync) => dispatch ( { type : type, data : { instance : path, queryIndex : index, visible : visible, sync : sync } } ) }
+  return {
+    vfbGraph: (type, path, index, visible, sync) => dispatch ( { type : type, data : { instance : path, queryIndex : index, visible : visible, sync : sync } } ) 
+  }
 }
 
 export default connect(mapStateToProps, mapDispatchToProps, null, { forwardRef : true } )(VFBGraph);

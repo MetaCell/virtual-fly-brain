@@ -1,7 +1,7 @@
 import { getInstancesTypes } from './reducers/actions/types/getInstancesTypes';
 import { getQueriesTypes } from './reducers/actions/types/getQueriesTypes';
 import { getInstanceByID, selectInstance, focusInstance } from './reducers/actions/instances';
-import { getQueries } from './reducers/actions/queries';
+import { getQueries, getQueriesFailure } from './reducers/actions/queries';
 import { addRecentSearch } from './reducers/actions/globals'
 import { setQueryComponentOpened, setFirstIDLoaded, setAlignTemplates, setTemplateID } from './reducers/actions/globals';
 
@@ -56,16 +56,17 @@ const loaded = (store, firstIDLoaded, allLoadedInstances) => {
       if ( queryList?.length > 0 ) {
         queryList?.forEach( q => {
           const query = q.split(",");
-          getQueries({ short_form : query[0], type : query[1]})
+          let type = query[1];
+          if ( type === undefined ) {
+            store.dispatch(getQueriesFailure("Missing query type for ID : " + query[0], query[0]))
+          } else {
+            getQueries( query[0], type)
+            store.dispatch(setQueryComponentOpened(true));
+          }
         })
-      } else {
-        store.dispatch(setFirstIDLoaded())
-      }
-    } else {
-      store.dispatch(setFirstIDLoaded())
+      } 
     }
-
-    const id = getUrlParameter("id")?.split(",")?.[0];
+    store.dispatch(setFirstIDLoaded())
   }
 }
 
@@ -120,16 +121,19 @@ export const urlUpdaterMiddleware = store => next => (action) => {
     }
     case getQueriesTypes.UPDATE_QUERIES:
     case getQueriesTypes.GET_QUERIES_SUCCESS : {
-      const globalRecentSearches = store.getState().globalInfo.recentSearches;
-
-      if ( !globalRecentSearches?.find( recent => recent.id === action.payload.Id ) &&  action.payload.Id != undefined){
-        store.dispatch(addRecentSearch(action.payload, true));
-      }  
-      if ( !firstIDLoaded ){
-          store.dispatch(setFirstIDLoaded())
-          store.dispatch(setQueryComponentOpened(true));
+      const globalRecentSearches = store.getState().globalInfo.recentSearches; 
+      if ( action.payload.query?.queries?.length < 1 && action.payload.query?.rows === undefined){
+        store.dispatch(getQueriesFailure("No queries found for : " + action.payload.short_form, action.payload.short_form))
+      } else {
+        if ( !globalRecentSearches?.find( recent => recent.short_form === action.payload.short_form && recent.is_query) && action.payload.query.queries?.length > 0 ){
+          store.dispatch(addRecentSearch(action.payload, true));
+        }  
+        if ( !firstIDLoaded ){
+            store.dispatch(setFirstIDLoaded())
+            store.dispatch(setQueryComponentOpened(true));
         }
-        break;
+      }
+      break;
     }
     default:
         break;

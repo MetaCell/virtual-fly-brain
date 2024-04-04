@@ -1,50 +1,28 @@
 import { Box, Button, Divider, Typography } from "@mui/material";
-import React, { useState } from "react";
+import React from "react";
 import { Add, ChevronDown, ImportExport } from "../../icons";
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import vars from "../../theme/variables";
 import { dividerStyle } from "./Query";
-
+import { removeAllRecentSearch } from "../../reducers/actions/globals";
+import { useDispatch } from "react-redux";
 
 const { searchHeadingColor, whiteColor, secondaryBg, primaryBg } = vars
 
-const QueryHeader = ({ title, filters, recentSearches, clearAll, setFilteredSearches }) => {
-  const [sort, setSort] = useState('Name');
-  const [crescent , setCrescent] = useState(1);
+const QueryHeader = ({ title, filters, handleSort, handleCrescentEvent, clearAll, setFilteredSearches }) => {
+  const [sort, setSort] = React.useState('Name');
+  const dispatch = useDispatch();
+  const [crescent , setCrescent] = React.useState(1);
 
   const handleChange = (value) => {
     setSort(value);
-    const identifier = filters.filters[value];
-    let updatedSearches = [...recentSearches.sort( (a,b) => {
-      if ( a?.[identifier] && b?.[identifier] ){
-        return (crescent)* a?.[identifier]?.localeCompare(b?.[identifier] )
-      } else if ( a?.[filters.tags] && b?.[filters.tags] ) {
-        if ( a?.[filters.tags]?.includes(identifier) ) {
-          return -1;
-        } else {
-          return 0;
-        }
-      }
-    })];
-    setFilteredSearches(updatedSearches)
+    handleSort(value, crescent);
   };
 
   const handleCrescentChange = () => {
-    const identifier = filters.filters[sort];
-    let updatedSearches = [...recentSearches.sort( (a,b) => {
-      if ( a?.[identifier] && b?.[identifier] ){
-        return (crescent * -1 )* a?.[identifier]?.localeCompare(b?.[identifier] )
-      } else if ( a?.[filters.tags] && b?.[filters.tags] ) {
-        if ( a?.[filters.tags]?.includes(identifier) ) {
-          return -1;
-        } else {
-          return 0;
-        }
-      }
-    })];
-    setFilteredSearches(updatedSearches)
+    handleCrescentEvent(sort, crescent)
     setCrescent(crescent * -1 );
   };
 
@@ -148,7 +126,7 @@ const QueryHeader = ({ title, filters, recentSearches, clearAll, setFilteredSear
               value={sort}
               onChange={(event) => handleChange(event.target.value)}
             >
-              { Object.keys(filters.filters || {}).map( (filter, index) => (<MenuItem key={index} value={filter}>{filter}</MenuItem> ))}
+              { Object.keys(filters.filters || {}).map( (filter, index) => {return(<MenuItem key={index} value={filter}>{filter}</MenuItem> )})}
             </Select>
           </FormControl>
         </Box>
@@ -178,7 +156,7 @@ const QueryHeader = ({ title, filters, recentSearches, clearAll, setFilteredSear
         <Button
             disableRipple
             variant="text"
-            onClick={clearAll}
+            onClick={(event) => clearAll()}
             sx={{
               minWidth: '0.0625rem',
               padding: 0,

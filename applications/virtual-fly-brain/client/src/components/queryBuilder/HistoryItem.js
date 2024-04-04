@@ -22,17 +22,21 @@ export const Item = ({
   const queries = useSelector(state => state.queries.queries);
   const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances);
   
-  const handleClick = (event, isQuery, id) => {
+  const handleClick = (event, isQuery, id, type) => {
     setAnchorEl(anchorEl ? null : event.currentTarget);
     if(isQuery){
       let updatedQueries = [...queries];
-      let matchQuery = updatedQueries?.find( q => q.Id === id );
-      updatedQueries?.forEach( q => q.active = false )
-      if ( matchQuery ) {
-        matchQuery.active = true;
+      let matchQuery = updatedQueries?.find( q => q.short_form === id );
+      updatedQueries?.forEach( query => {
+        if( query.queries ){
+          Object.keys(query.queries)?.forEach( q => query.queries[q].active = false );
+        }
+      });
+      if ( matchQuery.queries[type] ) {
+        matchQuery.queries[type].active = true;
         updateQueries(updatedQueries);
       } else {
-        getQueries({ short_form : id })
+        getQueries(id, type)
       }
       dispatch(setQueryComponentOpened(true));
     } else if ( !isQuery && id ) {
@@ -150,7 +154,7 @@ export const Item = ({
           <List>
             { !search?.is_query ? 
             <ListItem>
-              <ListItemButton onClick={(event) => handleClick(event, false, search?.short_form)}>
+              <ListItemButton onClick={(event) => handleClick(event, false, search?.short_form, search?.type)}>
                 <ListItemIcon sx={{
                   minWidth: '0.0625rem',
                   padding: '0 0.375rem 0 0'
@@ -165,7 +169,7 @@ export const Item = ({
             }
             { search?.is_query ? 
             <ListItem>
-              <ListItemButton onClick={(event) => handleClick(event, true, search?.short_form)}>
+              <ListItemButton onClick={(event) => handleClick(event, true, search?.short_form, search?.type)}>
                 <ListItemIcon sx={{
                   minWidth: '0.0625rem',
                   padding: '0 0.375rem 0 0'

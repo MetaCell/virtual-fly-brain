@@ -7,6 +7,8 @@ import vars from "../../theme/variables";
 import Filter from "./Filter";
 import { getUpdatedTags } from "../../utils/utils";
 import { updateQueries } from "./../../reducers/actions/queries"
+import { removeRecentSearch } from "./../../reducers/actions/globals"
+import { useDispatch } from 'react-redux'
 
 const { headerBorderColor, searchHeadingColor, secondaryBg, listHeadingColor, primaryBg } = vars;
 const colors_config = require("../configuration/VFBColors").facets_annotations_colors;
@@ -16,24 +18,26 @@ export const dividerStyle = {
   height: '0.875rem', width: '0.0625rem', background: listHeadingColor, borderRadius: '0.125rem'
 }
 
+const getTags = (tags) => {
+  return tags.split("|")
+}
+
 const getQueries = (newQueries) => {
-  let examples = {};
   let updatedQueries = []
-  newQueries?.filter(q => q.active).forEach( (query, index ) => {
-    if ( query?.Examples ){
-      examples = query?.Examples;
-    } else if ( query?.Images ){
-      examples = query?.Images;
+  newQueries?.forEach( (query, index ) => {
+    if ( query.queries ) {
+      Object.keys(query.queries).map( key => {
+        if ( query.queries[key]?.active ) {
+          let rows = [];
+          if ( query.queries[key]?.rows ){
+            rows = query.queries[key]?.rows;
+          } 
+          updatedQueries = updatedQueries.concat(rows)
+        }
+      });
     }
-
-    Object.keys(examples).map( key => {
-      const example = examples[key][0];
-      example.tags = query.Tags
-
-      updatedQueries.push(example)
-    });
   })
-  
+
   return updatedQueries;
 }
 
@@ -49,6 +53,7 @@ const Query = ({ fullWidth, queries }) => {
     "tags" : "tags"
   };
   const [filters, setFilters] = React.useState(initialFilters);
+  const dispatch = useDispatch();
 
   const updateFilters = (searches) => {
     setFilteredSearches(searches)
@@ -56,7 +61,7 @@ const Query = ({ fullWidth, queries }) => {
 
   useEffect( () => {
     let tags = {...initialFilters.filters};
-    queries?.filter( q => q.active ).forEach( (query, index ) => {
+    queries?.forEach( (query, index ) => {
       query.Tags?.forEach( tag => {
         if ( tags?.[tag] == undefined ){
           tags[tag] = tag;
@@ -68,10 +73,12 @@ const Query = ({ fullWidth, queries }) => {
 
   const getCount = () => {
     let count = 0;
-    filteredSearches?.forEach( q => {
-        if (chipTags?.filter(f => f.active)?.some(v => q.tags.includes(v.label)) ) {
-          count = count + 1;
+    queries?.forEach( query => {
+      Object.keys(query.queries)?.map( q => {
+        if ( query.queries[q]?.active && query.queries[q].rows) {
+          count = count + query.queries[q].count;
         }
+      })
     })
 
     return count;
@@ -80,12 +87,19 @@ const Query = ({ fullWidth, queries }) => {
   useEffect( () => {
     setCount(getCount());
     let tags = [];
-    queries?.filter(q => q.active).forEach( (query, index ) => {
-      query.Tags?.forEach( tag => {
-        if ( tags?.find(t => t.label === tag) == undefined ){
-          tags.push({ label : tag, active : true});
+    queries?.forEach( (query, index ) => {
+      Object.keys(query.queries)?.map( q => {
+        if ( query.queries[q]?.active ) {
+          query.queries[q]?.rows?.forEach( row => {
+            const rowTags = getTags(row.tags);
+            rowTags?.forEach( rowTag => {
+              if ( tags?.find(t => t.label === rowTag) == undefined ){
+                tags.push({ label : rowTag, active : true});
+              }
+            });
+          })
         }
-      })
+      });
     })
     setFilteredSearches(getQueries(queries))
     setChipTags(tags);
@@ -99,19 +113,69 @@ const Query = ({ fullWidth, queries }) => {
   }
 
   const clearAll = () => {
-    updateQueries([]);
+    let clearQueries = [...queries];
+    clearQueries?.forEach( query => {
+      if ( query.queries ) {
+        Object.keys(query.queries)?.forEach( key => {
+          if ( query.queries?.[key]?.active ) {
+            query.queries[key].active = false;
+          }
+        })
+      }
+    });
+    updateQueries(clearQueries);
   }
 
   const clearAllTags = () => {
     let tags = [...chipTags]
-    tags.forEach( c => c.active = false )
+    tags.forEach( c => c.active = true )
     setCount(getCount())
     setChipTags(tags);
   }
 
+  const handleSort = (value, crescent) => {
+    const identifier = filters.filters[value];
+    let updatedSearches = [...filteredSearches.sort( (a,b) => {
+      if ( a?.[identifier] && b?.[identifier] ){
+        return (crescent)* a?.[identifier]?.localeCompare(b?.[identifier] )
+      } else if ( a?.[filters.tags] && b?.[filters.tags] ) {
+        if ( a?.[filters.tags]?.includes(identifier) ) {
+          return -1;
+        } else {
+          return 0;
+        }
+      }
+    })];
+    setFilteredSearches(updatedSearches)
+  }
+
+  const handleCrescentEvent = (sort, crescent) => {
+    const identifier = filters.filters[sort];
+    let updatedSearches = [...filteredSearches.sort( (a,b) => {
+      if ( a?.[identifier] && b?.[identifier] ){
+        return (crescent * -1 )* a?.[identifier]?.localeCompare(b?.[identifier] )
+      } else if ( a?.[filters.tags] && b?.[filters.tags] ) {
+        if ( a?.[filters.tags]?.includes(identifier) ) {
+          return -1;
+        } else {
+          return 0;
+        }
+      }
+    })];
+    setFilteredSearches(updatedSearches)
+  }
+
   return (
     <>
-      <QueryHeader title={ getCount() + " Query results"} filters={filters} recentSearches={filteredSearches} setFilteredSearches={updateFilters} clearAll={clearAll}/>
+      <QueryHeader 
+        title={ count + " Query results"}
+        filters={filters}
+        recentSearches={filteredSearches}
+        setFilteredSearches={updateFilters}
+        clearAll={clearAll}
+        handleCrescentEvent={handleCrescentEvent}
+        handleSort={handleSort}
+      />
 
       <Box
         position='sticky'
@@ -224,23 +288,25 @@ const Query = ({ fullWidth, queries }) => {
 
       <Box overflow='auto' height='calc(100% - 5.375rem)' p={1.5}>
         <Grid container spacing={1.5}>
-          {filteredSearches?.map( (query, index ) => {
-            if ( chipTags?.filter(f => f.active)?.some(v => query.tags.includes(v.label)) ) {
-                return (
-                  <Grid
-                    key={index}
-                    item
-                    xs={12}
-                    sm={6}
-                    md={4}
-                    lg={fullWidth ? 4 : 3}
-                    xl={3}
-                  >
-                    <QueryCard facets_annotation={query.tags} query={query} fullWidth={fullWidth} />
-                  </Grid>
-                )
+          {filteredSearches?.map((row, index) => {
+            const tags = getTags(row.tags);
+            if ( chipTags?.filter(f => f.active)?.some(v => tags.includes(v.label)) ) {
+              return (
+                <Grid
+                  key={index}
+                  item
+                  xs={12}
+                  sm={6}
+                  md={4}
+                  lg={fullWidth ? 4 : 3}
+                  xl={3}
+                >
+                  <QueryCard facets_annotation={tags} query={row} fullWidth={fullWidth} />
+                </Grid>
+              )
             }
-          })}
+            })
+          }
         </Grid>
       </Box>
     </>

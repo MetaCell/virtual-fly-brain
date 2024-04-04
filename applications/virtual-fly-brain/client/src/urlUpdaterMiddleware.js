@@ -58,7 +58,7 @@ const loaded = (store, firstIDLoaded, allLoadedInstances) => {
           const query = q.split(",");
           let type = query[1];
           if ( type === undefined ) {
-            store.dispatch(getQueriesFailure("Missing query type for ID : " + query[0]))
+            store.dispatch(getQueriesFailure("Missing query type for ID : " + query[0], query[0]))
           } else {
             getQueries( query[0], type)
             store.dispatch(setQueryComponentOpened(true));
@@ -121,17 +121,19 @@ export const urlUpdaterMiddleware = store => next => (action) => {
     }
     case getQueriesTypes.UPDATE_QUERIES:
     case getQueriesTypes.GET_QUERIES_SUCCESS : {
-      const globalRecentSearches = store.getState().globalInfo.recentSearches;
-      console.log("globalRecentSearches ", globalRecentSearches)
-      if ( !globalRecentSearches?.find( recent => recent.short_form === action.payload.short_form && recent.is_query) && action.payload.short_form != undefined ){
-        console.log("adding search ", action.payload)
-        store.dispatch(addRecentSearch(action.payload, true));
-      }  
-      if ( !firstIDLoaded ){
-          store.dispatch(setFirstIDLoaded())
-          store.dispatch(setQueryComponentOpened(true));
+      const globalRecentSearches = store.getState().globalInfo.recentSearches; 
+      if ( action.payload.query?.queries?.length < 1 && action.payload.query?.rows === undefined){
+        store.dispatch(getQueriesFailure("No queries found for : " + action.payload.short_form, action.payload.short_form))
+      } else {
+        if ( !globalRecentSearches?.find( recent => recent.short_form === action.payload.short_form && recent.is_query) && action.payload.query.queries?.length > 0 ){
+          store.dispatch(addRecentSearch(action.payload, true));
+        }  
+        if ( !firstIDLoaded ){
+            store.dispatch(setFirstIDLoaded())
+            store.dispatch(setQueryComponentOpened(true));
         }
-        break;
+      }
+      break;
     }
     default:
         break;

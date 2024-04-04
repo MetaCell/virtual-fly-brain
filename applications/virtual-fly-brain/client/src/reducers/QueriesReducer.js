@@ -5,7 +5,8 @@ export const initialStateQueriesReducer = {
   queries : [],
   isLoading: false,
   error: false,
-  errorMessage: undefined
+  errorMessage: undefined,
+  errorID : undefined
 };
 
 const QueriesReducer = (state = initialStateQueriesReducer, response) => {
@@ -64,6 +65,7 @@ const QueriesReducer = (state = initialStateQueriesReducer, response) => {
         return Object.assign({}, state, {
           error: true,
           errorMessage: response.payload.error,
+          errorID: response.payload.id,
         })
       case getGlobalTypes.RESET_ERRORS: {
         return Object.assign({}, state, {

@@ -148,6 +148,10 @@ export default function SearchBuilder(props) {
   const queries = useSelector(state => state.queries.queries);
   const [hasFocus,setHasFocus] = React.useState(false);
   const globalRecentSearches = useSelector( state => state.globalInfo.recentSearches)
+  const queriesError = useSelector(state => state.queries.error);
+  const queriesErrorMessage = useSelector(state => state.queries.errorMessage);
+  const queriesErrorID = useSelector(state => state.queries.errorID);
+
   const dispatch = useDispatch();
 
   const addQueryTag = () => { 
@@ -160,6 +164,7 @@ export default function SearchBuilder(props) {
       setValue((prevValue) => [{label: 'Queries', tags: [], id : "Queries"}, ...prevValue])
     }
   };
+
   const checkResults = () => {
     props.setBottomNav(2)
     setIsOpen(false)
@@ -207,9 +212,7 @@ export default function SearchBuilder(props) {
         getQueries(option.short_form);
       } 
       setValue([...value, {...option, id : option.short_form, label : option.label}])
-      console.log("globalRecentSearches ", globalRecentSearches)
       if ( !globalRecentSearches?.find( recent => recent.short_form === option.short_form ) ){
-        console.log("adding search ", option)
         dispatch(addRecentSearch(option, false));
       }
     }
@@ -293,13 +296,20 @@ export default function SearchBuilder(props) {
   });
 
   React.useEffect(() => {
-    console.log("Focused changed ", focused)
     handleFocused(focused);
   }, [focused])
 
   React.useEffect(() => {
     handleFocused(props.filterOpened);
   }, [props.filterOpened])
+
+  React.useEffect( () => {
+    let values = [...value];
+    if ( values.find( v => v.id === queriesErrorID ) ) {
+      values = values.filter( v => v.id != queriesErrorID );
+    }
+    setValue(values)
+  }, [queriesErrorID])
 
   return (
     <Box flexGrow={1}>

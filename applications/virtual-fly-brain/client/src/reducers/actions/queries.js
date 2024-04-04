@@ -30,10 +30,11 @@ const getQueriesStarted = () => ({
   type: getQueriesTypes.GET_QUERIES_STARTED
 });
 
-export const getQueriesFailure = error => ({
+export const getQueriesFailure = ( error, id) => ({
   type: getQueriesTypes.GET_QUERIES_FAILURE,
   payload: {
-    error
+    error : error,
+    id : id
   }
 });
 
@@ -44,7 +45,7 @@ export const getQueries = async (short_form, type) => {
   try {
     response = await get_query_results(short_form, type);
   } catch (error) {
-    store.dispatch(getQueriesFailure(error.message))
+    store.dispatch(getQueriesFailure(error.message, short_form))
   }
 
   store.dispatch(getQueriesSuccess(response, short_form, type))

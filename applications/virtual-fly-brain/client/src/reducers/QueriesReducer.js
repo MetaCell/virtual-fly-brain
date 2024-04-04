@@ -17,12 +17,12 @@ const QueriesReducer = (state = initialStateQueriesReducer, response) => {
      case getQueriesTypes.GET_QUERIES_SUCCESS:{
         let updatedQueries = [...state.queries]
         response.payload.query.active = true;
-        if ( Array.isArray(response.payload.query) ) {
-          response.payload?.query.forEach( query => {
+        if ( Array.isArray(response.payload.query.queries) ) {
+          response.payload?.query.queries.forEach( query => {
             query.active = true;
             let findQuery = updatedQueries?.find( i => i.short_form === response.payload.short_form );
             if ( findQuery === undefined ){
-              const newQuery = { short_form : response.payload.short_form, queries : { [query["query"]] : query }}
+              const newQuery = { short_form : response.payload.short_form, name : response.payload.query.name, queries : { [query["query"]] : query }}
               updatedQueries.push(newQuery)
             } else {
               if ( findQuery.queries?.[response.payload.type] ) {
@@ -33,7 +33,7 @@ const QueriesReducer = (state = initialStateQueriesReducer, response) => {
         } else {
           let findQuery = updatedQueries?.find( i => i.short_form === response.payload.short_form );
           if ( findQuery === undefined ){
-            const newQuery = { short_form : response.payload.short_form, queries : { [response.payload.type] : response.payload.query }}
+            const newQuery = { short_form : response.payload.short_form, name : response.payload.query.name, queries : { [response.payload.type] : response.payload.query }}
             updatedQueries.push(newQuery)
           } else {
             if ( findQuery.queries?.[response.payload.type] ) {
@@ -55,7 +55,7 @@ const QueriesReducer = (state = initialStateQueriesReducer, response) => {
         })
       case getQueriesTypes.DELETE_QUERY:
         return Object.assign({}, state, {
-          queries: state.queries?.filter( i => i.Id !== response.payload.id ),
+          queries: state.queries?.filter( i => i.short_form !== response.payload.id ),
           isLoading: false,
           error: false,
           errorMessage: undefined

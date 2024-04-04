@@ -13,6 +13,6 @@ def run_query(id, query_type):
             data_queries['Tags'] = data['Tags']
             return data_queries
         else:
-            return queries
+            return dict({ 'queries' : queries, 'name' :  data['Name']})
     except Exception as e:
         return str(e)

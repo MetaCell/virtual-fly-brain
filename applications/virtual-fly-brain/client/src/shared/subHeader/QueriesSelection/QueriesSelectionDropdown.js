@@ -158,7 +158,7 @@ export const QueriesSelectionDropdown = ({option, selectedOption, goBackToInitia
                 <List>
                   {!option.queries?.length && <ListItem>
                       <ListItemButton onClick={() => goBack(option.short_form )}>
-                        <ListItemText primary={`Select query for ${option.name}`}/>
+                        <ListItemText primary={`Select query for ${option.name || option.short_form}`}/>
                       </ListItemButton>
                     </ListItem>
                   }

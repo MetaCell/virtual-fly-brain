@@ -11,27 +11,19 @@ import { useDispatch } from "react-redux";
 
 const { searchHeadingColor, whiteColor, secondaryBg, primaryBg } = vars
 
-const QueryHeader = ({ title, filters, recentSearches, filteredSearches, setFilteredSearches }) => {
+const QueryHeader = ({ title, filters, handleSort, handleCrescentEvent, clearAll, setFilteredSearches }) => {
   const [sort, setSort] = React.useState('Name');
   const dispatch = useDispatch();
   const [crescent , setCrescent] = React.useState(1);
 
   const handleChange = (value) => {
     setSort(value);
-    const identifier = filters[value];
-    let updatedSearches = [...recentSearches.sort( (a,b) => a?.[identifier]?.localeCompare(b?.[identifier] ))];
-    setFilteredSearches(updatedSearches)
+    handleSort(value, crescent);
   };
 
   const handleCrescentChange = () => {
-    const identifier = filters[sort];
-    let updatedSearches = [...recentSearches.sort( (a,b) => (crescent * -1 )* a?.[identifier]?.localeCompare(b?.[identifier] ))];
-    setFilteredSearches(updatedSearches)
+    handleCrescentEvent(sort, crescent)
     setCrescent(crescent * -1 );
-  };
-
-  const removeFromHistory = () => {
-    dispatch(removeAllRecentSearch())
   };
 
   return (
@@ -134,7 +126,7 @@ const QueryHeader = ({ title, filters, recentSearches, filteredSearches, setFilt
               value={sort}
               onChange={(event) => handleChange(event.target.value)}
             >
-              { Object.keys(filters || {}).map( (filter, index) => (<MenuItem key={index} value={filter}>{filter}</MenuItem> ))}
+              { Object.keys(filters.filters || {}).map( (filter, index) => {return(<MenuItem key={index} value={filter}>{filter}</MenuItem> )})}
             </Select>
           </FormControl>
         </Box>
@@ -164,7 +156,7 @@ const QueryHeader = ({ title, filters, recentSearches, filteredSearches, setFilt
         <Button
             disableRipple
             variant="text"
-            onClick={(event) => removeFromHistory()}
+            onClick={(event) => clearAll()}
             sx={{
               minWidth: '0.0625rem',
               padding: 0,

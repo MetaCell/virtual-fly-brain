@@ -166,7 +166,6 @@ export default function SearchBuilder(props) {
     props.setFocused(false);
     let updatedQueries = [];
     queries.length > 0 ? updatedQueries = [...queries] : []
-    //updatedQueries?.forEach( uq => uq.active = false );
     updatedQueries.forEach( q => {
       let match = value?.find( v => v.short_form === q.short_form );
       if ( match !== undefined ) {
@@ -175,7 +174,11 @@ export default function SearchBuilder(props) {
             q.active = true;
             if ( q.queries[key].rows === undefined ) {
               getQueries(q.short_form, key)
-            } 
+            }else { 
+              if ( !globalRecentSearches?.find( recent => recent.short_form === option.id ) && option.type){
+                dispatch(addRecentSearch(option, true));
+              }
+            }
           }
         })
       }
@@ -200,11 +203,13 @@ export default function SearchBuilder(props) {
   const handleResultSelection = async(option) => {
     const doesOptionExist =  obj => obj.label === option.label
     if(!value.some(doesOptionExist)){
-      if (!queries?.find( q => q.short_form === option.short_form ) && value.find((chip) => chip.short_form === QUERIES)) { 
+      if (!queries?.find( q => q.short_form === option.short_form ) && value.find((chip) => chip.id === QUERIES)) { 
         getQueries(option.short_form);
       } 
-      setValue([...value, option])
-      if ( !globalRecentSearches?.find( recent => recent.id === option.id ) ){
+      setValue([...value, {...option, id : option.short_form, label : option.label}])
+      console.log("globalRecentSearches ", globalRecentSearches)
+      if ( !globalRecentSearches?.find( recent => recent.short_form === option.short_form ) ){
+        console.log("adding search ", option)
         dispatch(addRecentSearch(option, false));
       }
     }
@@ -212,7 +217,7 @@ export default function SearchBuilder(props) {
 
   const handleChipDelete = (label) => {
     handleQueryDeletion(label)
-    let filtered = value.filter((chip) => chip.short_form !== label);
+    let filtered = value.filter((chip) => chip.id !== label);
     setValue(filtered);
     if ( filtered.length == 0 || ( filtered.length === 1 && value.find( v => v.label === QUERIES ))){
       setGroupedOptions([]);
@@ -223,7 +228,7 @@ export default function SearchBuilder(props) {
   }
 
   const handleQueryDeletion = (id) => {
-    let option = value.find((chip) => chip.short_form === id);
+    let option = value.find((chip) => chip.id === id);
     deleteQuery(option?.short_form);
   }
 

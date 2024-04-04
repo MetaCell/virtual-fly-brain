@@ -41,13 +41,53 @@ const History = () => {
     dispatch(removeAllRecentSearch())
   };
 
+  const handleSort = (value, crescent) => {
+    const identifier = filters.filters[value];
+    let updatedSearches = [...filteredSearches.sort( (a,b) => {
+      if ( a?.[identifier] && b?.[identifier] ){
+        return (crescent)* a?.[identifier]?.localeCompare(b?.[identifier] )
+      } else if ( a?.[filters.tags] && b?.[filters.tags] ) {
+        if ( a?.[filters.tags]?.includes(identifier) ) {
+          return -1;
+        } else {
+          return 0;
+        }
+      }
+    })];
+    setFilteredSearches(updatedSearches)
+  }
+
+  const handleCrescentEvent = (sort, crescent) => {
+    const identifier = filters.filters[sort];
+    let updatedSearches = [...filteredSearches.sort( (a,b) => {
+      if ( a?.[identifier] && b?.[identifier] ){
+        return (crescent * -1 )* a?.[identifier]?.localeCompare(b?.[identifier] )
+      } else if ( a?.[filters.tags] && b?.[filters.tags] ) {
+        if ( a?.[filters.tags]?.includes(identifier) ) {
+          return -1;
+        } else {
+          return 0;
+        }
+      }
+    })];
+    setFilteredSearches(updatedSearches)
+  }
+
   React.useEffect( () => {
     setFilteredSearches(recentSearches)
   }, [recentSearches])
 
   return (
     <>
-      <QueryHeader filters={filters} recentSearches={filteredSearches} setFilteredSearches={updateFilters} title={recentSearches?.length + " results in history"} clearAll={removeFromHistory} />
+      <QueryHeader
+        filters={filters}
+        recentSearches={filteredSearches}
+        setFilteredSearches={updateFilters}
+        title={recentSearches?.length + " results in history"}
+        clearAll={removeFromHistory}
+        handleCrescentEvent={handleCrescentEvent}
+        handleSort={handleSort}
+      />
 
       <Box p={1}>
         {filteredSearches?.map((search, index) => (

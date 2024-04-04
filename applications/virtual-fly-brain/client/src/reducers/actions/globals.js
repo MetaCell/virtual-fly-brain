@@ -6,7 +6,7 @@ export const addRecentSearch = (search, isQuery) => ({
     Id : search.short_form || search.Id,
     Name : search.label || search.Name || search.query?.label,
     Tags : search.facets_annotation || search.Tags || search.query?.Tags,
-    Type : search.type || search.query.type,
+    Type : search.type || search.query?.type,
     IsQuery : isQuery
   }
 })

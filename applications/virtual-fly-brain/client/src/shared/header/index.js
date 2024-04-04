@@ -88,7 +88,7 @@ const Header = ({setBottomNav}) => {
             Object.keys(query.queries)?.forEach( q => query.queries[q].active = false );
           }
         });
-        if ( matchQuery.queries[action.parameters[1]] ) {
+        if ( matchQuery?.queries?.[action?.parameters[1]] ) {
           matchQuery.queries[action.parameters[1]].active = true;
           updateQueries(updatedQueries);
           setBottomNav(2)

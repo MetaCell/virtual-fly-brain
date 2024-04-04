@@ -61,16 +61,12 @@ const loaded = (store, firstIDLoaded, allLoadedInstances) => {
             store.dispatch(getQueriesFailure("Missing query type for ID : " + query[0]))
           } else {
             getQueries( query[0], type)
+            store.dispatch(setQueryComponentOpened(true));
           }
         })
-      } else {
-        store.dispatch(setFirstIDLoaded())
-      }
-    } else {
-      store.dispatch(setFirstIDLoaded())
+      } 
     }
-
-    const id = getUrlParameter("id")?.split(",")?.[0];
+    store.dispatch(setFirstIDLoaded())
   }
 }
 
@@ -126,7 +122,9 @@ export const urlUpdaterMiddleware = store => next => (action) => {
     case getQueriesTypes.UPDATE_QUERIES:
     case getQueriesTypes.GET_QUERIES_SUCCESS : {
       const globalRecentSearches = store.getState().globalInfo.recentSearches;
-      if ( !globalRecentSearches?.find( recent => recent.id === action.payload.short_form ) &&  action.payload.short_form != undefined){
+      console.log("globalRecentSearches ", globalRecentSearches)
+      if ( !globalRecentSearches?.find( recent => recent.short_form === action.payload.short_form && recent.is_query) && action.payload.short_form != undefined ){
+        console.log("adding search ", action.payload)
         store.dispatch(addRecentSearch(action.payload, true));
       }  
       if ( !firstIDLoaded ){

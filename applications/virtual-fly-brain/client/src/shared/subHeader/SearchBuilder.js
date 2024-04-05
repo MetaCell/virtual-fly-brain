@@ -146,7 +146,6 @@ export default function SearchBuilder(props) {
   const [lastSearch, setLastSearch] = React.useState("");
   const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances);
   const queries = useSelector(state => state.queries.queries);
-  const [hasFocus,setHasFocus] = React.useState(false);
   const globalRecentSearches = useSelector( state => state.globalInfo.recentSearches)
   const queriesError = useSelector(state => state.queries.error);
   const queriesErrorMessage = useSelector(state => state.queries.errorMessage);
@@ -276,7 +275,7 @@ export default function SearchBuilder(props) {
   }
 
   const handleFocused = (focused) => {
-    setHasFocus(focused)
+    props.setFocused(focused);
   }
 
   const {
@@ -348,7 +347,7 @@ export default function SearchBuilder(props) {
           <input placeholder='Find something...' {...getInputProps()}/>
         </InputWrapper>
       </Box>
-      { hasFocus && isOpen ? (
+      { props.focused && isOpen ? (
         <Listbox
           className='scrollbar'
           {...getListboxProps()}

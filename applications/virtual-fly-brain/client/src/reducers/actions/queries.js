@@ -1,11 +1,13 @@
 import store from '../../store';
-import { get_queries } from "../../network/query"
+import { get_queries, get_query_results } from "../../network/query"
 import { getQueriesTypes } from './types/getQueriesTypes';
 
-const getQueriesSuccess = query => ({
+const getQueriesSuccess = (query, short_form, type) => ({
   type: getQueriesTypes.GET_QUERIES_SUCCESS,
   payload: {
-    ...query
+    query : query,
+    short_form : short_form,
+    type : type
   }
 });
 
@@ -28,24 +30,25 @@ const getQueriesStarted = () => ({
   type: getQueriesTypes.GET_QUERIES_STARTED
 });
 
-const getQueriesFailure = error => ({
+export const getQueriesFailure = ( error, id) => ({
   type: getQueriesTypes.GET_QUERIES_FAILURE,
   payload: {
-    error
+    error : error,
+    id : id
   }
 });
 
-export const getQueries = async (instance) => {
+export const getQueries = async (short_form, type) => {
 
   store.dispatch(getQueriesStarted())
   let response;
   try {
-    response = await get_queries(instance.short_form);
+    response = await get_query_results(short_form, type);
   } catch (error) {
-    store.dispatch(getQueriesFailure(error.message))
+    store.dispatch(getQueriesFailure(error.message, short_form))
   }
 
-  store.dispatch(getQueriesSuccess(response))
+  store.dispatch(getQueriesSuccess(response, short_form, type))
 }
 
 export const deleteQuery = async (instance) => {

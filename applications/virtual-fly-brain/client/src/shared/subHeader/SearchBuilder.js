@@ -148,18 +148,23 @@ export default function SearchBuilder(props) {
   const queries = useSelector(state => state.queries.queries);
   const [hasFocus,setHasFocus] = React.useState(false);
   const globalRecentSearches = useSelector( state => state.globalInfo.recentSearches)
+  const queriesError = useSelector(state => state.queries.error);
+  const queriesErrorMessage = useSelector(state => state.queries.errorMessage);
+  const queriesErrorID = useSelector(state => state.queries.errorID);
+
   const dispatch = useDispatch();
 
   const addQueryTag = () => { 
     value.forEach( v => {
-      if (!queries?.find( q => q.Id === v.short_form )) { 
-        getQueries(v);
+      if (!queries?.find( q => q.short_form === v.short_form )) { 
+        getQueries(v.short_form);
       } 
     })
     if ( !value.find( v => v.label === QUERIES )){
       setValue((prevValue) => [{label: 'Queries', tags: [], id : "Queries"}, ...prevValue])
     }
   };
+
   const checkResults = () => {
     props.setBottomNav(2)
     setIsOpen(false)
@@ -167,12 +172,20 @@ export default function SearchBuilder(props) {
     let updatedQueries = [];
     queries.length > 0 ? updatedQueries = [...queries] : []
     updatedQueries.forEach( q => {
-      let match = value?.find( v => v.short_form === q.Id );
+      let match = value?.find( v => v.short_form === q.short_form );
       if ( match !== undefined ) {
-        q.active = true;
-        dispatch(addRecentSearch(q, true))
-      } else {
-        q.active = false;
+        Object.keys(q.queries)?.forEach( key => {
+          if ( q.queries[key].active ) {
+            q.active = true;
+            if ( q.queries[key].rows === undefined ) {
+              getQueries(q.short_form, key)
+            }else { 
+              if ( !globalRecentSearches?.find( recent => recent.short_form === option.id ) && option.type){
+                dispatch(addRecentSearch(option, true));
+              }
+            }
+          }
+        })
       }
     })
     updateQueries(updatedQueries);
@@ -195,11 +208,11 @@ export default function SearchBuilder(props) {
   const handleResultSelection = async(option) => {
     const doesOptionExist =  obj => obj.label === option.label
     if(!value.some(doesOptionExist)){
-      if (!queries?.find( q => q.Id === option.short_form ) && value.find((chip) => chip.short_form === QUERIES)) { 
-        getQueries(option);
+      if (!queries?.find( q => q.short_form === option.short_form ) && value.find((chip) => chip.id === QUERIES)) { 
+        getQueries(option.short_form);
       } 
-      setValue([...value, option])
-      if ( !globalRecentSearches?.find( recent => recent.id === option.id ) ){
+      setValue([...value, {...option, id : option.short_form, label : option.label}])
+      if ( !globalRecentSearches?.find( recent => recent.short_form === option.short_form ) ){
         dispatch(addRecentSearch(option, false));
       }
     }
@@ -207,7 +220,7 @@ export default function SearchBuilder(props) {
 
   const handleChipDelete = (label) => {
     handleQueryDeletion(label)
-    let filtered = value.filter((chip) => chip.short_form !== label);
+    let filtered = value.filter((chip) => chip.id !== label);
     setValue(filtered);
     if ( filtered.length == 0 || ( filtered.length === 1 && value.find( v => v.label === QUERIES ))){
       setGroupedOptions([]);
@@ -218,7 +231,7 @@ export default function SearchBuilder(props) {
   }
 
   const handleQueryDeletion = (id) => {
-    let option = value.find((chip) => chip.short_form === id);
+    let option = value.find((chip) => chip.id === id);
     deleteQuery(option?.short_form);
   }
 
@@ -291,6 +304,14 @@ export default function SearchBuilder(props) {
     handleFocused(props.filterOpened);
   }, [props.filterOpened])
 
+  React.useEffect( () => {
+    let values = [...value];
+    if ( values.find( v => v.id === queriesErrorID ) ) {
+      values = values.filter( v => v.id != queriesErrorID );
+    }
+    setValue(values)
+  }, [queriesErrorID])
+
   return (
     <Box flexGrow={1}>
       <Box {...getRootProps()}>
@@ -332,7 +353,7 @@ export default function SearchBuilder(props) {
           className='scrollbar'
           {...getListboxProps()}
         >
-          { value.find( v => v.label === QUERIES ) && value.filter( v => v.label !== QUERIES )?.length >= 1 ? (<QueriesSelection checkResults={checkResults} handleQueryDeletion={handleChipDelete} recentSearch={queries} queriesRequested={value.filter( v => v.label !== QUERIES )}/>) : null }
+          { value.find( v => v.label === QUERIES ) && value.filter( v => v.label !== QUERIES )?.length >= 1 ? (<QueriesSelection checkResults={checkResults} handleQueryDeletion={handleChipDelete} queriesRequested={value.filter( v => v.label !== QUERIES )}/>) : null }
 
           {/* { groupedOptions.length >=1 ? <NarrowSearchFilter chipColors={chipColors} groupedOptions={groupedOptions}/> :null } */}
 

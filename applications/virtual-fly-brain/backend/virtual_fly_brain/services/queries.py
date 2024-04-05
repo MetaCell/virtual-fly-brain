@@ -6,10 +6,13 @@ def run_query(id, query_type):
         data = vfb.get_term_info(id)
         queries = data['Queries']
         to_run = next((query for query in queries if query['query'] == query_type), None)
-        if to_run:
+        if to_run is not None:
             func = getattr(vfb, to_run['function'])
-            return func(id).to_json()
+            data_queries = func(id,return_dataframe=False)
+            data_queries['label'] = to_run['label']
+            data_queries['Tags'] = data['Tags']
+            return data_queries
         else:
-            return ""
+            return dict({ 'queries' : queries, 'name' :  data['Name']})
     except Exception as e:
         return str(e)

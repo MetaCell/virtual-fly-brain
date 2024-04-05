@@ -2,7 +2,7 @@ import { Box, Button,Tooltip, ButtonGroup, Grid, IconButton, Menu, MenuItem,
   Table, TableBody, TableCell, Paper, TableContainer, TableHead, TableRow,
    Typography } from "@mui/material";
 import React, { useState, useEffect } from "react";
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { styled } from '@mui/material/styles';
 import MediaQuery from 'react-responsive';
 import { ArView, Target, CylinderOn, CylinderOff, ArrowDown, ArrowRight, ChevronDown,
@@ -18,6 +18,8 @@ import { TreeItem } from "@mui/lab";
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import RectangleIcon from '@mui/icons-material/Rectangle';
 import GeneralInformation from "./TermInfo/GeneralInformation";
+import { getQueries } from './../reducers/actions/queries';
+import { setQueryComponentOpened } from './../reducers/actions/globals';
 import { getInstanceByID, selectInstance, hide3DMesh, hide3D, show3D, show3DMesh, removeInstanceByID,
   changeColor, focusInstance, show3DSkeleton, hide3DSkeleton, show3DSkeletonLines, show3DSkeletonCylinders, zoomToInstance } from './../reducers/actions/instances';
 import Ribbon from '@flybase/react-ontology-ribbon';
@@ -34,6 +36,7 @@ const {
   blackColor,
   listHeadingColor,
   headerBorderColor,
+  tabActiveColor,
   primaryBg
 } = vars;
 
@@ -185,6 +188,8 @@ const TermInfo = ({ open, setOpen }) => {
   const data = useSelector(state => state.instances.focusedInstance)
   const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances)
   const [termInfoData, setTermInfoData] = useState(data);
+  const [ toggleReadMore, setToggleReadMore ] = useState( false );
+  const dispatch = useDispatch();
 
   const popover = React.useRef();
 
@@ -287,6 +292,16 @@ const TermInfo = ({ open, setOpen }) => {
     });
 
     return queriesCount;
+  }
+
+  const setToggleMore = (prev, id, type) => {
+    if ( !toggleReadMore ){
+      getQueries(id, type)
+      dispatch(setQueryComponentOpened(true));
+    } else {
+      dispatch(setQueryComponentOpened(false));
+    }
+    setToggleReadMore(prev)
   }
 
   const termInfoHeading = (
@@ -665,6 +680,17 @@ const TermInfo = ({ open, setOpen }) => {
                                     ))}
                                   </TableBody>
                                 </Table>
+                                <Button
+                                  onClick={() => setToggleMore((prev) => !prev, termInfoData.metadata?.Id, query.query)}
+                                  disableRipple
+                                  sx={{
+                                    padding: 0,
+                                    marginTop: '0.25rem',
+                                    height: 'auto',
+                                    color: tabActiveColor
+                                  }}>
+                                {toggleReadMore ? 'Show Less' : 'Read More'}
+                              </Button>
                                 </TableContainer>
                                 </>
                          } /></TreeItem>)

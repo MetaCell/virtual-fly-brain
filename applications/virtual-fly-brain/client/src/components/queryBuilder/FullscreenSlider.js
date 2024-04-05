@@ -9,13 +9,27 @@ import { focusInstance, getInstanceByID, selectInstance } from '../../reducers/a
 
 const { whiteColor, listHeadingColor } = vars;
 
+const spanStyle = {
+  padding: '20px',
+  background: '#efefef',
+  color: '#000000'
+}
+
 const imageStyle =  {
   height: '100%',
   width: '100%',
   objectFit: 'cover'
 }
 
-const TerminfoSlider = (props) => {
+const divStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundSize: 'cover',
+  height: '400px'
+}
+
+const FullscreenSlider = (props) => {
   const classes = {
     root: {
       height: '100%',
@@ -117,11 +131,11 @@ const TerminfoSlider = (props) => {
   }
 
   useEffect( () => {
+    console.log("Layers ", props.examples)
     if(props?.examples) {
-      const keys = Object.keys(props.examples);
-      setSlideImages(keys.map( k => ({
-        url: props.examples[k][0].thumbnail,
-        caption: props.examples[k][0].label,
+      setSlideImages(props?.examples.map( k => ({
+        url: k.thumbnail,
+        caption: k.label,
         id : k
       })));
     }
@@ -129,16 +143,15 @@ const TerminfoSlider = (props) => {
 
   return (
     <Box sx={classes.root}>
-      <Slide canSwipe={ false } slidesToShow={ 1 } slidesToScroll={ 1 } infinite={ false } indicators={ true } prevArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } nextArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } arrows={ true }>
-            {slideImages?.map((slideImage, index) => (
-                <img
-                  key={index}
-                  style={imageStyle}
-                  src={slideImage.url}
-                  onClick={() => imageClick(slideImage.id)} 
-                  alt={slideImage.caption}
-                />
-            ))}
+      <Slide arrows={ true } canSwipe={ true } slidesToShow={ 1 } slidesToScroll={ 1 } infinite={ false } indicators={ true } prevArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } nextArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } >
+        {slideImages?.map((slideImage, index) => (
+          <div>
+            <div
+              style={{ ...divStyle, 'backgroundImage': `url(${slideImage.url})` }} onClick={() => imageClick(slideImage.id)}>
+              <span style={spanStyle}>{slideImage.caption}</span>
+            </div>
+          </div>
+        ))}
       </Slide>
       {props.allowFullscreen && (
         <Button onClick={() => props.setFullScreen(true)} sx={ {
@@ -158,4 +171,4 @@ const TerminfoSlider = (props) => {
   )
 }
 
-export default TerminfoSlider ;
+export default FullscreenSlider ;

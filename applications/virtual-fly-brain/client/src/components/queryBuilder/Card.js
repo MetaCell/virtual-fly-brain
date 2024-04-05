@@ -310,12 +310,7 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
       </Card>
 
       {showFullScreen && (
-        <FullScreenViewer sx={classes.slider} open={ showFullScreen } onClose={ () => setShowFullScreen( false ) } images={[{ url : getThumbnail(query.thumbnail) }]}>
-          <Button sx={ { position: 'absolute', zIndex: 9, gap: '0.25rem', right: '1.75rem', top: '1.75rem' } } variant="contained" color="info">
-            <Compare />
-            Compare images with current
-          </Button>
-        </FullScreenViewer>
+        <FullScreenViewer sx={classes.slider} open={ showFullScreen } onClose={ () => setShowFullScreen( false ) } images={ { [query.id] : [{ thumbnail : getThumbnail(query.thumbnail)[0] }]} } />
       )}
     </>
   )

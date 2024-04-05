@@ -65,7 +65,9 @@ def init_webapp_routes(app):
     def get_query_results():
         id = flask.request.args.get('id')
         query_type = flask.request.args.get('query_type')
-        return run_query(id, query_type)
+        query_info_data = run_query(id, query_type)
+        info_data = json.dumps(query_info_data, cls=NumpyEncoder)
+        return info_data
 
     @app.errorhandler(werkzeug.exceptions.NotFound)
     def handle_not_found(e):

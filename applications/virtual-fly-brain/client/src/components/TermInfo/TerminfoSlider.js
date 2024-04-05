@@ -113,7 +113,7 @@ const TerminfoSlider = (props) => {
   const [slideImages, setSlideImages] = useState([]);
 
   const imageClick = (image) => {
-    getInstanceByID(image.id, true, true, true);
+    getInstanceByID(image, true, true, true);
   }
 
   useEffect( () => {
@@ -129,7 +129,7 @@ const TerminfoSlider = (props) => {
 
   return (
     <Box sx={classes.root}>
-      <Slide canSwipe={ false } slidesToShow={ 1 } slidesToScroll={ 1 } infinite={ false } indicators={ true } prevArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } nextArrow={ <Typography><ChevronRight color={ listHeadingColor } /></Typography> } arrows={ true }>
+      <Slide canSwipe={ false } slidesToShow={ 1 } slidesToScroll={ 1 } infinite={ false } indicators={ true } prevArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } nextArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } arrows={ true }>
             {slideImages?.map((slideImage, index) => (
                 <img
                   key={index}

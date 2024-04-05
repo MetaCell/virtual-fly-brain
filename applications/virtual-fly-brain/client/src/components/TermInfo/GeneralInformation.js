@@ -45,7 +45,6 @@ const GeneralInformation = ({data, classes}) => {
           >
             <TerminfoSlider
               allowFullscreen
-              fullScreen={false}
               setFullScreen={setFullScreen}
               examples={data?.metadata?.Images ? data?.metadata?.Images : data?.metadata?.Examples}
             />

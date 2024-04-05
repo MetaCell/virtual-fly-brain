@@ -26,13 +26,6 @@ const vfbMiddleware = store => next => (action) => {
             }
             break;
         }
-        case getInstancesTypes.GET_INSTANCES_SUCCESS : {
-            next(action)
-            if ( action.payload.get3DMesh && !action.payload?.IsClass ){
-                get3DMesh(action.payload);
-            }
-            break;
-        }
         case getInstancesTypes.SHOW_3D_MESH:
         case getInstancesTypes.SHOW_3D : {
             let matchInstance = store.getState().instances.allLoadedInstances.find( i => i.metadata?.Id === action.payload.id );

@@ -92,11 +92,9 @@ const ROIBrowser = (props) => {
                 }
               })
               .then((response) => {
-                console.log("Response data ", response.data)
                 resolve(response.data);
               })
               .catch((error) => {
-                console.log("Error retrieving ROI query ", error)
                 reject(error);
             });
         });
@@ -257,7 +255,6 @@ const ROIBrowser = (props) => {
              * to the react-sortable-tree since it understands this data structure
              */
             if (data.errors.length > 0) {
-                console.log(data.errors);
                 setState({ ...state, errors : "Error retrieving the data - check the console for additional information"});
             }
 

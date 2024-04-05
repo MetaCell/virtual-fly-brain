@@ -180,7 +180,6 @@ const SubHeader = ({ setBottomNav, bottomNav }) => {
                 // since I noticed this button was not used yet
                 if (3 === index) {
                   let results = get_query_results('FBbt_00003748', 'ListAllAvailableImages');
-                  console.log(results);
                 }
               }}
               sx={{

@@ -6,7 +6,6 @@ export function queryParser (e) {
   let nodes = [], links = [];
   let graphData = e.data.params.results;
   let weight = e.data.params.weight;
-  console.log("Results ", e);
   // Reads graph data
   let data = graphData?.results[0]?.data;
   
@@ -61,7 +60,6 @@ export function queryParser (e) {
     
   // Loop through nodes from query and create nodes for graph
   data.forEach(({ graph }) => {
-    console.log("Results ", graph.nodes);
     graph.nodes.forEach(({ id, properties }) => {
       let label = properties[e.data.params.configuration.resultsMapping.node.label];
       let title = properties[e.data.params.configuration.resultsMapping.node.title];
@@ -71,8 +69,6 @@ export function queryParser (e) {
       
       // Retrieve list of Label colors from configuration
       const colorLabels = Object.entries(e.data.params.styling.nodeColorsByLabel);
-      console.log("Labels ", labels);
-      console.log("Color labels, ", colorLabels);
       // Loop through color labels
       for (var i = 0; i < colorLabels.length ; i++ ) {
         let index = labels.indexOf(colorLabels[i][0]);
@@ -101,9 +97,6 @@ export function queryParser (e) {
         }
         
         const classLabel = idClassLabels[title];
-        console.log("nodeColorLabels ", nodeColorLabels);
-        console.log(" className ", Object.values(classLabel).join());
-
         n = {
           name :  label,
           id : parseID,
@@ -248,10 +241,7 @@ export function queryParser (e) {
       }
     }
   });
-  
-  console.log("Nodes ", nodes);
-  console.log("Links ", links);
-  
+
   // Worker is done, notify main thread
   this.postMessage({ resultMessage: "OK", params: { results: { nodes, links }, colorLabels : legendLabels } });
 }

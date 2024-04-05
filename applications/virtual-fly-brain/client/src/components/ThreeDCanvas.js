@@ -135,7 +135,6 @@ class ThreeDCanvas extends Component {
   }
 
   onSelection (selectedInstances){
-    console.log("Selected instances ", selectedInstances);
     selectedInstances?.forEach( id => {
       selectInstance(id);
       focusInstance(id)

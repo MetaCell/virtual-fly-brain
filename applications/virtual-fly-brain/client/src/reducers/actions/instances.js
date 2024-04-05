@@ -206,7 +206,6 @@ export const get3DMesh = async (instance) => {
       mesh_response = await get_3d_mesh(instance, objURL);
     }
   } catch (error) {
-    console.log("Error ", error)
     store.dispatch(get3DOBJFailure(error.message))
     return
   }

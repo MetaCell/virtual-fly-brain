@@ -35,14 +35,17 @@ const Header = ({setBottomNav}) => {
   const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances)
 
   const handleLogoClick = () => {
+    // TODO: what to do here?
     console.log('Logo Clicked!')
   }
 
   const handleHistoryClick = () => {
+    // TODO: what to do here?
     console.log('History Clicked!')
   }
 
   const handleQueryStatsClick = () => {
+    // TODO: what to do here?
     console.log('QueryStats Clicked!')
   }
 

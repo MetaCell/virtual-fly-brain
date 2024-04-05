@@ -10,7 +10,6 @@ const ErrorDialog = ({ display, message }) => {
     const [open, setOpen] = React.useState(display);
 
     const handleClose = () => {
-        console.log('clicked')
         dispatch(resetErrors());
     };
 

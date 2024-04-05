@@ -84,11 +84,9 @@ const VFBUploader = (props) => {
     axios.put(url,
       formData, { headers: { 'Content-Type': configuration.contentType } }
     ).then((response) => {
-      console.log('SUCCESS!!', response);
       setState({...state, uploading : false, fileNBLASTURL : newURL, nblastEnabled: true });
     })
       .catch((error) => {
-        console.log('FAILURE!!', error);
         setState({...state, error : true, uploading : false });
       });
   }

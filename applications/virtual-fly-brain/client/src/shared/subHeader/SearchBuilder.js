@@ -237,9 +237,10 @@ export default function SearchBuilder(props) {
           }
           break;
       case "ERROR":
-        setRetrievingResults(false);    
+        setRetrievingResults(false);
       break;
       default:
+          // TODO: Handle this case
           console.log("This is a case not considered");
     }
 
@@ -283,7 +284,6 @@ export default function SearchBuilder(props) {
   });
 
   React.useEffect(() => {
-    console.log("Focused changed ", focused)
     handleFocused(focused);
   }, [focused])
 

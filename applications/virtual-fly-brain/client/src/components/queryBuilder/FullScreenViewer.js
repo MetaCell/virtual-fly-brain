@@ -3,9 +3,9 @@ import Dialog from '@mui/material/Dialog';
 import { Box, Button,IconButton,Typography } from "@mui/material";
 import { CrossCircle } from "../../icons";
 import { Compare } from "../../icons";
-import TerminfoSlider from "./FullscreenSlider";
+import FullscreenSlider from "./FullscreenSlider";
 import { Slide } from 'react-slideshow-image';
-import { ChevronLeft, FullScreen } from '../../icons';
+import { ChevronLeft, ChevronRight } from '../../icons';
 import { useSelector } from "react-redux";
 import vars from '../../theme/variables';
 
@@ -22,7 +22,9 @@ const imageStyle =  {
 }
 
 const spanStyle = {
-  padding: '20px',
+  padding: '5px',
+  position: 'absolute',
+  bottom : '0px',
   background: '#efefef',
   color: '#000000'
 }
@@ -97,7 +99,7 @@ const FullScreenViewer = ( { open, onClose, maxWidth = 'md', images, sx, childre
         <CrossCircle />
       </IconButton>
       {children}
-      <Slide canSwipe={ false } slidesToShow={ 1 } slidesToScroll={ 1 } infinite={ false } indicators={ true } prevArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } nextArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } arrows={ true }>
+      <Slide canSwipe={ false } slidesToShow={ 1 } slidesToScroll={ 1 } infinite={ false } indicators={ true } prevArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } nextArrow={ <Typography><ChevronRight color={ listHeadingColor } /></Typography> } arrows={ true }>
             {Object.keys(images)?.map((src, index) => (
                 <div key={index}>
                   <div
@@ -124,7 +126,7 @@ const FullScreenViewer = ( { open, onClose, maxWidth = 'md', images, sx, childre
             overflow: 'hidden'
           }}
           >
-            <TerminfoSlider
+            <FullscreenSlider
               fullScreen={true} examples={layersImages}
             />
           </Box>

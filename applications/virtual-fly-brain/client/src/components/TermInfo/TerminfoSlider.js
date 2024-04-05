@@ -3,7 +3,7 @@ import { Box, Button, Typography } from '@mui/material';
 import React, { useState, useEffect } from 'react';
 import { Slide } from 'react-slideshow-image';
 import 'react-slideshow-image/dist/styles.css'
-import { ChevronLeft, FullScreen } from '../../icons';
+import { ChevronLeft, ChevronRight, FullScreen } from '../../icons';
 import vars from '../../theme/variables';
 import { focusInstance, getInstanceByID, selectInstance } from '../../reducers/actions/instances';
 
@@ -129,7 +129,7 @@ const TerminfoSlider = (props) => {
 
   return (
     <Box sx={classes.root}>
-      <Slide canSwipe={ false } slidesToShow={ 1 } slidesToScroll={ 1 } infinite={ false } indicators={ true } prevArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } nextArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } arrows={ true }>
+      <Slide canSwipe={ false } slidesToShow={ 1 } slidesToScroll={ 1 } infinite={ false } indicators={ true } prevArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } nextArrow={ <Typography><ChevronRight color={ listHeadingColor } /></Typography> } arrows={ true }>
             {slideImages?.map((slideImage, index) => (
                 <img
                   key={index}

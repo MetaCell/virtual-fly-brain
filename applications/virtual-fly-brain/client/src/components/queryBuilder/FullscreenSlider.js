@@ -1,16 +1,15 @@
 /* eslint-disable no-undef */
-import { Box, Button, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import React, { useState, useEffect } from 'react';
 import { Slide } from 'react-slideshow-image';
 import 'react-slideshow-image/dist/styles.css'
-import { ChevronLeft, FullScreen } from '../../icons';
+import { ChevronLeft, ChevronRight } from '../../icons';
 import vars from '../../theme/variables';
-import { focusInstance, getInstanceByID, selectInstance } from '../../reducers/actions/instances';
 
 const { whiteColor, listHeadingColor } = vars;
 
 const spanStyle = {
-  padding: '20px',
+  padding: '5px',
   background: '#efefef',
   color: '#000000'
 }
@@ -126,10 +125,6 @@ const FullscreenSlider = (props) => {
   };
   const [slideImages, setSlideImages] = useState([]);
 
-  const imageClick = (image) => {
-    getInstanceByID(image.id, true, true, true);
-  }
-
   useEffect( () => {
     console.log("Layers ", props.examples)
     if(props?.examples) {
@@ -142,11 +137,11 @@ const FullscreenSlider = (props) => {
   }, [props.examples]);
 
   return (
-      <Slide canSwipe={ false } slidesToShow={ 1 } slidesToScroll={ 1 } infinite={ false } indicators={ true } prevArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } nextArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } arrows={ true }>
+      <Slide canSwipe={ false } slidesToShow={ 1 } slidesToScroll={ 1 } infinite={ false } indicators={ true } prevArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } nextArrow={ <Typography><ChevronRight color={ listHeadingColor } /></Typography> } arrows={ true }>
         {slideImages?.map((slideImage, index) => (
           <div key={slideImage.caption}>
             <div
-              style={{ ...divStyle, 'backgroundImage': `url(${slideImage.url})` }} onClick={() => imageClick(slideImage.id)}>
+              style={{ ...divStyle, 'backgroundImage': `url(${slideImage.url})` }} >
               <span style={spanStyle}>{slideImage.caption}</span>
             </div>
           </div>

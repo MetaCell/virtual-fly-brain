@@ -142,10 +142,9 @@ const FullscreenSlider = (props) => {
   }, [props.examples]);
 
   return (
-    <Box sx={classes.root}>
-      <Slide arrows={ true } canSwipe={ true } slidesToShow={ 1 } slidesToScroll={ 1 } infinite={ false } indicators={ true } prevArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } nextArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } >
+      <Slide canSwipe={ false } slidesToShow={ 1 } slidesToScroll={ 1 } infinite={ false } indicators={ true } prevArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } nextArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } arrows={ true }>
         {slideImages?.map((slideImage, index) => (
-          <div>
+          <div key={slideImage.caption}>
             <div
               style={{ ...divStyle, 'backgroundImage': `url(${slideImage.url})` }} onClick={() => imageClick(slideImage.id)}>
               <span style={spanStyle}>{slideImage.caption}</span>
@@ -153,21 +152,6 @@ const FullscreenSlider = (props) => {
           </div>
         ))}
       </Slide>
-      {props.allowFullscreen && (
-        <Button onClick={() => props.setFullScreen(true)} sx={ {
-          position: 'absolute',
-          bottom: '0.5rem',
-          right: '0.5rem',
-          padding: 0,
-          minWidth: '0.0625rem',
-          height: 'auto',
-          lineHeight: 1,
-        }}>
-          <FullScreen size="20" />
-        </Button>
-      )}
-
-    </Box>
   )
 }
 

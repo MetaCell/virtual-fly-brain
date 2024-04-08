@@ -113,7 +113,7 @@ function a11yProps(index) {
   };
 }
 const ribbonConfiguration = require("../components/configuration/TermInfo/TermInfo").ribbonConfiguration;
-
+const configuration = require("../components/configuration/TermInfo/configuration.json");
 const classes = {
   root: {
     // transition: 'all ease-in-out .3s',
@@ -188,7 +188,7 @@ const TermInfo = ({ open, setOpen }) => {
   const openMenu = Boolean(anchorEl);
   const [value, setValue] = useState(0);
   const [ displayColorPicker, setDisplayColorPicker ] = useState(false);
-  const [expanded, setExpanded] = useState({ "General Information" : false, "Queries" : false, "Graphs" : false});
+  const [expanded, setExpanded] = useState({ "General Information" : configuration.sectionsExpanded, "Queries" : configuration.sectionsExpanded, "Graphs" : configuration.sectionsExpanded});
   const [sections, setSections] = useState(["General Information", "Queries", "Graphs"])
   const data = useSelector(state => state.instances.focusedInstance)
   const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances)

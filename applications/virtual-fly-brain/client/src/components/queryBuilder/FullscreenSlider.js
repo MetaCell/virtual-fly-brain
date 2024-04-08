@@ -1,13 +1,18 @@
 /* eslint-disable no-undef */
-import { Box, Button, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import React, { useState, useEffect } from 'react';
 import { Slide } from 'react-slideshow-image';
 import 'react-slideshow-image/dist/styles.css'
-import { ChevronLeft, ChevronRight, FullScreen } from '../../icons';
+import { ChevronLeft, ChevronRight } from '../../icons';
 import vars from '../../theme/variables';
-import { focusInstance, getInstanceByID, selectInstance } from '../../reducers/actions/instances';
 
 const { whiteColor, listHeadingColor } = vars;
+
+const spanStyle = {
+  padding: '5px',
+  background: '#efefef',
+  color: '#000000'
+}
 
 const imageStyle =  {
   height: '100%',
@@ -15,7 +20,15 @@ const imageStyle =  {
   objectFit: 'cover'
 }
 
-const TerminfoSlider = (props) => {
+const divStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundSize: 'cover',
+  height: '400px'
+}
+
+const FullscreenSlider = (props) => {
   const classes = {
     root: {
       height: '100%',
@@ -112,50 +125,29 @@ const TerminfoSlider = (props) => {
   };
   const [slideImages, setSlideImages] = useState([]);
 
-  const imageClick = (image) => {
-    getInstanceByID(image, true, true, true);
-  }
-
   useEffect( () => {
+    console.log("Layers ", props.examples)
     if(props?.examples) {
-      const keys = Object.keys(props.examples);
-      setSlideImages(keys.map( k => ({
-        url: props.examples[k][0].thumbnail,
-        caption: props.examples[k][0].label,
+      setSlideImages(props?.examples.map( k => ({
+        url: k.thumbnail,
+        caption: k.label,
         id : k
       })));
     }
   }, [props.examples]);
 
   return (
-    <Box sx={classes.root}>
-      <Slide canSwipe={ false } slidesToShow={ 1 } slidesToScroll={ 1 } infinite={ false } indicators={ true } prevArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } nextArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } arrows={ true }>
-            {slideImages?.map((slideImage, index) => (
-                <img
-                  key={index}
-                  style={imageStyle}
-                  src={slideImage.url}
-                  onClick={() => imageClick(slideImage.id)} 
-                  alt={slideImage.caption}
-                />
-            ))}
+      <Slide canSwipe={ false } slidesToShow={ 1 } slidesToScroll={ 1 } infinite={ false } indicators={ true } prevArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } nextArrow={ <Typography><ChevronRight color={ listHeadingColor } /></Typography> } arrows={ true }>
+        {slideImages?.map((slideImage, index) => (
+          <div key={slideImage.caption}>
+            <div
+              style={{ ...divStyle, 'backgroundImage': `url(${slideImage.url})` }} >
+              <span style={spanStyle}>{slideImage.caption}</span>
+            </div>
+          </div>
+        ))}
       </Slide>
-      {props.allowFullscreen && (
-        <Button onClick={() => props.setFullScreen(true)} sx={ {
-          position: 'absolute',
-          bottom: '0.5rem',
-          right: '0.5rem',
-          padding: 0,
-          minWidth: '0.0625rem',
-          height: 'auto',
-          lineHeight: 1,
-        }}>
-          <FullScreen size="20" />
-        </Button>
-      )}
-
-    </Box>
   )
 }
 
-export default TerminfoSlider ;
+export default FullscreenSlider ;

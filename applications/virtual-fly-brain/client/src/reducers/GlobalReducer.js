@@ -8,7 +8,8 @@ export const initialStateGlobalReducer = {
   recentSearches : [],
   firstIDLoaded : false,
   alignedTemplates : true,
-  misalignedTemplate : null
+  misalignedTemplate : null,
+  misalignedIDs : {}
 };
 
 const GlobalReducer = (state = initialStateGlobalReducer, response) => {
@@ -29,11 +30,15 @@ const GlobalReducer = (state = initialStateGlobalReducer, response) => {
           return Object.assign({}, state, {
             firstIDLoaded: true
           })
-      case getGlobalTypes.ALIGN_TEMPLATES:
+      case getGlobalTypes.ALIGN_TEMPLATES:{
+        const aligned = response.payload.aligned;
+        const id = response.payload.templateID
         return Object.assign({}, state, {
-          alignedTemplates: response.payload.aligned,
-          misalignedTemplate : response.payload.templateID
+          alignedTemplates: aligned,
+          misalignedTemplate : id,
+          misalignedIDs : {...state.misalignedIDs, [id] : id }
         })
+      }
       case getGlobalTypes.OPEN_QUERY_COMPONENT:
         return Object.assign({}, state, {
           queryComponentOpened: response.payload.opened

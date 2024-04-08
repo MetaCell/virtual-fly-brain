@@ -476,6 +476,15 @@ const rgbToHex = (color) => {
                                   break;
                                 }
                               }
+                            } else if ( !window.shiftDown || window.shiftDown === undefined ){
+                              try {
+                                getInstanceByID(that.props.templateDomainTypeIds[index], false, true, false, false);
+                                that.setStatusText(that.props.templateDomainTypeIds[index] + ' selected');
+                                break;
+                              } catch (ignore) {
+                                console.log(that.props.templateDomainTypeIds[index] + ' requested');
+                                that.setStatusText(that.props.templateDomainTypeIds[index] + ' requested');
+                              }
                             }
                           } else {
                             console.log('Index not listed: ' + result[j]);
@@ -546,7 +555,7 @@ const rgbToHex = (color) => {
                       var index = Number(result[j]);
                       if (i !== 0 || index !== 0) { // don't select template
                         if (index == 0) {
-                          if (!window.shiftDown) {
+                          if (!window.shiftDown || window.shiftDown === undefined ) {
                             let updatedObjects = [...that.state.objects];
                             if ( !updatedObjects?.find( o => o === that.state.label[i] ) ){
                               updatedObjects.push(that.props.templateDomainNames[index]);
@@ -555,6 +564,7 @@ const rgbToHex = (color) => {
                             that.state.objects = updatedObjects
                           }
                         } else {
+                          console.log("Shit down ", that.props.templateDomainNames[index])
                           if (typeof that.props.templateDomainIds !== 'undefined' && typeof that.props.templateDomainNames !== 'undefined' && typeof that.props.templateDomainIds[index] !== 'undefined' && typeof that.props.templateDomainNames[index] !== 'undefined' && that.props.templateDomainNames[index] !== null) {
                             let updatedObjects = [...that.state.objects];
                             if ( !updatedObjects?.find( o => o === that.props.templateDomainNames[index] ) ){

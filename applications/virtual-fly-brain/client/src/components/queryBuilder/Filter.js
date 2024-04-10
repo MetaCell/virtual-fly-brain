@@ -8,9 +8,13 @@ const { primaryBg, outlinedBtnTextColor, bottomNavBg, tabActiveColor, whiteColor
 const Filter = (props) => {
   const [filterAnchorEl, setFilterAnchorEl] = React.useState(null);
   const [filtersApplied, setFiltersApplied] = useState(props.tags)
-
   const filterhandleClick = (event) => {
     setFilterAnchorEl(filterAnchorEl ? null : event.currentTarget);
+  };
+
+  const applyFilters = (event) => {
+    props.setChipTags(filtersApplied)
+    filterhandleClick(event)
   };
 
   const filterOpen = Boolean(filterAnchorEl);
@@ -19,7 +23,7 @@ const Filter = (props) => {
   const handleFilterCheck = (event) => {
     let tags = [...props.tags];
     tags.find( t => t.label === event.target.name ).active = event.target.checked;
-    props.setChipTags(tags); 
+    setFiltersApplied(tags); 
   }
 
   return (
@@ -135,7 +139,7 @@ const Filter = (props) => {
             Clean all
           </Button>
           <Button
-            onClick={filterhandleClick}
+            onClick={applyFilters}
             variant="outlined"
             color="primary"
             sx={{

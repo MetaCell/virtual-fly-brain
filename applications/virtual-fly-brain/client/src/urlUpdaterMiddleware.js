@@ -134,8 +134,8 @@ export const urlUpdaterMiddleware = store => next => (action) => {
       if ( action.payload.query?.queries?.length < 1 && action.payload.query?.rows === undefined){
         store.dispatch(getQueriesFailure("No queries found for : " + action.payload.short_form, action.payload.short_form))
       } else {
-        if ( !globalRecentSearches?.find( recent => recent.short_form === action.payload.short_form && recent.is_query) && action.payload.query.queries?.length > 0 ){
-          store.dispatch(addRecentSearch(action.payload, true));
+        if ( !globalRecentSearches?.find( recent => recent.short_form === action.payload.short_form && recent.is_query) && (action.payload.query?.rows) ){
+          store.dispatch(addRecentSearch(action.payload , true));
         }  
         if ( !firstIDLoaded ){
             store.dispatch(setFirstIDLoaded())

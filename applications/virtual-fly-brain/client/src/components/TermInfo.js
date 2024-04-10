@@ -18,7 +18,7 @@ import { TreeItem } from "@mui/lab";
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import RectangleIcon from '@mui/icons-material/Rectangle';
 import GeneralInformation from "./TermInfo/GeneralInformation";
-import { getQueries } from './../reducers/actions/queries';
+import { getQueries, updateQueries } from './../reducers/actions/queries';
 import { setQueryComponentOpened } from './../reducers/actions/globals';
 import { getInstanceByID, selectInstance, hide3DMesh, hide3D, show3D, show3DMesh, removeInstanceByID,
   changeColor, show3DSkeleton, hide3DSkeleton, show3DSkeletonLines, show3DSkeletonCylinders, zoomToInstance } from './../reducers/actions/instances';
@@ -113,7 +113,7 @@ function a11yProps(index) {
   };
 }
 const ribbonConfiguration = require("../components/configuration/TermInfo/TermInfo").ribbonConfiguration;
-
+const configuration = require("../components/configuration/TermInfo/configuration.json");
 const classes = {
   root: {
     // transition: 'all ease-in-out .3s',
@@ -188,10 +188,11 @@ const TermInfo = ({ open, setOpen }) => {
   const openMenu = Boolean(anchorEl);
   const [value, setValue] = useState(0);
   const [ displayColorPicker, setDisplayColorPicker ] = useState(false);
-  const [expanded, setExpanded] = useState({ "General Information" : false, "Queries" : false, "Graphs" : false});
+  const [expanded, setExpanded] = useState({ "General Information" : configuration.sectionsExpanded, "Queries" : configuration.sectionsExpanded, "Graphs" : configuration.sectionsExpanded});
   const [sections, setSections] = useState(["General Information", "Queries", "Graphs"])
   const data = useSelector(state => state.instances.focusedInstance)
   const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances)
+  const queries = useSelector(state => state.queries.queries)
   const [termInfoData, setTermInfoData] = useState(data);
   const [ toggleReadMore, setToggleReadMore ] = useState( false );
   const dispatch = useDispatch();
@@ -291,18 +292,29 @@ const TermInfo = ({ open, setOpen }) => {
   const getQueriesLength = (queries) => {
     let queriesCount = 0;
     queries?.forEach( query => {
-      if ( query?.preview_results?.rows?.length > 0 ) {
-        queriesCount = queriesCount + 1;
+      if ( query?.count ) {
+        queriesCount = query.count + 1;
       }
     });
 
     return queriesCount;
   }
 
+  const openQuery = (id, type) => {
+    let updatedQueries = [...queries];
+    updatedQueries?.forEach( query => {
+      if( query.queries ){
+        Object.keys(query.queries)?.forEach( q => query.queries[q].active = false );
+      }
+    });
+    updateQueries(updatedQueries);
+    getQueries(id, type)
+    dispatch(setQueryComponentOpened(true));
+  }
+
   const setToggleMore = (prev, id, type) => {
     if ( !toggleReadMore ){
-      getQueries(id, type)
-      dispatch(setQueryComponentOpened(true));
+      openQuery(id, type)
     } else {
       dispatch(setQueryComponentOpened(false));
     }
@@ -607,7 +619,7 @@ const TermInfo = ({ open, setOpen }) => {
                   aria-controls="panel2a-content"
                   id="panel2a-header"
                 >
-                  <Typography>Queries ({getQueriesLength(termInfoData?.metadata?.Queries)}) </Typography>
+                  <Typography>Queries ({termInfoData?.metadata?.Queries?.length}) </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                   <TreeView
@@ -619,12 +631,12 @@ const TermInfo = ({ open, setOpen }) => {
                       <CustomBox display='flex' flexWrap='wrap'>
                         <Typography>Types of neurons with...</Typography>
                         <Box display='flex' sx={{ zIndex: 1000 }} pl={0.5}>
-                          <Typography sx={{ pr: 0.5 }}>{termInfoData?.metadata?.Queries?.reduce((n, {preview_results}) => n + preview_results?.rows?.length, 0)}</Typography>
+                          <Typography sx={{ pr: 0.5 }}>{termInfoData?.metadata?.Queries?.reduce((n, {count}) => n + count, 0)}</Typography>
                           <ListAltIcon sx={{ fontSize: '1.25rem', color: '#A0A0A0' }} />
                         </Box>
                       </CustomBox>
                     }> 
-                    { termInfoData?.metadata?.Queries?.map( query => (
+                    { termInfoData?.metadata?.Queries?.map( (query, index) => (
                          query.output_format === "table" && query?.preview_results?.rows?.length > 0 ?
                         (
                           <TreeItem key={query.label} nodeId={query.label} label={
@@ -699,7 +711,7 @@ const TermInfo = ({ open, setOpen }) => {
                                     height: 'auto',
                                     color: tabActiveColor
                                   }}>
-                                {toggleReadMore ? 'Show Less' : 'Read More'}
+                                {toggleReadMore ? 'Show Less' : 'See More'}
                               </Button>
                                 </TableContainer>
                                 </>
@@ -725,7 +737,27 @@ const TermInfo = ({ open, setOpen }) => {
                               heatLevels={ribbonConfiguration.heatLevels}
                             />
                           </Box>
-                          </TreeItem> : null)
+                          </TreeItem> : <Box
+                            display='flex'
+                            alignItems="center"
+                            key={index}
+                            onClick={() => openQuery(data.metadata?.Id, query.query)}
+                          >
+                            <Typography sx={{
+                              flexGrow: 1, color: outlinedBtnTextColor,
+                              fontSize: {
+                                xs: '0.875rem',
+                                lg: '1rem'
+                              },
+                              "&:hover": { "cursor": "pointer" } 
+                            }}>
+                              {query.label}
+                            </Typography>
+                            <Box display='flex' sx={{ zIndex: 1000 }} pl={0.5}>
+                                <Typography sx={{ pr: 0.5 }}>{termInfoData?.metadata?.Queries?.reduce((n, {count}) => n + count, 0)}</Typography>
+                                <ListAltIcon sx={{ fontSize: '1.25rem', color: '#A0A0A0' }} />
+                              </Box>
+                          </Box>)
                     ))
                   }
                     </TreeItem> : null }
@@ -752,17 +784,19 @@ const TermInfo = ({ open, setOpen }) => {
                         display='flex'
                         alignItems="center"
                         key={index}
+                        onClick={() => handleGraphSelection(data.metadata?.Id, item)}
                       >
                         <Typography sx={{
                           flexGrow: 1, color: outlinedBtnTextColor,
                           fontSize: {
                             xs: '0.875rem',
-                            lg: '1rem'
+                            lg: '1rem',
+                            "&:hover": { "cursor" : "pointer" } 
                           }
                         }}>
                           {item.label(data.metadata?.Name)}
                         </Typography>
-                        <IconButton sx={{ p: 0 }} onClick={() => handleGraphSelection(data.metadata?.Id, item)}>
+                        <IconButton sx={{ p: 0 }}>
                           <ScatterPlot />
                         </IconButton>
                       </Box>)

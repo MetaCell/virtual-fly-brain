@@ -70,7 +70,7 @@ const GeneralInformation = ({data, classes}) => {
               <Typography sx={classes.heading}>Tags</Typography>
                 <Box sx={{display : 'flex', columnGap : '15px', flexWrap : 'wrap', justifyContent : 'center'}} gap={'0.288rem'}>
                   {
-                    data?.metadata?.Tags?.map((tag, i) => ( <Chip key={tag} sx={{margin: '.25rem', backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color, color: facets_annotations_colors[tag]?.textColor || facets_annotations_colors?.default?.textColor}} label={tag} /> ) )
+                    data?.metadata?.Tags?.map((tag, i) => ( <Chip key={tag} sx={{backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color, color: facets_annotations_colors[tag]?.textColor || facets_annotations_colors?.default?.textColor}} label={tag} /> ) )
                   }
               </Box>
             </Box>

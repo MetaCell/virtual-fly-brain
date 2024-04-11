@@ -69,6 +69,18 @@ const rgbToHex = (color) => {
       };
     },
 
+    setShiftDown : function(event){
+      if(event.keyCode === 16 || event.charCode === 16){
+          window.shiftDown = true;
+      }
+    },
+
+    setShiftUp : function(event){
+      if(event.keyCode === 16 || event.charCode === 16){
+          window.shiftDown = false;
+      }
+    },
+
     /**
      * In this case, componentDidMount is used to grab the canvas container ref, and
      * and hook up the PixiJS renderer
@@ -133,21 +145,14 @@ const rgbToHex = (color) => {
 
       setTimeout(this.bufferStack, 30000);
 
-      let setShiftDown = function(event){
-          if(event.keyCode === 16 || event.charCode === 16){
-              window.shiftDown = true;
-          }
-      };
+      window.addEventListener? document.addEventListener('keydown', this.setShiftDown) : document.attachEvent('keydown', this.setShiftDown);
+      window.addEventListener? document.addEventListener('keyup', this.setShiftUp) : document.attachEvent('keyup', this.setShiftUp);
 
-      let setShiftUp = function(event){
-          if(event.keyCode === 16 || event.charCode === 16){
-              window.shiftDown = false;
-          }
-      };
+    },
 
-      window.addEventListener? document.addEventListener('keydown', setShiftDown) : document.attachEvent('keydown', setShiftDown);
-      window.addEventListener? document.addEventListener('keyup', setShiftUp) : document.attachEvent('keyup', setShiftUp);
-
+    componentWillUnmount : function () {
+      window.addEventListener? document.removeEventListener('keydown', this.setShiftDown, false) : document.attachEvent('keydown', this.setShiftDown);
+      window.addEventListener? document.removeEventListener('keyup', this.setShiftUp, false) : document.detachEvent('keyup', this.setShiftUp);
     },
 
     componentDidUpdate: function () {
@@ -441,7 +446,7 @@ const rgbToHex = (color) => {
                       var index = Number(result[j]);
                       if (i !== 0 || index !== 0) { // don't select template
                         if (index == 0 ) {
-                          if (!window.shiftDown){
+                          if ( !isSelected && (!window.shiftDown || window.shiftDown === undefined)){
                             //console.log(that.state.label[i] + ' clicked');
                             try {
                               getInstanceByID(that.props.templateDomainIds[index], true, true, true);
@@ -475,6 +480,15 @@ const rgbToHex = (color) => {
                                   that.setStatusText(that.props.templateDomainNames[index] + ' (⇧click to add)');
                                   break;
                                 }
+                              }
+                            } else if ( !window.shiftDown || window.shiftDown === undefined ){
+                              try {
+                                getInstanceByID(that.props.templateDomainTypeIds[index], false, true, false, false);
+                                that.setStatusText(that.props.templateDomainNames[index] + ' selected');
+                                break;
+                              } catch (ignore) {
+                                console.log(that.props.templateDomainTypeIds[index] + ' requested');
+                                that.setStatusText(that.props.templateDomainNames[index] + ' requested');
                               }
                             }
                           } else {
@@ -546,7 +560,7 @@ const rgbToHex = (color) => {
                       var index = Number(result[j]);
                       if (i !== 0 || index !== 0) { // don't select template
                         if (index == 0) {
-                          if (!window.shiftDown) {
+                          if (!window.shiftDown || window.shiftDown === undefined ) {
                             let updatedObjects = [...that.state.objects];
                             if ( !updatedObjects?.find( o => o === that.state.label[i] ) ){
                               updatedObjects.push(that.props.templateDomainNames[index]);
@@ -555,6 +569,7 @@ const rgbToHex = (color) => {
                             that.state.objects = updatedObjects
                           }
                         } else {
+                          console.log("Shit down ", that.props.templateDomainNames[index])
                           if (typeof that.props.templateDomainIds !== 'undefined' && typeof that.props.templateDomainNames !== 'undefined' && typeof that.props.templateDomainIds[index] !== 'undefined' && typeof that.props.templateDomainNames[index] !== 'undefined' && that.props.templateDomainNames[index] !== null) {
                             let updatedObjects = [...that.state.objects];
                             if ( !updatedObjects?.find( o => o === that.props.templateDomainNames[index] ) ){

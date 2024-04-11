@@ -11,7 +11,7 @@ import ErrorDialog from "./ErrorDialog";
 import { getLayoutManagerInstance } from "@metacell/geppetto-meta-client/common/layout/LayoutManager";
 import { addWidget } from '@metacell/geppetto-meta-client/common/layout/actions';
 import { setTermInfoOpened, setQueryComponentOpened } from './../reducers/actions/globals'
-import { templateLoaded,  removeAllInstances } from './../reducers/actions/instances';
+import { templateLoaded,  removeAllInstances, getInstanceByID } from './../reducers/actions/instances';
 import { widgets } from "./layout/widgets";
 
 const {
@@ -149,9 +149,13 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
 
 
   const handleModalClose = (id, openTemplate) => {
-    templateLoaded(id, openTemplate);
+    if ( openTemplate) {
+      templateLoaded(id, openTemplate);
+      templateRef = window.location.href.replace(id + ",", "")
+    }else {
+      getInstanceByID(id, false, true, false, false)
+    }
     setModalOpen(false)
-    templateRef = window.location.href.replace(id + ",", "")
   }
 
   const tabContent = (
@@ -197,7 +201,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
             The image you requested is aligned to another template. Click Okay
             to open in a new tab or Cancel to just view the image metadata.
           </Typography>
-          <Button variant="contained" color="primary" onClick={() => handleModalClose(misalignedTemplate, true )} target="_blank" href={window.location.href.replace(misalignedTemplate + ",", "")}>Okay</Button>
+          <Button variant="contained" color="primary" onClick={() => handleModalClose(misalignedTemplate, true )} target="_blank" href={window.location.origin + "/?id=" + misalignedTemplate}>Okay</Button>
           <Button variant="outlined" color="secondary" onClick={() => handleModalClose(misalignedTemplate, false )}>Cancel</Button>
         </Box>
       </Modal>

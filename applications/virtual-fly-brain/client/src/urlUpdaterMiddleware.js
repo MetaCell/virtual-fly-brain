@@ -1,6 +1,6 @@
 import { getInstancesTypes } from './reducers/actions/types/getInstancesTypes';
 import { getQueriesTypes } from './reducers/actions/types/getQueriesTypes';
-import { getInstanceByID, selectInstance, focusInstance } from './reducers/actions/instances';
+import { getInstanceByID, get3DMesh } from './reducers/actions/instances';
 import { getQueries, getQueriesFailure } from './reducers/actions/queries';
 import { addRecentSearch } from './reducers/actions/globals'
 import { setQueryComponentOpened, setFirstIDLoaded, setAlignTemplates, setTemplateID } from './reducers/actions/globals';
@@ -82,51 +82,60 @@ const getInstance = (allLoadedInstances, id, focus) => {
 }
 
 export const urlUpdaterMiddleware = store => next => (action) => {
-  next(action);
+  const launchTemplate = store.getState().instances.launchTemplate;
+  const misalignedIDs = store.getState().globalInfo.misalignedIDs;
 
   const allLoadedInstances = store.getState().instances.allLoadedInstances;
   isFirstTimeLoad(allLoadedInstances)
-
   const firstIDLoaded = store.getState().globalInfo.firstIDLoaded;
   switch (action.type) {
-    case getInstancesTypes.GET_3D_OBJ_TYPE_SUCCESS : {
-      const idFromUrl = getUrlParameter("id")?.split(',')?.[0];
-      if ( action.payload.id === idFromUrl ){
-        //focusInstance(idFromUrl);
-        //selectInstance(idFromUrl)
-      }
-      break;
-    }
     case getInstancesTypes.GET_INSTANCES_SUCCESS : {
-        const launchTemplate = store.getState().instances.launchTemplate;
-        const templateLookup = action.payload?.Images || {} ;
+
+        const templateLookup = action.payload?.Images || action.payload?.Examples || {} ;
+        const template = Object.keys(templateLookup)?.[0];
+        const loadedTemplate = launchTemplate?.metadata?.Id;
 
         if ( !action.payload?.IsClass ) {
           if ( !action.payload.IsTemplate && !firstIDLoaded ){
-            let template = Object.keys(templateLookup)?.[0];
+            next(action); 
+            if ( action.payload.get3DMesh && !action.payload?.IsClass ){
+              get3DMesh(action.payload);
+            }
             getInstanceByID(template, true, false, false)
             store.dispatch(setTemplateID(template))
             updateUrlParameterWithCurrentUrl("i", template);
-          } else if ( !action.payload.IsTemplate && Object.keys(templateLookup)?.[0] != launchTemplate?.metadata?.Id ) {
+          } else if ( (action.payload.IsTemplate && launchTemplate) == null || 
+            (!action.payload.IsTemplate && template == loadedTemplate) ){
+            if ( action.payload.get3DMesh && !action.payload?.IsClass ){
+              next(action)
+              get3DMesh(action.payload);
+            }
+          } else if ( !action.payload.IsTemplate && template != loadedTemplate && misalignedIDs[action.payload.Id] == undefined ) {
             store.dispatch(setAlignTemplates(false, action.payload.Id))
             break;
-          } else if ( action.payload.IsTemplate && launchTemplate?.metadata?.Id !== action.payload.Id ) {
+          } else if ( action.payload.IsTemplate && loadedTemplate !== action.payload.Id && misalignedIDs[action.payload.Id] == undefined ) {
             store.dispatch(setAlignTemplates(false, action.payload.Id))
             break;
+          } else if ( misalignedIDs[action.payload.Id] ) {
+            next(action)
           }
+          loaded(store, firstIDLoaded, allLoadedInstances)
+        } else if ( action.payload?.IsClass ) {
+          next(action)
+          loaded(store, firstIDLoaded, allLoadedInstances)
         }
 
-        loaded(store, firstIDLoaded, allLoadedInstances)
         break;
     }
     case getQueriesTypes.UPDATE_QUERIES:
     case getQueriesTypes.GET_QUERIES_SUCCESS : {
+      next(action);
       const globalRecentSearches = store.getState().globalInfo.recentSearches; 
       if ( action.payload.query?.queries?.length < 1 && action.payload.query?.rows === undefined){
         store.dispatch(getQueriesFailure("No queries found for : " + action.payload.short_form, action.payload.short_form))
       } else {
-        if ( !globalRecentSearches?.find( recent => recent.short_form === action.payload.short_form && recent.is_query) && action.payload.query.queries?.length > 0 ){
-          store.dispatch(addRecentSearch(action.payload, true));
+        if ( !globalRecentSearches?.find( recent => recent.short_form === action.payload.short_form && recent.is_query) && (action.payload.query?.rows) ){
+          store.dispatch(addRecentSearch(action.payload , true));
         }  
         if ( !firstIDLoaded ){
             store.dispatch(setFirstIDLoaded())
@@ -136,6 +145,7 @@ export const urlUpdaterMiddleware = store => next => (action) => {
       break;
     }
     default:
-        break;
+      next(action);  
+      break;
     }
 };

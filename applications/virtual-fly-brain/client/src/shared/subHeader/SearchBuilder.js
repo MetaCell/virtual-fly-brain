@@ -174,16 +174,14 @@ export default function SearchBuilder(props) {
       let match = value?.find( v => v.short_form === q.short_form );
       if ( match !== undefined ) {
         Object.keys(q.queries)?.forEach( key => {
-          if ( q.queries[key].active ) {
-            q.active = true;
-            if ( q.queries[key].rows === undefined ) {
-              getQueries(q.short_form, key)
-            }else { 
-              if ( !globalRecentSearches?.find( recent => recent.short_form === option.id ) && option.type){
-                dispatch(addRecentSearch(option, true));
-              }
-            }
+          q.queries[key].active = true;
+          if ( q.queries[key].rows === undefined ) {
+            getQueries(q.short_form, key)
           }
+        })
+      } else {
+        Object.keys(q.queries)?.forEach( key => {
+          q.queries[key].active = false
         })
       }
     })

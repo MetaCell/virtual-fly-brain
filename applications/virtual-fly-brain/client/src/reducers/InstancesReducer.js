@@ -38,15 +38,12 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         let loadedInstances = [...state.allLoadedInstances]
         return Object.assign({}, state, {
             allLoadedInstances: loadedInstances,
-            launchTemplate : null,
             focusedInstance : loadedInstances?.find( i => i?.metadata?.Id === response.payload.id ),
             event : { action : getInstancesTypes.ADD_INSTANCE, id : response.payload.id, trigger : Date.now()},
             isLoading: false
         })
       } else {
-        return Object.assign({}, state, {
-            launchTemplate : null
-        })
+        return Object.assign({}, state)
       }
     } 
     case getInstancesTypes.GET_INSTANCES_STARTED: {

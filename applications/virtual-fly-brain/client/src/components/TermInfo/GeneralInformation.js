@@ -6,6 +6,7 @@ import vars from "../../theme/variables";
 import TerminfoSlider from "./TerminfoSlider";
 import FullScreenViewer from "../queryBuilder/FullScreenViewer";
 import { getUpdatedTags } from "../../utils/utils";
+import Fullscreen from "@mui/icons-material/Fullscreen";
 
 const {
   whiteColor,
@@ -138,12 +139,7 @@ const GeneralInformation = ({data, classes}) => {
       </Grid>
 
       {fullScreen && (
-        <FullScreenViewer open={ fullScreen } onClose={ () => setFullScreen( false ) } images={data?.metadata?.Images ? data?.metadata?.Images : data?.metadata?.Examples}>
-          <Button sx={ { position: 'absolute', zIndex: 9, gap: '0.25rem', right: '1.75rem', top: '1.75rem' } } variant="contained" color="info">
-            <Compare />
-            Compare images with current
-          </Button>
-        </FullScreenViewer>
+        <FullScreenViewer open={ fullScreen } onClose={ () => setFullScreen( false ) } images={data?.metadata?.Images ? data?.metadata?.Images : data?.metadata?.Examples} />
       )}
     </>
   )

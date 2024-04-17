@@ -8,9 +8,8 @@ import { useDispatch } from "react-redux";
 
 const facets_annotations_colors = require("../configuration/VFBColors").facets_annotations_colors;
 
-const History = () => {
-  const recentSearches = useSelector(state => state.globalInfo.recentSearches);
-  const [filteredSearches, setFilteredSearches] = React.useState(recentSearches);
+const History = ({recentSearches, totalResults}) => {
+  const [filteredSearches, setFilteredSearches] = React.useState(recentSearches || []);
   const dispatch = useDispatch();
   const initialFilters = {
     "filters" : {

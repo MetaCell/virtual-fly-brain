@@ -75,15 +75,15 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
 
   useEffect( () => {
     if ( queryComponentOpened && bottomNav == undefined ){
-      setBottomNav(5);
-    } else if ( queryComponentOpened && bottomNav !== 5 ){
-      dispatch(setQueryComponentOpened(true));
-    } 
+      setBottomNav(2)
+    } else if ( !queryComponentOpened ) {
+      setBottomNav(undefined)
+    }
   }, [queryComponentOpened]);
 
   useEffect( () => {
-    if ( bottomNav === 5 ){
-      dispatch(setQueryComponentOpened(false));
+    if ( bottomNav === 2 ){
+      //dispatch(setQueryComponentOpened(true));
     }
   }, [bottomNav]);
 

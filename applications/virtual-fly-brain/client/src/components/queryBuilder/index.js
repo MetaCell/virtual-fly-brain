@@ -56,8 +56,14 @@ const QueryBuilder = ({ fullWidth, bottomNav, setBottomNav, tabSelected }) => {
   const queryComponentOpened = useSelector( state => state.globalInfo?.queryComponentOpened );
 
   React.useEffect( () => {
-    queryComponentOpened && setValue(0);
+    if ( queryComponentOpened ) {
+      setValue(0);
+    }
   }, [queryComponentOpened]);
+
+  React.useEffect( () => {
+    setHistoryItems(recentSearches.slice(page * count - count, count))
+  }, [recentSearches]);
 
   React.useEffect( () => {
     setQueries(storeQueries);

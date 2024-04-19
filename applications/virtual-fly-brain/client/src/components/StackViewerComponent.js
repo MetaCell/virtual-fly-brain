@@ -2,7 +2,11 @@ import React from 'react';
 import { Application, Container, Assets, Sprite, Text, TextStyle, utils, extensions, ExtensionType, Texture , Resource, BLEND_MODES } from 'pixi.js';
 var createClass = require('create-react-class');
 import { getInstanceByID, selectInstance } from '../reducers/actions/instances';
+import SLICE from "../assets/viewer/slice.svg";
+import ORTH from "../assets/viewer/orth.svg";
+import GLASS from '../assets/viewer/glass.jpg';
 
+const SLICE_VIEWER_DISPLAY = "sliceViewerDisplay";
 
 const componentToHex = (c) => {
   const hex = (c*255).toString(16);
@@ -405,12 +409,34 @@ const rgbToHex = (color) => {
 
     passPlane: function () {
       if (this.state.stackViewerPlane) {
-        if (this.props.canvasRef != undefined && this.props.canvasRef != null) {
-          this.state.stackViewerPlane = this.props.canvasRef.modify3DPlane(this.state.stackViewerPlane, this.state.plane[0], this.state.plane[1], this.state.plane[2], this.state.plane[3], this.state.plane[4], this.state.plane[5], this.state.plane[6], this.state.plane[7], this.state.plane[8], this.state.plane[9], this.state.plane[10], this.state.plane[11]);
-        }
+          let data = {
+            data : { 
+              vert1 : [ parseInt(this.state.plane[0]), parseInt(this.state.plane[1]), parseInt(this.state.plane[2])],
+              vert2: [ parseInt(this.state.plane[3]), parseInt(this.state.plane[4]), parseInt(this.state.plane[5]) ],
+              vert3 : [ parseInt(this.state.plane[6]), parseInt(this.state.plane[7]), parseInt(this.state.plane[8]) ],
+              vert4 : [ parseInt(this.state.plane[9]), parseInt(this.state.plane[10]), parseInt(this.state.plane[11])]
+             },
+             id : SLICE_VIEWER_DISPLAY,
+             textureUrl :  GLASS,
+             visible : this.props.slice
+          };
+          this.state.stackViewerPlane = true;
+          this.props.modifySliceDisplay(data)
       } else {
-        if (this.props.canvasRef != undefined && this.props.canvasRef != null) {
-          this.state.stackViewerPlane = this.props.canvasRef.add3DPlane(this.state.plane[0], this.state.plane[1], this.state.plane[2], this.state.plane[3], this.state.plane[4], this.state.plane[5], this.state.plane[6], this.state.plane[7], this.state.plane[8], this.state.plane[9], this.state.plane[10], this.state.plane[11], "window.GEPPETTO/node_modules/@window.GEPPETTOengine/window.GEPPETTO-client/js/components/widgets/stackViewer/images/glass.jpg");
+        if (this.props.slice) {
+          let data = {
+            data : { 
+              vert1 : [ parseInt(this.state.plane[0]), parseInt(this.state.plane[1]), parseInt(this.state.plane[2])],
+              vert2: [ parseInt(this.state.plane[3]), parseInt(this.state.plane[4]), parseInt(this.state.plane[5]) ],
+              vert3 : [ parseInt(this.state.plane[6]), parseInt(this.state.plane[7]), parseInt(this.state.plane[8]) ],
+              vert4 : [ parseInt(this.state.plane[9]), parseInt(this.state.plane[10]), parseInt(this.state.plane[11])]
+             },
+             id : SLICE_VIEWER_DISPLAY,
+             textureUrl :  GLASS,
+             visible : true
+          };
+          this.state.stackViewerPlane = true;
+          this.props.showSliceDisplay(data)
         }
         if (this.state.stackViewerPlane) {
           this.state.stackViewerPlane = true;
@@ -418,9 +444,7 @@ const rgbToHex = (color) => {
       }
       if (this.disp.width > 0 && this.props.slice) {
         this.state.stackViewerPlane = true;
-      } else {
-        this.state.stackViewerPlane = false;
-      }
+      } 
       this.state.planeUpdating = false;
     },
 
@@ -1723,21 +1747,31 @@ const StackViewerComponent = () => createClass({
             </div>
             <button style={{
               position: 'absolute',
-              left: 15,
-              top: startOffset + 60,
+              left: 12,
+              top: startOffset + 55,
               padding: 0,
               paddingTop: 3,
               border: 0,
               background: 'transparent'
-            }} className={orthClass} onClick={this.toggleOrth} title={'Change Slice Plane Through Stack'} />
+            }} className={orthClass} onClick={this.toggleOrth} title={'Change Slice Plane Through Stack'}>
+              <img
+                src={ORTH}
+                alt={'Toggle Orth'}
+              />
+            </button>
             <button style={{
               position: 'absolute',
-              left: 15,
-              top: startOffset + 130,
+              left: 12,
+              top: startOffset + 125,
               padding: 0,
               border: 0,
               background: 'transparent'
-            }} className={toggleSliceClass} onClick={this.toggleSlice} title={'Toggle the 3D slice display'} />
+            }} className={toggleSliceClass} onClick={this.toggleSlice} title={'Toggle the 3D slice display'}>
+              <img
+                src={SLICE}
+                alt={'Add Slices'}
+              />
+            </button>
             <Canvas zoomLevel={this.state.zoomLevel} dst={this.state.dst}
               serverUrl={this.props.config.serverUrl} canvasRef={this.props.canvasRef}
               fxp={this.state.fxp} pit={this.state.pit} yaw={this.state.yaw} rol={this.state.rol}
@@ -1752,7 +1786,8 @@ const StackViewerComponent = () => createClass({
               templateDomainTypeIds={this.state.tempType}
               templateDomainNames={this.state.tempName}
               slice={this.state.slice} onHome={this.onHome} onZoomIn={this.onZoomIn}
-              onResize={this.onResize} />
+              onResize={this.onResize} showSliceDisplay={this.props.showSliceDisplay} 
+              modifySliceDisplay={this.props.modifySliceDisplay}/>
           </div>
         );
       } else {

@@ -5,6 +5,8 @@ import { getInstanceByID, selectInstance } from '../reducers/actions/instances';
 import SLICE from "../assets/viewer/slice.svg";
 import ORTH from "../assets/viewer/orth.svg";
 import GLASS from '../assets/viewer/glass.jpg';
+import ORTHHOVER from "../assets/viewer/orth_hover.svg";
+import SLICEHOVER from '../assets/viewer/slice_hover.svg';
 
 const SLICE_VIEWER_DISPLAY = "sliceViewerDisplay";
 
@@ -1224,7 +1226,9 @@ const StackViewerComponent = () => createClass({
         slice: false,
         lastUpdate: 0,
         scrollTrack: 0,
-        loadChanges: true
+        loadChanges: true,
+        hoverOrthButton : false,
+        hoverOrthSlice : false
       };
     },
 
@@ -1498,6 +1502,14 @@ const StackViewerComponent = () => createClass({
       });
     },
 
+    mouseOverOrth : function (over) {
+      this.setState({ hoverOrthButton : over});
+    },
+
+    mouseOverSlice : function (over) {
+      this.setState({ hoverSliceButton : over});
+    },
+
     toggleOrth: function () {
       var orth = this.state.orth += 1;
       var pit, yaw, rol;
@@ -1682,13 +1694,8 @@ const StackViewerComponent = () => createClass({
       var stepInClass = 'btn fa fa-chevron-down';
       var stepOutClass = 'btn fa fa-chevron-up';
       var pointerClass = 'btn fa fa-hand-pointer-o';
-      var orthClass = 'btn gpt-xyz';
+      var orthClass = 'btn';
       var toggleSliceClass = 'btn ';
-      if (this.state.slice) {
-        toggleSliceClass += 'gpt-hideplane';
-      } else {
-        toggleSliceClass += 'gpt-showplane';
-      }
       var startOffset = 45;
       var displayArea = this.props.data.id + 'displayArea';
       var markup = '';
@@ -1753,9 +1760,9 @@ const StackViewerComponent = () => createClass({
               paddingTop: 3,
               border: 0,
               background: 'transparent'
-            }} className={orthClass} onClick={this.toggleOrth} title={'Change Slice Plane Through Stack'}>
+            }} className={orthClass} onClick={this.toggleOrth} onMouseOver={() => this.mouseOverOrth(true)} onMouseOut={() => this.mouseOverOrth(false)} title={'Change Slice Plane Through Stack'}>
               <img
-                src={ORTH}
+                src={this.state.hoverOrthButton ? ORTHHOVER : ORTH}
                 alt={'Toggle Orth'}
               />
             </button>
@@ -1766,9 +1773,9 @@ const StackViewerComponent = () => createClass({
               padding: 0,
               border: 0,
               background: 'transparent'
-            }} className={toggleSliceClass} onClick={this.toggleSlice} title={'Toggle the 3D slice display'}>
+            }} className={toggleSliceClass} onClick={this.toggleSlice} onMouseOver={() => this.mouseOverSlice(true)} onMouseOut={() => this.mouseOverSlice(false)} title={'Toggle the 3D slice display'}>
               <img
-                src={SLICE}
+                src={this.state.hoverSliceButton ? SLICEHOVER : SLICE}
                 alt={'Add Slices'}
               />
             </button>

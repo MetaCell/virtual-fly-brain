@@ -82,7 +82,7 @@ const History = ({recentSearches, totalResults}) => {
         filters={filters}
         recentSearches={filteredSearches}
         setFilteredSearches={updateFilters}
-        title={recentSearches?.length + " results in history"}
+        title={totalResults + " results in history"}
         clearAll={removeFromHistory}
         handleCrescentEvent={handleCrescentEvent}
         handleSort={handleSort}

@@ -53,6 +53,20 @@ export const setQueryComponentOpened = (opened) => ({
   }
 });
 
+export const showSliceDisplay = (data) => ({
+  type : getGlobalTypes.SHOW_SLICE_DISPLAY,
+  payload : {
+    data : data
+  }
+})
+
+export const modifySliceDisplay = (data) => ({
+  type : getGlobalTypes.MODIFY_SLICE_DISPLAY,
+  payload : {
+    data : data
+  }
+})
+
 export const resetErrors = () => ({
   type: getGlobalTypes.RESET_ERRORS,
   payload : {}

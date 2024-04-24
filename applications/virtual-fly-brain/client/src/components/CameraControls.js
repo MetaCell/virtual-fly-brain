@@ -1,6 +1,7 @@
 
 import { Box, IconButton, Tooltip } from '@mui/material';
 import React, { useState, useRef, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import UP from "../assets/viewer/up.svg";
 import DOWN from "../assets/viewer/down.svg";
 import LEFT from "../assets/viewer/left.svg";
@@ -18,13 +19,21 @@ import ZOOM_IN from "../assets/viewer/zoom_in.svg";
 import ZOOM_OUT from "../assets/viewer/zoom_out.svg";
 
 export const cameraControlsActions = {
+  PAN_LEFT: 'panLeft',
+  PAN_UP: 'panUp',
+  PAN_RIGHT: 'panRight',
+  PAN_DOWN: 'panDown',
+  PAN_HOME: 'cameraHome',
+  ROTATE_LEFT: 'rotateLeft',
+  ROTATE_UP: 'rotateUp',
+  ROTATE_RIGHT: 'rotateRight',
+  ROTATE_DOWN: 'rotateDown',
+  ROTATE_Z: 'rotateZ',
+  ROTATE_MZ: 'rotateMZ',
   ROTATE: 'rotate',
   ZOOM_IN: 'zoomIn',
   ZOOM_OUT: 'zoomOut',
-  COLOR_PICKER: 'COLOR_PICKER',
-  DEV_STAGES: 'DEVELOPMENT_STAGES',
-  LAYERS: 'LAYERS',
-  HOME: 'cameraHome',
+  WIREFRAME: 'wireframe',
 };
 
 export const cameraControlsRotateState = {
@@ -35,50 +44,95 @@ export const cameraControlsRotateState = {
 };
 
 const CameraControls = (props) => {
+  const {
+    cameraControlsHandler,
+    viewerId,
+  } = props;
+  const dispatch = useDispatch();
+  const pickerRef = useRef();
+  const developmentRef = useRef();
+  const layersRef = useRef();
+
+  const widget = useSelector((state) => state.widgets[viewerId]);
+  const widgetConfig = widget?.config;
+
+  const setRotationState = (rotationState) => {
+    const newWidgetConfig = {
+      ...widgetConfig,
+      rotate: rotationState,
+    };
+    dispatch(updateWidgetConfig(viewerId, newWidgetConfig));
+  };
+
+  useEffect(() => {
+    if (widgetConfig?.rotate === cameraControlsRotateState.STARTING) {
+      cameraControlsHandler(cameraControlsActions.ROTATE);
+      setRotationState(cameraControlsRotateState.ROTATING);
+    }
+    if (widgetConfig?.rotate === cameraControlsRotateState.STOPPING) {
+      cameraControlsHandler(cameraControlsActions.ROTATE);
+      setRotationState(cameraControlsRotateState.STOP);
+    }
+  }, [widgetConfig]);
+
+  const handleClick = (event, value) => {
+    cameraControlsHandler(value?.action);
+  };
+  
   const controlsBottom = [
     {
-      tooltip: 'LANG',
+      tooltip: 'Wireframe',
       image: LANG,
+      action : cameraControlsActions.WIREFRAME
     },
     {
-      tooltip: 'ZOOM_IN',
+      tooltip: 'Zoom In',
       image: ZOOM_IN,
+      action : cameraControlsActions.ZOOM_IN
     },
     {
-      tooltip: 'ZOOM_OUT',
+      tooltip: 'Zoom Out',
       image: ZOOM_OUT,
+      action : cameraControlsActions.ZOOM_OUT
     },
   ];
 
   const controlsRight = [
     {
-      tooltip: 'REPLAY',
+      tooltip: 'Rotate Up',
       image: REPLAY,
+      action : cameraControlsActions.ROTATE_UP
     },
     {
-      tooltip: 'R2P2AY_1',
+      tooltip: 'Rotate Left',
       image: REPLAY_1,
+      action : cameraControlsActions.ROTATE_LEFT
     },
     {
-      tooltip: 'VIDEOCAM',
+      tooltip: 'Rotate',
       image: VIDEOCAM,
+      action : cameraControlsActions.ROTATE
     },
     {
-      tooltip: 'REPLAY_2',
+      tooltip: 'Rotate Right',
       image: REPLAY_2,
+      action : cameraControlsActions.ROTATE_RIGHT
     },
 
     {
-      tooltip: 'REPLAY_3',
+      tooltip: 'Rotate Z',
       image: REPLAY_3,
+      action : cameraControlsActions.ROTATE_Z
     },
     {
-      tooltip: 'REPLAY_4',
+      tooltip: 'Rotate Down',
       image: REPLAY_4,
+      action : cameraControlsActions.ROTATE_DOWN
     },
     {
-      tooltip: 'REPLAY_5',
+      tooltip: 'Rotate Z',
       image: REPLAY_5,
+      action : cameraControlsActions.ROTATE_MZ
     },
   ];
 
@@ -86,23 +140,28 @@ const CameraControls = (props) => {
     {
       tooltip: 'Up',
       image: UP,
+      action : cameraControlsActions.PAN_UP
     },
     {
       tooltip: 'Left',
       image: LEFT,
+      action : cameraControlsActions.PAN_LEFT
     },
     {
       tooltip: 'Home',
       image: HOME,
+      action : cameraControlsActions.PAN_HOME
     },
     {
       tooltip: 'Right',
       image: RIGHT,
+      action : cameraControlsActions.PAN_RIGHT
     },
 
     {
       tooltip: 'Down',
       image: DOWN,
+      action : cameraControlsActions.PAN_DOWN
     },
   ];
 
@@ -125,7 +184,7 @@ const CameraControls = (props) => {
   return (
     <Box className="position-toolbar" sx={{
       position: 'absolute',
-      top: '50%',
+      top: '25%',
       width: '4.125rem',
       left: '1rem',
       transform: 'translateY(-50%)'
@@ -146,6 +205,7 @@ const CameraControls = (props) => {
                   sx={{padding: 0}}
                   disableRipple
                   key={value?.tooltip}
+                  onClick={(event) => handleClick(event, value)}
                 >
                   <img
                     src={value.image}
@@ -172,6 +232,9 @@ const CameraControls = (props) => {
                   sx={{padding: 0}}
                   disableRipple
                   key={value?.tooltip}
+                  aria-describedby={value?.tooltip}
+                  ref={value?.ref}
+                  onClick={(event) => handleClick(event, value)}
                 >
                   <img
                     src={value.image}
@@ -193,6 +256,7 @@ const CameraControls = (props) => {
                   sx={{padding: 0}}
                   disableRipple
                   key={value?.tooltip}
+                  onClick={(event) => handleClick(event, value)}
                 >
                   <img
                     src={value.image}

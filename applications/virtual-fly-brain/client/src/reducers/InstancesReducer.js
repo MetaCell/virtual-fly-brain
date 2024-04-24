@@ -438,6 +438,26 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
           isLoading: false
         })
       }
+      case getGlobalTypes.SHOW_SLICE_DISPLAY : {
+        let objectFound = null;
+        for (let child of state.threeDObjects) {
+          if ( params.id === child.material?.name ) {
+            objectFound = true;
+            break;
+          }
+        }
+
+        if ( objectFound ) return
+    
+        return Object.assign( {}, state, {
+          threeDObjects : [...state.threeDObjects, response.payload.data.plane]
+        })
+      }
+      case getGlobalTypes.MODIFY_SLICE_DISPLAY : {        
+        return Object.assign( {}, state, {
+          threeDObjects : [...state.threeDObjects]
+        })
+      }
       case getGlobalTypes.RESET_ERRORS: {
         return Object.assign({}, state, {
           error: false,

@@ -193,6 +193,8 @@ const TermInfo = ({ open, setOpen }) => {
   const data = useSelector(state => state.instances.focusedInstance)
   const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances)
   const queries = useSelector(state => state.queries.queries)
+  const queryComponentOpened = useSelector(state => state.globalInfo.queryComponentOpened)
+
   const [termInfoData, setTermInfoData] = useState(data);
   const [ toggleReadMore, setToggleReadMore ] = useState( false );
   const dispatch = useDispatch();
@@ -307,18 +309,23 @@ const TermInfo = ({ open, setOpen }) => {
         Object.keys(query.queries)?.forEach( q => query.queries[q].active = false );
       }
     });
+    dispatch(setQueryComponentOpened(true));
     updateQueries(updatedQueries);
     getQueries(id, type)
-    dispatch(setQueryComponentOpened(true));
   }
+
+  React.useEffect( () => {
+    setToggleReadMore(queryComponentOpened)
+  }, [queryComponentOpened])
 
   const setToggleMore = (prev, id, type) => {
     if ( !toggleReadMore ){
       openQuery(id, type)
+      setToggleReadMore(prev)
     } else {
+      setToggleReadMore(prev)
       dispatch(setQueryComponentOpened(false));
     }
-    setToggleReadMore(prev)
   }
 
   const handleGraphSelection = (id, selection) => {
@@ -629,7 +636,7 @@ const TermInfo = ({ open, setOpen }) => {
                   >
                     { getQueriesLength(termInfoData?.metadata?.Queries) > 0 ? <TreeItem nodeId="1" label={
                       <CustomBox display='flex' flexWrap='wrap'>
-                        <Typography>Types of neurons with...</Typography>
+                        <Typography>{termInfoData?.metadata?.Queries?.find(q => q.output_format === "table" && q?.preview_results?.rows?.length > 0 ) ? "Types of neurons with..." : "Queries for ..." + termInfoData?.metadata?.Name }</Typography>
                         <Box display='flex' sx={{ zIndex: 1000 }} pl={0.5}>
                           <Typography sx={{ pr: 0.5 }}>{termInfoData?.metadata?.Queries?.reduce((n, {count}) => n + count, 0)}</Typography>
                           <ListAltIcon sx={{ fontSize: '1.25rem', color: '#A0A0A0' }} />

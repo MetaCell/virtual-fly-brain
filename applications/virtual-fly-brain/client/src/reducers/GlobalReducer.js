@@ -1,3 +1,4 @@
+import { Return } from '../icons';
 import { getGlobalTypes } from './actions/types/GlobalTypes';
 import { getInstancesTypes } from './actions/types/getInstancesTypes';
 
@@ -9,7 +10,8 @@ export const initialStateGlobalReducer = {
   firstIDLoaded : false,
   alignedTemplates : true,
   misalignedTemplate : null,
-  misalignedIDs : {}
+  misalignedIDs : {},
+  showSliceDisplay : {}
 };
 
 const GlobalReducer = (state = initialStateGlobalReducer, response) => {
@@ -76,6 +78,32 @@ const GlobalReducer = (state = initialStateGlobalReducer, response) => {
       case getGlobalTypes.REMOVE_ALL_RECENT_SEARCH: {
         return Object.assign({}, state, {
           recentSearches: []
+        })
+      }
+      case getGlobalTypes.SHOW_SLICE_DISPLAY : {
+        return Object.assign( {}, state, {
+          showSliceDisplay : {
+            params : { 
+              data : response.payload.data?.data || state.showSliceDisplay.data,
+              textureURL : response.payload.data?.textureUrl || state.showSliceDisplay.textureURL,
+              id : response.payload.data?.id || state.showSliceDisplay.id,
+              visible : response.payload.data?.visible || state.showSliceDisplay.visible
+            },
+            action : "addSliceDisplay"
+          }
+        })
+      }
+      case getGlobalTypes.MODIFY_SLICE_DISPLAY : {
+        return Object.assign( {}, state, {
+          showSliceDisplay : {
+            params : { 
+              data : response.payload.data?.data || state.showSliceDisplay.data,
+              textureURL : response.payload.data?.textureUrl || state.showSliceDisplay.textureURL,
+              id : response.payload.data?.id || state.showSliceDisplay.id,
+              visible : response.payload.data?.visible || state.showSliceDisplay.visible
+            },
+            action : "modifySliceDisplay"
+          }
         })
       }
       default:

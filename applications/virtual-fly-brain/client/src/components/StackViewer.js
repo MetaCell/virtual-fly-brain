@@ -7,6 +7,7 @@ import SimpleInstance from "@metacell/geppetto-meta-core/model/SimpleInstance";
 import Resources from '@metacell/geppetto-meta-core/Resources';
 import vars from "../theme/variables";
 import { integerPropType } from '@mui/utils';
+import { modifySliceDisplay, showSliceDisplay } from '../reducers/actions/globals';
 
 const {
   secondaryBg,
@@ -17,7 +18,9 @@ const {
 let StackComponent = null;
 
 const VFBStackViewer = (props) => {
-  const data = useSelector(state => state.instances.allLoadedInstances)
+  const data = useSelector(state => state.instances.allLoadedInstances);
+  const dispatch = useDispatch();
+  
   let config = {
     serverUrl: 'http://www.virtualflybrain.org/fcgi/wlziipsrv.fcgi',
     templateId: 'NOTSET'
@@ -59,6 +62,14 @@ const VFBStackViewer = (props) => {
 
   const updateStackWidget = () => {
     addSlices(getSliceInstances());
+  }
+
+  const showSliceDisplayControl = (data) => {
+    dispatch(showSliceDisplay(data))
+  }
+
+  const modifySliceDisplayControl = (data) => {
+    dispatch(modifySliceDisplay(data))
   }
 
   // stack widget helper methods
@@ -196,6 +207,8 @@ const VFBStackViewer = (props) => {
       stackData?.instances?.length > 0 ? <StackComponent
       data={stackData}
       height={stackData.height}
+      showSliceDisplay={showSliceDisplayControl}
+      modifySliceDisplay={modifySliceDisplayControl}
       width={stackData.width}
       config={config}
       voxel={voxelSize}/> : null

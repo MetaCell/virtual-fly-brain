@@ -200,6 +200,8 @@ const TermInfo = ({ open, setOpen }) => {
   const data = useSelector(state => state.instances.focusedInstance)
   const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances)
   const queries = useSelector(state => state.queries.queries)
+  const queryComponentOpened = useSelector(state => state.globalInfo.queryComponentOpened)
+
   const [termInfoData, setTermInfoData] = useState(data);
   const [toggleReadMore, setToggleReadMore] = useState(false);
   const dispatch = useDispatch();
@@ -315,6 +317,10 @@ const TermInfo = ({ open, setOpen }) => {
     updateQueries(updatedQueries);
     getQueries(id, type)
   }
+
+  React.useEffect( () => {
+    setToggleReadMore(queryComponentOpened)
+  }, [queryComponentOpened])
 
   const setToggleMore = (prev, id, type) => {
     if (!toggleReadMore) {

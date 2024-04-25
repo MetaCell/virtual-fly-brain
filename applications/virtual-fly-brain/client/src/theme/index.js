@@ -42,6 +42,38 @@ theme = createTheme({
           font-family: ${primaryFont};
           box-sizing: border-box
         }
+
+        .chrome-picker {
+          z-index: 100;
+          border-radius: 6px !important;
+          background: ${secondaryBg} !important;
+        }
+
+        .flexbox-fix label {
+          color: ${whiteColor} !important;
+        }
+
+        .flexbox-fix input {
+          background: ${primaryBg} !important;
+          color: ${whiteColor} !important;
+          box-shadow: none !important;
+          border-radius: 4px !important;
+        }
+
+        .flexbox-fix input:focus {
+          outline: none !important;
+          border: none !important;
+          box-shadow: none !important;
+        }
+
+        .flexbox-fix svg {
+          fill: ${whiteColor} !important;
+        }
+
+        .flexbox-fix svg:hover {
+          background: transparent !important;
+        }
+
         .flexlayout__tab_button {
           margin: 0;
           border-radius: 8px 8px 0px 0px;
@@ -213,9 +245,147 @@ theme = createTheme({
       styleOverrides: {
         root: {
           '& .MuiTreeItem-root': {
+            position: 'relative',
+            '&:before': {
+              position: 'absolute',
+              left: '-10px',
+              top: '0px',
+              borderLeft: '1px solid #505050',
+              borderBottom: '1px solid #505050',
+              content: '""',
+              width: '8px',
+              height: '1em',
+              borderBottomLeftRadius: "50%"
+            },
+            '&:after': {
+              position: 'absolute',
+              left: '-10px',
+              bottom: '0px',
+              borderLeft: '1px solid #505050',
+              content: '""',
+              width: '8px',
+              height: '100%'
+            },
             '&:last-of-type': {
-              '&:before': {
-                height: 'calc(100% - 2.8125rem)'
+              '&:after': {
+                display: 'none'
+              }
+            }
+          }
+        }
+      }
+    },
+
+    MuiTreeItem: {
+      styleOverrides: {
+        group: {
+          paddingTop: '0.25rem',
+          marginLeft: '1.25rem',
+        },
+        root: {
+          position: 'relative',
+          padding: 0,
+          '&:not([aria-expanded])': {
+            '& .MuiTreeItem-iconContainer': {
+              position: 'absolute',
+              left: '-0.78125rem',
+              top: '-0.25rem',
+            },
+          },
+          '&[aria-expanded="true"]': {
+            // '&:before': {
+            //   content: "''",
+            //   position: 'absolute',
+            //   left: '0.5rem',
+            //   top: '1.25rem',
+            //   backgroundColor: primaryBg,
+            //   height: 'calc(100% - 1rem)',
+            //   width: '0.0625rem',
+            // }
+          }
+
+        },
+        content: {
+          padding: '0.125rem 0',
+          // cursor: 'auto',
+
+          '&:hover': {
+            backgroundColor: 'transparent'
+          },
+
+          '&.Mui-selected': {
+            backgroundColor: 'transparent',
+            '&:hover': {
+              backgroundColor: 'transparent'
+            },
+            '&.Mui-focused': {
+              backgroundColor: 'transparent',
+              '&:hover': {
+                backgroundColor: 'transparent'
+              }
+            },
+          },
+          '&.Mui-focused': {
+            backgroundColor: 'transparent',
+            '&:hover': {
+              backgroundColor: 'transparent'
+            }
+          },
+        },
+        iconContainer: {
+          marginRight: 0,
+          width: 'auto'
+        },
+        label: {
+          paddingLeft: 0,
+          userSelect: 'none',
+          fontWeight: 400,
+          fontSize: '1rem',
+          marginLeft: '0.25rem',
+          [theme.breakpoints.down('lg')]: {
+              fontSize: '0.875rem'
+          },
+          lineHeight: '125%',
+          color: outlinedBtnTextColor,
+
+          '& .MuiTabs-root': {
+            minHeight: '1.75rem'
+          },
+
+          '& .MuiTab-root': {
+            padding: 0,
+            minHeight: '1.75rem'
+          },
+
+          '& p': {
+            lineHeight: '125%',
+            fontSize: '1rem',
+            [theme.breakpoints.down('lg')]: {
+              fontSize: '0.875rem'
+          },
+            letterSpacing: 'normal'
+          },
+
+          '& > div': {
+            alignItems: 'center'
+          },
+
+          '& > div > p': {
+            flex: 1,
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            overflow:'hidden',
+            position: 'relative',
+            '&:after': {
+              content: "''",
+              position: 'absolute',
+              right: 0,
+              width: '5.5rem',
+              height: '100%',
+              background: 'linear-gradient(270deg, #222222 0%, rgba(34, 34, 34, 0) 26.7%)',
+
+              [theme.breakpoints.up('lg')]: {
+                background: 'linear-gradient(270deg, #1A1A1A 0%, rgba(26, 26, 26, 0.00) 26.7%)'
               }
             }
           }
@@ -254,7 +424,7 @@ theme = createTheme({
           backgroundColor: 'transparent',
           boxShadow: 'none',
           border: `0.0625rem solid ${secondaryBg}`,
-          marginBottom: '0.5rem'
+          borderRadius: '0.5rem'
         }
       }
     },
@@ -376,123 +546,6 @@ theme = createTheme({
       }
     },
 
-    MuiTreeItem: {
-      styleOverrides: {
-        group: {
-          paddingTop: '0.25rem',
-          marginLeft: '1.25rem',
-        },
-        root: {
-          position: 'relative',
-          padding: 0,
-          '&:not([aria-expanded])': {
-            '& .MuiTreeItem-iconContainer': {
-              position: 'absolute',
-              left: '-0.78125rem',
-              top: '-0.25rem',
-            },
-          },
-          '&[aria-expanded="true"]': {
-            '&:before': {
-              content: "''",
-              position: 'absolute',
-              left: '0.5rem',
-              top: '1.25rem',
-              backgroundColor: primaryBg,
-              height: 'calc(100% - 1rem)',
-              width: '0.0625rem',
-            }
-          }
-
-        },
-        content: {
-          padding: '0.125rem 0',
-          // cursor: 'auto',
-
-          '&:hover': {
-            backgroundColor: 'transparent'
-          },
-
-          '&.Mui-selected': {
-            backgroundColor: 'transparent',
-            '&:hover': {
-              backgroundColor: 'transparent'
-            },
-            '&.Mui-focused': {
-              backgroundColor: 'transparent',
-              '&:hover': {
-                backgroundColor: 'transparent'
-              }
-            },
-          },
-          '&.Mui-focused': {
-            backgroundColor: 'transparent',
-            '&:hover': {
-              backgroundColor: 'transparent'
-            }
-          },
-        },
-        iconContainer: {
-          marginRight: 0,
-          width: 'auto'
-        },
-        label: {
-          paddingLeft: 0,
-          userSelect: 'none',
-          fontWeight: 400,
-          fontSize: '1rem',
-          [theme.breakpoints.down('lg')]: {
-              fontSize: '0.875rem'
-          },
-          lineHeight: '125%',
-          color: outlinedBtnTextColor,
-
-          '& .MuiTabs-root': {
-            minHeight: '1.75rem'
-          },
-
-          '& .MuiTab-root': {
-            padding: 0,
-            minHeight: '1.75rem'
-          },
-
-          '& p': {
-            lineHeight: '125%',
-            fontSize: '1rem',
-            [theme.breakpoints.down('lg')]: {
-              fontSize: '0.875rem'
-          },
-            letterSpacing: 'normal'
-          },
-
-          '& > div': {
-            alignItems: 'center'
-          },
-
-          '& > div > p': {
-            flex: 1,
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            overflow:'hidden',
-            position: 'relative',
-            '&:after': {
-              content: "''",
-              position: 'absolute',
-              right: 0,
-              width: '5.5rem',
-              height: '100%',
-              background: 'linear-gradient(270deg, #222222 0%, rgba(34, 34, 34, 0) 26.7%)',
-
-              [theme.breakpoints.up('lg')]: {
-                background: 'linear-gradient(270deg, #1A1A1A 0%, rgba(26, 26, 26, 0.00) 26.7%)'
-              }
-            }
-          }
-        }
-      }
-    },
-
-
     MuiAccordion: {
       styleOverrides: {
         root: {
@@ -575,6 +628,64 @@ theme = createTheme({
 
     MuiDialog: {
       styleOverrides: {
+        root: {
+          '& div[dir="ltr"][aria-roledescription="carousel"]': {
+            position: 'relative'
+          },
+
+          '& .react-slideshow-container .nav': {
+            zIndex: 10,
+            position: 'absolute',
+            cursor: 'pointer',
+            bottom: '0.5rem',
+            margin: 0,
+            display: 'flex',
+            alignItems: 'center',
+          },
+
+          '& .react-slideshow-container .nav svg': {
+            width: '1.25rem',
+            height: '1.25rem'
+          },
+    
+          '& .react-slideshow-container .nav.disabled': {
+            opacity: 0.6
+          },
+    
+          '& .react-slideshow-container .nav:first-of-type': {
+            left: '40%'
+          },
+    
+          '& .react-slideshow-container .nav:last-of-type': {
+            right: '40%'
+          },
+    
+          '& .react-slideshow-container + ul.indicators .each-slideshow-indicator::before': {
+            background: whiteColor,
+            position: 'static',
+            display: 'block',
+            width: '0.375rem',
+            height: '0.375rem'
+          },
+    
+          '& .react-slideshow-container + ul.indicators li': {
+            width: 'auto',
+            height: 'auto',
+            padding: 0,
+            display: 'flex',
+    
+          },
+    
+          '& .react-slideshow-container + ul.indicators': {
+            margin: 0,
+            padding: 0,
+            position: 'absolute',
+            bottom: '1rem',
+            height: 'auto',
+            width: '100%',
+          }
+        },
+
         paper: {
           overflow: 'visible',
           borderRadius: '0.875rem',

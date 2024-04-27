@@ -400,7 +400,7 @@ const ROIBrowser = (props) => {
                             hide3DMesh(rowInfo.node.instanceId)
                             setState({ ...state, nodeSelected : rowInfo.node });
                     }}>
-                     <VisibilityOff />
+                    <VisibilityOff />
                     </IconButton>
                 );
                 buttons.push(
@@ -413,19 +413,23 @@ const ROIBrowser = (props) => {
                         }}>
                             <ColorLensIcon/>
                         {displayColorPicker[rowInfo.node.instanceId] ? (
-                                <div style={{ width: '100%' }} ref={colorPickerContainer}><ChromePicker
-                                    disableAlpha={true}    
-                                    color={color}
-                                    onChangeComplete={(color, event) => {
-                                        let rgb;
-                                        event.stopPropagation();
-                                        if ( event.target.className == 'saturation-black' ) {
+                                <div ref={colorPickerContainer} style={{
+                                        position: 'absolute',
+                                        width: '100%',
+                                        top: '1.4rem',
+                                        left: -1 * rowInfo.path.length + 'rem'
+                                    }}>
+                                    <ChromePicker
+                                        disableAlpha={false}
+                                        color={{ r:color.r*255, g:color.g*255, b:color.b*255, a:color.a }}
+                                        onChangeComplete={(color, event) => {
+                                            let rgb;
+                                            event.stopPropagation();
                                             rgb = { r:color.rgb.r/255, g:color.rgb.g/255, b:color.rgb.b/255, a:color.rgb.a }
                                             changeColor(rowInfo.node.instanceId, rgb)
-                                        }
-                                    }}
-                                    style={{ zIndex: 10 }}
-                                /></div>
+                                        }}
+                                        style={{ zIndex: 10 }} />
+                                </div>
                         ) : null}
                     </IconButton>
                 );

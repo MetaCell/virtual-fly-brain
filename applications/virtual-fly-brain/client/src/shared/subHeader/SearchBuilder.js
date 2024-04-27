@@ -89,7 +89,7 @@ const Listbox = styled('div')(
   background-color: ${bottomNavBg};
   overflow: auto;
   border-top: 0.0625rem solid ${primaryBg};
-  max-height: 17.375rem;
+  max-height: 24.375rem;
   border-radius: 0 0 0.5rem 0.5rem;
   z-index: 1;
   backdrop-filter: blur(0.625rem);

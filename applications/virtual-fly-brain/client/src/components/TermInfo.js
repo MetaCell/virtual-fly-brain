@@ -1,13 +1,13 @@
 import { Box, Button,Tooltip, ButtonGroup, Grid, IconButton, Menu, MenuItem,
   Table, TableBody, TableCell, Paper, TableContainer, TableHead, TableRow,
-   Typography } from "@mui/material";
+  Typography } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from 'react-redux'
 import { styled } from '@mui/material/styles';
 import MediaQuery from 'react-responsive';
 import { ArView, Target, CylinderOn, CylinderOff, ArrowDown, ArrowRight, ChevronDown,
-   ChevronLeft, ChevronRight, Delete, Expand, Eye, Focus,Line, Remove,
-    ScatterPlot, SkeletonOn, SelectOff, SkeletonOff, EyeOff, ArViewOff } from "../icons";
+  ChevronLeft, ChevronRight, Delete, Expand, Eye, Focus,Line, Remove,
+  ScatterPlot, SkeletonOn, SelectOff, SkeletonOff, EyeOff, ArViewOff } from "../icons";
 import PropTypes from 'prop-types';
 import vars from "../theme/variables";
 import Accordion from '@mui/material/Accordion';
@@ -368,6 +368,7 @@ const TermInfo = ({ open, setOpen }) => {
     let instance = allLoadedInstances.find( instance => instance.metadata?.Id == termInfoData?.metadata?.Id );
     return instance;
   }
+
   return (
     <Box
       sx={{
@@ -529,21 +530,19 @@ const TermInfo = ({ open, setOpen }) => {
                         <>
                           <Tooltip title={"Edit 3D Canvas Color"}>
                             <Button
-                            sx={{ width: 75 }} 
+                            sx={{ width: 75 }}
                             onClick={() => setDisplayColorPicker(!displayColorPicker)}>
                             <RectangleIcon sx={{color : RGBAToHexA( getInstance()?.color)}}/><ArrowDown/>
                           </Button>
                           </Tooltip>
                           { displayColorPicker ?
                           <ChromePicker
-                            color={getInstance()?.color}
-                            disableAlpha={true} 
+                            color={{ r:termInfoData?.color.r*255, g:termInfoData?.color.g*255, b:termInfoData?.color.b*255, a:termInfoData?.color.a }}
+                            disableAlpha={false}
                             onChangeComplete={ (color, event) => {
                               let rgb;
-                              if ( event.target.className == "saturation-black" ) {
-                                rgb = { r:color.rgb.r/255, g:color.rgb.g/255, b:color.rgb.b/255, a:color.rgb.a }
-                                changeColor(termInfoData?.metadata?.Id, rgb)
-                              }                           
+                              rgb = { r:color.rgb.r/255, g:color.rgb.g/255, b:color.rgb.b/255, a:color.rgb.a }
+                              changeColor(termInfoData?.metadata?.Id, rgb)
                             }}
                             style={{ zIndex: 10 }}/>
                             : null

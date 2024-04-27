@@ -73,14 +73,14 @@ const controlsMenuConf = {
   buttons: [
     {
       label: "",
-      icon: <i className="fa fa-eye" />,
+      icon: <i className="fa fa-eye" style={{'marginRight': '5px'}}/>,
       activeColor : "red",
       action: "",
       position: "bottom-start",
       caret : {
         show : true, 
-        expandedIcon : <i className="fa fa-angle-down" />,
-        closedIcon : <i className="fa fa-angle-up" />
+        expandedIcon : <i className="fa fa-angle-down" style={{'fontSize': '12px'}}/>,
+        closedIcon : <i className="fa fa-angle-up" style={{'fontSize': '12px'}}/>
       },
       list: [
         {

@@ -189,7 +189,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
 
         return Object.assign({}, state, {
           allLoadedInstances : allLoadedInstances,
-          threeDObjects : threeDObjects, 
+          threeDObjects : threeDObjects,
           mappedCanvasData : getMappedCanvasData(allLoadedInstances),
           event : { action : getInstancesTypes.UPDATE_INSTANCES, id : response.payload.id, trigger : Date.now()},
           isLoading: false

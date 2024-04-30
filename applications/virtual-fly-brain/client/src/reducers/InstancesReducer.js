@@ -9,7 +9,6 @@ export const initialStateInstancesReducer = {
   focusedInstance : undefined,
   threeDObjects : [],
   mappedCanvasData : [],
-  focusedInstance : "",
   event : {},
   isLoading: false,
   launchTemplate : null,
@@ -72,7 +71,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       if ( response.payload.focus ) {
         focused = loadedInstances?.find( i => i?.metadata?.Id === response.payload.Id )
       }
-      if ( response.payload.select ) {
+      if ( response.payload.select && response.payload?.IsTemplate !== true ) {
         focused = loadedInstances?.find( i => i?.metadata?.Id === response.payload.Id )
         focused.selected = true;
         focused.color = SELECTED_COLOR
@@ -216,7 +215,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       case getInstancesTypes.SELECT_INSTANCE:{
         const allLoadedInstances = [...state.allLoadedInstances]
         const findInstance = allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );
-        if ( findInstance ){
+        if ( findInstance && findInstance?.metadata?.IsTemplate != true ){
           findInstance.selected = !findInstance.selected;
           if ( findInstance.selected ) {
             findInstance.color = SELECTED_COLOR

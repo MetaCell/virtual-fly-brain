@@ -748,7 +748,7 @@ const TermInfo = ({ open, setOpen }) => {
                             display='flex'
                             alignItems="center"
                             key={index}
-                            onClick={() => openQuery(data.metadata?.Id, query.query)}
+                            onClick={() => openQuery(data?.metadata?.Id, query.query)}
                           >
                             <Typography sx={{
                               flexGrow: 1, color: outlinedBtnTextColor,
@@ -791,7 +791,7 @@ const TermInfo = ({ open, setOpen }) => {
                         display='flex'
                         alignItems="center"
                         key={index}
-                        onClick={() => handleGraphSelection(data.metadata?.Id, item)}
+                        onClick={() => handleGraphSelection(data?.metadata?.Id, item)}
                       >
                         <Typography sx={{
                           flexGrow: 1, color: outlinedBtnTextColor,
@@ -801,7 +801,7 @@ const TermInfo = ({ open, setOpen }) => {
                             "&:hover": { "cursor" : "pointer" } 
                           }
                         }}>
-                          {item.label(data.metadata?.Name)}
+                          {item.label(data?.metadata?.Name)}
                         </Typography>
                         <IconButton sx={{ p: 0 }}>
                           <ScatterPlot />

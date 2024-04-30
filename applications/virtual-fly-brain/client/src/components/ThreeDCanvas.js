@@ -132,11 +132,40 @@ class ThreeDCanvas extends Component {
   }
 
   onSelection (selectedInstances){
-    console.log("Selected instances ", selectedInstances);
     selectedInstances?.forEach( id => {
-      selectInstance(id);
       focusInstance(id)
+      selectInstance(id);
     })
+  }
+
+  selectionStrategy (props, selectedMap) {
+    let selected =  Object.freeze({
+      "nearest": selectedMap => [Object.keys(selectedMap)
+        .reduce((selected, current) => {
+          if (!selected) {
+            return current
+          } else {
+            return selectedMap[current].distance < selectedMap[selected].distance ? current : selected
+          }
+        }, null)].filter(s => s != props.templateID), "farthest": selectedMap => [Object.keys(selectedMap)
+        .reduce((selected, current) => {
+          if (!selected) {
+            return current
+          } else {
+            return selectedMap[current].distance > selectedMap[selected].distance ? current : selected
+          }
+        }, null)].filter(s => s != props.templateID), "all": selectedMap => Object.keys(selectedMap).filter(s => s != props.templateID)
+    })    
+
+    const selection = selected["all"](selectedMap);
+    let match = props.allLoadedInstances?.find( i => i.selected);
+    if ( match ) {
+      if ( selection.findIndex( index => index == match?.metadata?.Id ) > -1 ) {
+        selection.splice(selection.findIndex( index => index == match?.metadata?.Id ), 1)
+      }
+    }
+
+    return selection;
   }
 
   hoverHandler () {}
@@ -166,6 +195,7 @@ class ThreeDCanvas extends Component {
               onMount={scene => this.scene = scene}
               backgroundColor={blackColor}
               onSelection={this.onSelection}
+              selectionStrategy={(selectedMap) => this.selectionStrategy(this.props, selectedMap)}
               onHoverListeners={{ 'hoverId': this.hoverHandler }}
               dracoDecoderPath={'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/jsm/libs/draco/'}
             />
@@ -181,7 +211,8 @@ const mapStateToProps = state => ({
   mappedCanvasData : state.instances.mappedCanvasData,
   threeDObjects : state.instances.threeDObjects,
   focusInstance : state.instances.focusInstance,
-  event : state.instances.event
+  event : state.instances.event,
+  templateID : state.globalInfo.templateID
 });
 
 

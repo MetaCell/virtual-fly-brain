@@ -829,27 +829,27 @@ const TermInfo = ({ open, setOpen }) => {
                     rowGap={1}
                     mb={2}
                   >
-                    {stylingConfiguration.dropDownQueries.map((item, index) =>
-                    (<Box
-                      display='flex'
-                      alignItems="center"
-                      key={index}
-                      onClick={() => handleGraphSelection(data.metadata?.Id, item)}
-                    >
-                      <Typography sx={{
-                        flexGrow: 1, color: outlinedBtnTextColor,
-                        fontSize: {
-                          xs: '0.875rem',
-                          lg: '1rem',
-                          "&:hover": { "cursor": "pointer" }
-                        }
-                      }}>
-                        {item.label(data.metadata?.Name)}
-                      </Typography>
-                      <IconButton sx={{ p: 0 }}>
-                        <ScatterPlot />
-                      </IconButton>
-                    </Box>)
+                     { stylingConfiguration.dropDownQueries.map((item, index) => 
+                      (<Box
+                        display='flex'
+                        alignItems="center"
+                        key={index}
+                        onClick={() => handleGraphSelection(data?.metadata?.Id, item)}
+                      >
+                        <Typography sx={{
+                          flexGrow: 1, color: outlinedBtnTextColor,
+                          fontSize: {
+                            xs: '0.875rem',
+                            lg: '1rem',
+                            "&:hover": { "cursor" : "pointer" } 
+                          }
+                        }}>
+                          {item.label(data?.metadata?.Name)}
+                        </Typography>
+                        <IconButton sx={{ p: 0 }}>
+                          <ScatterPlot />
+                        </IconButton>
+                      </Box>)
                     )}
                   </Box>
                 </AccordionDetails>

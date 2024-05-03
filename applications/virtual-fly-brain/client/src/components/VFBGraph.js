@@ -119,8 +119,9 @@ class VFBGraph extends Component {
 
       if (!this.resizeObserver && this.containerRef.current)
       {
+        let self = this;
         this.resizeObserver = new ResizeObserver(entries => {
-          this.graphRef.current.ggv.current.zoomToFit();
+          self.graphRef?.current?.ggv?.current.zoomToFit();
         });
     
         if (this.containerRef.current) {
@@ -249,7 +250,7 @@ class VFBGraph extends Component {
     this.loading = true;
     this.setState({ optionsIconColor : stylingConfiguration.defaultRefreshIconColor });
     // Perform cypher query
-    this.queryResults(cypherQuery(node.title), { id : node.title, name : this.querySelection(node.path) } );
+    this.queryResults(cypherQuery(node.title), { id : node.title, name : this.querySelection.label(node.path) } );
   }
 
   selectedNodeLoaded (instance) {
@@ -300,7 +301,11 @@ class VFBGraph extends Component {
     
     // Perform cypher query
     this.props.vfbGraph(getGraphTypes.UPDATE_GRAPH, stateInstance, -1, true, false);
-    this.queryResults(cypherQuery(instanceId), { id : instanceId, name : this.querySelection(instanceName) });
+
+    if ( this.querySelection?.label == undefined ) {
+      this.querySelection = stylingConfiguration.dropDownQueries[0];
+    }
+    this.queryResults(cypherQuery(instanceId), { id : instanceId, name : this.querySelection.label(instanceName) });
   }
 
   /**

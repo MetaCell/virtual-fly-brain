@@ -1,6 +1,6 @@
 import React from "react";
 import Dialog from '@mui/material/Dialog';
-import { Box, Button,IconButton,Typography } from "@mui/material";
+import { Box, Button, DialogTitle, IconButton, Typography } from "@mui/material";
 import { CrossCircle } from "../../icons";
 import { Compare } from "../../icons";
 import FullscreenSlider from "./FullscreenSlider";
@@ -10,37 +10,31 @@ import { useSelector } from "react-redux";
 import vars from '../../theme/variables';
 
 const {
-  carouselBg,
-  headerBorderColor,
   listHeadingColor
 } = vars;
 
-const imageStyle =  {
-  height: '100%',
-  width: '100%',
-  objectFit: 'cover'
-}
-
 const spanStyle = {
-  padding: '5px',
-  position: 'absolute',
-  bottom : '0px',
-  background: '#efefef',
-  color: '#000000'
+  color: '#181818',
+  fontSize: '1rem',
+  fontWeight: 400
 }
 
 const divStyle = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  backgroundSize: 'cover',
-  height: '400px'
+  backgroundSize: '100% 100%',
+  height: '320px',
+  borderRadius: '8px',
+  backgroundPosition: 'center center'
 }
 
-const FullScreenViewer = ( { open, onClose, maxWidth = 'md', images, sx, children } ) =>
-{
+const FullScreenViewer = ({ open, onClose, maxWidth = 'md', images, sx, children }) => {
   const [openLayersImages, setOpenLayersImages] = React.useState(false);
   const [layersImages, setLayersImages] = React.useState([]);
+  const [slideImages, setSlideImages] = React.useState([]);
+  const [currentSlide, setCurrentSlide] = React.useState(0);
+  const [slideImageCurrentSlide, setSlideImageCurrentSlide] = React.useState(0);
   const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances);
 
   const handleCompare = () => {
@@ -52,23 +46,24 @@ const FullScreenViewer = ( { open, onClose, maxWidth = 'md', images, sx, childre
     onClose()
   }
 
-  React.useEffect( () => {
+  React.useEffect(() => {
     let images = [];
     allLoadedInstances.filter(i => i.meshCreated).map(instance => {
-      if ( instance?.metadata?.Images ) {
+      if (instance?.metadata?.Images) {
         let keys = Object.keys(instance?.metadata?.Images);
-        keys.forEach( key => {
+        keys.forEach(key => {
           images = images.concat(instance?.metadata?.Images[key][0])
         })
-      } else if ( instance?.metadata?.Examples ){
+      } else if (instance?.metadata?.Examples) {
         let keys = Object.keys(instance?.metadata?.Examples);
-        keys.forEach( key => {
+        keys.forEach(key => {
           images = images.concat(instance?.metadata?.Examples[key][0])
         })
       }
     })
     setLayersImages(images)
   }, [allLoadedInstances])
+
 
   return (
     <Dialog
@@ -79,15 +74,18 @@ const FullScreenViewer = ( { open, onClose, maxWidth = 'md', images, sx, childre
       open={open}
       sx={sx}
     >
-      <Button 
-        sx={ { position: 'absolute', zIndex: 9, gap: '0.25rem', right: '1.75rem', top: '1.75rem' } }
-        variant="contained"
-        color="info"
-        onClick={handleCompare}  
-      >
-        <Compare />
-        Compare images with current
-      </Button>
+      <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 0, mb: 1.5, ...spanStyle }}>
+        {images[Object.keys(images)[currentSlide]]?.[0].label}
+        <Button
+          variant="contained"
+          color="info"
+          onClick={handleCompare}
+          sx={{ gap: '0.25rem' }}
+        >
+          <Compare />
+          {openLayersImages ? "Stop comparison" : "Compare images with current"}
+        </Button>
+      </DialogTitle>
       <IconButton
         sx={{
           position: 'absolute',
@@ -99,40 +97,37 @@ const FullScreenViewer = ( { open, onClose, maxWidth = 'md', images, sx, childre
         <CrossCircle />
       </IconButton>
       {children}
-      <Slide canSwipe={ false } slidesToShow={ 1 } slidesToScroll={ 1 } infinite={ false } indicators={ true } prevArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } nextArrow={ <Typography><ChevronRight color={ listHeadingColor } /></Typography> } arrows={ true }>
-            {Object.keys(images)?.map((src, index) => (
-                <div key={index}>
-                  <div
-                    style={{ ...divStyle, 'backgroundImage': `url(${images[src]?.[0].thumbnail})` }}>
-                    <span style={spanStyle}>{images[src]?.[0].label}</span>
-                  </div>
-                </div>
-            ))}
+      <Slide canSwipe={false} slidesToShow={1} slidesToScroll={1} infinite={false} indicators={true} prevArrow={<Typography><ChevronLeft color={listHeadingColor} /></Typography>} nextArrow={<Typography><ChevronRight color={listHeadingColor} /></Typography>} arrows={true} onChange={(slideIndex) => setCurrentSlide(slideIndex)}>
+        {Object.keys(images)?.map((src, index) => (
+          <div key={index}>
+            <div style={{ ...divStyle, 'backgroundImage': `url(${images[src]?.[0].thumbnail})` }}></div>
+          </div>
+        ))}
       </Slide>
       {
         openLayersImages ? (
           <Box
-          sx={{
-            width: '100%',
-            height: {
-              xs: '15.188rem',
-              lg: '14.25rem'
-            },
-            background: {
-              xs: carouselBg,
-              lg: headerBorderColor
-            },
-            borderRadius: '0.5rem',
-            overflow: 'hidden'
-          }}
+            sx={{
+              width: '100%',
+              background: 'transparent',
+              overflow: 'hidden',
+              mt: '0.75rem'
+            }}
           >
+            <Typography sx={{ ...spanStyle, mb: '0.75rem' }}>
+              {slideImages[slideImageCurrentSlide]?.caption}
+            </Typography>
             <FullscreenSlider
-              fullScreen={true} examples={layersImages}
+              fullScreen={true}
+              examples={layersImages}
+              slideImages={slideImages}
+              setSlideImages={setSlideImages}
+              setSlideImageCurrentSlide={setSlideImageCurrentSlide}
             />
           </Box>
-        ) 
-        :
-        null
+        )
+          :
+          null
       }
     </Dialog>
   )

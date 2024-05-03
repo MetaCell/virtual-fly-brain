@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 // import CameraControls from "@metacell/geppetto-meta-ui/camera-controls/CameraControls";
 import { withStyles } from '@material-ui/core';
-import { applySelection, mapToCanvasData } from "@metacell/geppetto-meta-ui/3d-canvas/utils/SelectionUtils"
 import { connect } from 'react-redux';
 import vars from '../theme/variables';
 import CameraControls from './CameraControls';
@@ -11,6 +10,7 @@ import { getInstancesTypes } from '../reducers/actions/types/getInstancesTypes';
 import SharkViewer, { swcParser } from '@janelia/sharkviewer';
 import * as THREE from 'three';
 import { add3DSkeleton, focusInstance, selectInstance } from '../reducers/actions/instances';
+import { getGlobalTypes } from '../reducers/actions/types/GlobalTypes';
 
 const {
   whiteColor,
@@ -67,6 +67,12 @@ class ThreeDCanvas extends Component {
           } else {
             this.canvasRef.current.defaultCameraControlsHandler("cameraHome")
           }
+          break;
+        }
+        // TOOD : Geppetto-meta bug opened to handle this. Once it's close, this can be removed.
+        case getGlobalTypes.CAMERA_EVENT : {
+          // Force Canvas re-render after a camera event
+          this.forceUpdate();
           break;
         }
         case getInstancesTypes.UPDATE_SKELETON:

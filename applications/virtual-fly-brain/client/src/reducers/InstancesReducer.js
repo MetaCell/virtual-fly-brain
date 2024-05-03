@@ -13,7 +13,8 @@ export const initialStateInstancesReducer = {
   isLoading: false,
   launchTemplate : null,
   error: false,
-  errorMessage: undefined
+  errorMessage: undefined,
+  cameraEvent : {}
 };
 
 const getMappedCanvasData = (loadedInstances) => {
@@ -461,6 +462,12 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         return Object.assign({}, state, {
           error: false,
           errorMessage: undefined
+        })
+      }
+      case getGlobalTypes.CAMERA_EVENT: {
+        return Object.assign({}, state, {
+          cameraEvent : { action : response.payload.action, date : Date.now() },
+          event : { action : getGlobalTypes.CAMERA_EVENT, id : response.payload.id, trigger : Date.now()},
         })
       }
       default:

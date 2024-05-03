@@ -20,10 +20,10 @@ module.exports = function webpacking(envVariables) {
     production: JSON.stringify('https://vfb.dev.metacell.us/'),
     development: JSON.stringify('http://localhost:8080/')
   }
-  
+
   // check environment mode
   const environment = env.mode === 'production' ? 'production' : 'development';
-  
+
   console.log('####################');
   console.log('####################');
   console.log('BUILD bundle with parameters:');

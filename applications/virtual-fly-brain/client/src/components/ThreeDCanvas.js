@@ -144,7 +144,7 @@ class ThreeDCanvas extends Component {
     const { cameraOptions } = this.state
     const { classes , mappedCanvasData, threeDObjects} = this.props
 
-    return <Box
+    return (<Box
       sx={{
         height: 'calc(100% - 0.5rem)',
         color: whiteColor,
@@ -171,7 +171,7 @@ class ThreeDCanvas extends Component {
           </>
         </div>
       ) : null }
-    </Box>
+    </Box>)
   }
 }
 

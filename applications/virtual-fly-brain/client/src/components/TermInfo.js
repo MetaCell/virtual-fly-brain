@@ -532,7 +532,7 @@ const TermInfo = ({ open, setOpen }) => {
                             <Button
                             sx={{ width: 75 }}
                             onClick={() => setDisplayColorPicker(!displayColorPicker)}>
-                            <RectangleIcon sx={{color : RGBAToHexA( getInstance()?.color)}}/><ArrowDown/>
+                            <RectangleIcon sx={{color: RGBAToHexA( getInstance()?.color), width: '1.3rem', height: '1.3rem', marginLeft: '0.2rem'}}/><ArrowDown/>
                           </Button>
                           </Tooltip>
                           { displayColorPicker ?

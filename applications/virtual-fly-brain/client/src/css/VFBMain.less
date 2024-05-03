@@ -1,6 +1,8 @@
 @import "./colors.less";
+@import url("https://use.fontawesome.com/releases/v5.13.0/css/all.css");
 @import (css) url('https://fonts.googleapis.com/css2?family=Barlow:wght@300&display=swap');
 @import (css) url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300&display=swap');
+
 @url: url("/");
 
 @-webkit-keyframes fadeIn {
@@ -105,7 +107,7 @@
     border-color: #11bffe;
     color: #ffffff;
     font-size: 20px;
-    font-family: 'Barlow', 'Khand', sans-serif;
+    font-family: 'Inter', sans-serif;
     border: 0px solid;
     background: #444141;
 	padding: 4px 5px 4px 5px;
@@ -384,7 +386,7 @@
 .flexlayout__tab_button--selected {
     color: @background_color_body_0;
     font-size: 16px;
-    font-family: 'Barlow Condensed', 'Khand', sans-serif;
+    font-family: 'Inter', sans-serif;
     background-color: #000000;
 
 }
@@ -407,7 +409,7 @@
     padding-right: 5px;
     font-weight: 300;
     font-size: 15px;
-    font-family: 'Barlow Condensed', 'Khand', sans-serif;
+    font-family: 'Inter', sans-serif;
 }
 
 .flexlayout__tab_button_textbox {
@@ -421,8 +423,12 @@
 }
 
 .flexlayout__tab_button_trailing:before {
-    content: "\F00D";
-    font-family: FontAwesome;
+    font-family: "Font Awesome 5 Free" !important;
+    content: "\f00f";
+    font-style: normal;
+    font-weight: normal;
+    font-size:40px;
+    color: white;
 }
 
 .flexlayout__tab_button_trailing:hover {
@@ -441,8 +447,19 @@
 }
 
 .flexlayout__tab_button_overflow:before {
-    content: "\F101";
-    font-family: FontAwesome;
+    // font-family: "Font Awesome 5 Free" !important;
+    content: ">>";
+    margin-right: 2px;
+    font-size:10px;
+    color: white;
+}
+
+.flexlayout__tab_button_overflow:hover:before {
+  // font-family: "Font Awesome 5 Free" !important;
+  content: ">>";
+  margin-right: 2px;
+  font-size:10px;
+  color: @primary_color;
 }
 
 .flexlayout__tab_button_overflow {
@@ -453,12 +470,15 @@
     padding-left:12px;
     border:none;
     font-size: 14px;
-    color:@primary_color;
+    color:white;
     background: transparent;
+    position: absolute;
+    top: 0;
+    z-index: 10;
 }
 
 .flexlayout__tab_button_overflow:hover {
-    color: @secondary_color
+    color: @primary_color
 }
 
 .flexlayout__tabset_header
@@ -511,8 +531,12 @@
 }
 
 .flexlayout__tab_toolbar_button-min:before {
-    content: "\F2D0";
-    font-family: FontAwesome;
+    font-family: "Font Awesome" !important;
+    content: "\f2d0";
+    font-style: normal;
+    font-weight: normal;
+    font-size:40px;
+    color: white;
 }
 
 .flexlayout__tab_toolbar_button-min {
@@ -531,8 +555,12 @@
 }
 
 .flexlayout__tab_toolbar_button-max:before {
-    content: "\F2D2";
-    font-family: FontAwesome;
+    font-family: "Font Awesome" !important;
+    content: "\f2d2";
+    font-size:40px;
+    font-style: normal;
+    font-weight: normal;
+    color: white;
 }
 
 .flexlayout__tab_toolbar_button-max {
@@ -557,7 +585,7 @@
     color: white;
     border: 1px solid;
     font-size: 14px;
-    font-family: 'Barlow Condensed', 'Khand', sans-serif;
+    font-family: 'Inter', sans-serif;
 }
 
 .flexlayout__popup_menu_item:hover {
@@ -666,7 +694,7 @@
     padding-right: 4px;
     font-weight: 300;
     font-size: 15px;
-    font-family: 'Barlow', 'Khand', sans-serif;
+    font-family: 'Inter', sans-serif;
     color: white;
 }
 
@@ -686,8 +714,12 @@
 }
 
 .flexlayout__border_button_trailing:before {
-    content: "\F00D";
-    font-family: FontAwesome;
+  font-family: "Font Awesome" !important;
+  content: "\f00d";
+  font-style: normal;
+  font-weight: normal;
+  font-size:40px;
+  color: white;
 }
 
 .flexlayout__border_button_trailing:hover {
@@ -782,7 +814,7 @@
     -ms-transition: opacity 0.5s;
     -o-transition: opacity 0.5s;
     transition: opacity 0.5s;
-    font-family: 'Barlow', 'Khand', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-size: 13px;
     font-weight: 300;
     min-width: 60px;
@@ -1581,7 +1613,7 @@
     display: none;
     white-space: pre-wrap;
     font-size:0px;
-    font-family: 'Barlow', 'Khand', sans-serif;
+    font-family: 'Inter', sans-serif;
     padding-top: 8px;
 }
 
@@ -1628,7 +1660,7 @@
   font-size: 14px;
   font-weight: 400;
   line-height: 128.571%;
-  // font-family: 'Barlow', 'Khand', sans-serif;
+  // font-family: 'Inter',sans-serif;
   border: 0px solid;
   background: transparent;
 }
@@ -1660,7 +1692,7 @@
 #treeError {
   color: #ffffff;
   font-size: 17px;
-  font-family: 'Barlow', 'Khand', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 @-moz-document url-prefix() {
@@ -1705,7 +1737,7 @@ img[class^="VFBQuickHelp-image-"] {
 }
 
 ._ribbonBlockTitleTerm_lfxw8_13 {
-  font-family: 'Inter',sans-serif;
+  font-family: 'Inter', sans-serif;
   font-weight: 400;
   font-size: 12px;
   line-height: 12px;

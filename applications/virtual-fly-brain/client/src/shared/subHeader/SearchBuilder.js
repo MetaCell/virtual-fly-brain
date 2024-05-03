@@ -18,8 +18,10 @@ import { addRecentSearch } from '../../reducers/actions/globals';
 import { useSelector, useDispatch } from 'react-redux'
 import { getQueries, deleteQuery, updateQueries } from '../../reducers/actions/queries';
 import { getUpdatedTags } from '../../utils/utils';
+import { debounce } from '@mui/material';
 
 const QUERIES = "Queries";
+const SEARCH_DEBOUNCE = 500;
 
 const {
   bottomNavBg,
@@ -130,9 +132,7 @@ const Listbox = styled('div')(
 `,
 );
 
-const searchResults = [
-
-];
+const searchResults = [];
 
 const colors_config = require("../../components/configuration/VFBColors").facets_annotations_colors;
 const facets_annotations_colors = getUpdatedTags(colors_config)
@@ -272,6 +272,10 @@ export default function SearchBuilder(props) {
     }
   }
 
+  const debouncedResults = React.useMemo(() => {
+    return debounce(handleSearch, SEARCH_DEBOUNCE);
+  }, []);
+
   const handleFocused = (focused) => {
     props.setFocused(focused);
   }
@@ -290,7 +294,7 @@ export default function SearchBuilder(props) {
     open: isOpen,
     options: searchResults,
     getOptionLabel: (option) => option?.label,
-    onInputChange : event => handleSearch(event.target.value)
+    onInputChange : event => debouncedResults(event.target.value)
   });
 
   React.useEffect(() => {

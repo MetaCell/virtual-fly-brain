@@ -145,7 +145,7 @@ class ListViewerControlsMenu extends Component {
   updateControlsConfiguration () {
     // Create deep clone of configuration
     var configuration = { ...controlsConfiguration };
-    let list = new Array();
+    let list = [];
     let self = this;
 
     let buttons = [...configuration.buttons];

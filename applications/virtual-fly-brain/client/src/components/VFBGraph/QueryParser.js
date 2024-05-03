@@ -8,7 +8,7 @@ export function queryParser (e) {
   data.forEach(({ graph }) => {
     graph.relationships.forEach(({ startNode, endNode, properties }) => {
       if (linksMap.get(startNode) === undefined) {
-        linksMap.set(startNode, new Array());
+        linksMap.set(startNode, []);
       }
 
       let newLink = true;

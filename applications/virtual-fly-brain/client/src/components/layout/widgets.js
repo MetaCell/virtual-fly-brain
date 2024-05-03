@@ -25,7 +25,7 @@ export const widgets = {
         name: "Template ROI Browser",
         component: "roiBrowser",
         panelName: "right",
-        hideOnClose: false,
+        hideOnClose: true,
         status: WidgetStatus.ACTIVE,
         props: { size: { height: 600, width: 600 } }
     },
@@ -35,8 +35,7 @@ export const widgets = {
         name: "Term Context",
         component: "termContext",
         panelName: "right",
-        enableClose: false,
-        hideOnClose: false,
+        hideOnClose: true,
         status: WidgetStatus.ACTIVE,
         props: { size: { height: 600, width: 300 } }
     },
@@ -46,8 +45,7 @@ export const widgets = {
         name: "Circuit Browser",
         component: "circuitBrowser",
         panelName: "right",
-        enableClose: false,
-        hideOnClose: false,
+        hideOnClose: true,
         status: WidgetStatus.ACTIVE,
         props: { size: { height: 600, width: 300 } }
     },
@@ -57,8 +55,7 @@ export const widgets = {
     name: "Layers",
     component: "listViewer",
     panelName: "right",
-    enableClose: false,
-    hideOnClose: false,
+    hideOnClose: true,
     status: WidgetStatus.ACTIVE,
     props: { size: { height: 600, width: 300 } }
     }

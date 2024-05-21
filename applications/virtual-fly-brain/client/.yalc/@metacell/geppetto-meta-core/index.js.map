@@ -1,1 +1,0 @@
-{"version":3,"file":"index.js","names":[],"sources":["../src/index.js"],"sourcesContent":["export { default as Resources } from './Resources';\n"],"mappings":";;;;;;;;;;;AAAA;AAAmD"}

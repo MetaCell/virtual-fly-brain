@@ -1,1 +1,0 @@
-{"version":3,"file":"IDraggable.js","names":[],"sources":["../../../../src/flex-layout/src/model/IDraggable.ts"],"sourcesContent":["export default interface IDraggable {\n    /** @hidden @internal */\n    isEnableDrag(): boolean;\n    /** @hidden @internal */\n    getName(): string | undefined;\n}\n"],"mappings":"","ignoreList":[]}

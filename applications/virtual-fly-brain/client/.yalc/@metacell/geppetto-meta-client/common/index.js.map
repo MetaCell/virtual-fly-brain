@@ -1,1 +1,0 @@
-{"version":3,"file":"index.js","names":[],"sources":["../../src/common/index.ts"],"sourcesContent":["export { createStore } from './store';\nexport * from './layout';"],"mappings":";;;;;;;;;;;;;;AAAA;AACA;AAAA;EAAA;EAAA;EAAA;EAAA;IAAA;IAAA;MAAA;IAAA;EAAA;AAAA"}

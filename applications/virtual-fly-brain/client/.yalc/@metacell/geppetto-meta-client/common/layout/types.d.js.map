@@ -1,1 +1,0 @@
-{"version":3,"file":"types.d.js","names":[],"sources":["../../../src/common/layout/types.d.ts"],"sourcesContent":["export interface BorderNode {\n    type: string;\n    location: string;\n    children: BorderNode[];\n    config?: {\n        isMinimizedPanel?: boolean;\n    };\n\n    getId(): string;\n\n    getConfig(): any;\n}"],"mappings":""}

@@ -1,8 +1,17 @@
 import { WidgetStatus } from "@metacell/geppetto-meta-client/common/layout/model";
 
+export const widgetsIDs = {
+    threeDCanvasWidgetID : 'threeDCanvasWidget',
+    stackViewerWidgetID : 'stackViewerWidget',
+    roiBrowserWidgetID : 'roiBrowserWidget',
+    termContextWidgetID : 'termContextWidget',
+    circuitBrowserWidgetID : 'circuitBrowserWidget',
+    listViewerWidgetID : 'listViewerWidget'
+};
+
 export const widgets = {
     threeDCanvasWidget : {
-        id: 'threeDCanvasWidget',
+        id: widgetsIDs.threeDCanvasWidgetID,
         name: "3D Canvas",
         component: "threeDCanvas",
         panelName: "left",
@@ -14,7 +23,7 @@ export const widgets = {
     },
 
     stackViewerWidget : {
-        id: 'stackViewerWidget',
+        id: widgetsIDs.stackViewerWidgetID,
         name: "Slice Viewer",
         component: "stackViewer",
         panelName: "right",
@@ -26,7 +35,7 @@ export const widgets = {
     },
 
     roiBrowserWidget : {
-        id: 'roiBrowserWidget',
+        id: widgetsIDs.roiBrowserWidgetID,
         name: "Template ROI Browser",
         component: "roiBrowser",
         panelName: "right",
@@ -38,7 +47,7 @@ export const widgets = {
     },
 
     termContextWidget : {
-        id: 'termContextWidget',
+        id: widgetsIDs.termContextWidgetID,
         name: "Term Context",
         component: "termContext",
         panelName: "right",
@@ -50,7 +59,7 @@ export const widgets = {
     },
 
     circuitBrowserWidget : {
-        id: 'circuitBrowserWidget',
+        id: widgetsIDs.circuitBrowserWidgetID,
         name: "Circuit Browser",
         component: "circuitBrowser",
         panelName: "right",
@@ -62,83 +71,14 @@ export const widgets = {
     },
 
     listViewerWidget : {
-    id: 'listViewerWidget',
-    name: "Layers",
-    component: "listViewer",
-    panelName: "right",
-    hideOnClose: true,
-    status: WidgetStatus.ACTIVE,
-    defaultPosition: 'RIGHT',
-    pos: 5,
-    props: { size: { height: 600, width: 300 } }
-    }
-}
-
-export const imagesWidgets = {
-    threeDCanvasWidget : {
-        id: 'threeDCanvasWidget',
-        name: "3D Canvas",
-        component: "threeDCanvas",
-        panelName: "left",
-        hideOnClose: true,
-        status: WidgetStatus.ACTIVE,
-        defaultPosition: 'RIGHT',
-        props: { size: { height: 600, width: 600 } }
-    },
-
-    stackViewerWidget : {
-        id: 'stackViewerWidget',
-        name: "Slice Viewer",
-        component: "stackViewer",
+        id: widgetsIDs.listViewerWidgetID,
+        name: "Layers",
+        component: "listViewer",
         panelName: "right",
         hideOnClose: true,
         status: WidgetStatus.ACTIVE,
         defaultPosition: 'RIGHT',
-        props: { size: { height: 600, width: 600 } }
-    },
-
-    roiBrowserWidget : {
-        id: 'roiBrowserWidget',
-        name: "Template ROI Browser",
-        component: "roiBrowser",
-        panelName: "right",
-        hideOnClose: true,
-        status: WidgetStatus.ACTIVE,
-        defaultPosition: 'RIGHT',
-        props: { size: { height: 600, width: 600 } }
-    },
-
-    termContextWidget : {
-        id: 'termContextWidget',
-        name: "Term Context",
-        component: "termContext",
-        panelName: "right",
-        hideOnClose: true,
-        status: WidgetStatus.ACTIVE,
-        defaultPosition: 'RIGHT',
-        props: { size: { height: 600, width: 300 } }
-    },
-
-    listViewerWidget : {
-    id: 'listViewerWidget',
-    name: "Layers",
-    component: "listViewer",
-    panelName: "right",
-    hideOnClose: true,
-    status: WidgetStatus.ACTIVE,
-    defaultPosition: 'RIGHT',
-    props: { size: { height: 600, width: 300 } }
-    }
-}
-
-export const circuitWidgets = {
-    circuitBrowserWidget : {
-        id: 'circuitBrowserWidget',
-        name: "Circuit Browser",
-        component: "circuitBrowser",
-        panelName: "right",
-        hideOnClose: true,
-        status: WidgetStatus.ACTIVE,
+        pos: 5,
         props: { size: { height: 600, width: 300 } }
     }
 }

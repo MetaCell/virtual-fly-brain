@@ -49,10 +49,6 @@ const CameraControls = (props) => {
     viewerId,
   } = props;
   const dispatch = useDispatch();
-  const pickerRef = useRef();
-  const developmentRef = useRef();
-  const layersRef = useRef();
-
   const widget = useSelector((state) => state.widgets[viewerId]);
   const widgetConfig = widget?.config;
 
@@ -178,7 +174,7 @@ const CameraControls = (props) => {
 
   const lastElementStyle = {
     ...commonStyle,
-    bottom: "-1.3125rem"
+    bottom: "-1.5125rem"
   }
 
   return (

@@ -14,6 +14,8 @@ import { setTermInfoOpened } from "../../reducers/actions/globals";
 import layout1 from "../../components/layout/layout1";
 import layout2 from "../../components/layout/layout2";
 import layout3 from "../../components/layout/layout3";
+import { WidgetStatus } from "@metacell/geppetto-meta-client/common/layout/model";
+import { getLayoutManagerInstance } from "@metacell/geppetto-meta-client/common/layout/LayoutManager";
 
 const { primaryBg, headerBoxShadow, headerBorderColor } = vars;
 
@@ -66,7 +68,12 @@ const Header = ({setBottomNav}) => {
   const menuHandler = (action, component) => {
     switch (action.handlerAction){
       case ACTIONS.SHOW_WIDGET: {
-        dispatch(updateWidget({ ...widgets[action.parameters[0]] }));
+        const newWidget = { ...widgets[action.parameters[0]] }
+        const layoutManager = getLayoutManagerInstance();
+        newWidget.defaultPanel = layoutManager.model.getRoot().getModel().getActiveTabset().getId();
+        newWidget.panelName = layoutManager.model.getRoot().getModel().getActiveTabset().getId();
+        newWidget.status = WidgetStatus.ACTIVE;
+        dispatch(updateWidget(newWidget));
         break;
       }
       case ACTIONS.SHOW_COMPONENT:

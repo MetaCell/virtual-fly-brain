@@ -6,9 +6,9 @@ import { getLayoutTypes } from './../actions/types/getLayoutTypes';
 import { getInstancesTypes } from '../actions/types/getInstancesTypes';
 import { get3DMesh } from '../actions/instances';
 import { widgets } from "./../../components/layout/widgets";
-import { minimized } from '../../components/layout/minimized';
 import { getGlobalTypes } from '../actions/types/GlobalTypes';
 import { add3DPlane, modify3DPlane } from '../../utils/instancesHelper';
+import { widgetsIDs } from './../../components/layout/widgets';
 
 const getWidget = (store, viewerId) => {
     const state = store.getState();
@@ -86,19 +86,6 @@ const vfbMiddleware = store => next => (action) => {
             next(action)
             break;
         }
-        case GeppettoActions.layoutActions.UPDATE_WIDGET : {
-            const layoutManager = getLayoutManagerInstance();
-            const widget = { ...getWidget(store, action.data.id)};
-            if (widget.status === WidgetStatus.MINIMIZED) {
-                widget.defaultPanel = layoutManager.model.getRoot().getModel().getActiveTabset().getId();
-                widget.panelName = layoutManager.model.getRoot().getModel().getActiveTabset().getId();
-                widget.status = WidgetStatus.ACTIVE;
-                next({type: action.type, data: widget});
-            } else {
-                next(action);
-            }
-            break;
-        }
         case getLayoutTypes.LOAD_CUSTOM_LAYOUT : {
             const importLayout = (input) => ({
                 type: GeppettoActions.IMPORT_APPLICATION_STATE,
@@ -114,6 +101,32 @@ const vfbMiddleware = store => next => (action) => {
                 localStorage.setItem('vfb_layout', JSON.stringify(store.getState()));
             }
             next(action);
+            break;
+        }
+        case getLayoutTypes.ACTIVATE_IMAGES :
+        case getLayoutTypes.ACTIVATE_CIRCUITS : {
+            const hiddenPanel = 'border_bottom';
+            const keys = [];
+            if (action.type === getLayoutTypes.ACTIVATE_CIRCUITS) {
+                keys.push(widgetsIDs.circuitBrowserWidgetID);
+            } else if (action.type === getLayoutTypes.ACTIVATE_IMAGES) {
+                keys.push(widgetsIDs.threeDCanvasWidgetID);
+                keys.push(widgetsIDs.stackViewerWidgetID);
+                keys.push(widgetsIDs.termContextWidgetID);
+                keys.push(widgetsIDs.roiBrowserWidgetID);
+                keys.push(widgetsIDs.listViewerWidgetID);
+            }
+            const layoutManager = getLayoutManagerInstance();
+            const activePanel = layoutManager.model.getRoot().getModel().getActiveTabset().getId();
+
+            Object.keys(widgets).forEach( key => {
+                if ( !keys.includes(key) ){
+                    next(updateWidget({ ...widgets[key], panelName: hiddenPanel, defaultPanel: hiddenPanel, status: WidgetStatus.MINIMIZED }));
+                } else {
+
+                    next(updateWidget({ ...widgets[key], panelName: activePanel, defaultPanel: activePanel, status: WidgetStatus.ACTIVE }));
+                }
+            });
             break;
         }
         default:

@@ -1,0 +1,1 @@
+{"version":3,"file":"layout.js","names":[],"sources":["../../../src/common/actions/layout.js"],"sourcesContent":["export * from '../layout/actions';"],"mappings":";;;;;AAAA;AAAA;EAAA;EAAA;EAAA;IAAA;IAAA;MAAA;IAAA;EAAA;AAAA"}

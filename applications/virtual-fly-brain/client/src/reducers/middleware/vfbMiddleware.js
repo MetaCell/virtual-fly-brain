@@ -1,8 +1,12 @@
 import { updateWidget, addWidget } from '@metacell/geppetto-meta-client/common/layout/actions';
+import * as GeppettoActions from '@metacell/geppetto-meta-client/common/actions';
+import { getLayoutManagerInstance } from "@metacell/geppetto-meta-client/common/layout/LayoutManager";
+import { WidgetStatus } from '@metacell/geppetto-meta-client/common/layout/model';
 import { getLayoutTypes } from './../actions/types/getLayoutTypes';
 import { getInstancesTypes } from '../actions/types/getInstancesTypes';
 import { get3DMesh } from '../actions/instances';
 import { widgets } from "./../../components/layout/widgets";
+import { minimized } from '../../components/layout/minimized';
 import { getGlobalTypes } from '../actions/types/GlobalTypes';
 import { add3DPlane, modify3DPlane } from '../../utils/instancesHelper';
 
@@ -10,7 +14,7 @@ const getWidget = (store, viewerId) => {
     const state = store.getState();
     const { widgets } = state;
     if (!widgets) {
-      return false;
+        return false;
     }
     const widget = widgets[viewerId];
     return !widget ? false : { ...widget };
@@ -48,7 +52,7 @@ const vfbMiddleware = store => next => (action) => {
             }
 
             if ( !objectFound ){
-                let params = { 
+                let params = {
                     "data" : action.payload.data?.data,
                     "textureURL" : action.payload.data?.textureUrl,
                     "id" : action.payload.data?.id,
@@ -71,7 +75,7 @@ const vfbMiddleware = store => next => (action) => {
             }
 
             if ( objectFound ){
-                let params = { 
+                let params = {
                     "data" : action.payload.data?.data,
                     "textureURL" : action.payload.data?.textureUrl,
                     "id" : action.payload.data?.id,
@@ -82,9 +86,39 @@ const vfbMiddleware = store => next => (action) => {
             next(action)
             break;
         }
+        case GeppettoActions.layoutActions.UPDATE_WIDGET : {
+            const layoutManager = getLayoutManagerInstance();
+            const widget = { ...getWidget(store, action.data.id)};
+            if (widget.status === WidgetStatus.MINIMIZED) {
+                widget.defaultPanel = layoutManager.model.getRoot().getModel().getActiveTabset().getId();
+                widget.panelName = layoutManager.model.getRoot().getModel().getActiveTabset().getId();
+                widget.status = WidgetStatus.ACTIVE;
+                next({type: action.type, data: widget});
+            } else {
+                next(action);
+            }
+            break;
+        }
+        case getLayoutTypes.LOAD_CUSTOM_LAYOUT : {
+            const importLayout = (input) => ({
+                type: GeppettoActions.IMPORT_APPLICATION_STATE,
+                data: input
+            });
+            next(importLayout(action.data));
+            break;
+        }
+        case getLayoutTypes.AUTOSAVE_LAYOUT :
+        case GeppettoActions.layoutActions.SET_LAYOUT :
+        case GeppettoActions.layoutActions.UPDATE_LAYOUT : {
+            if (store.getState().globalInfo.autoSaveLayout) {
+                localStorage.setItem('vfb_layout', JSON.stringify(store.getState()));
+            }
+            next(action);
+            break;
+        }
         default:
             next(action);
     }
-  };
-  
-  export default vfbMiddleware;
+};
+
+export default vfbMiddleware;

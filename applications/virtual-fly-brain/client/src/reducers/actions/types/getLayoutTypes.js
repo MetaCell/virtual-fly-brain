@@ -1,3 +1,5 @@
 export const getLayoutTypes = Object.freeze({
-  SHOW_WIDGET : 'SHOW_WIDGET'
+  SHOW_WIDGET : 'SHOW_WIDGET',
+  LOAD_CUSTOM_LAYOUT : 'LOAD_CUSTOM_LAYOUT',
+  AUTOSAVE_LAYOUT : 'AUTOSAVE_LAYOUT',
 })

@@ -57,7 +57,7 @@ class ThreeDCanvas extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if(this.props.event.trigger !== prevProps.event.trigger){ 
+    if(this.props.event.trigger !== prevProps.event.trigger){
       switch(this.props.event.action){
         // TODO : Remove and let custom camera handler control this action. Issue #VFB-136
         case getInstancesTypes.ZOOM_TO_INSTANCE : {
@@ -70,7 +70,7 @@ class ThreeDCanvas extends Component {
           break;
         }
         case getInstancesTypes.UPDATE_SKELETON:
-        // Called to create the Neuron skeleton using the THREED Renderer  
+        // Called to create the Neuron skeleton using the THREED Renderer
         this.showSkeleton(this.props.event.id, this.props.event.mode, this.props.event.visible, this.props.threeDObjects)
           break;
         default:
@@ -116,6 +116,11 @@ class ThreeDCanvas extends Component {
 
   componentWillUnmount () {
     document.removeEventListener('mousedown', this.handleClickOutside);
+  }
+
+  componentDidMount () {
+    document.addEventListener('mousedown', this.handleClickOutside);
+    this.setState({ mappedCanvasData: mapToCanvasData(this.props.allLoadedInstances) })
   }
 
   handleToggle () {
@@ -166,11 +171,11 @@ class ThreeDCanvas extends Component {
               backgroundColor={blackColor}
               onSelection={this.onSelection}
               onHoverListeners={{ 'hoverId': this.hoverHandler }}
-              dracoDecoderPath={'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/jsm/libs/draco/'}
+              dracoDecoderPath={'https://raw.githubusercontent.com/ddelpiano/three.js/dev/examples/jsm/libs/draco/'}
             />
           </>
         </div>
-      ) : null }
+      ) : <div></div> }
     </Box>)
   }
 }

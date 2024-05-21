@@ -1,0 +1,1 @@
+{"version":3,"file":"datasources.js","names":["DatasourceTypes","exports"],"sources":["../../../src/search/datasources/datasources.tsx"],"sourcesContent":["export enum DatasourceTypes {\n    CUSTOM = 'CUSTOM',\n    SOLRClient = 'SOLR'\n}"],"mappings":";;;;;;IAAYA,eAAe,GAAAC,OAAA,CAAAD,eAAA,0BAAfA,eAAe;EAAfA,eAAe;EAAfA,eAAe;EAAA,OAAfA,eAAe;AAAA","ignoreList":[]}

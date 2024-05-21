@@ -1,36 +1,37 @@
 
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector, useStore } from 'react-redux';
-import { Box, Button,Modal, useMediaQuery, useTheme, Typography, CircularProgress, Link } from "@mui/material";
 import TermInfo from "./TermInfo"
 import vars from "../theme/variables";
-import VFBDownloadContents from "./VFBDownloadContents/VFBDownloadContents";
-import VFBUploader from "./VFBUploader/VFBUploader";
-import QueryBuilder from "./queryBuilder";
 import ErrorDialog from "./ErrorDialog";
-import { getLayoutManagerInstance } from "@metacell/geppetto-meta-client/common/layout/LayoutManager";
-import { addWidget } from '@metacell/geppetto-meta-client/common/layout/actions';
+import QueryBuilder from "./queryBuilder";
+import MediaQuery from 'react-responsive';
+import VFBUploader from "./VFBUploader/VFBUploader";
+import { useDispatch, useSelector, useStore } from 'react-redux';
+import { widgets, imagesWidgets, circuitWidgets } from "./layout/widgets";
+import VFBDownloadContents from "./VFBDownloadContents/VFBDownloadContents";
+import { setWidgets } from '@metacell/geppetto-meta-client/common/layout/actions';
 import { setTermInfoOpened, setQueryComponentOpened } from './../reducers/actions/globals'
+import { getLayoutManagerInstance } from "@metacell/geppetto-meta-client/common/layout/LayoutManager";
 import { templateLoaded,  removeAllInstances, getInstanceByID } from './../reducers/actions/instances';
-import { widgets } from "./layout/widgets";
+import { Box, Button,Modal, useMediaQuery, useTheme, Typography, CircularProgress, Link } from "@mui/material";
 
 const {
   secondaryBg,
   headerBorderColor,
   tabActiveColor,
-  blackColor
+  primaryBg,
+  secondaryBtnColor
 } = vars;
 
 const tabsArr = [
   { id: 0, name: 'Term Info' },
   { id: 1, name: 'Images' },
-  { id: 2, name: 'Stack Viewers' },
-  { id: 3, name: 'Template ROI Browser' }
+  { id: 2, name: 'Circuits' },
 ]
 
 const MainLayout = ({ bottomNav, setBottomNav }) => {
   const theme = useTheme();
-  
+
   const sidebarOpen = useSelector(state => state.globalInfo.termInfoOpened)
   const [modalOpen, setModalOpen] = useState(false);
   const desktopScreen = useMediaQuery(theme.breakpoints.up('lg'));
@@ -88,12 +89,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
   }, [bottomNav]);
 
   useEffect(() => {
-    dispatch(addWidget(widgets.threeDCanvasWidget));
-    dispatch(addWidget(widgets.stackViewerWidget));
-    dispatch(addWidget(widgets.circuitBrowserWidget));
-    dispatch(addWidget(widgets.roiBrowserWidget));
-    dispatch(addWidget(widgets.termContextWidget));
-    dispatch(addWidget(widgets.listViewerWidget));
+    dispatch(setWidgets(widgets));
   }, [])
 
   const classes = {
@@ -141,6 +137,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
 
   const handleTabSelect = (id) => {
     setTab([id])
+    // TODO: add dispatch to set the layout to display in the tab.
   }
 
   const setSidebarOpen = (opened) => {
@@ -175,7 +172,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
 
   return (
     <>
-      {/*<MediaQuery maxWidth={1199}>
+      <MediaQuery maxWidth={1199}>
         {!bottomNav ? (
           <Box display='flex' sx={classes.tabs}>
             {tabsArr.map((el) => (
@@ -186,7 +183,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
           </Box>
         ) : null}
       </MediaQuery>
-      */}
+     
       <ErrorDialog display={modalError} message={modalErrorMessage}/>
       <Modal
         open={modalOpen}
@@ -201,8 +198,8 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
             The image you requested is aligned to another template. Click Okay
             to open in a new tab or Cancel to just view the image metadata.
           </Typography>
-          <Button variant="contained" color="primary" onClick={() => handleModalClose(misalignedTemplate, true )} target="_blank" href={window.location.origin + "/?id=" + misalignedTemplate}>Okay</Button>
-          <Button variant="outlined" color="secondary" onClick={() => handleModalClose(misalignedTemplate, false )}>Cancel</Button>
+          <Button variant="contained" color={primaryBg} onClick={() => handleModalClose(misalignedTemplate, true )} target="_blank" href={window.location.origin + "/?id=" + misalignedTemplate}>Okay</Button>
+          <Button variant="outlined" color={secondaryBtnColor} onClick={() => handleModalClose(misalignedTemplate, false )}>Cancel</Button>
         </Box>
       </Modal>
       <Box

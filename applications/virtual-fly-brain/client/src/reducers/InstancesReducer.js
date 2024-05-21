@@ -448,12 +448,12 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         }
 
         if ( objectFound ) return
-    
+
         return Object.assign( {}, state, {
           threeDObjects : [...state.threeDObjects, response.payload.data.plane]
         })
       }
-      case getGlobalTypes.MODIFY_SLICE_DISPLAY : {        
+      case getGlobalTypes.MODIFY_SLICE_DISPLAY : {
         return Object.assign( {}, state, {
           threeDObjects : [...state.threeDObjects]
         })

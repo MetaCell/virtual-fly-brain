@@ -1,12 +1,10 @@
 import React from 'react';
-import { Box } from "@mui/material";
-import StackViewerComponent from './StackViewerComponent';
+import vars from "../theme/variables";
 import { useEffect, useMemo, useRef } from 'react';
 import {useSelector, useDispatch} from 'react-redux'
-import SimpleInstance from "@metacell/geppetto-meta-core/model/SimpleInstance";
+import StackViewerComponent from './StackViewerComponent';
 import Resources from '@metacell/geppetto-meta-core/Resources';
-import vars from "../theme/variables";
-import { integerPropType } from '@mui/utils';
+import SimpleInstance from "@metacell/geppetto-meta-core/model/SimpleInstance";
 import { modifySliceDisplay, showSliceDisplay } from '../reducers/actions/globals';
 
 const {
@@ -105,7 +103,6 @@ const VFBStackViewer = (props) => {
     data?.forEach( stackViewerData => {
       if (stackViewerData?.stackInstance) {
         let keys = Object.keys(stackViewerData.metadata?.Images);
-
         const instancespec = {
           "eClass": "SimpleInstance",
           "id": stackViewerData.metadata?.Id,
@@ -150,9 +147,7 @@ const VFBStackViewer = (props) => {
     height: props.size.height,
     width: props.size.width,
     instances : instances };
-
   setStackData(newData);
-
   },[data]);
 
   // Update height and width of the stackwidget, happens when flex layout resizes tabs

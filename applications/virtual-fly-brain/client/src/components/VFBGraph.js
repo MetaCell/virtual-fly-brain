@@ -114,7 +114,7 @@ class VFBGraph extends Component {
         const instanceId = stateInstance.metadata.Id ;
         const instanceName = stateInstance.metadata.Name ;
         this.props.vfbGraph(getGraphTypes.UPDATE_GRAPH, stateInstance, -1, true, false);
-        this.queryResults(cypherQuery(instanceId), { id : instanceId, name : this.querySelection.label(instanceName) });
+        this.queryResults(cypherQuery(instanceId), { id : instanceId, name : this.querySelection?.label(instanceName) });
       }
 
       if (!this.resizeObserver && this.containerRef.current)

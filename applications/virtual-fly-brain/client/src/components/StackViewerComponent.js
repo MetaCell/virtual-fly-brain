@@ -1,12 +1,12 @@
 import React from 'react';
 import { Application, Container, Assets, Sprite, Text, TextStyle, utils, extensions, ExtensionType, Texture , Resource, BLEND_MODES } from 'pixi.js';
-var createClass = require('create-react-class');
 import { getInstanceByID, selectInstance } from '../reducers/actions/instances';
 import SLICE from "../assets/viewer/slice.svg";
 import ORTH from "../assets/viewer/orth.svg";
 import GLASS from '../assets/viewer/glass.jpg';
 import ORTHHOVER from "../assets/viewer/orth_hover.svg";
 import SLICEHOVER from '../assets/viewer/slice_hover.svg';
+const createClass = require('create-react-class');
 
 const SLICE_VIEWER_DISPLAY = "sliceViewerDisplay";
 
@@ -100,6 +100,7 @@ const rgbToHex = (color) => {
 
       // Setup PIXI Canvas in componentDidMount
       this.app = new Application({ width : this.props.width, height : this.props.height});
+      // this.app.renderer.backgroundColor = '#1a1a1a';
       // maintain full window size
       this.refs.stackCanvas?.getElementsByTagName("canvas")?.length == 0 && this.refs.stackCanvas?.appendChild(this.app.view);
 
@@ -154,11 +155,6 @@ const rgbToHex = (color) => {
       window.addEventListener? document.addEventListener('keydown', this.setShiftDown) : document.attachEvent('keydown', this.setShiftDown);
       window.addEventListener? document.addEventListener('keyup', this.setShiftUp) : document.attachEvent('keyup', this.setShiftUp);
 
-    },
-
-    componentWillUnmount : function () {
-      window.addEventListener? document.removeEventListener('keydown', this.setShiftDown, false) : document.attachEvent('keydown', this.setShiftDown);
-      window.addEventListener? document.removeEventListener('keyup', this.setShiftUp, false) : document.detachEvent('keyup', this.setShiftUp);
     },
 
     componentDidUpdate: function () {
@@ -224,6 +220,9 @@ const rgbToHex = (color) => {
       // this.refs.stackCanvas?.removeChild(this.app.view);
       // this.app.destroy(true,true);
       // this.app = null;
+
+      window.addEventListener? document.removeEventListener('keydown', this.setShiftDown, false) : document.attachEvent('keydown', this.setShiftDown);
+      window.addEventListener? document.removeEventListener('keyup', this.setShiftUp, false) : document.detachEvent('keyup', this.setShiftUp);
 
       if (this.props.canvasRef != null && this.props.canvasRef != undefined) {
         this.props.canvasRef.removeObject(this.state.stackViewerPlane);
@@ -595,7 +594,6 @@ const rgbToHex = (color) => {
                             that.state.objects = updatedObjects
                           }
                         } else {
-                          console.log("Shit down ", that.props.templateDomainNames[index])
                           if (typeof that.props.templateDomainIds !== 'undefined' && typeof that.props.templateDomainNames !== 'undefined' && typeof that.props.templateDomainIds[index] !== 'undefined' && typeof that.props.templateDomainNames[index] !== 'undefined' && that.props.templateDomainNames[index] !== null) {
                             let updatedObjects = [...that.state.objects];
                             if ( !updatedObjects?.find( o => o === that.props.templateDomainNames[index] ) ){
@@ -922,10 +920,10 @@ const rgbToHex = (color) => {
         const style = {
           fontSize: 16,
           fill: '#ffffff',
-          stroke: '#000000',
+          stroke: '#1a1a1a',
           strokeThickness: 2,
           dropShadow: true,
-          dropShadowColor: '#000000',
+          dropShadowColor: '#1a1a1a',
           dropShadowAngle: Math.PI / 6,
           dropShadowDistance: 2,
           wordWrap: true,
@@ -1085,7 +1083,6 @@ const rgbToHex = (color) => {
       if (this._isMounted) {
         // render the stage container (if the component is still mounted)
         this.app.renderer.render(this.disp);
-        // this.frame = requestAnimationFrame(this.animate);
       }
     },
 
@@ -1181,11 +1178,8 @@ const rgbToHex = (color) => {
      */
     render: function () {
       return (
-        < div
-          className="stack-canvas-container" ref="stackCanvas"
-          > </div>
-      )
-      ;
+        < div className="stack-canvas-container" ref="stackCanvas"> </div>
+      );
     }
   });
 

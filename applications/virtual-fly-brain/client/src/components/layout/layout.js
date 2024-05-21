@@ -4,12 +4,16 @@ export default {
     tabSetHeaderHeight: 28,
     tabSetTabStripHeight: 28,
     enableEdgeDock: false,
+    borderBarSize: 1,
+    borderEnableDrop: false,
   },
   borders: [
     {
       type: 'border',
       location: 'bottom',
-      children: [],
+      size: 1,
+      barSize: 1,
+      enableDrop: false,
       config: {
         isMinimizedPanel: true
       }
@@ -18,20 +22,23 @@ export default {
   layout: {
     type: "row",
     id: "root",
+    enableDeleteWhenEmpty: true,
     weight: 100,
     children: [{
       type: "tabset",
       id: "left",
       weight: 60,
-      enableDeleteWhenEmpty: false,
+      enableDeleteWhenEmpty: true,
       tabSetEnableMaximize: true,
+      children: []
     },
     {
       type: "tabset",
       id: "right",
       weight: 40,
-      enableDeleteWhenEmpty: false,
+      enableDeleteWhenEmpty: true,
       tabSetEnableMaximize: true,
+      children: []
     }]
   }
 };

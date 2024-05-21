@@ -5,3 +5,13 @@ export const showComponent = (componentID, config) => ({
   componentID,
   config
 })
+
+export const loadCustomLayout = (layout) => ({
+  type: getLayoutTypes.LOAD_CUSTOM_LAYOUT,
+  data: layout
+});
+
+export const saveCustomLayout = () => ({
+  type: getLayoutTypes.AUTOSAVE_LAYOUT,
+  data: undefined
+});

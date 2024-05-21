@@ -1,0 +1,1 @@
+{"version":3,"file":"index.js","names":["LoadingSpinnerBase"],"sources":["../../../../src/components/interface/LoadingSpinner/index.js"],"sourcesContent":["import LoadingSpinnerBase from './LoadingSpinner';\n\nexport default LoadingSpinnerBase;"],"mappings":";;;;;;AAAA;AAAkD;AAAA,eAEnCA,0BAAkB;AAAA"}

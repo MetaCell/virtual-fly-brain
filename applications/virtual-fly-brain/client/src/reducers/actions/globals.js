@@ -71,3 +71,10 @@ export const resetErrors = () => ({
   type: getGlobalTypes.RESET_ERRORS,
   payload : {}
 });
+
+export const cameraControlAction = (action) => ({
+  type : getGlobalTypes.CAMERA_EVENT,
+  payload : {
+    action : action
+  }
+});

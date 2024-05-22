@@ -260,7 +260,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
             md: 'visible'
           },
           height: {
-            xs: !bottomNav ? 'calc(100vh - 8.8125rem)' : 'calc(100vh - 6.0625rem)',
+            xs: !bottomNav ? '100%' : 'calc(100vh - 6.0625rem)',
             lg: 'calc(100vh - 6rem)'
           },
         }}

@@ -1,132 +1,27 @@
 /* eslint-disable no-undef */
 import { Typography } from '@mui/material';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Slide } from 'react-slideshow-image';
 import 'react-slideshow-image/dist/styles.css'
 import { ChevronLeft, ChevronRight } from '../../icons';
 import vars from '../../theme/variables';
 
-const { whiteColor, listHeadingColor } = vars;
-
-const spanStyle = {
-  padding: '5px',
-  background: '#efefef',
-  color: '#000000'
-}
-
-const imageStyle =  {
-  height: '100%',
-  width: '100%',
-  objectFit: 'cover'
-}
+const { listHeadingColor } = vars;
 
 const divStyle = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  backgroundSize: 'cover',
-  height: '400px'
+  backgroundSize: '100% 100%',
+  height: '320px',
+  borderRadius: '0.5rem',
+  backgroundPosition: 'center center'
 }
 
 const FullscreenSlider = (props) => {
-  const classes = {
-    root: {
-      height: '100%',
-      position: 'relative',
-      overflow: !props.allowFullscreen ? 'hidden' : 'visible',
-      borderRadius: !props.allowFullscreen ? '0.5rem' : '0',
-
-      '& img': {
-        display: 'block'
-      },
-
-      '& > div:first-child': {
-        height: '100%',
-        '& > div': {
-          height: '100%',
-        }
-      },
-      '& .react-slideshow-wrapper': {
-        height: '100%'
-      },
-
-      '& .react-slideshow-container': {
-        height: '100%',
-      },
-
-      '& .images-wrap': {
-        height: '100%',
-        width: '100% !important',
-        transform: "translate(0px) !important",
-        '& > div': {
-        height: '100%',
-        '& > div': {
-          height: '100%',
-        }
-      },
-      },
-
-      '& .react-slideshow-container .nav': {
-        zIndex: 10,
-        position: 'absolute',
-        cursor: 'pointer',
-        bottom: '0.5rem',
-        margin: 0,
-        display: 'flex',
-        alignItems: 'center',
-      },
-
-      '& .react-slideshow-container .nav svg': {
-        width: '1.25rem',
-        height: '1.25rem'
-      },
-
-      '& .react-slideshow-container .nav.disabled': {
-        opacity: 0.6
-      },
-
-      '& .react-slideshow-container .nav:first-of-type': {
-        left: '3.75rem'
-      },
-
-      '& .react-slideshow-container .nav:last-of-type': {
-        right: '3.75rem',
-
-        '& svg': {
-          transform: 'rotate(180deg)'
-        }
-      },
-
-      '& .react-slideshow-container + ul.indicators .each-slideshow-indicator::before': {
-        background: whiteColor,
-        position: 'static',
-        display: 'block',
-        width: '0.375rem',
-        height: '0.375rem'
-      },
-
-      '& .react-slideshow-container + ul.indicators li': {
-        width: 'auto',
-        height: 'auto',
-        padding: 0,
-        display: 'flex',
-
-      },
-
-      '& .react-slideshow-container + ul.indicators': {
-        margin: 0,
-        padding: 0,
-        position: 'absolute',
-        bottom: '0.938rem',
-        height: 'auto',
-        width: '100%',
-      }
-    }
-  };
-  const [slideImages, setSlideImages] = useState([]);
+  const {slideImages, setSlideImages, setSlideImageCurrentSlide} = props;
 
   useEffect( () => {
-    console.log("Layers ", props.examples)
     if(props?.examples) {
       setSlideImages(props?.examples.map( k => ({
         url: k.thumbnail,
@@ -136,14 +31,12 @@ const FullscreenSlider = (props) => {
     }
   }, [props.examples]);
 
+
   return (
-      <Slide canSwipe={ false } slidesToShow={ 1 } slidesToScroll={ 1 } infinite={ false } indicators={ true } prevArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } nextArrow={ <Typography><ChevronRight color={ listHeadingColor } /></Typography> } arrows={ true }>
-        {slideImages?.map((slideImage, index) => (
+      <Slide canSwipe={ false } slidesToShow={ 1 } slidesToScroll={ 1 } infinite={ false } indicators={ true } prevArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } nextArrow={ <Typography><ChevronRight color={ listHeadingColor } /></Typography> } arrows={ true } onChange={(slideIndex) => setSlideImageCurrentSlide(slideIndex)}>
+        {slideImages?.map((slideImage) => (
           <div key={slideImage.caption}>
-            <div
-              style={{ ...divStyle, 'backgroundImage': `url(${slideImage.url})` }} >
-              <span style={spanStyle}>{slideImage.caption}</span>
-            </div>
+            <div style={{ ...divStyle, 'backgroundImage': `url(${slideImage.url})` }}></div>
           </div>
         ))}
       </Slide>

@@ -294,4 +294,3 @@ export const zoomToInstance = async (id) => {
 export const templateLoaded = async (id, openTemplate) => {
   store.dispatch(templateLoadedMessage(id, openTemplate))
 }
-

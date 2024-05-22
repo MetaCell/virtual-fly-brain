@@ -2,6 +2,7 @@
 import { Box, IconButton, Tooltip } from '@mui/material';
 import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { cameraControlAction } from './../reducers/actions/globals'
 import UP from "../assets/viewer/up.svg";
 import DOWN from "../assets/viewer/down.svg";
 import LEFT from "../assets/viewer/left.svg";
@@ -50,29 +51,12 @@ const CameraControls = (props) => {
   } = props;
   const dispatch = useDispatch();
   const widget = useSelector((state) => state.widgets[viewerId]);
-  const widgetConfig = widget?.config;
-
-  const setRotationState = (rotationState) => {
-    const newWidgetConfig = {
-      ...widgetConfig,
-      rotate: rotationState,
-    };
-    dispatch(updateWidgetConfig(viewerId, newWidgetConfig));
-  };
-
-  useEffect(() => {
-    if (widgetConfig?.rotate === cameraControlsRotateState.STARTING) {
-      cameraControlsHandler(cameraControlsActions.ROTATE);
-      setRotationState(cameraControlsRotateState.ROTATING);
-    }
-    if (widgetConfig?.rotate === cameraControlsRotateState.STOPPING) {
-      cameraControlsHandler(cameraControlsActions.ROTATE);
-      setRotationState(cameraControlsRotateState.STOP);
-    }
-  }, [widgetConfig]);
 
   const handleClick = (event, value) => {
     cameraControlsHandler(value?.action);
+    if ( value?.action === cameraControlAction.WIREFRAME ){
+      dispatch(cameraControlAction(value?.action))
+    }
   };
   
   const controlsBottom = [

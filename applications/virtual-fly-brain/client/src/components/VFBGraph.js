@@ -94,14 +94,17 @@ class VFBGraph extends Component {
 
     const graphInstance = this.props.graphInstanceOnFocus ;
     const graphInstanceSelection = this.props.graphInstanceSelection
+    const stateInstanceOnFocus = this.props.stateInstanceOnFocus;
 
     if (graphInstanceSelection && graphInstance)
     {
       this.updateSelection(graphInstanceSelection, graphInstance.metadata.Id, graphInstance.metadata.Name )
+    } else if (stateInstanceOnFocus) {
+      this.updateSelection(stylingConfiguration.dropDownQueries[0], stateInstanceOnFocus.metadata.Id, stateInstanceOnFocus.metadata.Name )
     }
   }
 
-  componentDidUpdate () {
+  componentDidUpdate (prevProps, prevState) {
     const graphInstance = this.props.graphInstanceOnFocus ;
     const stateInstance = this.props.stateInstanceOnFocus
     const graphInstanceSelection = this.props.graphInstanceSelection
@@ -122,7 +125,6 @@ class VFBGraph extends Component {
         this.resizeObserver = new ResizeObserver(entries => {
           this.graphRef.current.ggv.current.zoomToFit();
         });
-    
         if (this.containerRef.current) {
           this.resizeObserver.observe(this.containerRef.current); // Start observing for size changes
         }
@@ -654,6 +656,7 @@ function mapStateToProps (state) {
   const graphInstanceOnFocus = state.graph.instanceOnFocus;
   const graphInstanceSelection = state.graph.selection;
   const stateInstanceOnFocus = state.instances.focusedInstance;
+  const firstIDLoaded = state.globalInfo.firstIDLoaded;
   const newProps = {
     graphQueryIndex : graphInstanceOnFocus && stateInstanceOnFocus ? 0 : -1,
     sync : state.graph.sync,

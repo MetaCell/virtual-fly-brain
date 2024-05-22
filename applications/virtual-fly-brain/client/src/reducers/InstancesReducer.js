@@ -189,7 +189,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
 
         return Object.assign({}, state, {
           allLoadedInstances : allLoadedInstances,
-          threeDObjects : threeDObjects, 
+          threeDObjects : threeDObjects,
           mappedCanvasData : getMappedCanvasData(allLoadedInstances),
           event : { action : getInstancesTypes.UPDATE_INSTANCES, id : response.payload.id, trigger : Date.now()},
           isLoading: false
@@ -448,12 +448,12 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         }
 
         if ( objectFound ) return
-    
+
         return Object.assign( {}, state, {
           threeDObjects : [...state.threeDObjects, response.payload.data.plane]
         })
       }
-      case getGlobalTypes.MODIFY_SLICE_DISPLAY : {        
+      case getGlobalTypes.MODIFY_SLICE_DISPLAY : {
         return Object.assign( {}, state, {
           threeDObjects : [...state.threeDObjects]
         })

@@ -25,7 +25,7 @@ class DropDownQueries extends Component {
 
     return (
       <div>
-        <Tooltip placement="right" title={`Refresh for ${self.props.stateInstanceOnFocus?.metadata.Name}`}>
+        <Tooltip placement="right" title={`Refresh for ${self.props.stateInstanceOnFocus?.metadata?.Name}`}>
           <LoopIcon key="tooltip-icon"
             onClick={ self.props.sync } style={{fontSize: '1.3rem', zIndex : "1000",
               cursor : "pointer",

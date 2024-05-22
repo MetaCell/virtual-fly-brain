@@ -1,16 +1,20 @@
 import { updateWidget, addWidget } from '@metacell/geppetto-meta-client/common/layout/actions';
+import * as GeppettoActions from '@metacell/geppetto-meta-client/common/actions';
+import { getLayoutManagerInstance } from "@metacell/geppetto-meta-client/common/layout/LayoutManager";
+import { WidgetStatus } from '@metacell/geppetto-meta-client/common/layout/model';
 import { getLayoutTypes } from './../actions/types/getLayoutTypes';
 import { getInstancesTypes } from '../actions/types/getInstancesTypes';
 import { get3DMesh } from '../actions/instances';
 import { widgets } from "./../../components/layout/widgets";
 import { getGlobalTypes } from '../actions/types/GlobalTypes';
 import { add3DPlane, modify3DPlane } from '../../utils/instancesHelper';
+import { widgetsIDs } from './../../components/layout/widgets';
 
 const getWidget = (store, viewerId) => {
     const state = store.getState();
     const { widgets } = state;
     if (!widgets) {
-      return false;
+        return false;
     }
     const widget = widgets[viewerId];
     return !widget ? false : { ...widget };
@@ -48,7 +52,7 @@ const vfbMiddleware = store => next => (action) => {
             }
 
             if ( !objectFound ){
-                let params = { 
+                let params = {
                     "data" : action.payload.data?.data,
                     "textureURL" : action.payload.data?.textureUrl,
                     "id" : action.payload.data?.id,
@@ -71,7 +75,7 @@ const vfbMiddleware = store => next => (action) => {
             }
 
             if ( objectFound ){
-                let params = { 
+                let params = {
                     "data" : action.payload.data?.data,
                     "textureURL" : action.payload.data?.textureUrl,
                     "id" : action.payload.data?.id,
@@ -82,9 +86,52 @@ const vfbMiddleware = store => next => (action) => {
             next(action)
             break;
         }
+        case getLayoutTypes.LOAD_CUSTOM_LAYOUT : {
+            const importLayout = (input) => ({
+                type: GeppettoActions.IMPORT_APPLICATION_STATE,
+                data: input
+            });
+            next(importLayout(action.data));
+            break;
+        }
+        case getLayoutTypes.AUTOSAVE_LAYOUT :
+        case GeppettoActions.layoutActions.SET_LAYOUT :
+        case GeppettoActions.layoutActions.UPDATE_LAYOUT : {
+            if (store.getState().globalInfo.autoSaveLayout) {
+                localStorage.setItem('vfb_layout', JSON.stringify(store.getState()));
+            }
+            next(action);
+            break;
+        }
+        case getLayoutTypes.ACTIVATE_IMAGES :
+        case getLayoutTypes.ACTIVATE_CIRCUITS : {
+            const hiddenPanel = 'border_bottom';
+            const keys = [];
+            if (action.type === getLayoutTypes.ACTIVATE_CIRCUITS) {
+                keys.push(widgetsIDs.circuitBrowserWidgetID);
+            } else if (action.type === getLayoutTypes.ACTIVATE_IMAGES) {
+                keys.push(widgetsIDs.threeDCanvasWidgetID);
+                keys.push(widgetsIDs.stackViewerWidgetID);
+                keys.push(widgetsIDs.termContextWidgetID);
+                keys.push(widgetsIDs.roiBrowserWidgetID);
+                keys.push(widgetsIDs.listViewerWidgetID);
+            }
+            const layoutManager = getLayoutManagerInstance();
+            const activePanel = layoutManager.model.getRoot().getModel().getActiveTabset().getId();
+
+            Object.keys(widgets).forEach( key => {
+                if ( !keys.includes(key) ){
+                    next(updateWidget({ ...widgets[key], panelName: hiddenPanel, defaultPanel: hiddenPanel, status: WidgetStatus.MINIMIZED }));
+                } else {
+
+                    next(updateWidget({ ...widgets[key], panelName: activePanel, defaultPanel: activePanel, status: WidgetStatus.ACTIVE }));
+                }
+            });
+            break;
+        }
         default:
             next(action);
     }
-  };
-  
-  export default vfbMiddleware;
+};
+
+export default vfbMiddleware;

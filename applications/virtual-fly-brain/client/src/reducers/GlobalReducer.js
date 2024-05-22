@@ -1,6 +1,7 @@
 import { Return } from '../icons';
 import { getGlobalTypes } from './actions/types/GlobalTypes';
 import { getInstancesTypes } from './actions/types/getInstancesTypes';
+import { getLayoutTypes } from './actions/types/getLayoutTypes';
 
 export const initialStateGlobalReducer = {
   templateID: "VFB_00101567",
@@ -11,7 +12,8 @@ export const initialStateGlobalReducer = {
   alignedTemplates : true,
   misalignedTemplate : null,
   misalignedIDs : {},
-  showSliceDisplay : {}
+  showSliceDisplay : {},
+  autoSaveLayout : false,
 };
 
 const GlobalReducer = (state = initialStateGlobalReducer, response) => {
@@ -83,7 +85,7 @@ const GlobalReducer = (state = initialStateGlobalReducer, response) => {
       case getGlobalTypes.SHOW_SLICE_DISPLAY : {
         return Object.assign( {}, state, {
           showSliceDisplay : {
-            params : { 
+            params : {
               data : response.payload.data?.data || state.showSliceDisplay.data,
               textureURL : response.payload.data?.textureUrl || state.showSliceDisplay.textureURL,
               id : response.payload.data?.id || state.showSliceDisplay.id,
@@ -96,7 +98,7 @@ const GlobalReducer = (state = initialStateGlobalReducer, response) => {
       case getGlobalTypes.MODIFY_SLICE_DISPLAY : {
         return Object.assign( {}, state, {
           showSliceDisplay : {
-            params : { 
+            params : {
               data : response.payload.data?.data || state.showSliceDisplay.data,
               textureURL : response.payload.data?.textureUrl || state.showSliceDisplay.textureURL,
               id : response.payload.data?.id || state.showSliceDisplay.id,
@@ -105,6 +107,11 @@ const GlobalReducer = (state = initialStateGlobalReducer, response) => {
             action : "modifySliceDisplay"
           }
         })
+      }
+      case getLayoutTypes.AUTOSAVE_LAYOUT : {
+        return Object.assign({}, state, {
+          autoSaveLayout: !state.autoSaveLayout
+        });
       }
       default:
         return state;

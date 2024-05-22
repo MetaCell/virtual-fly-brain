@@ -560,10 +560,8 @@ const TermInfo = ({ open, setOpen }) => {
                             disableAlpha={true}
                             onChangeComplete={(color, event) => {
                               let rgb;
-                              if (event.target.className == "saturation-black") {
-                                rgb = { r: color.rgb.r / 255, g: color.rgb.g / 255, b: color.rgb.b / 255, a: color.rgb.a }
-                                changeColor(termInfoData?.metadata?.Id, rgb)
-                              }
+                              rgb = { r: color.rgb.r / 255, g: color.rgb.g / 255, b: color.rgb.b / 255, a: color.rgb.a }
+                              changeColor(termInfoData?.metadata?.Id, rgb)
                             }}
                             style={{ zIndex: 10 }} />
                           : null

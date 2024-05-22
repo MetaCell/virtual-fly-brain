@@ -7,6 +7,7 @@ import CameraControls from './CameraControls';
 import {Button, Box} from '@mui/material'
 import Canvas from "@metacell/geppetto-meta-ui/3d-canvas/Canvas";
 import { getInstancesTypes } from '../reducers/actions/types/getInstancesTypes';
+import { mapToCanvasData } from "@metacell/geppetto-meta-ui/3d-canvas/utils/SelectionUtils";
 import SharkViewer, { swcParser } from '@janelia/sharkviewer';
 import * as THREE from 'three';
 import { add3DSkeleton, focusInstance, selectInstance } from '../reducers/actions/instances';
@@ -57,7 +58,7 @@ class ThreeDCanvas extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if(this.props.event.trigger !== prevProps.event.trigger){ 
+    if(this.props.event.trigger !== prevProps.event.trigger){
       switch(this.props.event.action){
         // TODO : Remove and let custom camera handler control this action. Issue #VFB-136
         case getInstancesTypes.ZOOM_TO_INSTANCE : {
@@ -76,7 +77,7 @@ class ThreeDCanvas extends Component {
           break;
         }
         case getInstancesTypes.UPDATE_SKELETON:
-        // Called to create the Neuron skeleton using the THREED Renderer  
+        // Called to create the Neuron skeleton using the THREED Renderer
         this.showSkeleton(this.props.event.id, this.props.event.mode, this.props.event.visible, this.props.threeDObjects)
           break;
         default:
@@ -122,6 +123,11 @@ class ThreeDCanvas extends Component {
 
   componentWillUnmount () {
     document.removeEventListener('mousedown', this.handleClickOutside);
+  }
+
+  componentDidMount () {
+    document.addEventListener('mousedown', this.handleClickOutside);
+    this.setState({ mappedCanvasData: mapToCanvasData(this.props.allLoadedInstances) })
   }
 
   handleToggle () {
@@ -180,7 +186,7 @@ class ThreeDCanvas extends Component {
     const { cameraOptions } = this.state
     const { classes , mappedCanvasData, threeDObjects} = this.props
 
-    return <Box
+    return (<Box
       sx={{
         height: 'calc(100% - 0.5rem)',
         color: whiteColor,
@@ -203,12 +209,12 @@ class ThreeDCanvas extends Component {
               onSelection={this.onSelection}
               selectionStrategy={(selectedMap) => this.selectionStrategy(this.props, selectedMap)}
               onHoverListeners={{ 'hoverId': this.hoverHandler }}
-              dracoDecoderPath={'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/jsm/libs/draco/'}
+              dracoDecoderPath={'https://raw.githubusercontent.com/ddelpiano/three.js/dev/examples/jsm/libs/draco/'}
             />
           </>
         </div>
-      ) : null }
-    </Box>
+      ) : <div></div> }
+    </Box>)
   }
 }
 

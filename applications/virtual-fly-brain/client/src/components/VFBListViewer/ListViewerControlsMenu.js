@@ -145,7 +145,7 @@ class ListViewerControlsMenu extends Component {
   updateControlsConfiguration () {
     // Create deep clone of configuration
     var configuration = { ...controlsConfiguration };
-    let list = new Array();
+    let list = [];
     let self = this;
 
     let buttons = [...configuration.buttons];
@@ -185,14 +185,12 @@ class ListViewerControlsMenu extends Component {
             ref={ref => this.colorPickerContainer = ref}
             style={{ left: this.state.pickerPosition }}>
             <ChromePicker
-              color={ matchInstance.color }
-              disableAlpha={true}
+              color={{ r:matchInstance.color.r*255, g:matchInstance.color.g*255, b:matchInstance.color.b*255, a:matchInstance.color.a }}
+              disableAlpha={false}
               onChangeComplete={ (color, event) => {
                 let rgb;
-                if ( event.target.className != 'hue-horizontal' ) {
-                  rgb = { r:color.rgb.r/255, g:color.rgb.g/255, b:color.rgb.b/255, a:color.rgb.a }
-                  changeColor(this.props.instance, rgb)
-                }
+                rgb = { r:color.rgb.r/255, g:color.rgb.g/255, b:color.rgb.b/255, a:color.rgb.a }
+                changeColor(this.props.instance, rgb)
               }}
               style={{ zIndex: 10 }}/>
           </div>

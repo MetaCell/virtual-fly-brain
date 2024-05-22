@@ -1,6 +1,6 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import useAutocomplete from '@mui/base/useAutocomplete';
+import { useAutocomplete } from '@mui/base/useAutocomplete';
 import CircularProgress from '@mui/material/CircularProgress';
 import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
@@ -18,8 +18,10 @@ import { addRecentSearch } from '../../reducers/actions/globals';
 import { useSelector, useDispatch } from 'react-redux'
 import { getQueries, deleteQuery, updateQueries } from '../../reducers/actions/queries';
 import { getUpdatedTags } from '../../utils/utils';
+import { debounce } from '@mui/material';
 
 const QUERIES = "Queries";
+const SEARCH_DEBOUNCE = 500;
 
 const {
   bottomNavBg,
@@ -89,7 +91,7 @@ const Listbox = styled('div')(
   background-color: ${bottomNavBg};
   overflow: auto;
   border-top: 0.0625rem solid ${primaryBg};
-  max-height: 17.375rem;
+  max-height: 24.375rem;
   border-radius: 0 0 0.5rem 0.5rem;
   z-index: 1;
   backdrop-filter: blur(0.625rem);
@@ -130,9 +132,7 @@ const Listbox = styled('div')(
 `,
 );
 
-const searchResults = [
-
-];
+const searchResults = [];
 
 const colors_config = require("../../components/configuration/VFBColors").facets_annotations_colors;
 const facets_annotations_colors = getUpdatedTags(colors_config)
@@ -247,9 +247,10 @@ export default function SearchBuilder(props) {
           }
           break;
       case "ERROR":
-        setRetrievingResults(false);    
+        setRetrievingResults(false);
       break;
       default:
+          // TODO: Handle this case
           console.log("This is a case not considered");
     }
 
@@ -271,6 +272,10 @@ export default function SearchBuilder(props) {
     }
   }
 
+  const debouncedResults = React.useMemo(() => {
+    return debounce(handleSearch, SEARCH_DEBOUNCE);
+  }, []);
+
   const handleFocused = (focused) => {
     props.setFocused(focused);
   }
@@ -289,7 +294,7 @@ export default function SearchBuilder(props) {
     open: isOpen,
     options: searchResults,
     getOptionLabel: (option) => option?.label,
-    onInputChange : event => handleSearch(event.target.value)
+    onInputChange : event => debouncedResults(event.target.value)
   });
 
   React.useEffect(() => {

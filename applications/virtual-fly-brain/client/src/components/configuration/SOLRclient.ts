@@ -51,7 +51,6 @@ export function getResultsSOLR ( searchString: string, returnResults: Function, 
 
       var worker = new Worker(blobUrl);
       worker.onmessage = function (e) {
-        console.log("Message ", e);
         switch(e.data.resultMessage) {
           case "OK":
             returnResults("OK", e.data.params.results, searchString);

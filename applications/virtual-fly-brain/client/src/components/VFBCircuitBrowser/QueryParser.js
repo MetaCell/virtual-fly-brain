@@ -6,7 +6,6 @@ export function queryParser (e) {
   let nodes = [], links = [];
   let graphData = e.data.params.results;
   let weight = e.data.params.weight;
-  console.log("Results ", e);
   // Reads graph data
   let data = graphData?.results[0]?.data;
   
@@ -32,11 +31,11 @@ export function queryParser (e) {
   let nodesMap = new Map();
   
   // Colors for labels
-  let legendLabels = new Array();
+  let legendLabels = [];
   // maps of links with their max hop
   let linksMaxHops = {};
   // Keeps track of what level nodes belong
-  let nodesInLevel = new Array();
+  let nodesInLevel = [];
   
   // Read relationshipY:index values
   relationshipsHops?.forEach( rel => {
@@ -51,7 +50,7 @@ export function queryParser (e) {
       // Keep track of the level where the node will be placed
       linksMaxHops[id] ? nodesInLevel[endNode] ? nodesInLevel[endNode] = linksMaxHops[id] : nodesInLevel[endNode] = linksMaxHops[id] : null;
       if (allRelationships.get(parseInt(startNode)) === undefined) {
-        allRelationships.set(parseInt(startNode), new Array());
+        allRelationships.set(parseInt(startNode), []);
       }
       if ( data[0]?.row[3].includes(parseInt(id)) ) {
         allRelationships?.get(parseInt(startNode))?.push( { target : parseInt(endNode), label : properties[e.data.params.configuration.resultsMapping.link.label], weight : properties[e.data.params.configuration.resultsMapping.link.weight] });
@@ -61,18 +60,15 @@ export function queryParser (e) {
     
   // Loop through nodes from query and create nodes for graph
   data.forEach(({ graph }) => {
-    console.log("Results ", graph.nodes);
     graph.nodes.forEach(({ id, properties }) => {
       let label = properties[e.data.params.configuration.resultsMapping.node.label];
       let title = properties[e.data.params.configuration.resultsMapping.node.title];
       let color = e.data.params.styling.defaultNodeDescriptionBackgroundColor;
-      let nodeColorLabels = new Array();
+      let nodeColorLabels = [];
       const labels = properties.uniqueFacets.sort();
       
       // Retrieve list of Label colors from configuration
       const colorLabels = Object.entries(e.data.params.styling.nodeColorsByLabel);
-      console.log("Labels ", labels);
-      console.log("Color labels, ", colorLabels);
       // Loop through color labels
       for (var i = 0; i < colorLabels.length ; i++ ) {
         let index = labels.indexOf(colorLabels[i][0]);
@@ -101,9 +97,6 @@ export function queryParser (e) {
         }
         
         const classLabel = idClassLabels[title];
-        console.log("nodeColorLabels ", nodeColorLabels);
-        console.log(" className ", Object.values(classLabel).join());
-
         n = {
           name :  label,
           id : parseID,
@@ -183,7 +176,7 @@ export function queryParser (e) {
       
       if ( row[3].includes(parseInt(id)) ) {
         if (linksMap.get(startNode) === undefined) {
-          linksMap.set(startNode, new Array());
+          linksMap.set(startNode, []);
         }
 
         let newLink = true;
@@ -202,7 +195,7 @@ export function queryParser (e) {
       } else {
         // Keep track of reverse links
         if (reverseMap.get(startNode) === undefined) {
-          reverseMap.set(startNode, new Array());
+          reverseMap.set(startNode, []);
         }
         reverseMap.get(startNode).push( { target : endNode, label : properties[e.data.params.configuration.resultsMapping.link.label], weight : properties[e.data.params.configuration.resultsMapping.link.weight] });
       }
@@ -248,10 +241,7 @@ export function queryParser (e) {
       }
     }
   });
-  
-  console.log("Nodes ", nodes);
-  console.log("Links ", links);
-  
+
   // Worker is done, notify main thread
   this.postMessage({ resultMessage: "OK", params: { results: { nodes, links }, colorLabels : legendLabels } });
 }

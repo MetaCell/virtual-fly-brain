@@ -50,10 +50,6 @@ const CameraControls = (props) => {
     viewerId,
   } = props;
   const dispatch = useDispatch();
-  const pickerRef = useRef();
-  const developmentRef = useRef();
-  const layersRef = useRef();
-
   const widget = useSelector((state) => state.widgets[viewerId]);
 
   const handleClick = (event, value) => {
@@ -162,7 +158,7 @@ const CameraControls = (props) => {
 
   const lastElementStyle = {
     ...commonStyle,
-    bottom: "-1.3125rem"
+    bottom: "-1.5125rem"
   }
 
   return (
@@ -202,7 +198,7 @@ const CameraControls = (props) => {
         }
       </Box>
 
-      <Box className="right position-relative" id="right-controls-id" sx={{marginTop: '3.5625rem', gap: '0.375rem', flexWrap: 'wrap', display: 'flex'}}>
+      <Box className="right position-relative" id="right-controls-id" sx={{marginTop: '3.5625rem', gap: '0.355rem', flexWrap: 'wrap', display: 'flex'}}>
         {
           controlsRight.map((value, index) => {
             let style = {};
@@ -210,7 +206,7 @@ const CameraControls = (props) => {
               style = firstElementStyle;
             }
             return (
-              <Tooltip title={value.tooltip} placement="top" key={`left_'${index}`}>
+              <Tooltip title={value.tooltip} placement="top" key={`right_'${index}`}>
                 <IconButton
                   style={ style }
                   sx={{padding: 0}}
@@ -235,7 +231,7 @@ const CameraControls = (props) => {
         {
           controlsBottom.map((value, index) => {
             return (
-              <Tooltip title={value.tooltip} placement="top" key={`left_'${index}`}>
+              <Tooltip title={value.tooltip} placement="top" key={`bottom_'${index}`}>
                 <IconButton
                   sx={{padding: 0}}
                   disableRipple

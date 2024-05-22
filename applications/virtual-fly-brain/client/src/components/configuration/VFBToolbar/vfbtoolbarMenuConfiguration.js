@@ -1,4 +1,5 @@
 import React from 'react';
+import { useDispatch, useSelector } from "react-redux";
 import vars from "../../../theme/variables";
 import { widgets } from "../../layout/widgets";
 const { primaryFont, whiteColor, tabActiveColor, primaryBg } = vars;
@@ -16,10 +17,13 @@ const ACTIONS = {
   CLICK_QUICK_HELP : 'CLICK_QUICK_HELP',
   HISTORY_MENU_INJECTOR : 'HISTORY_MENU_INJECTOR',
   SELECT_INSTANCE : 'SELECT_INSTANCE',
-  RUN_QUERY : 'RUN_QUERY'
+  RUN_QUERY : 'RUN_QUERY',
+  LOAD_LAYOUT : 'LOAD_LAYOUT',
+  LOAD_CUSTOM_LAYOUT : 'LOAD_CUSTOM_LAYOUT',
+  SAVE_LAYOUT : 'SAVE_LAYOUT',
 };
 
-export const toolbarMenu = {
+export const toolbarMenu = (autoSaveLayout) => { return {
   global: {
     buttonsStyle: {
       standard: {
@@ -201,7 +205,7 @@ export const toolbarMenu = {
         },
         {
           label: "Query",
-          icon: "fa fa-quora",
+          icon: "fa fa-clipboard-question",
           action: {
             handlerAction: ACTIONS.SHOW_COMPONENT,
             parameters: [2]
@@ -212,7 +216,7 @@ export const toolbarMenu = {
           icon: "fa fa-list",
           action: {
             handlerAction: ACTIONS.SHOW_WIDGET,
-            parameters: [widgets.listViewerWidget.id]
+            parameters: [widgets?.listViewerWidget?.id]
           }
         },
         {
@@ -228,15 +232,15 @@ export const toolbarMenu = {
           icon: "fa fa-cube",
           action: {
             handlerAction: ACTIONS.SHOW_WIDGET,
-            parameters: [widgets.threeDCanvasWidget.id]
+            parameters: [widgets?.threeDCanvasWidget?.id]
           }
         },
         {
           label: "Slice Viewer",
-          icon: "fa fa-sliders",
+          icon: "fa fa-layer-group",
           action: {
             handlerAction: ACTIONS.SHOW_WIDGET,
-            parameters: [widgets.stackViewerWidget.id]
+            parameters: [widgets?.stackViewerWidget?.id]
           }
         },
         {
@@ -244,7 +248,7 @@ export const toolbarMenu = {
           icon: "fa fa-indent",
           action: {
             handlerAction: ACTIONS.SHOW_WIDGET,
-            parameters: [widgets.roiBrowserWidget.id]
+            parameters: [widgets?.roiBrowserWidget?.id]
           }
         },
         {
@@ -252,15 +256,15 @@ export const toolbarMenu = {
           icon: "fa fa-sitemap",
           action: {
             handlerAction: ACTIONS.SHOW_WIDGET,
-            parameters: [widgets.termContextWidget.id]
+            parameters: [widgets?.termContextWidget?.id]
           }
         },
         {
           label: "Circuit Browser",
-          icon: "fa fa-connectdevelop",
+          icon: "fa fa-route",
           action: {
             handlerAction: ACTIONS.SHOW_WIDGET,
-            parameters: [widgets.circuitBrowserWidget.id]
+            parameters: [widgets?.circuitBrowserWidget?.id]
           }
         },
         {
@@ -770,42 +774,42 @@ export const toolbarMenu = {
       position: "bottom-start",
       list: [
         {
-          label: "Default layout 1",
-          icon: "",
+          label: "3D + EM viewers",
+          icon: "fa fa-window-restore",
           action: {
-            handlerAction: "",
+            handlerAction: ACTIONS.LOAD_LAYOUT,
+            parameters: ["layout1"]
+          }
+        },
+        {
+          label: "Hierarchy + circuit + data list",
+          icon: "fa fa-window-restore",
+          action: {
+            handlerAction: ACTIONS.LOAD_LAYOUT,
+            parameters: ["layout2"]
+          }
+        },
+        {
+          label: "3D + EM + data list",
+          icon: "fa fa-window-restore",
+          action: {
+            handlerAction: ACTIONS.LOAD_LAYOUT,
+            parameters: ["layout3"]
+          }
+        },
+        {
+          label: "Load user custom layout",
+          icon: "fa fa-window-restore",
+          action: {
+            handlerAction: ACTIONS.LOAD_CUSTOM_LAYOUT,
             parameters: [""]
           }
         },
         {
-          label: "Default layout 2",
-          icon: "",
+          label: autoSaveLayout ? "Disable layout autosaving" : "Enable layout autosaving",
+          icon: autoSaveLayout ? "fa fa-ban" : "fa fa-save",
           action: {
-            handlerAction: "",
-            parameters: [""]
-          }
-        },
-        {
-          label: "Default layout 3",
-          icon: "",
-          action: {
-            handlerAction: "",
-            parameters: [""]
-          }
-        },
-        {
-          label: "User custom layout",
-          icon: "",
-          action: {
-            handlerAction: "",
-            parameters: [""]
-          }
-        },
-        {
-          label: "Autosave disabled",
-          icon: "fa fa-twitter",
-          action: {
-            handlerAction: "",
+            handlerAction: ACTIONS.SAVE_LAYOUT,
             parameters: [""]
           }
         },
@@ -861,4 +865,4 @@ export const toolbarMenu = {
       ]
     }
   ]
-};
+}};

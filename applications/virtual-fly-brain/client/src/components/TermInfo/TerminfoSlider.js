@@ -12,7 +12,9 @@ const { whiteColor, listHeadingColor } = vars;
 const imageStyle =  {
   height: '100%',
   width: '100%',
-  objectFit: 'cover'
+  objectFit: 'scale-down',
+  backgroundColor: 'black',
+  cursor: 'pointer'
 }
 
 const TerminfoSlider = (props) => {
@@ -135,7 +137,7 @@ const TerminfoSlider = (props) => {
                   key={index}
                   style={imageStyle}
                   src={slideImage.url}
-                  onClick={() => imageClick(slideImage.id)} 
+                  onClick={() => imageClick(slideImage.id)}
                   alt={slideImage.caption}
                 />
             ))}

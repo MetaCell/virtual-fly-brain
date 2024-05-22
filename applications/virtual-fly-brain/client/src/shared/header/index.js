@@ -1,19 +1,23 @@
-import { Box, Button, Link } from "@mui/material";
-import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useEffect, useState } from "react";
 import vars from '../../theme/variables';
 import MediaQuery from 'react-responsive';
-import { History, Logo, Menu as MenuIcon, QueryStats } from "../../icons";
+import { Box, Button } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
 import Menu from '@metacell/geppetto-meta-ui/menu/Menu';
-import { toolbarMenu } from "../../components/configuration/VFBToolbar/vfbtoolbarMenuConfiguration";
-import { showComponent } from "../../reducers/actions/layout";
-import { WidgetStatus } from "@metacell/geppetto-meta-client/common/layout/model";
-import { selectInstance, focusInstance, getInstanceByID } from '../../reducers/actions/instances';
+import { History, Logo, Menu as MenuIcon, QueryStats } from "../../icons";
 import { getQueries, updateQueries } from '../../reducers/actions/queries';
+import { loadCustomLayout, saveCustomLayout } from "../../reducers/actions/layout";
+import { updateWidget } from "@metacell/geppetto-meta-client/common/layout/actions";
+import { selectInstance, focusInstance, getInstanceByID } from '../../reducers/actions/instances';
+import { toolbarMenu } from "../../components/configuration/VFBToolbar/vfbtoolbarMenuConfiguration";
 import { setTermInfoOpened } from "../../reducers/actions/globals";
+import layout1 from "../../components/layout/layout1";
+import layout2 from "../../components/layout/layout2";
+import layout3 from "../../components/layout/layout3";
+import { WidgetStatus } from "@metacell/geppetto-meta-client/common/layout/model";
+import { getLayoutManagerInstance } from "@metacell/geppetto-meta-client/common/layout/LayoutManager";
 
 const { primaryBg, headerBoxShadow, headerBorderColor } = vars;
-const ACTIONS = toolbarMenu.actions;
 
 const Header = ({setBottomNav}) => {
   const classes = {
@@ -33,16 +37,24 @@ const Header = ({setBottomNav}) => {
   const recentSearches = useSelector(state => state.globalInfo.recentSearches)
   const queries = useSelector(state => state.queries.queries)
   const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances)
+  const widgets = useSelector(state => state.widgets);
+  const firstIdLoaded = useSelector(state => state.globalInfo.firstIDLoaded);
+  let autoSaveLayout = useSelector(state => state.globalInfo.autoSaveLayout);
+  let menuConfig = toolbarMenu(autoSaveLayout);
+  const ACTIONS = menuConfig.actions;
 
   const handleLogoClick = () => {
+    // TODO: what to do here?
     console.log('Logo Clicked!')
   }
 
   const handleHistoryClick = () => {
+    // TODO: what to do here?
     console.log('History Clicked!')
   }
 
   const handleQueryStatsClick = () => {
+    // TODO: what to do here?
     console.log('QueryStats Clicked!')
   }
 
@@ -55,9 +67,15 @@ const Header = ({setBottomNav}) => {
    */
   const menuHandler = (action, component) => {
     switch (action.handlerAction){
-      case ACTIONS.SHOW_WIDGET:
-        dispatch(showComponent(action.parameters[0], { status : WidgetStatus.ACTIVE }))
+      case ACTIONS.SHOW_WIDGET: {
+        const newWidget = { ...widgets[action.parameters[0]] }
+        const layoutManager = getLayoutManagerInstance();
+        newWidget.defaultPanel = layoutManager.model.getRoot().getModel().getActiveTabset().getId();
+        newWidget.panelName = layoutManager.model.getRoot().getModel().getActiveTabset().getId();
+        newWidget.status = WidgetStatus.ACTIVE;
+        dispatch(updateWidget(newWidget));
         break;
+      }
       case ACTIONS.SHOW_COMPONENT:
         setBottomNav(action.parameters[0])
         break;
@@ -115,8 +133,49 @@ const Header = ({setBottomNav}) => {
         })
         return historyList;
       }
+      case ACTIONS.LOAD_LAYOUT:{
+        if (!firstIdLoaded) {
+          store.dispatch(getInstancesFailure('No instance loaded, wait please ...'));
+          break;
+        }
+        switch (action.parameters[0]){
+          case 'layout1':
+            dispatch(loadCustomLayout(layout1));
+            break;
+          case 'layout2':
+            dispatch(loadCustomLayout(layout2));
+            break;
+          case 'layout3':
+            dispatch(loadCustomLayout(layout3));
+            break;
+          default:
+            console.log('layout not implemented');
+        }
+        break;
+      }
+      case ACTIONS.SAVE_LAYOUT: {
+        dispatch(saveCustomLayout());
+        break;
+      }
+      case ACTIONS.LOAD_CUSTOM_LAYOUT: {
+        const vfb_layout = localStorage.getItem('vfb_layout');
+        if (vfb_layout !== null && vfb_layout !== undefined) {
+          const layout = {
+            version: Math.random(),
+            redux: JSON.parse(vfb_layout)
+          }
+          dispatch(loadCustomLayout(layout));
+        } else {
+          console.log('No layout saved');
+        }
+        break;
+      }
     }
   }
+
+  useEffect(() => {
+    menuConfig = toolbarMenu(autoSaveLayout);
+  }, [autoSaveLayout]);
 
   return (
     <Box
@@ -208,7 +267,7 @@ const Header = ({setBottomNav}) => {
           }}
         >
           <Menu
-            configuration={toolbarMenu}
+            configuration={menuConfig}
             menuHandler={menuHandler}
           />
         </Box>

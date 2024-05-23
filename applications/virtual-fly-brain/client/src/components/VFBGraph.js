@@ -108,16 +108,26 @@ class VFBGraph extends Component {
     const graphInstance = this.props.graphInstanceOnFocus ;
     const stateInstance = this.props.stateInstanceOnFocus
     const graphInstanceSelection = this.props.graphInstanceSelection
+
+    // Find FlexLayout div for VFBGraph. 
+    let componentFocused = document.getElementById("VFBGraph")
+    while( componentFocused?.className != "flexlayout__tab" && componentFocused != undefined) {
+      componentFocused = componentFocused?.parentNode;
+    }
+
     if ( graphInstance != undefined && graphInstanceSelection != undefined && graphInstanceSelection?.label(graphInstance?.metadata?.Name) != this.requestedQuery?.name )
     {
       this.updateSelection(graphInstanceSelection, graphInstance.metadata.Id, graphInstance.metadata.Name )
     } else {
-      if (graphInstance == undefined && stateInstance)
+      if ((graphInstance == undefined && stateInstance))
       {
         const instanceId = stateInstance.metadata.Id ;
         const instanceName = stateInstance.metadata.Name ;
         this.props.vfbGraph(getGraphTypes.UPDATE_GRAPH, stateInstance, -1, true, false);
         this.queryResults(cypherQuery(instanceId), { id : instanceId, name : this.querySelection?.label(instanceName) });
+      } else if ( componentFocused?.style?.display === "none" && graphInstance?.metadata?.Id !== stateInstance?.metadata?.Id) {
+        // If FlexLayout div exists but is hidden, we sync the graph
+        this.sync();
       }
 
       if (!this.resizeObserver && this.containerRef.current)

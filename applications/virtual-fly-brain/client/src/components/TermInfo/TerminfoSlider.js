@@ -128,7 +128,7 @@ const TerminfoSlider = (props) => {
       const example = examples.get(image);
       if (example.template !== reduxState.instances.launchTemplate?.metadata?.Id) {
         if(confirm("The image selected is aligned with another template, do you want to load it?")) {
-          window.open(window.location.origin + '/id=' + example.template + '&i=' + example.id,'_blank');
+          window.open(window.location.origin + '/?id=' + example.template + '&i=' + example.id,'_blank');
         }
       } else {
         getInstanceByID(image, true, true, true);

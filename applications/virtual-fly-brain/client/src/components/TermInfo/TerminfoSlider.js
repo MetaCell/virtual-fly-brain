@@ -1,11 +1,12 @@
 /* eslint-disable no-undef */
-import { Box, Button, Typography } from '@mui/material';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, } from 'react';
+import vars from '../../theme/variables';
 import { Slide } from 'react-slideshow-image';
 import 'react-slideshow-image/dist/styles.css'
+import { Box, Button, Typography } from '@mui/material';
+import { getInstanceByID } from '../../reducers/actions/instances';
 import { ChevronLeft, ChevronRight, FullScreen } from '../../icons';
-import vars from '../../theme/variables';
-import { focusInstance, getInstanceByID, selectInstance } from '../../reducers/actions/instances';
+import { useSelector } from 'react-redux';
 
 const { whiteColor, listHeadingColor } = vars;
 
@@ -75,11 +76,11 @@ const TerminfoSlider = (props) => {
       },
 
       '& .react-slideshow-container .nav:first-of-type': {
-        left: '3.75rem'
+        left: '2.75rem'
       },
 
       '& .react-slideshow-container .nav:last-of-type': {
-        right: '3.75rem',
+        right: '2.75rem',
 
         '& svg': {
           transform: 'rotate(180deg)'
@@ -113,19 +114,42 @@ const TerminfoSlider = (props) => {
     }
   };
   const [slideImages, setSlideImages] = useState([]);
+  const reduxState = useSelector(state => state);
 
   const imageClick = (image) => {
-    getInstanceByID(image, true, true, true);
+    if (image !== reduxState.instances.launchTemplate?.metadata?.Id) {
+      const templates = Object.keys(reduxState.instances.focusedInstance.metadata.Examples);
+      const examples = new Map();
+      templates.forEach(t => {
+        reduxState.instances.focusedInstance.metadata.Examples[t].forEach(e => {
+          examples.set(e.id, {...e, template: t});
+        });
+      });
+      const example = examples.get(image);
+      if (example.template !== reduxState.instances.launchTemplate?.metadata?.Id) {
+        if(confirm("The image selected is aligned with another template, do you want to load it?")) {
+          window.open(window.location.origin + '/id=' + example.template + '&i=' + example.id,'_blank');
+        }
+      } else {
+        getInstanceByID(image, true, true, true);
+      }
+    }
   }
 
   useEffect( () => {
     if(props?.examples) {
+      const images = [];
       const keys = Object.keys(props.examples);
-      setSlideImages(keys.map( k => ({
-        url: props.examples[k][0].thumbnail,
-        caption: props.examples[k][0].label,
-        id : k
-      })));
+      keys.forEach( k => {
+        props.examples[k].forEach( e => {
+          images.push({
+            url: e.thumbnail,
+            caption: e.label,
+            id: e.id
+          });
+        });
+      });
+      setSlideImages(images);
     }
   }, [props.examples]);
 

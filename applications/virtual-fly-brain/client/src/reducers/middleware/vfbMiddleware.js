@@ -91,7 +91,21 @@ const vfbMiddleware = store => next => (action) => {
                 type: GeppettoActions.IMPORT_APPLICATION_STATE,
                 data: input
             });
-            next(importLayout(action.data));
+            const currentState = store.getState();
+            const newState = {
+                version: action.data.version,
+                redux: {
+                    ...currentState,
+                    client: { ...action.data.redux.client },
+                    instances: {
+                        ...currentState.instances,
+                        allLoadedInstances: currentState.instances.allLoadedInstances.map( i => i),
+                    },
+                    layout: { ...action.data.redux.layout },
+                    widgets: { ...action.data.redux.widgets }
+                }
+            };
+            next(importLayout(newState));
             break;
         }
         case getLayoutTypes.AUTOSAVE_LAYOUT :
@@ -123,7 +137,6 @@ const vfbMiddleware = store => next => (action) => {
                 if ( !keys.includes(key) ){
                     next(updateWidget({ ...widgets[key], panelName: hiddenPanel, defaultPanel: hiddenPanel, status: WidgetStatus.MINIMIZED }));
                 } else {
-
                     next(updateWidget({ ...widgets[key], panelName: activePanel, defaultPanel: activePanel, status: WidgetStatus.ACTIVE }));
                 }
             });

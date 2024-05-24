@@ -164,8 +164,6 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
     if ( openTemplate) {
       templateLoaded(id, openTemplate);
       templateRef = window.location.href.replace(id + ",", "")
-    }else {
-      getInstanceByID(id, false, true, false, false)
     }
     setModalOpen(false)
   }
@@ -230,8 +228,8 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
             The image you requested is aligned to another template. Click Okay
             to open in a new tab or Cancel to just view the image metadata.
           </Typography>
-          <Button variant="contained" color={primaryBg} onClick={() => handleModalClose(misalignedTemplate, true )} target="_blank" href={window.location.origin + "/?id=" + misalignedTemplate}>Okay</Button>
-          <Button variant="outlined" color={secondaryBtnColor} onClick={() => handleModalClose(misalignedTemplate, false )}>Cancel</Button>
+          <Button variant="contained" color={"primary"} onClick={() => handleModalClose(misalignedTemplate, true )} target="_blank" href={window.location.origin + "/?id=" + misalignedTemplate}>Okay</Button>
+          <Button variant="outlined" color={"secondary"} onClick={() => handleModalClose(misalignedTemplate, false )}>Cancel</Button>
         </Box>
       </Modal>
       <Box

@@ -1,0 +1,73 @@
+name: Build and Push VFB Containers
+
+on:
+  push:
+    branches: [ "main", "master", "development" ]
+  pull_request:
+    branches: [ "main", "master", "development" ]
+  # Allow manual trigger
+  workflow_dispatch:
+
+env:
+  REGISTRY: docker.io
+  BACKEND_IMAGE_NAME: virtualflybrain/vfb-backend
+  FRONTEND_IMAGE_NAME: virtualflybrain/vfb-frontend
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Log in to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ env.BACKEND_IMAGE_NAME }}
+            ${{ env.FRONTEND_IMAGE_NAME }}
+          tags: |
+            type=schedule
+            type=ref,event=branch
+            type=ref,event=tag
+            type=ref,event=pr
+            type=sha
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push Backend image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile.backend
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ env.BACKEND_IMAGE_NAME }}:latest,${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=registry,ref=${{ env.BACKEND_IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ env.BACKEND_IMAGE_NAME }}:buildcache,mode=max
+
+      - name: Build and push Frontend image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile.frontend
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ env.FRONTEND_IMAGE_NAME }}:latest,${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=registry,ref=${{ env.FRONTEND_IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ env.FRONTEND_IMAGE_NAME }}:buildcache,mode=max

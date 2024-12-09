@@ -1,42 +1,106 @@
 
 import React, { useEffect, useState } from "react";
-import MediaQuery from 'react-responsive';
-import { Box, Button, useMediaQuery, useTheme } from "@mui/material";
-import ThreeDCanvas from "./ThreeDCanvas"
 import TermInfo from "./TermInfo"
-import Images from "./Images";
-import StackViewer from './StackViewer';
 import vars from "../theme/variables";
-import SideBar from "../shared/sidebar";
-import Circuit from "./Circuit";
-import StackViewerComponent from "./StackViewerComponent";
+import ErrorDialog from "./ErrorDialog";
 import QueryBuilder from "./queryBuilder";
+import MediaQuery from 'react-responsive';
+import VFBUploader from "./VFBUploader/VFBUploader";
+import { useDispatch, useSelector, useStore } from 'react-redux';
+import { widgets } from "./layout/widgets";
+import VFBDownloadContents from "./VFBDownloadContents/VFBDownloadContents";
+import { setWidgets } from '@metacell/geppetto-meta-client/common/layout/actions';
+import { setTermInfoOpened, setQueryComponentOpened } from './../reducers/actions/globals'
+import { getLayoutManagerInstance } from "@metacell/geppetto-meta-client/common/layout/LayoutManager";
+import { templateLoaded,  removeAllInstances, getInstanceByID } from './../reducers/actions/instances';
+import { Box, Button,Modal, useMediaQuery, useTheme, Typography, CircularProgress, Link } from "@mui/material";
+import { activateCircuits, activateImages } from "../reducers/actions/layout";
 
 const {
   secondaryBg,
   headerBorderColor,
   tabActiveColor,
-  blackColor
+  primaryBg,
+  secondaryBtnColor
 } = vars;
 
 const tabsArr = [
   { id: 0, name: 'Term Info' },
   { id: 1, name: 'Images' },
   { id: 2, name: 'Circuits' },
-  { id: 3, name: 'Stack Viewer' }
 ]
 
 const MainLayout = ({ bottomNav, setBottomNav }) => {
   const theme = useTheme();
-
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const sidebarOpen = useSelector(state => state.globalInfo.termInfoOpened)
+  const [modalOpen, setModalOpen] = useState(false);
   const desktopScreen = useMediaQuery(theme.breakpoints.up('lg'));
-  const defaultActiveTab = desktopScreen ? [0, 1, 2, 3] : [0];
+  const defaultActiveTab = desktopScreen ? [0, 1, 2, 3, 4] : [0];
   const [tab, setTab] = useState([]);
+  const [LayoutComponent, setLayoutComponent] = useState(undefined);
+  const [isLayoutMobile, setIsLayoutMobile] = useState(window.innerWidth < 1200);
+  const misalignedTemplate = useSelector(state => state.globalInfo.misalignedTemplate)
+  const alignedTemplates = useSelector( state => state.globalInfo.alignedTemplates)
+  const dispatch = useDispatch();
+  let templateRef = window.location.origin + "?id=" + misalignedTemplate;
+  const store = useStore();
+
+  //global reducers errors
+  const instancesError = useSelector(state => state.instances.error);
+  const instancesErrorMessage = useSelector(state => state.instances.errorMessage);
+  const queriesError = useSelector(state => state.queries.error);
+  const queriesErrorMessage = useSelector(state => state.queries.errorMessage);
+  const allLoadedInstances = useSelector( state => state.instances.allLoadedInstances);
+
+  const modalError = instancesError || queriesError;
+  const modalErrorMessage = instancesErrorMessage || queriesErrorMessage;
+
+  const handleMediaQueryChange = (matches) => {
+    if (!matches) {
+      setIsLayoutMobile(false);
+    } else {
+      setIsLayoutMobile(true);
+      setTab([0]);
+    }
+  };
 
   useEffect(() => {
     setTab(defaultActiveTab)
   }, [desktopScreen])
+
+  useEffect(() => {
+    setModalOpen(!alignedTemplates)
+  }, [alignedTemplates])
+
+  useEffect(() => {
+    if (LayoutComponent === undefined) {
+      const myManager = getLayoutManagerInstance();
+      if (myManager) {
+        myManager.enableMinimize = true
+        setLayoutComponent(myManager.getComponent());
+      }
+    }
+  }, [store])
+
+  const queryComponentOpened = useSelector( state => state.globalInfo?.queryComponentOpened );
+
+  useEffect( () => {
+    if ( queryComponentOpened && bottomNav == undefined ){
+      setBottomNav(2)
+    } else if ( !queryComponentOpened ) {
+      setBottomNav(undefined)
+    }
+  }, [queryComponentOpened]);
+
+  useEffect( () => {
+    if ( bottomNav === 2 ){
+      //dispatch(setQueryComponentOpened(true));
+    }
+  }, [bottomNav]);
+
+  useEffect(() => {
+    dispatch(setWidgets(widgets));
+  }, [])
 
   const classes = {
     tabs: {
@@ -68,31 +132,77 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
         // display: 'flex'
       }
     },
+    modalStyle : {
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      width: 400,
+      bgcolor: 'background.paper',
+      border: '2px solid #000',
+      boxShadow: 24,
+      p: 4,
+    }
   }
 
   const handleTabSelect = (id) => {
-    setTab([id])
+    setTab([id]);
+
+    if (id === 1) {
+      dispatch(activateImages());
+    } else if (id === 2) {
+      dispatch(activateCircuits());
+    }
   }
 
-  const tabContent = (
+  const setSidebarOpen = (opened) => {
+    dispatch(setTermInfoOpened(opened))
+  }
+
+
+  const handleModalClose = (id, openTemplate) => {
+    if ( openTemplate) {
+      templateLoaded(id, openTemplate);
+      templateRef = window.location.href.replace(id + ",", "")
+    }
+    setModalOpen(false)
+  }
+
+  const tabContent = isLayoutMobile ? (
     <>
       {tab.includes(0) && (
-        <SideBar open={sidebarOpen} setOpen={setSidebarOpen} />
+        <TermInfo open={sidebarOpen} setOpen={setSidebarOpen} />
       )}
 
       {tab.includes(1) && (
-        <ThreeDCanvas />
+        <Box>
+          {LayoutComponent === undefined ? <CircularProgress/> : <LayoutComponent/>}
+        </Box>
       )}
 
-      {/* {tab.includes(2) && (
-        <Circuit />
-      )} */}
+      {tab.includes(2) && (
+        <Box>
+          {LayoutComponent === undefined ? <CircularProgress/> : <LayoutComponent/>}
+        </Box>
+      )}
     </>
-  )
+  ) : (
+    <>
+      {tab.includes(0) && (
+        <TermInfo open={sidebarOpen} setOpen={setSidebarOpen} />
+      )}
+
+      {tab.includes(1) && (
+        <Box>
+          {LayoutComponent === undefined ? <CircularProgress/> : <LayoutComponent/>}
+        </Box>
+      )}
+    </>
+  );
 
   return (
     <>
-      <MediaQuery maxWidth={1199}>
+      <MediaQuery maxWidth={1199} onChange={handleMediaQueryChange}>
         {!bottomNav ? (
           <Box display='flex' sx={classes.tabs}>
             {tabsArr.map((el) => (
@@ -104,6 +214,24 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
         ) : null}
       </MediaQuery>
 
+      <ErrorDialog display={modalError} message={modalErrorMessage}/>
+      <Modal
+        open={modalOpen}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={classes.modalStyle}>
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Template Alignation
+          </Typography>
+          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+            The image you requested is aligned to another template. Click Okay
+            to open in a new tab or Cancel to just view the image metadata.
+          </Typography>
+          <Button variant="contained" color={"primary"} onClick={() => handleModalClose(misalignedTemplate, true )} target="_blank" href={window.location.origin + "/?id=" + misalignedTemplate}>Okay</Button>
+          <Button variant="outlined" color={"secondary"} onClick={() => handleModalClose(misalignedTemplate, false )}>Cancel</Button>
+        </Box>
+      </Modal>
       <Box
         display='flex'
         flexWrap='wrap'
@@ -122,27 +250,39 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
           },
           pb: {
             xs: 7,
+            sm: 9,
             lg: 0
           },
           overflow: {
             xs: 'auto',
+            md: 'visible'
           },
           height: {
-            xs: !bottomNav ? 'calc(100vh - 8.8125rem)' : 'calc(100vh - 6.0625rem)',
-            lg: 'calc(100vh - 5.75rem)'
+            xs: !bottomNav ? '100%' : 'calc(100vh - 6.0625rem)',
+            lg: 'calc(100vh - 6rem)'
           },
         }}
       >
-
         {desktopScreen ? (
           <>
             {tabContent}
-            {bottomNav === 2 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} />}
+            {bottomNav === 0 && < VFBUploader open={true} setBottomNav={setBottomNav} />}
+            {bottomNav === 1 && <VFBDownloadContents open={true} setBottomNav={setBottomNav} />}
+            {bottomNav === 2 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} tabSelected={0}/>}
+            {bottomNav === 4 && ( allLoadedInstances?.length > 1 && removeAllInstances())}
+            {bottomNav === 5 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} tabSelected={1}/>}
           </>
         ) : (
-            <>
-              {!bottomNav ? tabContent : bottomNav === 2 ? <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} /> : null}
-            </>
+          <>
+            {
+              bottomNav != 2 && tabContent
+            }
+            {bottomNav === 0 && <VFBUploader open={true} setBottomNav={setBottomNav} />}
+            {bottomNav === 1 && <VFBDownloadContents open={true} setBottomNav={setBottomNav} />}
+            {bottomNav === 2 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} tabSelected={0}/>}
+            {bottomNav === 4 && ( allLoadedInstances?.length > 1 && removeAllInstances())}
+            {bottomNav === 5 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} tabSelected={1}/>}
+          </>
         )}
       </Box>
     </>

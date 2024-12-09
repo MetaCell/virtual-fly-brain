@@ -5,6 +5,7 @@ const vars = {
   outlinedBtnBorderColor: '#707070',
   outlinedBtnTextColor: 'rgba(255, 255, 255, 0.8)',
   secondaryBg: '#3A3A3A',
+  secondaryBtnColor: '#0AB7FE',
   searchBoxBg: '#505050',
   listBg: 'rgba(58, 58, 58, 1)',
   shortcutBg: 'rgba(255, 255, 255, 0.1)',
@@ -16,9 +17,9 @@ const vars = {
   popperShadow: '0px 4px 94px rgba(0, 0, 0, 0.2), 0px 0px 80px rgba(0, 0, 0, 0.6)',
   filterPopoverShadow: '0px 0px 80px rgba(0, 0, 0, 0.6)',
   filterPopoverBg: 'rgba(80, 80, 80, 0.8)',
-  chipPrimaryColor: '#FFFFB3',
-  chipSecondaryColor: '#9F843C',
-  carouselBg: 'linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), #222222',
+  chipPrimaryColor: '#68A04E',
+  chipSecondaryColor: '#A0984E',
+  carouselBg: 'linear-gradient(0deg, rgba(26, 26, 26, 0.50) 0%, rgba(26, 26, 26, 0.50) 100%), #222',
   queryBorderColor: '#5D5D5D',
   listHeadingColor: '#A0A0A0',
   descriptionBg: 'linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), #222222',
@@ -39,6 +40,11 @@ const vars = {
   btnTextHoverColor: 'rgba(255, 255, 255, 0.04)',
   queryChipBg: 'rgba(10, 183, 254, 0.8)',
   queryBuilderBg: 'rgba(34, 34, 34, 0.80)',
+  btnDisabledColor: 'rgba(255, 255, 255, 0.4)',
+  sliderRailBgColor: '#EEF9FF',
+  dialogBgColor: 'rgba(58, 58, 58, 0.80)',
+  dialogContentTextColor: 'rgba(255, 255, 255, 0.80)',
+  dialogBoxShadow: '0px 0px 80px 0px rgba(0, 0, 0, 0.60), 0px 4px 94px 0px rgba(0, 0, 0, 0.20)'
 };
 
 export default vars;

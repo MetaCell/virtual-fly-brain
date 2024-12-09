@@ -1,92 +1,31 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { CheckBoxDefault, CheckBoxGreen, CheckBoxRed, CleaningServices, FilterIcon, Tick, Undo } from "../../icons";
 import { Box, Button, Checkbox, FormControlLabel, FormGroup, IconButton, Popper, Typography } from "@mui/material";
 import vars from "../../theme/variables";
 
-const filterChipColors = [
-  '#6D4EA0',
-  '#4E5BA0',
-  '#4E91A0',
-  '#4EA082',
-  '#4EA060',
-  '#68A04E',
-  '#7CA04E',
-  '#A0984E',
-  '#A07A4E',
-  '#A0624E',
-  '#A04E6C',
-  '#994EA0',
-  '#A04E4E'
-];
-
-const DUMMY_FILTERS = [
-  {
-    id: 0,
-    label: 'Adult'
-  },
-  {
-    id: 1,
-    label: 'Image'
-  },
-  {
-    id: 2,
-    label: 'Split Expression'
-  },
-  {
-    id: 3,
-    label: 'Expression Pattern'
-  },
-  {
-    id: 4,
-    label: 'Expression Pattern Fragment'
-  },
-  {
-    id: 5,
-    label: 'Anatomy'
-  },
-  {
-    id: 6,
-    label: 'Neuron with Connectivity'
-  },
-  {
-    id: 7,
-    label: 'Nervous system'
-  },
-  {
-    id: 8,
-    label: 'Neuron'
-  },
-  {
-    id: 9,
-    label: 'Neuron Similarity (NBLAST)'
-  },
-  {
-    id: 10,
-    label: 'Synaptic Neuropil'
-  },
-  {
-    id: 11,
-    label: 'Nervous projection bundle'
-  },
-  {
-    id: 12,
-    label: 'Larva'
-  }
-]
-
-
 const { primaryBg, outlinedBtnTextColor, bottomNavBg, tabActiveColor, whiteColor, searchHeadingColor } = vars;
 
-const Filter = () => {
+const Filter = (props) => {
   const [filterAnchorEl, setFilterAnchorEl] = React.useState(null);
-  const [filtersApplied, setFiltersApplied] = useState(false)
-
+  const [filtersApplied, setFiltersApplied] = useState(props.tags)
   const filterhandleClick = (event) => {
     setFilterAnchorEl(filterAnchorEl ? null : event.currentTarget);
   };
 
+  const applyFilters = (event) => {
+    props.setChipTags(filtersApplied)
+    filterhandleClick(event)
+  };
+
   const filterOpen = Boolean(filterAnchorEl);
   const filterId = filterOpen ? 'simple-popper' : undefined;
+
+  const handleFilterCheck = (event) => {
+    let tags = [...props.tags];
+    tags.find( t => t.label === event.target.name ).active = event.target.checked;
+    setFiltersApplied(tags); 
+  }
+
   return (
     <>
       <Button
@@ -152,12 +91,12 @@ const Filter = () => {
             alignItems: 'flex-start',
             rowGap: 1.5
           }}>
-            {DUMMY_FILTERS.map((filter, index) => (
+            {props.tags?.map((tag, index) => (
               <FormControlLabel sx={{
                 height: '20px',
                 borderRadius: '50px',
                 px: '0.5rem',
-                backgroundColor: filterChipColors[index],
+                backgroundColor: props.facets_annotations_colors[tag.label]?.color,
 
                 '& .MuiCheckbox-root': {
                   marginRight: '0.25rem'
@@ -168,7 +107,7 @@ const Filter = () => {
                   fontSize: '0.625rem'
                 }
 
-              }} key={filter.id} control={<Checkbox checkedIcon={<Tick color="#fff" />} icon={<></>} />} label={filter.label} />
+              }} key={tag.label} control={<Checkbox checked={tag.active} onChange={handleFilterCheck} checkedIcon={<Tick color={whiteColor} />} icon={<></>} />} label={tag.label} name={tag.label} />
             ))}
           </FormGroup>
         </Box>
@@ -182,7 +121,7 @@ const Filter = () => {
           display: 'flex'
         }}>
           <Button
-            onClick={filterhandleClick}
+            onClick={() => props.clearAllTags()}
             variant="text"
             sx={{
               px: 0,
@@ -200,7 +139,7 @@ const Filter = () => {
             Clean all
           </Button>
           <Button
-            onClick={filterhandleClick}
+            onClick={applyFilters}
             variant="outlined"
             color="primary"
             sx={{

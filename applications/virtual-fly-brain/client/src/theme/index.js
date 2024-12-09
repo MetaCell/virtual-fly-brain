@@ -1,5 +1,9 @@
 import vars from "./variables";
 import { createTheme } from "@mui/material/styles";
+import windowMinimizeIcon from "../assets/viewer/window_minimize_icon.svg";
+import maximizeIcon from "../assets/viewer/maximize_icon.svg";
+import minimizeIcon from "../assets/viewer/minimize_icon.svg";
+import closeIcon from "../assets/viewer/close_icon.svg";
 
 const {
   primaryFont,
@@ -27,6 +31,7 @@ theme = createTheme({
   typography: {
     allVariants: {
       fontFamily: primaryFont,
+      letterSpacing: 'normal'
     }
   },
 
@@ -36,6 +41,122 @@ theme = createTheme({
         *, body {
           font-family: ${primaryFont};
           box-sizing: border-box
+        }
+
+        .chrome-picker {
+          z-index: 100;
+          border-radius: 6px !important;
+          background: ${secondaryBg} !important;
+        }
+
+        .flexbox-fix label {
+          color: ${whiteColor} !important;
+        }
+
+        .flexbox-fix input {
+          background: ${primaryBg} !important;
+          color: ${whiteColor} !important;
+          box-shadow: none !important;
+          border-radius: 4px !important;
+        }
+
+        .flexbox-fix input:focus {
+          outline: none !important;
+          border: none !important;
+          box-shadow: none !important;
+        }
+
+        .flexbox-fix svg {
+          fill: ${whiteColor} !important;
+        }
+
+        .flexbox-fix svg:hover {
+          background: transparent !important;
+        }
+
+        .flexlayout__tab_button {
+          margin: 0;
+          border-radius: 8px 8px 0px 0px;
+          padding: 0.25rem 0.5rem;
+          margin-right: 0.25rem;
+        }
+        .flexlayout__tab_button--selected {
+          background-color: ${blackColor};
+        }
+        .flexlayout__tab_button--selected:hover {
+          background-color: ${blackColor};
+        }
+        .flexlayout__tab_button--unselected {
+          background-color: transparent;
+          border-top: 1px solid ${secondaryBg};
+          border-right: 1px solid ${secondaryBg};
+          border-left: 1px solid ${secondaryBg};
+          border-bottom: 0;
+        }
+        .flexlayout__tab_button--unselected:hover {
+          background-color: transparent;
+        }
+        .flexlayout__tab_button_content {
+          font-size: 0.875rem;
+          line-height: 1.125rem;
+          color: ${outlinedBtnTextColor};
+          font-weight: 400;
+          padding: 0;
+          font-family: ${primaryFont};
+        }
+        .flexlayout__tabset_tabbar_inner_tab_container_top {
+          border-top: none;
+          gap: 0.25rem;
+        }
+        .flexlayout__tabset_tabbar_outer {
+          background-color: transparent;
+        }
+        .flexlayout__tabset_tabbar_outer_top {
+          border-bottom: none;
+        }
+        .flexlayout__layout {
+          border-top: none;
+        }
+        .flexlayout__tabset {
+          background-color: transparent;
+        }
+        .flexlayout__tab {
+          border-radius: 0px 8px 8px 8px;
+          background-color: ${blackColor};
+          padding: 1rem;
+        }
+        .flexlayout__tab_toolbar {
+          gap: 0.25rem;
+          margin-bottom: 0.25rem;
+        }
+        .flexlayout__tab_toolbar_button-min {
+          background: transparent url(${maximizeIcon}) no-repeat center;
+          cursor: pointer;
+        }
+        .flexlayout__tab_toolbar_button-max {
+          background: transparent url(${minimizeIcon}) no-repeat center;
+          cursor: pointer;
+        }
+        .flexlayout__tab_button_trailing {
+          background: transparent url(${closeIcon}) no-repeat center !important;
+          min-width: 1rem;
+          min-height: 1rem;
+          margin-left: 0.5rem;
+        }
+        .customIconFlexLayout:hover {
+          color: #c0c0c0;
+        }
+        .flexlayout__tab_toolbar_button-min:before {
+          content: "";
+        }
+        .flexlayout__tab_toolbar_button-max:before {
+          content: "";
+        }
+        .flexlayout__tab_button_trailing:before {
+          content: "";
+        }
+        .flexlayout__splitter {
+          background: transparent;
         }
       `,
     },
@@ -101,7 +222,13 @@ theme = createTheme({
     MuiListItemButton: {
       styleOverrides: {
         root: {
-          padding: '0.25rem 0.5rem'
+          padding: '0.25rem 0.5rem',
+          '&:hover': {
+            backgroundColor: secondaryBg,
+            '& .MuiTypography-root': {
+              color: whiteColor
+            }
+          }
         }
       }
     },
@@ -114,46 +241,151 @@ theme = createTheme({
       }
     },
 
-    MuiPopper: {
+    MuiTreeView: {
       styleOverrides: {
         root: {
-          maxWidth: '100%',
-          '&:not(.MuiTooltip-popper)': {
-            zIndex: 99,
-            background: bottomNavBg,
-            boxShadow: popperShadow,
-            backdropFilter: 'blur(0.625rem)',
-            borderRadius: '0.375rem',
-            width: '23.9375rem',
-            marginTop: '-1.5rem !important',
-
-            '&.menu-popover': {
-              marginTop: '0 !important',
-              width: '10rem',
-              background: filterPopoverBg,
-              boxShadow: filterPopoverShadow,
-              backdropFilter: 'blur(0.375rem)',
-              borderRadius: '0.125rem'
+          '& .MuiTreeItem-root': {
+            position: 'relative',
+            '&:before': {
+              position: 'absolute',
+              left: '-10px',
+              top: '0px',
+              borderLeft: '1px solid #505050',
+              borderBottom: '1px solid #505050',
+              content: '""',
+              width: '8px',
+              height: '1em',
+              borderBottomLeftRadius: "50%"
             },
-
-            '&.filter-popover': {
-              marginTop: '-1.75rem !important',
-              width: '15.5rem',
-              background: filterPopoverBg,
-              boxShadow: filterPopoverShadow
+            '&:after': {
+              position: 'absolute',
+              left: '-10px',
+              bottom: '0px',
+              borderLeft: '1px solid #505050',
+              content: '""',
+              width: '8px',
+              height: '100%'
+            },
+            '&:last-of-type': {
+              '&:after': {
+                display: 'none'
+              }
             }
           }
         }
       }
     },
 
-    MuiTreeView: {
+    MuiTreeItem: {
       styleOverrides: {
+        group: {
+          paddingTop: '0.25rem',
+          marginLeft: '1.25rem',
+        },
         root: {
-          '& .MuiTreeItem-root': {
-            '&:last-of-type': {
-              '&:before': {
-                height: 'calc(100% - 2.8125rem)'
+          position: 'relative',
+          padding: 0,
+          '&:not([aria-expanded])': {
+            '& .MuiTreeItem-iconContainer': {
+              position: 'absolute',
+              left: '-0.78125rem',
+              top: '-0.25rem',
+            },
+          },
+          '&[aria-expanded="true"]': {
+            // '&:before': {
+            //   content: "''",
+            //   position: 'absolute',
+            //   left: '0.5rem',
+            //   top: '1.25rem',
+            //   backgroundColor: primaryBg,
+            //   height: 'calc(100% - 1rem)',
+            //   width: '0.0625rem',
+            // }
+          }
+
+        },
+        content: {
+          padding: '0.125rem 0',
+          // cursor: 'auto',
+
+          '&:hover': {
+            backgroundColor: 'transparent'
+          },
+
+          '&.Mui-selected': {
+            backgroundColor: 'transparent',
+            '&:hover': {
+              backgroundColor: 'transparent'
+            },
+            '&.Mui-focused': {
+              backgroundColor: 'transparent',
+              '&:hover': {
+                backgroundColor: 'transparent'
+              }
+            },
+          },
+          '&.Mui-focused': {
+            backgroundColor: 'transparent',
+            '&:hover': {
+              backgroundColor: 'transparent'
+            }
+          },
+        },
+        iconContainer: {
+          marginRight: 0,
+          width: 'auto'
+        },
+        label: {
+          paddingLeft: 0,
+          userSelect: 'none',
+          fontWeight: 400,
+          fontSize: '1rem',
+          marginLeft: '0.25rem',
+          [theme.breakpoints.down('lg')]: {
+              fontSize: '0.875rem'
+          },
+          lineHeight: '125%',
+          color: outlinedBtnTextColor,
+
+          '& .MuiTabs-root': {
+            minHeight: '1.75rem'
+          },
+
+          '& .MuiTab-root': {
+            padding: 0,
+            minHeight: '1.75rem'
+          },
+
+          '& p': {
+            lineHeight: '125%',
+            fontSize: '1rem',
+            [theme.breakpoints.down('lg')]: {
+              fontSize: '0.875rem'
+          },
+            letterSpacing: 'normal'
+          },
+
+          '& > div': {
+            alignItems: 'center'
+          },
+
+          '& > div > p': {
+            flex: 1,
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            overflow:'hidden',
+            position: 'relative',
+            '&:after': {
+              content: "''",
+              position: 'absolute',
+              right: 0,
+              width: '5.5rem',
+              height: '100%',
+              background: 'linear-gradient(270deg, #222222 0%, rgba(34, 34, 34, 0) 26.7%)',
+
+              [theme.breakpoints.up('lg')]: {
+                background: 'linear-gradient(270deg, #1A1A1A 0%, rgba(26, 26, 26, 0.00) 26.7%)'
               }
             }
           }
@@ -192,7 +424,7 @@ theme = createTheme({
           backgroundColor: 'transparent',
           boxShadow: 'none',
           border: `0.0625rem solid ${secondaryBg}`,
-          marginBottom: '0.5rem'
+          borderRadius: '0.5rem'
         }
       }
     },
@@ -314,98 +546,6 @@ theme = createTheme({
       }
     },
 
-    MuiTreeItem: {
-      styleOverrides: {
-        group: {
-          paddingTop: '0.25rem',
-          marginLeft: '1.25rem',
-        },
-        root: {
-          position: 'relative',
-          padding: 0,
-          '&:not([aria-expanded])': {
-            '& .MuiTreeItem-iconContainer': {
-              position: 'absolute',
-              left: '-0.78125rem',
-              top: '-0.25rem',
-            },
-          },
-          '&[aria-expanded="true"]': {
-            '&:before': {
-              content: "''",
-              position: 'absolute',
-              left: '0.5rem',
-              top: '1.25rem',
-              backgroundColor: primaryBg,
-              height: 'calc(100% - 1rem)',
-              width: '0.0625rem',
-            }
-          }
-
-        },
-        content: {
-          padding: '0.125rem 0',
-          // cursor: 'auto',
-
-          '&:hover': {
-            backgroundColor: 'transparent'
-          },
-
-          '&.Mui-selected': {
-            backgroundColor: 'transparent',
-            '&:hover': {
-              backgroundColor: 'transparent'
-            },
-            '&.Mui-focused': {
-              backgroundColor: 'transparent',
-              '&:hover': {
-                backgroundColor: 'transparent'
-              }
-            },
-          },
-          '&.Mui-focused': {
-            backgroundColor: 'transparent',
-            '&:hover': {
-              backgroundColor: 'transparent'
-            }
-          },
-        },
-        iconContainer: {
-          marginRight: 0,
-          width: 'auto'
-        },
-        label: {
-          paddingLeft: 0,
-          userSelect: 'none',
-          fontWeight: 400,
-          fontSize: '1rem',
-          lineHeight: '125%',
-          color: outlinedBtnTextColor,
-
-          '& > div > p': {
-            flex: 1,
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            overflow:'hidden',
-            position: 'relative',
-            '&:after': {
-              content: "''",
-              position: 'absolute',
-              right: 0,
-              width: '5.5rem',
-              height: '100%',
-              background: 'linear-gradient(270deg, #222222 0%, rgba(34, 34, 34, 0) 26.7%)',
-
-              [theme.breakpoints.up('lg')]: {
-                background: 'linear-gradient(270deg, #000000 0%, rgba(0, 0, 0, 0) 26.7%)',
-              }
-            }
-          }
-        }
-      }
-    },
-
-
     MuiAccordion: {
       styleOverrides: {
         root: {
@@ -416,25 +556,19 @@ theme = createTheme({
           boxShadow: 'none',
 
           '&.Mui-expanded': {
-            margin: 0
+            margin: 0,
           },
 
           '&.Mui-expanded:before': {
             opacity: 1,
+            display: 'block !important'
           },
-
-          // '&:first-of-type:before': {
-          //   display: 'block'
-          // },
-
-          // '&:last-of-type:before': {
-          //   display: 'none'
-          // },
 
           '&:before': {
             backgroundColor: secondaryBg,
-            // top: 'auto',
-            // bottom: 0,
+            top: 'auto',
+            bottom: 0,
+            display: 'block !important'
           },
         }
       }
@@ -480,7 +614,6 @@ theme = createTheme({
         },
         grouped: {
           minWidth: '1.75rem',
-          borderRadius: '0.25rem',
           padding: 0,
           [theme.breakpoints.down('lg')]: {
             height: '100%',
@@ -495,12 +628,70 @@ theme = createTheme({
 
     MuiDialog: {
       styleOverrides: {
+        root: {
+          '& div[dir="ltr"][aria-roledescription="carousel"]': {
+            position: 'relative'
+          },
+
+          '& .react-slideshow-container .nav': {
+            zIndex: 10,
+            position: 'absolute',
+            cursor: 'pointer',
+            bottom: '0.5rem',
+            margin: 0,
+            display: 'flex',
+            alignItems: 'center',
+          },
+
+          '& .react-slideshow-container .nav svg': {
+            width: '1.25rem',
+            height: '1.25rem'
+          },
+    
+          '& .react-slideshow-container .nav.disabled': {
+            opacity: 0.6
+          },
+    
+          '& .react-slideshow-container .nav:first-of-type': {
+            left: '40%'
+          },
+    
+          '& .react-slideshow-container .nav:last-of-type': {
+            right: '40%'
+          },
+    
+          '& .react-slideshow-container + ul.indicators .each-slideshow-indicator::before': {
+            background: whiteColor,
+            position: 'static',
+            display: 'block',
+            width: '0.375rem',
+            height: '0.375rem'
+          },
+    
+          '& .react-slideshow-container + ul.indicators li': {
+            width: 'auto',
+            height: 'auto',
+            padding: 0,
+            display: 'flex',
+    
+          },
+    
+          '& .react-slideshow-container + ul.indicators': {
+            margin: 0,
+            padding: 0,
+            position: 'absolute',
+            bottom: '1rem',
+            height: 'auto',
+            width: '100%',
+          }
+        },
+
         paper: {
           overflow: 'visible',
           borderRadius: '0.875rem',
           padding: '0.75rem',
           boxShadow: '0 0.5rem 0.5rem -0.25rem rgba(16, 24, 40, 0.03), 0 1.25rem 1.5rem -0.25rem rgba(16, 24, 40, 0.08)'
-        }
+        },
       }
     },
 
@@ -513,8 +704,15 @@ theme = createTheme({
           color: whiteColor,
           padding: '0.375rem 0.5rem',
 
+          '&.Mui-selected': {
+            background: secondaryBg,
+            '&:hover': {
+              background: secondaryBg
+            }
+          },
+
           '&:hover': {
-            background: primaryBg
+            background: secondaryBg
           }
         }
       }
@@ -523,10 +721,11 @@ theme = createTheme({
     MuiMenu: {
       styleOverrides: {
         paper: {
-          background: secondaryBg,
-          boxShadow: '0 1.25rem 1.5rem -0.25rem rgba(16, 24, 40, 0.08), 0 0.5rem 0.5rem -0.25rem rgba(16, 24, 40, 0.03)',
           borderRadius: '0.375rem',
-          padding: '0.5rem'
+          padding: '0.5rem',
+          background: bottomNavBg,
+          boxShadow: popperShadow,
+          backdropFilter: 'blur(0.625rem)',
         },
         list: {
           padding: 0,
@@ -543,7 +742,7 @@ theme = createTheme({
           fontWeight: 400,
           borderRadius: '0.5rem',
           textTransform: 'none',
-          height: '2.125rem',
+          height: '2.125rem'
         },
 
         text: {
@@ -561,9 +760,21 @@ theme = createTheme({
         },
 
         containedSecondary: {
-          backgroundColor: primaryBg,
+          backgroundColor: secondaryBg,
           '&:hover': {
-            backgroundColor: primaryBg,
+            backgroundColor: secondaryBg,
+          }
+        },
+
+        containedInfo: {
+          backgroundColor: tabActiveColor,
+          height: '2rem',
+          padding: '0 0.75rem',
+          fontSize: '0.75rem',
+          fontWeight: 500,
+          borderRadius: '0.25rem',
+          '&:hover': {
+            backgroundColor: tabActiveColor,
           }
         },
 
@@ -606,9 +817,10 @@ theme = createTheme({
         outlinedPrimary: {
           border: `0.0625rem solid ${outlinedBtnBorderColor}`,
           color: outlinedBtnTextColor,
+          padding: '0 0.75rem',
           '&:hover': {
             borderColor: outlinedBtnBorderColor,
-            backgroundColor: outlinedBtnBorderColor,
+            backgroundColor: secondaryBg,
             color: whiteColor
           }
         }
@@ -660,9 +872,9 @@ theme = createTheme({
         root: {
           fontFamily: primaryFont,
           height: '1.5rem',
-          padding: '0 0.5rem',
+          padding: '0.5rem',
           fontWeight: 400,
-          fontSize: '0.75rem',
+          fontSize: '0.625rem',
           lineHeight: '133%',
           color: whiteColor,
 
@@ -679,7 +891,7 @@ theme = createTheme({
           background: chipPrimaryColor,
 
           '& .MuiChip-label': {
-            color: secondaryBg
+            color: whiteColor
           }
         },
 
@@ -692,7 +904,7 @@ theme = createTheme({
         },
 
         colorDefault: {
-          background: secondaryBg
+          background: primaryBg
         },
       }
     },
@@ -718,14 +930,6 @@ theme = createTheme({
           textOverflow: 'ellipsis',
           overflow: 'hidden',
           whiteSpace:'nowrap'
-        }
-      }
-    },
-
-    MuiListItemButton: {
-      styleOverrides: {
-        root: {
-          padding: '0.25rem 0.5rem'
         }
       }
     },
@@ -774,6 +978,17 @@ theme = createTheme({
       }
     },
 
+    MuiTooltip: {
+      styleOverrides: {
+        tooltip: {
+          backgroundColor: secondaryBg
+        },
+        arrow: {
+          color: secondaryBg
+        }
+      }
+    },
+
     MuiPopper: {
       styleOverrides: {
         root: {
@@ -785,7 +1000,6 @@ theme = createTheme({
             backdropFilter: 'blur(0.625rem)',
             borderRadius: '0.375rem',
             width: '23.9375rem',
-            marginTop: '-1.5rem !important',
 
             '&.menu-popover': {
               marginTop: '0 !important',

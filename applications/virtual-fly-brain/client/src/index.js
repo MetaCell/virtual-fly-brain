@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { MuiThemeProvider } from '@material-ui/core/styles';
 import reportWebVitals from './reportWebVitals';
 import './index.css';
 import App from './App';
@@ -11,6 +10,17 @@ import { ThemeProvider } from "@mui/material/styles";
 import theme from './theme/index';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+
+function clearAppStorage() {
+  Object.keys(localStorage).forEach(key => {
+    localStorage.removeItem(key);
+  });
+  Object.keys(sessionStorage).forEach(key => {
+    sessionStorage.removeItem(key);
+  });
+}
+
+clearAppStorage();
 
 root.render(
   <Provider store={store} >

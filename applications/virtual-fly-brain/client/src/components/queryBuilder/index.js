@@ -5,7 +5,8 @@ import { Box, Button, ButtonGroup, IconButton, InputAdornment, Pagination, Pagin
 import Query from "./Query";
 import History from "./History";
 import vars from "../../theme/variables";
-
+import { useDispatch, useSelector } from 'react-redux'
+import { setQueryComponentOpened } from "../../reducers/actions/globals";
 
 const { secondaryBg, outlinedBtnTextColor, headerBorderColor, blackColor, queryBuilderBg, whiteColor, primaryBg } = vars;
 
@@ -43,12 +44,52 @@ function a11yProps(index) {
   };
 }
 
-const QueryBuilder = ({ fullWidth, bottomNav, setBottomNav }) => {
-  const [value, setValue] = React.useState(0);
+const QueryBuilder = ({ fullWidth, bottomNav, setBottomNav, tabSelected }) => {
+  const [value, setValue] = React.useState(tabSelected || 0);
+  const storeQueries = useSelector(state => state.queries.queries);
+  const [queries, setQueries ] = React.useState(storeQueries);
+  const recentSearches = useSelector(state => state.globalInfo.recentSearches);
+  const [page, setPage] = React.useState(1);
+  const count = 10;
+  const [historyItems, setHistoryItems] = React.useState(recentSearches.slice(page * count - count, count))
+  
+  const queryComponentOpened = useSelector( state => state.globalInfo?.queryComponentOpened );
 
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
+  React.useEffect( () => {
+    if ( queryComponentOpened ) {
+      setValue(0);
+    }
+  }, [queryComponentOpened]);
+
+  React.useEffect( () => {
+    setHistoryItems(recentSearches.slice(page * count - count, count))
+  }, [recentSearches]);
+
+  React.useEffect( () => {
+    setQueries(storeQueries);
+  }, [storeQueries]);
+
+  const handlePageChange = (event, value) => {
+    if ( value * count - count < recentSearches?.length ) {
+      setPage(value);
+      setHistoryItems(recentSearches.slice(value * count - count, value * count))
+    }
   };
+
+  const dispatch = useDispatch();
+  
+  const handleTabChange = (event, newValue) => {
+    setValue(newValue);
+    if ( newValue == 1 && queryComponentOpened ) {
+      dispatch(setQueryComponentOpened(false));
+    }
+  };
+
+  const handleClose = (event) => {
+    dispatch(setQueryComponentOpened(false));
+    setBottomNav(undefined);
+  }
+
   const classes = {
     root: {
       display: 'flex',
@@ -81,7 +122,7 @@ const QueryBuilder = ({ fullWidth, bottomNav, setBottomNav }) => {
         lg: queryBuilderBg
       },
       boxShadow: {
-        lg: `0 0 5rem 0 rgba(0, 0, 0, 0.60), 0 0.25rem 6.25rem 0 ${blackColor}`
+        lg: `0px 0px 80px 0px rgba(0, 0, 0, 0.60), 0px 4px 100px 0px rgba(0, 0, 0, 0.50)`
       },
       backdropFilter: 'blur(0.625rem)'
     },
@@ -122,7 +163,7 @@ const QueryBuilder = ({ fullWidth, bottomNav, setBottomNav }) => {
 
         }}>
           <Button
-            onClick={() => setBottomNav('')}
+            onClick={handleClose}
             sx={{
               height: 'auto',
               borderRight: `0.0625rem solid ${primaryBg}`,
@@ -135,19 +176,19 @@ const QueryBuilder = ({ fullWidth, bottomNav, setBottomNav }) => {
           >
             <Cross />
           </Button>
-          <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
-            <Tab label="Query" {...a11yProps(0)} />
-            <Tab label="History" {...a11yProps(1)} />
+          <Tabs value={value} onChange={handleTabChange} aria-label="basic tabs example">
+            <Tab disableRipple label="Query" {...a11yProps(0)} />
+            <Tab disableRipple label="History" {...a11yProps(1)} />
           </Tabs>
         </Box>
       </Box>
 
       <Box sx={classes.body}>
         <TabPanel value={value} index={0}>
-          <Query fullWidth={fullWidth} />
+          <Query fullWidth={fullWidth} queries={queries} />
         </TabPanel>
         <TabPanel value={value} index={1}>
-          <History />
+          <History recentSearches={historyItems} totalResults={recentSearches?.length}/>
         </TabPanel>
       </Box>
 
@@ -195,6 +236,7 @@ const QueryBuilder = ({ fullWidth, bottomNav, setBottomNav }) => {
 
                   '&::placeholder': {
                     color: outlinedBtnTextColor,
+                    opacity: 1
                   }
                 }
               }}
@@ -226,7 +268,9 @@ const QueryBuilder = ({ fullWidth, bottomNav, setBottomNav }) => {
           </>
         ) : (
             <Pagination
-              count={10}
+              count={Math.ceil(recentSearches?.length / 10) }
+              page={page}
+              onChange={handlePageChange}
               renderItem={(item) => (
                 <PaginationItem
                   slots={{ previous: Prev, next: Next }}

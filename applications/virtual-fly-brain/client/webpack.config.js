@@ -20,10 +20,10 @@ module.exports = function webpacking(envVariables) {
     production: JSON.stringify('https://vfb.dev.metacell.us/'),
     development: JSON.stringify('http://localhost:8080/')
   }
-  
+
   // check environment mode
   const environment = env.mode === 'production' ? 'production' : 'development';
-  
+
   console.log('####################');
   console.log('####################');
   console.log('BUILD bundle with parameters:');
@@ -50,8 +50,9 @@ module.exports = function webpacking(envVariables) {
         loader: 'babel-loader'
       },
       {
-        test: /\.ts|tsx?$/,
-        loader: "awesome-typescript-loader"
+          test: /\.tsx?$/,
+          loader: 'ts-loader',
+          exclude: /node_modules/,
       },
       {
         test: /\.(css)$/,

@@ -1,56 +1,31 @@
 import React from "react";
-import { Box, Button, Card, CardActionArea, CardContent, CardMedia, Chip, IconButton, Tooltip, Typography } from "@mui/material";
-import { FullScreen, Link as LinkIcon } from "../../icons";
+import { Box, Button, Card, CardContent, CardMedia, Chip, IconButton, Tooltip, Typography } from "@mui/material";
+import LinkIcon from '@mui/icons-material/Link';
 import vars from "../../theme/variables";
 import { useState } from "react";
 import FullScreenViewer from "./FullScreenViewer";
-import IMAGE from '../../assets/query.png';
+import FullscreenIcon from '@mui/icons-material/Fullscreen';
+import { Compare } from "../../icons";
+import { getUpdatedTags } from "../../utils/utils";
 
 const {
   listHeadingColor,
   whiteColor,
   tabActiveColor,
-  chipGreen,
-  chipOrange,
   primaryBg,
-  chipYellow,
   secondaryBg,
-  outlinedBtnBorderColor
+  outlinedBtnBorderColor,
+  outlinedBtnTextColor
 } = vars;
 
-const chipsArr = [
-  {
-    id: 0,
-    label: 'Anatomy',
-    color: chipGreen
-  },
-  {
-    id: 1,
-    label: 'Neuron',
-    color: chipOrange
-  },
-  {
-    id: 2,
-    label: 'Nervous system',
-    color: chipYellow
-  },
-  {
-    id: 3,
-    label: 'Anatomy',
-    color: chipGreen
-  },
-  {
-    id: 4,
-    label: 'Neuron',
-    color: chipOrange
-  }
-];
+const colors_config = require("../configuration/VFBColors").facets_annotations_colors;
+const facets_annotations_colors = getUpdatedTags(colors_config)
 
-const QueryCard = ({ fullWidth }) => {
+const QueryCard = ({ fullWidth, facets_annotation, query }) => {
   const [toggleReadMore, setToggleReadMore] = useState(false);
   const [showFullScreen, setShowFullScreen] = useState(false);
+
   const MAX_LENGTH = 40;
-  const DUMMY_STRING = "A doughnut shaped synaptic neuropil domain of the central complex of the adult brain that lies just anterior to the fan-shaped body."
   const classes = {
     heading: {
       fontWeight: 400,
@@ -63,8 +38,72 @@ const QueryCard = ({ fullWidth }) => {
       textOverflow: 'ellipsis',
       whiteSpace: 'nowrap',
       overflow: 'hidden'
+    },
+
+    slider: {
+      '& .images-wrap': {
+        '& img': {
+          maxHeight: '30.375rem',
+          borderRadius: '0.5rem',
+          display: 'block',
+        }
+      },
+      '& .react-slideshow-container .nav:first-of-type': {
+        transform: 'translateX(-50%)',
+        left: '50%',
+        bottom: '0.5rem',
+        marginLeft: '-1.25rem',
+        display: 'flex',
+      },
+      '& .react-slideshow-container .nav:last-of-type': {
+        transform: 'translateX(-50%) rotate(180deg)',
+        bottom: '0.5rem',
+        left: '50%',
+        right: 'auto',
+        marginLeft: '1.25rem',
+        display: 'flex',
+      },
+      '& .react-slideshow-container + ul.indicators': {
+        margin: 0,
+        position: 'absolute',
+        bottom: '1.6875rem',
+        left: 0,
+        width: 'auto',
+        right: 0,
+        padding: 0,
+
+        '& .each-slideshow-indicator': {
+          background: outlinedBtnBorderColor,
+          width: '0.375rem',
+          height: '0.375rem',
+          borderRadius: '50%',
+          padding: 0,
+
+          '&.active': {
+            background: outlinedBtnTextColor
+          },
+
+          '&:before': {
+            display: 'none'
+          }
+        },
+
+        '& li': {
+          display: 'flex',
+          padding: 0,
+          width: 'auto',
+          height: 'auto'
+        }
+      }
     }
   }
+
+  const getThumbnail = (thumbnail) => {
+    const matches = thumbnail.match(/\bhttps?::\/\/\S+/gi) || thumbnail.match(/\bhttps?:\/\/\S+/gi);
+
+    return matches;
+  }
+
   return (
     <>
       <Card sx={{
@@ -86,22 +125,19 @@ const QueryCard = ({ fullWidth }) => {
           sx={{
             height: '100%',
           }}
-          image={IMAGE}
+          image={getThumbnail(query.thumbnail)}
         >
           <IconButton onClick={(e) => {
             e.stopPropagation();
             setShowFullScreen(true)
           }}>
-            <FullScreen />
+            <FullscreenIcon sx={{fill: '#fff !important', fontSize: '1.0625rem', m: '0 !important'}} />
           </IconButton>
         </CardMedia>
-        {/* <CardActionArea sx={{ flexGrow: 1 }}>
-
-        </CardActionArea> */}
 
         <CardContent>
           <Tooltip placement="right"
-            arrow title="JRC_R80G01_GAL4_Brain_20100223">
+            arrow title={query.label}>
             <Typography sx={{
               ...classes.ellipsis,
               fontSize: '1rem',
@@ -109,7 +145,7 @@ const QueryCard = ({ fullWidth }) => {
               fontWeight: 400,
               lineHeight: '1.25rem',
             }}>
-              JRC_R80G01_GAL4_Brain_20100223
+              {query.label}
             </Typography>
           </Tooltip>
 
@@ -119,13 +155,13 @@ const QueryCard = ({ fullWidth }) => {
             flexDirection='column'
             rowGap={1}
           >
-            <Box
+            { query?.description && <Box
               display='flex'
               justifyContent='space-between'
               columnGap={1}
             >
               <Typography sx={classes.heading}>
-                Description
+                {query.description}
               </Typography>
               <Box display='flex' flexDirection='column' alignItems='flex-end'>
                 <Typography sx={{
@@ -133,7 +169,7 @@ const QueryCard = ({ fullWidth }) => {
                   color: whiteColor,
                   textAlign: 'right'
                 }}>
-                  {toggleReadMore ? DUMMY_STRING : `${DUMMY_STRING?.substr(0, MAX_LENGTH)}...`}
+                  {toggleReadMore ? "" : `${""?.substr(0, MAX_LENGTH)}...`}
                 </Typography>
                 <Button
                   onClick={() => setToggleReadMore((prev) => !prev)} disableRipple
@@ -151,9 +187,9 @@ const QueryCard = ({ fullWidth }) => {
                 </Button>
               </Box>
 
-            </Box>
+            </Box> }
 
-            <Box
+            { query?.type && <Box
               display='flex'
               justifyContent='space-between'
               columnGap={1}
@@ -173,18 +209,18 @@ const QueryCard = ({ fullWidth }) => {
                   color: whiteColor,
                   textAlign: 'right'
                 }}>
-                  {`P{GMR80G01-GAL4} expression pattern; anatomical entity`}
+                   {query.type}
                 </Typography>
               </Tooltip>
-            </Box>
+            </Box> }
 
-            <Box
+            { query?.imaging_tecnique && <Box
               display='flex'
               justifyContent='space-between'
               columnGap={1}
             >
               <Typography sx={classes.heading}>
-                Imaging_Tecnique
+                {query.imaging_tecnique}
               </Typography>
 
               <Tooltip
@@ -198,50 +234,64 @@ const QueryCard = ({ fullWidth }) => {
                   color: whiteColor,
                   textAlign: 'right'
                 }}>
-                  Confocal
+                  {query.confocal}
                 </Typography>
               </Tooltip>
-            </Box>
+            </Box> }
 
-            <Box
+            { query?.template_space && <Box
               display='flex'
               justifyContent='space-between'
               columnGap={1}
             >
               <Typography sx={classes.heading}>
-                Template_Space
+               {query.template_space}
               </Typography>
-
-
 
               <Tooltip
                 placement="right"
                 arrow
-                title="JRC2018U"
+                title={query.template}
               >
-                <Chip className="default-chip" sx={{ backgroundColor: primaryBg }} onClick={() => console.log('Clicked!')} icon={<LinkIcon />} label="JRC2018U" />
+                <Chip className="default-chip" sx={{ backgroundColor: primaryBg, gap: 0.5 }} onClick={() => console.log('Clicked!')} icon={<LinkIcon sx={{fill: '#fff !important', fontSize: '1.0625rem', m: '0 !important'}} />} label={query.template} />
               </Tooltip>
-            </Box>
+            </Box> }
 
 
 
 
-            <Box
+            {facets_annotation?.length > 0 && <Box
               display='flex'
               justifyContent='flex-end'
               columnGap={1}
             >
-              <Box display='flex' gap={0.5}>
-                {chipsArr?.slice(0, fullWidth ? 2 : 3).map(item => (
-                  <Chip key={item.id} sx={{ background: item.color }} label={item.label} />
+              <Box display='flex' gap={0.5} flexWrap='wrap'>
+                {facets_annotation?.slice(0, fullWidth ? 3 : 4)?.map((tag, index) => (
+                  <Chip
+                  key={tag + index}
+                  sx={{
+                    lineHeight: '140%',
+                    fontSize: '0.625rem',
+                    backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color,
+                    color: facets_annotations_colors[tag]?.textColor || facets_annotations_colors?.default?.textColor
+                  }}
+                  label={tag} />
                 ))}
 
                 <Tooltip
                   arrow
                   title={
-                    <Box display='flex' gap={0.5}>
-                      {chipsArr?.slice(fullWidth ? 2 : 3).map(item => (
-                        <Chip key={item.id} sx={{ background: item.color }} label={item.label} />
+                    <Box display='flex' py={1} flexWrap='wrap' gap={0.5}>
+                      {facets_annotation?.slice(fullWidth ? 3 : 4).map((tag, index) => (
+                        <Chip
+                          key={tag + index}
+                          sx={{
+                            lineHeight: '140%',
+                            fontSize: '0.625rem',
+                            backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color,
+                            color: facets_annotations_colors[tag]?.textColor || facets_annotations_colors?.default?.textColor
+                          }}
+                          label={tag} />
                       ))}
                     </Box>
                   }
@@ -249,18 +299,18 @@ const QueryCard = ({ fullWidth }) => {
                   <Chip
                     className="default-chip"
                     sx={{ background: primaryBg }}
-                    label={`+${chipsArr?.slice(fullWidth ? 2 : 3).length}`}
+                    label={`+${facets_annotation?.slice(fullWidth ? 3 : 4).length}`}
                   />
                 </Tooltip>
 
               </Box>
-            </Box>
+            </Box> }
           </Box>
         </CardContent>
       </Card>
 
       {showFullScreen && (
-        <FullScreenViewer open={showFullScreen} onClose={() => setShowFullScreen(false)} />
+        <FullScreenViewer open={ showFullScreen } onClose={ () => setShowFullScreen( false ) } images={ { [query.id] : [{ thumbnail : getThumbnail(query.thumbnail)[0], label : query.label }]} } />
       )}
     </>
   )

@@ -1,15 +1,37 @@
-import { legacy_createStore as createStore, combineReducers } from 'redux'
+import { combineReducers } from 'redux';
+import { urlUpdaterMiddleware } from './urlUpdaterMiddleware';
+import { createStore } from '@metacell/geppetto-meta-client/common';
 import './index.css';
-import TermInfoReducer from './reducers/TermInfoReducer';
-import ThreeDCanvasReducer from './reducers/ThreeDCanvasReducer';
-import GlobalReducer from './reducers/GlobalReducer';
 
-const rootReducer = combineReducers({
-  termInfo: TermInfoReducer,
-  threeD: ThreeDCanvasReducer,
-  globalInfo : GlobalReducer
-});
+import GlobalReducer, { initialStateGlobalReducer } from './reducers/GlobalReducer';
+import InstancesReducer, { initialStateInstancesReducer }  from './reducers/InstancesReducer';
+import QueriesReducer from './reducers/QueriesReducer';
+import baseLayout from './components/layout/layout';
+import componentMap from './components/layout/componentMap';
+import GraphReducer, { initialStateGraphReducer} from './reducers/GraphReducer';
 
-const store = createStore(rootReducer);
+import vfbMiddleware from './reducers/middleware/vfbMiddleware';
+
+const INIT_STATE = {
+  globalInfo: initialStateGlobalReducer,
+  instances: initialStateInstancesReducer,
+  graph: initialStateGraphReducer,
+};
+
+const reducers = {
+  globalInfo: GlobalReducer,
+  instances: InstancesReducer,
+  queries: QueriesReducer,
+  graph: GraphReducer
+};
+
+const isMinimizeEnabled = true;
+
+const store = createStore(
+  reducers,
+  INIT_STATE,
+  [vfbMiddleware, urlUpdaterMiddleware],
+  { undefined, baseLayout, componentMap, isMinimizeEnabled }
+)
 
 export default store; 

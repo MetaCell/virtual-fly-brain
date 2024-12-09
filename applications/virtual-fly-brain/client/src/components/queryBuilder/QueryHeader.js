@@ -1,19 +1,31 @@
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, Divider, Typography } from "@mui/material";
 import React from "react";
-import { ChevronDown, ImportExport } from "../../icons";
+import { Add, ChevronDown, ImportExport } from "../../icons";
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import vars from "../../theme/variables";
+import { dividerStyle } from "./Query";
+import { removeAllRecentSearch } from "../../reducers/actions/globals";
+import { useDispatch } from "react-redux";
 
 const { searchHeadingColor, whiteColor, secondaryBg, primaryBg } = vars
 
-const QueryHeader = ({ title }) => {
-  const [age, setAge] = React.useState('0');
+const QueryHeader = ({ title, filters, handleSort, handleCrescentEvent, clearAll, setFilteredSearches }) => {
+  const [sort, setSort] = React.useState('Name');
+  const dispatch = useDispatch();
+  const [crescent , setCrescent] = React.useState(1);
 
-  const handleChange = (event) => {
-    setAge(event.target.value);
+  const handleChange = (value) => {
+    setSort(value);
+    handleSort(value, crescent);
   };
+
+  const handleCrescentChange = () => {
+    handleCrescentEvent(sort, crescent)
+    setCrescent(crescent * -1 );
+  };
+
   return (
     <Box
       position='sticky'
@@ -47,7 +59,32 @@ const QueryHeader = ({ title }) => {
         gap: '0.5rem',
         display: 'flex',
         alignItems: 'center'
-      }}>
+      } }>
+        <Button
+          disableRipple
+          onClick={() => handleCrescentChange()}
+          variant="text"
+          sx={{
+            gap: '0.25rem',
+            display: 'flex',
+            minWidth: '0.0625rem',
+            padding: 0,
+            color: searchHeadingColor,
+            fontSize: '0.6875rem',
+            fontWeight: 500,
+            height: '1.25rem',
+            lineHeight: '0.9375rem',
+            letterSpacing: '-0.00344rem',
+
+            '&:hover': {
+              background: 'transparent'
+            }
+          }}
+        >
+          Crescent
+          <ImportExport />
+        </Button>
+        <Divider sx={dividerStyle} />
         <Box sx={{
           gap: '0.25rem',
           display: 'flex',
@@ -84,41 +121,59 @@ const QueryHeader = ({ title }) => {
           }} fullWidth>
             <Select
               IconComponent={ChevronDown}
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              value={age}
-              onChange={handleChange}
+              labelId="properties-select"
+              id="properties-select"
+              value={sort}
+              onChange={(event) => handleChange(event.target.value)}
             >
-              <MenuItem value={0}>Name</MenuItem>
-              <MenuItem value={1}>Ten</MenuItem>
-              <MenuItem value={2}>Twenty</MenuItem>
-              <MenuItem value={3}>Thirty</MenuItem>
+              { Object.keys(filters.filters || {}).map( (filter, index) => {return(<MenuItem key={index} value={filter}>{filter}</MenuItem> )})}
             </Select>
           </FormControl>
         </Box>
-        <Button
-          disableRipple
-          variant="text"
-          sx={{
-            gap: '0.25rem',
-            display: 'flex',
-            minWidth: '0.0625rem',
-            padding: 0,
-            color: searchHeadingColor,
-            fontSize: '0.6875rem',
-            fontWeight: 500,
-            height: '1.25rem',
-            lineHeight: '0.9375rem',
-            letterSpacing: '-0.00344rem',
+        {/* <Button
+            disableRipple
+            variant="text"
+            sx={{
+              minWidth: '0.0625rem',
+              padding: 0,
+              color: searchHeadingColor,
+              fontSize: '0.6875rem',
+              fontWeight: 500,
+              height: '1.25rem',
+              lineHeight: '0.9375rem',
+              gap: '0.25rem',
+              letterSpacing: '-0.00344rem',
 
-            '&:hover': {
-              background: 'transparent'
-            }
-          }}
+              '&:hover': {
+                background: 'transparent'
+              }
+            }}
         >
-          Crescent
-          <ImportExport />
-        </Button>
+            <Add size={12} opacity={1} color={searchHeadingColor} />
+            Add sorting
+          </Button> */}
+        <Divider sx={ dividerStyle } />
+        <Button
+            disableRipple
+            variant="text"
+            onClick={(event) => clearAll()}
+            sx={{
+              minWidth: '0.0625rem',
+              padding: 0,
+              color: searchHeadingColor,
+              fontSize: '0.6875rem',
+              fontWeight: 500,
+              height: '1.25rem',
+              lineHeight: '0.9375rem',
+              letterSpacing: '-0.00344rem',
+
+              '&:hover': {
+                background: 'transparent'
+              }
+            }}
+          >
+            Clear all
+          </Button>
       </Box>
     </Box>
   )

@@ -1,8 +1,23 @@
 import React from 'react';
-  import { Application, Container, Assets, Sprite, Text, utils, extensions, ExtensionType, Texture , Resource, BLEND_MODES } from 'pixi.js';
-  import * as PIXI from 'pixi.js';
-  var createClass = require('create-react-class');
-  import { useRef, useEffect } from 'react';
+import { Application, Container, Assets, Sprite, Text, TextStyle, utils, extensions, ExtensionType, Texture , Resource, BLEND_MODES } from 'pixi.js';
+import { getInstanceByID, selectInstance } from '../reducers/actions/instances';
+import SLICE from "../assets/viewer/slice.svg";
+import ORTH from "../assets/viewer/orth.svg";
+import GLASS from '../assets/viewer/glass.jpg';
+import ORTHHOVER from "../assets/viewer/orth_hover.svg";
+import SLICEHOVER from '../assets/viewer/slice_hover.svg';
+const createClass = require('create-react-class');
+
+const SLICE_VIEWER_DISPLAY = "sliceViewerDisplay";
+
+const componentToHex = (c) => {
+  const hex = (c*255).toString(16);
+  return hex.length == 1 ? "0" + hex : hex;
+}
+
+const rgbToHex = (color) => {
+  return "#" + componentToHex(color.r) + componentToHex(color.g) + componentToHex(color.b);
+}
 
   const Canvas = createClass({
     _isMounted: false,
@@ -60,14 +75,24 @@ import React from 'react';
       };
     },
 
+    setShiftDown : function(event){
+      if(event.keyCode === 16 || event.charCode === 16){
+          window.shiftDown = true;
+      }
+    },
+
+    setShiftUp : function(event){
+      if(event.keyCode === 16 || event.charCode === 16){
+          window.shiftDown = false;
+      }
+    },
+
     /**
      * In this case, componentDidMount is used to grab the canvas container ref, and
      * and hook up the PixiJS renderer
      *
      */
     componentDidMount: function () {
-      console.log("Component is mounted ")
-
       // signal component mounted (used to avoid calling isMounted() deprecated method)
       this._isMounted = true;
 
@@ -75,6 +100,7 @@ import React from 'react';
 
       // Setup PIXI Canvas in componentDidMount
       this.app = new Application({ width : this.props.width, height : this.props.height});
+      // this.app.renderer.backgroundColor = '#1a1a1a';
       // maintain full window size
       this.refs.stackCanvas?.getElementsByTagName("canvas")?.length == 0 && this.refs.stackCanvas?.appendChild(this.app.view);
 
@@ -125,6 +151,9 @@ import React from 'react';
       this.callPlaneEdges();
 
       setTimeout(this.bufferStack, 30000);
+
+      window.addEventListener? document.addEventListener('keydown', this.setShiftDown) : document.attachEvent('keydown', this.setShiftDown);
+      window.addEventListener? document.addEventListener('keyup', this.setShiftUp) : document.attachEvent('keyup', this.setShiftUp);
 
     },
 
@@ -188,10 +217,12 @@ import React from 'react';
 
 
     componentWillUnmount: function () {
-      console.log("Component is unmounted ")
       // this.refs.stackCanvas?.removeChild(this.app.view);
       // this.app.destroy(true,true);
       // this.app = null;
+
+      window.addEventListener? document.removeEventListener('keydown', this.setShiftDown, false) : document.attachEvent('keydown', this.setShiftDown);
+      window.addEventListener? document.removeEventListener('keyup', this.setShiftUp, false) : document.detachEvent('keyup', this.setShiftUp);
 
       if (this.props.canvasRef != null && this.props.canvasRef != undefined) {
         this.props.canvasRef.removeObject(this.state.stackViewerPlane);
@@ -232,7 +263,7 @@ import React from 'react';
             that.setState({ minDst: min, maxDst: max });
             let extent = { minDst: min, maxDst: max };
             that.props.setExtent(extent);
-            console.log('Stack Depth: ' + ((max - min) / 10.0).toFixed(0));
+            //console.log('Stack Depth: ' + ((max - min) / 10.0).toFixed(0));
             that.checkStack();
             that.callPlaneEdges();
             that.iBuffer = {};
@@ -379,12 +410,34 @@ import React from 'react';
 
     passPlane: function () {
       if (this.state.stackViewerPlane) {
-        if (this.props.canvasRef != undefined && this.props.canvasRef != null) {
-          this.state.stackViewerPlane = this.props.canvasRef.modify3DPlane(this.state.stackViewerPlane, this.state.plane[0], this.state.plane[1], this.state.plane[2], this.state.plane[3], this.state.plane[4], this.state.plane[5], this.state.plane[6], this.state.plane[7], this.state.plane[8], this.state.plane[9], this.state.plane[10], this.state.plane[11]);
-        }
+          let data = {
+            data : { 
+              vert1 : [ parseInt(this.state.plane[0]), parseInt(this.state.plane[1]), parseInt(this.state.plane[2])],
+              vert2: [ parseInt(this.state.plane[3]), parseInt(this.state.plane[4]), parseInt(this.state.plane[5]) ],
+              vert3 : [ parseInt(this.state.plane[6]), parseInt(this.state.plane[7]), parseInt(this.state.plane[8]) ],
+              vert4 : [ parseInt(this.state.plane[9]), parseInt(this.state.plane[10]), parseInt(this.state.plane[11])]
+             },
+             id : SLICE_VIEWER_DISPLAY,
+             textureUrl :  GLASS,
+             visible : this.props.slice
+          };
+          this.state.stackViewerPlane = true;
+          this.props.modifySliceDisplay(data)
       } else {
-        if (this.props.canvasRef != undefined && this.props.canvasRef != null) {
-          this.state.stackViewerPlane = this.props.canvasRef.add3DPlane(this.state.plane[0], this.state.plane[1], this.state.plane[2], this.state.plane[3], this.state.plane[4], this.state.plane[5], this.state.plane[6], this.state.plane[7], this.state.plane[8], this.state.plane[9], this.state.plane[10], this.state.plane[11], "window.GEPPETTO/node_modules/@window.GEPPETTOengine/window.GEPPETTO-client/js/components/widgets/stackViewer/images/glass.jpg");
+        if (this.props.slice) {
+          let data = {
+            data : { 
+              vert1 : [ parseInt(this.state.plane[0]), parseInt(this.state.plane[1]), parseInt(this.state.plane[2])],
+              vert2: [ parseInt(this.state.plane[3]), parseInt(this.state.plane[4]), parseInt(this.state.plane[5]) ],
+              vert3 : [ parseInt(this.state.plane[6]), parseInt(this.state.plane[7]), parseInt(this.state.plane[8]) ],
+              vert4 : [ parseInt(this.state.plane[9]), parseInt(this.state.plane[10]), parseInt(this.state.plane[11])]
+             },
+             id : SLICE_VIEWER_DISPLAY,
+             textureUrl :  GLASS,
+             visible : true
+          };
+          this.state.stackViewerPlane = true;
+          this.props.showSliceDisplay(data)
         }
         if (this.state.stackViewerPlane) {
           this.state.stackViewerPlane = true;
@@ -392,9 +445,7 @@ import React from 'react';
       }
       if (this.disp.width > 0 && this.props.slice) {
         this.state.stackViewerPlane = true;
-      } else {
-        this.state.stackViewerPlane = false;
-      }
+      } 
       this.state.planeUpdating = false;
     },
 
@@ -403,14 +454,8 @@ import React from 'react';
       var i, j, result, id, label;
       var that = this;
       var isSelected = false;
-      // FIXME
-      // while (window.GEPPETTO.SceneController.getSelection()[0] != undefined) {
-      //   window.GEPPETTO.SceneController.getSelection()[0].deselect();
-      // }
       [this.state.stack[0]]?.forEach( (item,i) => {
         (function (i, that, shift) {
-          // FIXME
-          // var shift = window.GEPPETTO.isKeyPressed("shift");
           var image = that.state.serverUrl.toString() + '?wlz=' + item + '&sel=0,255,255,255&mod=zeta&fxp=' + that.props.fxp.join(',') + '&scl=' + Number(that.state.scl).toFixed(1) + '&dst=' + Number(that.state.dst).toFixed(1) + '&pit=' + Number(that.state.pit).toFixed(0) + '&yaw=' + Number(that.state.yaw).toFixed(0) + '&rol=' + Number(that.state.rol).toFixed(0);
           // get image size;
           let file = image + '&prl=-1,' + that.state.posX.toFixed(0) + ',' + that.state.posY.toFixed(0) + '&obj=Wlz-foreground-objects';
@@ -425,11 +470,11 @@ import React from 'react';
                     if (result[j].trim() !== '') {
                       var index = Number(result[j]);
                       if (i !== 0 || index !== 0) { // don't select template
-                        if (index == 0 && !shift) {
-                          if (!isSelected){
-                            console.log(that.state.label[i] + ' clicked');
+                        if (index == 0 ) {
+                          if ( !isSelected && (!window.shiftDown || window.shiftDown === undefined)){
+                            //console.log(that.state.label[i] + ' clicked');
                             try {
-                              eval(that.state.id[i][Number(result[j])]).select();
+                              getInstanceByID(that.props.templateDomainIds[index], true, true, true);
                               that.setStatusText(that.state.label[i] + ' selected');
                               isSelected = true;
                             } catch (err) {
@@ -440,27 +485,35 @@ import React from 'react';
                           break;
                         } else {
                           if (typeof that.props.templateDomainIds !== 'undefined' && typeof that.props.templateDomainNames !== 'undefined' && typeof that.props.templateDomainIds[index] !== 'undefined' && typeof that.props.templateDomainNames[index] !== 'undefined' && that.props.templateDomainIds[index] !== null && that.props.templateDomainNames[index] !== null) {
-                            if (!isSelected) {
+                            if (!isSelected && window.shiftDown ) {
                               try {
-                                eval(that.state.id[i][Number(result[j])]).select();
-                                console.log(that.props.templateDomainNames[index] + ' clicked');
+                                getInstanceByID(that.props.templateDomainIds[index], true, true, true, true);
+                                selectInstance(that.props.templateDomainIds[index]);
+                                //console.log(that.props.templateDomainNames[index] + ' clicked');
                                 that.setStatusText(that.props.templateDomainNames[index] + ' selected');
                                 break;
                               } catch (ignore) {
-                                console.log(that.props.templateDomainNames[index] + ' requested');
+                                //console.log(that.props.templateDomainNames[index] + ' requested');
                                 that.setStatusText(that.props.templateDomainNames[index] + ' requested');
-                                if (shift) {
-                                  console.log('Adding ' + that.props.templateDomainNames[index]);
+                                if (window.shiftDown) {
+                                  //console.log('Adding ' + that.props.templateDomainNames[index]);
                                   that.setStatusText('Adding ' + that.props.templateDomainNames[index]);
                                   var varriableId = that.props.templateDomainIds[index];
-                                  //window.stackViewerRequest(varriableId); // window.stackViewerRequest must be configured in init script
                                   isSelected = true;
                                   break;
                                 } else {
                                   that.setStatusText(that.props.templateDomainNames[index] + ' (⇧click to add)');
-                                  //window.stackViewerRequest(that.props.templateDomainTypeIds[index]);
                                   break;
                                 }
+                              }
+                            } else if ( !window.shiftDown || window.shiftDown === undefined ){
+                              try {
+                                getInstanceByID(that.props.templateDomainTypeIds[index], false, true, false, false);
+                                that.setStatusText(that.props.templateDomainNames[index] + ' selected');
+                                break;
+                              } catch (ignore) {
+                                console.log(that.props.templateDomainTypeIds[index] + ' requested');
+                                that.setStatusText(that.props.templateDomainNames[index] + ' requested');
                               }
                             }
                           } else {
@@ -497,7 +550,7 @@ import React from 'react';
         this._initialized = true;
         this.props.onHome();
       }
-      if (this.state.text.indexOf('Buffering stack') > -1) {
+      if (this.state.text?.indexOf('Buffering stack') > -1) {
         this.state.buffer[-1].text = '';
       }
       this.state.bufferRunning = false;
@@ -518,8 +571,6 @@ import React from 'react';
             if (i == 0) {
               that.state.loadingLabels = true;
             }
-            // FIXME
-            // var shift = window.GEPPETTO.isKeyPressed("shift");
             var image = that.state.serverUrl.toString() + '?wlz=' + item + '&sel=0,255,255,255&mod=zeta&fxp=' + that.props.fxp.join(',') + '&scl=' + Number(that.state.scl).toFixed(1) + '&dst=' + Number(that.state.dst).toFixed(1) + '&pit=' + Number(that.state.pit).toFixed(0) + '&yaw=' + Number(that.state.yaw).toFixed(0) + '&rol=' + Number(that.state.rol).toFixed(0);
             let file = image + '&prl=-1,' + callX + ',' + callY + '&obj=Wlz-foreground-objects';
             fetch(file,{ method : "POST", url : file})
@@ -534,12 +585,22 @@ import React from 'react';
                       var index = Number(result[j]);
                       if (i !== 0 || index !== 0) { // don't select template
                         if (index == 0) {
-                          if (!shift) {
-                            that.state.objects.push(that.state.label[i]);
+                          if (!window.shiftDown || window.shiftDown === undefined ) {
+                            let updatedObjects = [...that.state.objects];
+                            if ( !updatedObjects?.find( o => o === that.state.label[i] ) ){
+                              updatedObjects.push(that.props.templateDomainNames[index]);
+                            }
+                            that.setState({ objects : updatedObjects})
+                            that.state.objects = updatedObjects
                           }
                         } else {
                           if (typeof that.props.templateDomainIds !== 'undefined' && typeof that.props.templateDomainNames !== 'undefined' && typeof that.props.templateDomainIds[index] !== 'undefined' && typeof that.props.templateDomainNames[index] !== 'undefined' && that.props.templateDomainNames[index] !== null) {
-                            that.state.objects.push(that.props.templateDomainNames[index]);
+                            let updatedObjects = [...that.state.objects];
+                            if ( !updatedObjects?.find( o => o === that.props.templateDomainNames[index] ) ){
+                              updatedObjects.push(that.props.templateDomainNames[index]);
+                            }
+                            that.setState({ objects : updatedObjects})
+                            that.state.objects = updatedObjects
                             break;
                           }
                         }
@@ -550,7 +611,7 @@ import React from 'react';
                     return index === arr.indexOf(el);
                   }).sort();
                   var objects = '';
-                  if (shift) {
+                  if (window.shiftDown) {
                     objects = 'Click to add: ';
                   }
                   for (j in list) {
@@ -638,12 +699,12 @@ import React from 'react';
               }
             }
           } else {
-            console.log('Buffering neighbouring layers (' + this.state.numTiles.toString() + ') tiles...');
+            //console.log('Buffering neighbouring layers (' + this.state.numTiles.toString() + ') tiles...');
             for (j = 0; j < this.state.numTiles; j++) {
               for (i in this.state.stack) {
                 image = this.state.serverUrl.toString() + '?wlz=' + this.state.stack[i] + '&sel=0,255,255,255&mod=zeta&fxp=' + this.props.fxp.join(',') + '&scl=' + Number(this.state.scl).toFixed(1) + '&dst=' + Number(this.state.dst).toFixed(1) + '&pit=' + Number(this.state.pit).toFixed(0) + '&yaw=' + Number(this.state.yaw).toFixed(0) + '&rol=' + Number(this.state.rol).toFixed(0) + '&qlt=80&jtl=' + j.toString();
                 if (!this.state.iBuffer[image]) {
-                  console.log('buffering ' + this.state.stack[i].toString() + '...');
+                  // console.log('buffering ' + this.state.stack[i].toString() + '...');
                   loadList.add(image);
                   buffMax -= 1;
                 }
@@ -660,7 +721,7 @@ import React from 'react';
 
         if (loadList.size > 0) {
           this.state.bufferRunning = true;
-          console.log('Loading ' + loadList.size + ' slices/tiles...');
+          // console.log('Loading ' + loadList.size + ' slices/tiles...');
 
           const imageDelivery = {
             extension: ExtensionType.LoadParser,
@@ -804,7 +865,7 @@ import React from 'react';
                   // this.state.images[d].alpha = 0.9;
                   this.state.images[d].blendMode = BLEND_MODES.SCREEN;
                 }
-                console.log("adding image ", this.state.images[d])
+                // console.log("adding image ", this.state.images[d])
                 this.stack.addChild(this.state.images[d]);
               } else {
                 if (this.state.imagesUrl[d] != image) {
@@ -856,20 +917,21 @@ import React from 'react';
 
     createStatusText: function () {
       if (!this.state.buffer[-1]) {
-        var style = {
-          font: '12px Helvetica',
+        const style = {
+          fontSize: 16,
           fill: '#ffffff',
-          stroke: '#000000',
+          stroke: '#1a1a1a',
           strokeThickness: 2,
           dropShadow: true,
-          dropShadowColor: '#000000',
+          dropShadowColor: '#1a1a1a',
           dropShadowAngle: Math.PI / 6,
           dropShadowDistance: 2,
           wordWrap: true,
           wordWrapWidth: this.app.view.width,
           textAlign: 'right'
         };
-        this.state.buffer[-1] = new Text(this.state.text, style);
+        const textStyle = new TextStyle(style);
+        this.state.buffer[-1] = new Text(this.state.text, textStyle);
         this.app.stage.addChild(this.state.buffer[-1]);
         // fix position
         this.state.buffer[-1].x = 0
@@ -982,16 +1044,16 @@ import React from 'react';
       this.state.images = [];
       this.stack.removeChildren();
       if (props.orth == 0) {
-        console.log('Frontal');
+        // console.log('Frontal');
         this.setStatusText('Frontal');
       } else if (props.orth == 1) {
-        console.log('Transverse');
+        // console.log('Transverse');
         this.setStatusText('Transverse');
       } else if (props.orth == 2) {
-        console.log('Sagittal');
+        // console.log('Sagittal');
         this.setStatusText('Sagittal');
       } else {
-        console.log('Orth:' + props.orth);
+        // console.log('Orth:' + props.orth);
         this.setStatusText('...');
       }
       this.callDstRange();
@@ -1021,7 +1083,6 @@ import React from 'react';
       if (this._isMounted) {
         // render the stage container (if the component is still mounted)
         this.app.renderer.render(this.disp);
-        // this.frame = requestAnimationFrame(this.animate);
       }
     },
 
@@ -1031,20 +1092,21 @@ import React from 'react';
        * the reason for this is because of multitouch
        * we want to track the movement of this particular touch
        */
-      this.state.data = event.data;
       this.stack.alpha = 0.7;
       this.state.dragging = true;
-      var offPosition = this.state.data.global;
-      this.state.dragOffset = {
-        x: offPosition.x,
-        y: offPosition.y
-      };
-      // console.log('DragStartOffset:'+JSON.stringify(this.state.dragOffset));
-      var startPosition = this.state.data.getLocalPosition(this.stack);
-      // console.log([startPosition.x,this.state.imageX*0.5,1/this.disp.scale.x]);
-      this.state.posX = Number(startPosition.x.toFixed(0));
-      this.state.posY = Number(startPosition.y.toFixed(0));
-      // console.log('DragStart:'+JSON.stringify(startPosition));
+      var offPosition = this.state.data?.global;
+      if ( offPosition ) {
+        this.state.dragOffset = {
+          x: offPosition.x,
+          y: offPosition.y
+        };
+        // console.log('DragStartOffset:'+JSON.stringify(this.state.dragOffset));
+        var startPosition = this.state.data?.getLocalPosition(this.stack);
+        // console.log([startPosition.x,this.state.imageX*0.5,1/this.disp.scale.x]);
+        this.state.posX = Number(startPosition?.x?.toFixed(0));
+        this.state.posY = Number(startPosition?.y?.toFixed(0));
+        // console.log('DragStart:'+JSON.stringify(startPosition));
+      }
     },
 
     onDragEnd: function () {
@@ -1062,19 +1124,20 @@ import React from 'react';
         }
         // set the interaction data to null
         this.state.data = null;
-        this.state.dragging = false;
         this.props.setExtent({ stackX: this.stack.position.x, stackY: this.stack.position.y });
         this.createImages();
         this.state.buffer[-1].text = '';
       }
+      this.state.dragging = false;
     },
 
     onHoverEvent: function (event) {
-      if (!this.state.loadingLabels && !this.state.dragging) {
+      this.state.data = event.data;
+      if (this.state.data !== null && typeof this.state.data.getLocalPosition === "function" && !this.state.loadingLabels && !this.state.dragging) {
         if (this.app === null ) {
           return;
         }
-        var currentPosition = this.app.renderer.plugins.interaction.rootPointerEvent?.screen;
+        var currentPosition = this.state.data.getLocalPosition(this.stack);
         // update new position:
         this.state.posX = Number(currentPosition?.x?.toFixed(0));
         this.state.posY = Number(currentPosition?.y?.toFixed(0));
@@ -1092,16 +1155,16 @@ import React from 'react';
     },
 
     onDragMove: function (event) {
-      if (this.state.dragging) {
-        var newPosition = this.state.data.global;
-        var xmove = (newPosition.x - this.state.dragOffset.x) / this.disp.scale.x;
-        var ymove = (newPosition.y - this.state.dragOffset.y) / this.disp.scale.y;
-        this.state.dragOffset.x = newPosition.x;
-        this.state.dragOffset.y = newPosition.y;
+      if (this.state.dragging && this.state.data?.global) {
+        var newPosition = this.state.data?.global;
+        var xmove = (newPosition?.x - this.state?.dragOffset?.x) / this.disp.scale?.x;
+        var ymove = (newPosition?.y - this.state?.dragOffset?.y) / this.disp.scale?.y;
+        this.state.dragOffset.x = newPosition?.x;
+        this.state.dragOffset.y = newPosition?.y;
         this.stack.position.x += xmove;
         this.stack.position.y += ymove;
         // console.log('Moving :'+xmove+','+ymove);
-        this.state.buffer[-1].text = 'Moving stack... (X:' + Number(this.stack.position.x).toFixed(2) + ',Y:' + Number(this.stack.position.y).toFixed(2) + ')';
+        this.state.buffer[-1].text = 'Moving stack... (X:' + Number(this.stack.position?.x).toFixed(2) + ',Y:' + Number(this.stack.position?.y).toFixed(2) + ')';
         // update slice view
         this.createImages();
       } else {
@@ -1115,11 +1178,8 @@ import React from 'react';
      */
     render: function () {
       return (
-        < div
-          className="stack-canvas-container" ref="stackCanvas"
-          > </div>
-      )
-      ;
+        < div className="stack-canvas-container" ref="stackCanvas"> </div>
+      );
     }
   });
 
@@ -1135,8 +1195,8 @@ const StackViewerComponent = () => createClass({
         text: '',
         stackX: 0,
         stackY: 0,
-        imageX: 10240,
-        imageY: 10240,
+        imageX: 1024,
+        imageY: 1024,
         fxp: [511, 255, 108],
         pit: 0,
         yaw: 0,
@@ -1160,7 +1220,9 @@ const StackViewerComponent = () => createClass({
         slice: false,
         lastUpdate: 0,
         scrollTrack: 0,
-        loadChanges: true
+        loadChanges: true,
+        hoverOrthButton : false,
+        hoverOrthSlice : false
       };
     },
 
@@ -1312,7 +1374,7 @@ const StackViewerComponent = () => createClass({
     },
 
     handleInstances: function (instances) {
-      var newState = this.state;
+      var newState = {...this.state};
       if (instances && instances != null && instances.length > 0) {
         var instance;
         var data, vals;
@@ -1359,9 +1421,10 @@ const StackViewerComponent = () => createClass({
               if (typeof this.props.config.templateId !== 'undefined' && typeof this.props.config.templateDomainIds !== 'undefined' && instances[instance].parent.getId() == this.props.config.templateId) {
                 ids.push(this.props.config.templateDomainIds);
               } else {
-                ids.push([instances[instance].parent.getId()]);
+                ids.push([instances[instance].getId()]);
               }
-              labels.push(instances[instance].parent.getName());
+              labels.push(instances[instance].getName());
+              colors.push(rgbToHex(instances[instance].wrappedObj.color))
             }
           } catch (err) {
             console.log('Error handling ' + instance);
@@ -1404,7 +1467,7 @@ const StackViewerComponent = () => createClass({
       var newDst = Number(this.state.dst);
       var stackX = this.state.stackX;
       var stackY = this.state.stackY;
-      if (window.GEPPETTO?.isKeyPressed("shift")) {
+      if (window.shiftDown) {
         zoomLevel = Number((this.state.zoomLevel += 1).toFixed(1));
       } else {
         zoomLevel = Number((this.state.zoomLevel += 0.1).toFixed(1));
@@ -1431,6 +1494,14 @@ const StackViewerComponent = () => createClass({
         stackX: stackX,
         stackY: stackY
       });
+    },
+
+    mouseOverOrth : function (over) {
+      this.setState({ hoverOrthButton : over});
+    },
+
+    mouseOverSlice : function (over) {
+      this.setState({ hoverSliceButton : over});
     },
 
     toggleOrth: function () {
@@ -1476,7 +1547,7 @@ const StackViewerComponent = () => createClass({
       var newDst = Number(this.state.dst);
       var stackX = this.state.stackX;
       var stackY = this.state.stackY;
-      if (window.GEPPETTO?.isKeyPressed("shift")) {
+      if (window.shiftDown) {
         zoomLevel = Number((this.state.zoomLevel -= 1).toFixed(1));
       } else {
         zoomLevel = Number((this.state.zoomLevel -= 0.1).toFixed(1));
@@ -1510,9 +1581,8 @@ const StackViewerComponent = () => createClass({
      *
      */
     onStepIn: function () {
-      var shift = window.GEPPETTO?.isKeyPressed("shift");
       var newdst = this.state.dst
-      if (shift) {
+      if (window.shiftDown) {
         newdst += (this.state.voxelZ * this.state.scl) * 10;
       } else {
         newdst += (this.state.voxelZ * this.state.scl);
@@ -1532,9 +1602,8 @@ const StackViewerComponent = () => createClass({
      *
      */
     onStepOut: function () {
-      var shift = window.GEPPETTO?.isKeyPressed("shift");
       var newdst = this.state.dst
-      if (shift) {
+      if (window.shiftDown) {
         newdst -= (this.state.voxelZ * this.state.scl) * 10;
       } else {
         newdst -= (this.state.voxelZ * this.state.scl);
@@ -1619,16 +1688,10 @@ const StackViewerComponent = () => createClass({
       var stepInClass = 'btn fa fa-chevron-down';
       var stepOutClass = 'btn fa fa-chevron-up';
       var pointerClass = 'btn fa fa-hand-pointer-o';
-      var orthClass = 'btn gpt-xyz';
+      var orthClass = 'btn';
       var toggleSliceClass = 'btn ';
-      if (this.state.slice) {
-        toggleSliceClass += 'gpt-hideplane';
-      } else {
-        toggleSliceClass += 'gpt-showplane';
-      }
-      var startOffset = 5;
+      var startOffset = 45;
       var displayArea = this.props.data.id + 'displayArea';
-
       var markup = '';
       if (this.state.stack.length > 0) {
         markup = (
@@ -1636,7 +1699,7 @@ const StackViewerComponent = () => createClass({
             <div  onClick={this.onHome} >
             <button style={{
               position: 'absolute',
-              left: 15,
+              left: 13,
               top: startOffset + 20,
               padding: 0,
               border: 0,
@@ -1685,21 +1748,31 @@ const StackViewerComponent = () => createClass({
             </div>
             <button style={{
               position: 'absolute',
-              left: 15,
-              top: startOffset + 60,
+              left: 12,
+              top: startOffset + 55,
               padding: 0,
               paddingTop: 3,
               border: 0,
               background: 'transparent'
-            }} className={orthClass} onClick={this.toggleOrth} title={'Change Slice Plane Through Stack'} />
+            }} className={orthClass} onClick={this.toggleOrth} onMouseOver={() => this.mouseOverOrth(true)} onMouseOut={() => this.mouseOverOrth(false)} title={'Change Slice Plane Through Stack'}>
+              <img
+                src={this.state.hoverOrthButton ? ORTHHOVER : ORTH}
+                alt={'Toggle Orth'}
+              />
+            </button>
             <button style={{
               position: 'absolute',
-              left: 15,
-              top: startOffset + 130,
+              left: 12,
+              top: startOffset + 125,
               padding: 0,
               border: 0,
               background: 'transparent'
-            }} className={toggleSliceClass} onClick={this.toggleSlice} title={'Toggle the 3D slice display'} />
+            }} className={toggleSliceClass} onClick={this.toggleSlice} onMouseOver={() => this.mouseOverSlice(true)} onMouseOut={() => this.mouseOverSlice(false)} title={'Toggle the 3D slice display'}>
+              <img
+                src={this.state.hoverSliceButton ? SLICEHOVER : SLICE}
+                alt={'Add Slices'}
+              />
+            </button>
             <Canvas zoomLevel={this.state.zoomLevel} dst={this.state.dst}
               serverUrl={this.props.config.serverUrl} canvasRef={this.props.canvasRef}
               fxp={this.state.fxp} pit={this.state.pit} yaw={this.state.yaw} rol={this.state.rol}
@@ -1714,7 +1787,8 @@ const StackViewerComponent = () => createClass({
               templateDomainTypeIds={this.state.tempType}
               templateDomainNames={this.state.tempName}
               slice={this.state.slice} onHome={this.onHome} onZoomIn={this.onZoomIn}
-              onResize={this.onResize} />
+              onResize={this.onResize} showSliceDisplay={this.props.showSliceDisplay} 
+              modifySliceDisplay={this.props.modifySliceDisplay}/>
           </div>
         );
       } else {

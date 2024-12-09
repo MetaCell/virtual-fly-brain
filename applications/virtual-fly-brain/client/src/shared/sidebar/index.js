@@ -1,8 +1,10 @@
-import { Box, Button, ButtonGroup, Chip, Grid, IconButton, Menu, MenuItem, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
+import { Box, Button, ButtonGroup, Grid, IconButton, Menu, MenuItem, Paper, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tabs, Typography } from "@mui/material";
 import React, { useState, useEffect } from "react";
-import {useSelector, useDispatch} from 'react-redux'
+import { useSelector } from 'react-redux'
+import { styled } from '@mui/material/styles';
 import MediaQuery from 'react-responsive';
-import { ArView, ArrowDown, ArrowRight, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Delete, Expand, Eye, Focus, Line, Link, PinDrop, Remove } from "../../icons";
+import { ArView, ArrowDown, ArrowRight, ChevronDown, ChevronLeft, ChevronRight, Delete, Expand, Eye, Focus, Line, Remove, ScatterPlot } from "../../icons";
+import PropTypes from 'prop-types';
 import vars from "../../theme/variables";
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -11,6 +13,7 @@ import TreeView from '@mui/lab/TreeView';
 import { TreeItem } from "@mui/lab";
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import GeneralInformation from "../../components/TermInfo/GeneralInformation";
+import RIBBON from '../../assets/ribbon.png';
 
 const {
   whiteColor,
@@ -19,11 +22,89 @@ const {
   blackColor,
   listHeadingColor,
   headerBorderColor,
+  primaryBg
 } = vars;
 
-const SideBar = ({open, setOpen}) => {
+const CustomTableContainer = styled(TableContainer)(
+  ({ theme }) => `
+  position: relative;
+  min-width: 35rem;
+  max-width: 43rem;
+  border-radius: 0.5rem;
+  box-shadow: 0px 2px 4px -2px rgba(16, 24, 40, 0.06), 0px 4px 8px -2px rgba(16, 24, 40, 0.10);
+  &:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    z-index: 999;
+    display: block;
+    height: 100%;
+    width: 100%;
+    pointer-events: none;
+    background: linear-gradient(270deg, #222 0%, rgba(34, 34, 34, 0.00) 26.7%);
+  }
+`,
+);
+
+const CustomBox = styled(Box)(
+  ({ theme }) => `
+  position: relative;
+  &:after {
+    content: '';
+    position: absolute;
+    right: 0;
+    z-index: 999;
+    width: 100%;
+    height: 100%;
+    display: block;
+    pointer-events: none;
+    background: linear-gradient(270deg, #1A1A1A 0%, rgba(26, 26, 26, 0.00) 26.7%);
+  }
+  `
+)
+
+function CustomTabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <Box
+      mt={1}
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <>
+          {children}
+        </>
+      )}
+    </Box>
+  );
+}
+
+CustomTabPanel.propTypes = {
+  children: PropTypes.node,
+  index: PropTypes.number.isRequired,
+  value: PropTypes.number.isRequired,
+};
+
+function a11yProps(index) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+  };
+}
+
+const SideBar = ({ open, setOpen }) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const openMenu = Boolean(anchorEl);
+  const [value, setValue] = React.useState(0);
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -47,17 +128,20 @@ const SideBar = ({open, setOpen}) => {
         xs: headerBorderColor,
         md: 'transparent'
       },
+      borderBottom: {
+        lg: '0.0625rem solid #3A3A3A'
+      },
       zIndex: 9,
       position: {
         xs: 'sticky',
         md: 'static',
       },
-      margin: {
-        xs: -2,
+      mx: {
+        xs: -1.5,
         md: 0
       },
-      padding: {
-        xs: 2,
+      px: {
+        xs: 1.5,
         md: 0
       }
     },
@@ -66,12 +150,14 @@ const SideBar = ({open, setOpen}) => {
       fontWeight: 400,
       fontSize: '0.875rem',
       lineHeight: '1.125rem',
-      color: listHeadingColor,
+      color: listHeadingColor
     },
 
     footer: {
       height: '3.75rem',
+      background: '#1A1A1A',
       borderTop: `0.0625rem solid ${secondaryBg}`,
+      zIndex: 9,
       '& p': {
         fontWeight: 400,
         fontSize: '1rem',
@@ -79,12 +165,21 @@ const SideBar = ({open, setOpen}) => {
         color: outlinedBtnTextColor,
       }
     },
+
+    buttonGroup: {
+      '& .MuiButton-root': {
+        height: '1.875rem',
+        background: {
+          xs: primaryBg,
+          lg: secondaryBg
+        }
+      }
+    }
   }
 
-  const data = useSelector(state => state.termInfo.termInfoData)
-  const error = useSelector(state => state.termInfo.error)
+  const data = useSelector(state => state.instances.focusedInstance)
 
-  const [termInfoData, setTermInfoData] = useState(data);
+  const [instanceOnFocus, setInstanceOnFocus] = useState(data.metadata);
 
   const termInfoHeading = (
     <>
@@ -125,10 +220,9 @@ const SideBar = ({open, setOpen}) => {
   const MAX_LENGTH = 40;
 
   // FIXME
-  useEffect( () => {
-    console.log("term info data : ", data);
-    setTermInfoData(data)
-  },[data]);
+  useEffect(() => {
+    setInstanceOnFocus(data)
+  }, [data]);
 
   return (
     <Box
@@ -138,11 +232,9 @@ const SideBar = ({open, setOpen}) => {
           xs: '100%',
           lg: open ? '34rem' : '2.75rem'
         },
-        flex: {
-          lg: open ? 1 : 'none !important'
-        },
+        flex: 'none !important',
         p: {
-          xs: 2,
+          xs: 1.5,
           lg: 0
         },
         pt: {
@@ -193,8 +285,8 @@ const SideBar = ({open, setOpen}) => {
               lg: 2
             }
           }}>
-            <Box mb={2} sx={classes.header}>
-              <Grid container alignItems='center'>
+            <Box sx={{ ...classes.header, pb: { xs: 1.5, lg: 2 } }}>
+              <Grid container alignItems='flex-start'>
                 <MediaQuery minWidth={768}>
                   <Grid item xs={12} lg={7} sm={6}>
                     <Box>
@@ -227,13 +319,27 @@ const SideBar = ({open, setOpen}) => {
                       },
                       columnGap: {
                         xs: 1,
-                        md: 3
+                        sm: 3
                       }
                     }}
                   >
-                    <Box display='flex' gap="0.375rem">
+                    <Box display='flex' sx={{
+                      gap: {
+                        xs: 0.5,
+                        sm: 1.125,
+                      }
+                    }}>
                       <Box>
                         <Button
+                          sx={{
+                            height: '1.875rem',
+                            fontSize: '0.75rem',
+                            color: outlinedBtnTextColor,
+                            background: {
+                              xs: primaryBg,
+                              lg: secondaryBg
+                            }
+                          }}
                           variant="contained"
                           color="secondary"
                           id="basic-button"
@@ -286,10 +392,9 @@ const SideBar = ({open, setOpen}) => {
                   </Box>
                 </Grid>
               </Grid>
-
             </Box>
 
-            <Box mx={-2} px={2} sx={{
+            <Box mx={-1.5} px={1.5} sx={{
               overflow: {
                 lg: 'auto'
               },
@@ -297,7 +402,7 @@ const SideBar = ({open, setOpen}) => {
                 lg: 'calc(100% - 4.0625rem)'
               }
             }}>
-              <Accordion defaultExpanded>
+              <Accordion>
                 <AccordionSummary
                   expandIcon={<ChevronDown />}
                   aria-controls="panel1a-content"
@@ -306,7 +411,7 @@ const SideBar = ({open, setOpen}) => {
                   <Typography>General Information</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <GeneralInformation data={termInfoData} classes={classes} />
+                  <GeneralInformation data={instanceOnFocus} classes={classes} />
                 </AccordionDetails>
               </Accordion>
 
@@ -320,70 +425,86 @@ const SideBar = ({open, setOpen}) => {
                 </AccordionSummary>
                 <AccordionDetails>
                   <TreeView
-                      aria-label="customized"
-                      defaultParentIcon={<ArrowRight />}
+                    aria-label="customized"
+                    defaultParentIcon={<ArrowRight />}
                     // defaultCollapseIcon={<ArrowRight />}
                     // defaultExpandIcon={<ArrowRight />}
-                      defaultEndIcon={<Line />}
+                    defaultEndIcon={<Line />}
                   >
                     <TreeItem nodeId="1" label={
-                      <Box display='flex' flexWrap='wrap'>
+                      <CustomBox display='flex' flexWrap='wrap'>
                         <Typography>Neurons with postsynaptic terminals in posterior ventrolateral protocerebrum</Typography>
-                          <Box display='flex' pl={0.5}>
+                        <Box display='flex' sx={{ zIndex: 1000 }} pl={0.5}>
                           <Typography sx={{ pr: 0.5 }}>71</Typography>
-                          <ListAltIcon />
+                          <ListAltIcon sx={{ fontSize: '1.25rem', color: '#A0A0A0' }} />
                         </Box>
-                      </Box>
+                      </CustomBox>
                     }>
                       <TreeItem nodeId="2" label="Hello" />
-                      <TreeItem nodeId="3" label="Subtree with children">
+                      <TreeItem nodeId="3" label="Subtree with children dfsf">
                         <TreeItem nodeId="6" label={
-                            <TableContainer component={Paper}>
-                            <Table aria-label="simple table">
-                              <TableHead>
-                                <TableRow>
-                                  <TableCell>Name</TableCell>
-                                  <TableCell>Description</TableCell>
-                                  <TableCell>Score</TableCell>
-                                  <TableCell></TableCell>
-                                </TableRow>
-                              </TableHead>
-                              <TableBody>
-                                {rows.map((row) => (
-                                  <TableRow
-                                    key={row.name}
-                                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                                  >
-                                    <TableCell>
-                                      <Button
-                                        disableRipple
-                                        variant="text"
-                                        color="info"
-                                        sx={{
-                                          padding: 0,
-                                          minWidth: '0.0625rem',
-                                          textAlign: 'left',
-                                          display: 'inline-block',
+                          <>
+                            <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
+                              <Tab label="Result" {...a11yProps(0)} />
+                              <Tab label="Ribbon" {...a11yProps(1)} />
+                            </Tabs>
 
-                                          '&:not(:hover)': {
-                                            color: 'rgba(255, 255, 255, 0.8)'
-                                          }
-                                        }}
+                            <CustomTabPanel value={value} index={0}>
+                              <CustomTableContainer component={Paper}>
+                                <Table aria-label="simple table">
+                                  <TableHead>
+                                    <TableRow>
+                                      <TableCell>Name</TableCell>
+                                      <TableCell>Description</TableCell>
+                                      <TableCell>Score</TableCell>
+                                      <TableCell></TableCell>
+                                    </TableRow>
+                                  </TableHead>
+                                  <TableBody>
+                                    {rows.map((row) => (
+                                      <TableRow
+                                        key={row.name}
+                                        sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                       >
-                                        {row.name}
-                                      </Button>
-                                    </TableCell>
-                                    <TableCell>{row.calories}</TableCell>
-                                    <TableCell>{row.fat}</TableCell>
-                                    <TableCell>
-                                      <Button variant="text" color="error">Delete</Button>
-                                      {/* <Button variant="outlined" color="info">Add</Button> */}
-                                    </TableCell>
-                                  </TableRow>
-                                ))}
-                              </TableBody>
-                            </Table>
-                            </TableContainer>
+                                        <TableCell>
+                                          <Button
+                                            disableRipple
+                                            variant="text"
+                                            color="info"
+                                            sx={{
+                                              padding: 0,
+                                              minWidth: '0.0625rem',
+                                              textAlign: 'left',
+                                              display: 'inline-block',
+
+                                              '&:hover': {
+                                                backgroundColor: 'transparent'
+                                              },
+
+                                              '&:not(:hover)': {
+                                                color: 'rgba(255, 255, 255, 0.8)'
+                                              }
+                                            }}
+                                          >
+                                            {row.name}
+                                          </Button>
+                                        </TableCell>
+                                        <TableCell>{row.calories}</TableCell>
+                                        <TableCell>{row.fat}</TableCell>
+                                        <TableCell>
+                                          <Button variant="text" color="error">Delete</Button>
+                                          {/* <Button variant="outlined" color="info">Add</Button> */}
+                                        </TableCell>
+                                      </TableRow>
+                                    ))}
+                                  </TableBody>
+                                </Table>
+                              </CustomTableContainer>
+                            </CustomTabPanel>
+                            <CustomTabPanel value={value} index={1}>
+                              <img src={RIBBON} alt="" style={{ width: '100%' }} />
+                            </CustomTabPanel>
+                          </>
                         } />
                         <TreeItem nodeId="7" label="Sub-subtree with children">
                           <TreeItem nodeId="9" label="Child 1" />
@@ -439,23 +560,29 @@ const SideBar = ({open, setOpen}) => {
                   aria-controls="panel1a-content"
                   id="panel2a-header"
                 >
-                    <Typography>Graphs</Typography>
+                  <Typography>Graphs</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                   <Box
                     display='flex'
-                      flexDirection='column'
-                      rowGap={1}
+                    flexDirection='column'
+                    rowGap={1}
                   >
                     <Box
                       display='flex'
                       alignItems="center"
                     >
-                        <Typography sx={{ flexGrow: 1, color: outlinedBtnTextColor }}>
+                      <Typography sx={{
+                        flexGrow: 1, color: outlinedBtnTextColor,
+                        fontSize: {
+                          xs: '0.875rem',
+                          lg: '1rem'
+                        }
+                      }}>
                         Show location of JRC2018Unisex
                       </Typography>
-                      <IconButton sx={{p: 0}}>
-                          <PinDrop />
+                      <IconButton sx={{ p: 0 }}>
+                        <ScatterPlot />
                       </IconButton>
                     </Box>
 
@@ -463,11 +590,18 @@ const SideBar = ({open, setOpen}) => {
                       display='flex'
                       alignItems="center"
                     >
-                        <Typography sx={{ flexGrow: 1, color: outlinedBtnTextColor }}>
+                      <Typography
+                        sx={{
+                          flexGrow: 1, color: outlinedBtnTextColor,
+                          fontSize: {
+                            xs: '0.875rem',
+                            lg: '1rem'
+                          }
+                        }}>
                         Show location of JRC2018Unisex
                       </Typography>
-                      <IconButton sx={{p: 0}}>
-                          <PinDrop />
+                      <IconButton sx={{ p: 0 }}>
+                        <ScatterPlot />
                       </IconButton>
                     </Box>
                   </Box>

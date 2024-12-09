@@ -1,70 +1,99 @@
-import React from "react";
+import React, { useEffect } from "react";
 import QueryHeader from "./QueryHeader";
 import { Item } from "./HistoryItem";
-import vars from "../../theme/variables";
 import { Box } from "@mui/material";
-const {
-  chipPink,
-  chipRed,
-  chipGreen,
-  chipYellow,
-  chipOrange
-} = vars;
+import { useSelector } from 'react-redux'
+import { removeAllRecentSearch } from "../../reducers/actions/globals";
+import { useDispatch } from "react-redux";
 
-const recentSearch = [
-  {
-    title: "CDF0 (anlage in statu nascendi)",
-    tags: [
-      {
-        id: 0,
-        label: "Anatomy"
-      },
-      {
-        id: 1,
-        label: "Nervous system"
-      },
-      {
-        id: 2,
-        label: "Neuron"
-      },
-      {
-        id: 3,
-        label: "Nervous projection bundle"
-      },
-      {
-        id: 4,
-        label: "Larva"
-      }
-    ]
-  },
-  {
-    title: "a00c_a41 (a00c_a4 (L1EM:2511238))",
-    tags: [
-      {
-        id: 0,
-        label: "Anatomy"
-      },
-      {
-        id: 1,
-        label: "Nervous system"
-      }
-    ]
+const facets_annotations_colors = require("../configuration/VFBColors").facets_annotations_colors;
+
+const History = ({recentSearches, totalResults}) => {
+  const [filteredSearches, setFilteredSearches] = React.useState(recentSearches || []);
+  const dispatch = useDispatch();
+  const initialFilters = {
+    "filters" : {
+      "Id" : "short_form",
+      "Name" : "label"
+    },
+    "tags" : "facets_annotation"
+  };
+  const [filters, setFilters] = React.useState(initialFilters);
+
+  useEffect( () => {
+    let tags = {...initialFilters.filters};
+    recentSearches?.forEach( (query, index ) => {
+      query.facets_annotation?.forEach( tag => {
+        if ( tags?.[tag] == undefined ){
+          tags[tag] = tag;
+        }
+      })
+    })
+    setFilters({...filters, filters : tags});
+  }, [recentSearches])
+
+  const updateFilters = (searches) => {
+    setFilteredSearches(searches)
   }
-]
 
-const History = () => {
-  const chipColors = [chipRed, chipGreen, chipOrange, chipPink, chipYellow];
+  const removeFromHistory = () => {
+    dispatch(removeAllRecentSearch())
+  };
+
+  const handleSort = (value, crescent) => {
+    const identifier = filters.filters[value];
+    let updatedSearches = [...filteredSearches.sort( (a,b) => {
+      if ( a?.[identifier] && b?.[identifier] ){
+        return (crescent)* a?.[identifier]?.localeCompare(b?.[identifier] )
+      } else if ( a?.[filters.tags] && b?.[filters.tags] ) {
+        if ( a?.[filters.tags]?.includes(identifier) ) {
+          return -1;
+        } else {
+          return 0;
+        }
+      }
+    })];
+    setFilteredSearches(updatedSearches)
+  }
+
+  const handleCrescentEvent = (sort, crescent) => {
+    const identifier = filters.filters[sort];
+    let updatedSearches = [...filteredSearches.sort( (a,b) => {
+      if ( a?.[identifier] && b?.[identifier] ){
+        return (crescent * -1 )* a?.[identifier]?.localeCompare(b?.[identifier] )
+      } else if ( a?.[filters.tags] && b?.[filters.tags] ) {
+        if ( a?.[filters.tags]?.includes(identifier) ) {
+          return -1;
+        } else {
+          return 0;
+        }
+      }
+    })];
+    setFilteredSearches(updatedSearches)
+  }
+
+  React.useEffect( () => {
+    setFilteredSearches(recentSearches)
+  }, [recentSearches])
 
   return (
     <>
-      <QueryHeader title="8 results in history" />
+      <QueryHeader
+        filters={filters}
+        recentSearches={filteredSearches}
+        setFilteredSearches={updateFilters}
+        title={totalResults + " results in history"}
+        clearAll={removeFromHistory}
+        handleCrescentEvent={handleCrescentEvent}
+        handleSort={handleSort}
+      />
 
       <Box p={1}>
-        {recentSearch?.map((search, index) => (
+        {filteredSearches?.map((search, index) => (
           <Item
             key={`recentSearch-${index}`}
             search={search}
-            chipColors={chipColors}
+            chipColors={facets_annotations_colors}
             index={index}
           />
         ))}

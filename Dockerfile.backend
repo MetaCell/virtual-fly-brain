@@ -1,56 +1,34 @@
-# Build stage
-FROM maven:3.9-eclipse-temurin-11 AS builder
+# Use Python base image
+FROM python:3.9-slim
 
 # Set working directory
 WORKDIR /app
 
-# Clone the repository (since we need the full project)
-RUN git clone https://github.com/openworm/org.geppetto.maven.git /tmp/maven && \
-    cd /tmp/maven && \
-    mvn install
+# Install git and build tools
+RUN apt-get update && \
+    apt-get install -y git build-essential && \
+    rm -rf /var/lib/apt/lists/*
 
-# Copy everything
-COPY . .
+# Copy requirements files
+COPY applications/virtual-fly-brain/backend/requirements.txt ./
+COPY applications/virtual-fly-brain/backend/test-requirements.txt ./
 
-# Initialize and update submodules
-RUN git submodule init && \
-    git submodule update
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt -r test-requirements.txt
 
-# Install dependencies and build
-RUN mvn install -DskipTests
+# Copy VFBquery library and install it
+COPY applications/virtual-fly-brain/backend/virtual_fly_brain/libs/VFBquery /app/VFBquery
+RUN cd /app/VFBquery && pip install -e .
 
-# Runtime stage
-FROM eclipse-temurin:11-jre-jammy
+# Copy backend code
+COPY applications/virtual-fly-brain/backend/virtual_fly_brain /app/virtual_fly_brain
+COPY applications/virtual-fly-brain/backend/setup.py /app/
 
-WORKDIR /app
-
-# Copy built artifacts from builder stage
-COPY --from=builder /app/target/org.geppetto.frontend.war /app/
-COPY --from=builder /app/target/classes/lib /app/lib/
-COPY --from=builder /app/src/main/webapp/WEB-INF/web.xml /app/WEB-INF/
-
-# Install required packages
-RUN apt-get update && apt-get install -y \
-    python3 \
-    python3-pip \
-    git \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install Python dependencies (if needed)
-COPY requirements.txt /app/requirements.txt
-RUN pip3 install -r requirements.txt
+# Set Python path
+ENV PYTHONPATH=/app
 
 # Expose port
 EXPOSE 8080
 
-# Set environment variables
-ENV CLIENT_TREE_BROWSER_SERVER=https://pdb-alpha.VirtualFlyBrain.org \
-    SERVER_PDB=http://pdb:7474 \
-    SERVER_OWL=http://owl:8080/kbs/vfb/ \
-    SERVER_OCPU_R=http://ocpu:80/ocpu/library/vfbr/R/vfb_nblast \
-    CLIENT_SOLR_SERVER=https://solr-alpha.virtualflybrain.org/solr/ontology/select \
-    GOOGLE_ANALYTICS_CODE=G-K7DDZVVXM7 \
-    USE_SSL=true
-
 # Command to run the application
-CMD ["java", "-jar", "/app/org.geppetto.frontend.war"]
+CMD ["python", "-m", "virtual_fly_brain"]

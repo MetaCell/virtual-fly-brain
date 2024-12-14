@@ -1,0 +1,48 @@
+# Build stage
+FROM maven:3.9-eclipse-temurin-11 AS builder
+
+# Set working directory
+WORKDIR /app
+
+# Copy pom.xml
+COPY pom.xml .
+
+# Copy source code
+COPY src src/
+COPY applications applications/
+
+# Install dependencies and build
+RUN mvn install -DskipTests
+
+# Runtime stage
+FROM eclipse-temurin:11-jre-jammy
+
+WORKDIR /app
+
+# Copy built artifacts from builder stage
+COPY --from=builder /app/target/org.geppetto.frontend.war /app/
+COPY --from=builder /app/target/classes/lib /app/lib/
+
+# Install required packages
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy configuration files
+COPY WEB-INF/web.xml /app/WEB-INF/
+
+# Expose port
+EXPOSE 8080
+
+# Set environment variables from your logs
+ENV CLIENT_TREE_BROWSER_SERVER=https://pdb-alpha.VirtualFlyBrain.org \
+    SERVER_PDB=http://pdb:7474 \
+    SERVER_OWL=http://owl:8080/kbs/vfb/ \
+    SERVER_OCPU_R=http://ocpu:80/ocpu/library/vfbr/R/vfb_nblast \
+    CLIENT_SOLR_SERVER=https://solr-alpha.virtualflybrain.org/solr/ontology/select \
+    GOOGLE_ANALYTICS_CODE=G-K7DDZVVXM7 \
+    USE_SSL=true
+
+# Command to run the application
+CMD ["java", "-jar", "/app/org.geppetto.frontend.war"]

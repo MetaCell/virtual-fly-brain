@@ -1,42 +1,28 @@
 # Use Node.js base image
-FROM node:16-bullseye
+FROM node:16-bullseye-slim
 
 # Set working directory
 WORKDIR /app
-
-# Install necessary build tools and git
-RUN apt-get update && apt-get install -y \
-    git \
-    build-essential \
-    && rm -rf /var/lib/apt/lists/*
 
 # Copy package files
 COPY applications/virtual-fly-brain/client/package.json ./
 COPY applications/virtual-fly-brain/client/yarn.lock ./
 
-# Install three.js and its loaders separately
-RUN npm install three@0.110.0
-RUN npm install three-obj-loader@1.1.3
+# Install dependencies
+RUN yarn install
 
-# Copy a patch file to fix the three.js import
-COPY <<EOF /app/three-patch.js
-import * as THREE from 'three';
-import { OBJLoader } from 'three-obj-loader';
-OBJLoader(THREE);
-export { THREE };
-EOF
+# Copy frontend code
+COPY applications/virtual-fly-brain/client/src ./src
+COPY applications/virtual-fly-brain/client/public ./public
+COPY applications/virtual-fly-brain/client/tsconfig.json ./
+COPY applications/virtual-fly-brain/client/webpack.config.js ./
+COPY applications/virtual-fly-brain/client/webpack.config.dev.js ./
 
-# Install remaining dependencies
-RUN npm install
+# Build application
+RUN yarn build
 
-# Copy the rest of the frontend code
-COPY applications/virtual-fly-brain/client/ ./
-
-# Build the application
-RUN npm run build
-
-# Expose the port the app runs on
+# Expose port
 EXPOSE 3000
 
-# Command to run the app
-CMD ["npm", "start"]
+# Command to run the application
+CMD ["yarn", "start"]

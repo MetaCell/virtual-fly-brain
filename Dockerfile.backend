@@ -4,10 +4,20 @@ FROM python:3.9-slim
 # Set working directory
 WORKDIR /app
 
-# Install git and build tools
-RUN apt-get update && \
-    apt-get install -y git build-essential && \
-    rm -rf /var/lib/apt/lists/*
+# Install git, build tools, and OpenGL dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    build-essential \
+    libgl1-mesa-glx \
+    libgl1-mesa-dev \
+    xvfb \
+    libglu1-mesa \
+    libosmesa6 \
+    freeglut3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set up virtual display for OpenGL
+ENV DISPLAY=:99
 
 # Copy requirements files
 COPY applications/virtual-fly-brain/backend/requirements.txt ./
@@ -24,11 +34,20 @@ RUN cd /app/VFBquery && pip install -e .
 COPY applications/virtual-fly-brain/backend/virtual_fly_brain /app/virtual_fly_brain
 COPY applications/virtual-fly-brain/backend/setup.py /app/
 
+# Create and set up volume directories
+RUN mkdir -p /app/data /app/cache
+VOLUME ["/app/data", "/app/cache"]
+
 # Set Python path
-ENV PYTHONPATH=/app
+ENV PYTHONPATH=/app \
+    PYTHONUNBUFFERED=1
 
 # Expose port
 EXPOSE 8080
 
+# Create startup script
+RUN echo '#!/bin/bash\nXvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &\nsleep 1\npython -m virtual_fly_brain' > /start.sh && \
+    chmod +x /start.sh
+
 # Command to run the application
-CMD ["python", "-m", "virtual_fly_brain"]
+CMD ["/start.sh"]

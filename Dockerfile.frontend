@@ -4,21 +4,25 @@ FROM node:16-bullseye-slim
 # Set working directory
 WORKDIR /app
 
+# Install required tools
+RUN apt-get update && \
+    apt-get install -y \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
 # Copy package files
 COPY applications/virtual-fly-brain/client/package.json ./
 COPY applications/virtual-fly-brain/client/yarn.lock ./
 
-# Install required tools
-RUN apt-get update && \
-    apt-get install -y jq && \
-    rm -rf /var/lib/apt/lists/* && \
-    yarn global add eslint
+# Set up global dependencies
+RUN npm install -g eslint \
+    && yarn config set ignore-engines true
 
 # Set up basic eslint config to avoid build errors
-RUN echo '{"extends": "react-app"}' > .eslintrc.json
+RUN echo '{"extends": ["react-app","eslint:recommended"],"rules":{"no-unused-vars":"warn"}}' > .eslintrc.json
 
-# Install dependencies
-RUN yarn install
+# Install dependencies with legacy peer deps to handle version conflicts
+RUN yarn install --legacy-peer-deps
 
 # Copy all configuration files
 COPY applications/virtual-fly-brain/client/.* ./
@@ -29,12 +33,11 @@ COPY applications/virtual-fly-brain/client/webpack.config*.js ./
 COPY applications/virtual-fly-brain/client/src ./src
 COPY applications/virtual-fly-brain/client/public ./public
 
-# Override package.json scripts to skip linting during startup
-RUN jq '.scripts.start = "webpack serve --config webpack.config.dev.js --mode development"' package.json > package.json.tmp && \
-    mv package.json.tmp package.json
+# Modify package.json scripts
+RUN sed -i 's/"start": ".*"/"start": "webpack serve --config webpack.config.dev.js --mode development"/' package.json
 
-# Build application
-RUN NODE_ENV=production yarn run build
+# Build the application with NODE_ENV set to production
+RUN NODE_ENV=production yarn build
 
 # Create and set up volume directories
 RUN mkdir -p /app/build /app/node_modules
@@ -42,6 +45,10 @@ VOLUME ["/app/build", "/app/node_modules"]
 
 # Expose port
 EXPOSE 3000
+
+# Set environment variable to disable eslint during runtime
+ENV DISABLE_ESLINT_PLUGIN=true \
+    NODE_ENV=production
 
 # Command to run the application
 CMD ["yarn", "start"]

@@ -1,5 +1,5 @@
 # Use Node.js base image
-FROM node:16-bullseye-slim
+FROM node:18-bullseye-slim
 
 # Set working directory
 WORKDIR /app

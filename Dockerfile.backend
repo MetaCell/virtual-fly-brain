@@ -4,6 +4,10 @@ FROM python:3.9-slim
 # Set working directory
 WORKDIR /app
 
+# Install Cloud Harness
+RUN git clone -b 'release/2.1.0' https://github.com/metacell/cloud-harness 
+RUN cd cloud-harness && sh install.sh
+
 # Install git, build tools, and OpenGL dependencies
 RUN apt-get update && apt-get install -y \
     git \

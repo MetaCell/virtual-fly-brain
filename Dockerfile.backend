@@ -4,10 +4,6 @@ FROM python:3.9-slim
 # Set working directory
 WORKDIR /app
 
-# Install Cloud Harness
-RUN git clone -b 'release/2.1.0' https://github.com/metacell/cloud-harness 
-RUN cd cloud-harness && sh install.sh
-
 # Install git, build tools, and OpenGL dependencies
 RUN apt-get update && apt-get install -y \
     git \
@@ -18,10 +14,15 @@ RUN apt-get update && apt-get install -y \
     libglu1-mesa \
     libosmesa6 \
     freeglut3-dev \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
 # Set up virtual display for OpenGL
 ENV DISPLAY=:99
+
+# Install Cloud harness
+RUN git clone -b 'release/2.1.0' https://github.com/metacell/cloud-harness 
+RUN cd cloud-harness && sh install.sh
 
 # Copy backend files first
 COPY applications/virtual-fly-brain/backend/virtual_fly_brain /app/virtual_fly_brain

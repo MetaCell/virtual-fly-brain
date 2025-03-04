@@ -31,15 +31,16 @@ COPY applications/virtual-fly-brain/backend/requirements.txt /app/
 COPY applications/virtual-fly-brain/backend/test-requirements.txt /app/
 
 # Copy and install VFBquery
-COPY applications/virtual-fly-brain/backend/virtual_fly_brain/libs/VFBquery /app/VFBquery
-RUN cd /app/VFBquery && pip install -e .
+# COPY applications/virtual-fly-brain/backend/virtual_fly_brain/libs/VFBquery /app/VFBquery
+RUN cd /app && git clone https://github.com/VirtualFlyBrain/VFBquery/ && cd VFBquery && git checkout d081560 && pip install -e .
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt -r test-requirements.txt
 
 # Add virtual_fly_brain to PYTHONPATH
 ENV PYTHONPATH=/app:/app/virtual_fly_brain:${PYTHONPATH} \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    VFB_DEV=true
 
 # Create and set up volume directories
 RUN mkdir -p /app/data /app/cache

@@ -5,10 +5,9 @@ var path = require('path');
 
 const PORT = 3300;
 
-
 module.exports = env => {
 
-  const theDomain = env && env.DOMAIN ? env.DOMAIN : 'localhost:5000';
+  const theDomain = env && env.DOMAIN ? env.DOMAIN : 'localhost';
   console.log('Dev server address: ', theDomain);
 
   const proxyTarget = theDomain;

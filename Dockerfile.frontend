@@ -7,7 +7,7 @@ WORKDIR /app
 # Install required tools
 RUN apt-get update && \
     apt-get install -y \
-    git \
+    git curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy package files
@@ -37,18 +37,17 @@ COPY applications/virtual-fly-brain/client/public ./public
 RUN sed -i 's/"start": ".*"/"start": "webpack serve --config webpack.config.dev.js --mode development"/' package.json
 
 # Build the application with NODE_ENV set to production
-RUN NODE_ENV=production yarn build
+# RUN NODE_ENV=production yarn build
 
 # Create and set up volume directories
 RUN mkdir -p /app/build /app/node_modules
 VOLUME ["/app/build", "/app/node_modules"]
 
 # Expose port
-EXPOSE 3000
+EXPOSE 3300
 
 # Set environment variable to disable eslint during runtime
-ENV DISABLE_ESLINT_PLUGIN=true \
-    NODE_ENV=production
+# ENV DISABLE_ESLINT_PLUGIN=true
 
 # Command to run the application
-CMD ["yarn", "start"]
+CMD ["yarn", "start", "--host", "0.0.0.0"]

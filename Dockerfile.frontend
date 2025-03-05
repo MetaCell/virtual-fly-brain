@@ -36,8 +36,7 @@ COPY applications/virtual-fly-brain/client/src ./src
 COPY applications/virtual-fly-brain/client/public ./public
 
 # Modify package.json scripts
-RUN sed -i '/"prestart": "eslint . --color --fix",/d' package.json && \
-    sed -i 's/"start": ".*"/"start": "webpack serve --config webpack.config.dev.js --mode development"/' package.json
+RUN sed -i 's/"start": ".*"/"start": "webpack serve --config webpack.config.dev.js --mode development"/' package.json
 
 # Create and set up volume directories
 RUN mkdir -p /app/build

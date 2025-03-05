@@ -15,7 +15,7 @@ COPY applications/virtual-fly-brain/client/package.json ./
 COPY applications/virtual-fly-brain/client/yarn.lock ./
 
 # Set up global dependencies
-RUN npm install -g eslint@^8.57.0 \
+RUN npm install -g eslint \
     && yarn config set ignore-engines true
 
 # Set up basic eslint config to avoid build errors
@@ -44,8 +44,12 @@ VOLUME ["/app/build", "/app/node_modules"]
 EXPOSE 3300
 
 # Default API URLs as environment variables
-ENV API_URL_PRODUCTION=https://backend.virtualflybrain.org/
-ENV API_URL_DEVELOPMENT=http://backend.virtualflybrain.org/
+ENV API_URL_PRODUCTION=https://vfb.dev.metacell.us/
+ENV API_URL_DEVELOPMENT=http://localhost:8080/
+
+# Add after the COPY or ADD commands for your application code
+WORKDIR /path/to/virtual-fly-brain/applications/virtual-fly-brain/client
+RUN yarn remove eslint && yarn add --dev eslint@^8.57.0
 
 # Command to run the application
 CMD ["yarn", "start", "--host", "0.0.0.0"]

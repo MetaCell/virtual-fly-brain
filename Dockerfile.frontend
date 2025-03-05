@@ -14,15 +14,17 @@ RUN apt-get update && \
 COPY applications/virtual-fly-brain/client/package.json ./
 COPY applications/virtual-fly-brain/client/yarn.lock ./
 
-# Set up global dependencies
-RUN npm install -g eslint@^8.57.0 \
-    && yarn config set ignore-engines true
-
-# Set up basic eslint config to avoid build errors
-RUN echo '{"extends": ["react-app","eslint:recommended"],"rules":{"no-unused-vars":"warn"}}' > .eslintrc.json
+# Configure yarn
+RUN yarn config set ignore-engines true
 
 # Install dependencies with legacy peer deps to handle version conflicts
 RUN yarn install --legacy-peer-deps
+
+# Set up global dependencies
+RUN npm install -g eslint@^8.57.0
+
+# Set up basic eslint config to avoid build errors
+RUN echo '{"extends": ["react-app","eslint:recommended"],"rules":{"no-unused-vars":"warn"}}' > .eslintrc.json
 
 # Copy all configuration files
 COPY applications/virtual-fly-brain/client/.* ./

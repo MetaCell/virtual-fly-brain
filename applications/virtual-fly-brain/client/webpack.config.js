@@ -16,9 +16,10 @@ module.exports = function webpacking(envVariables) {
     env.mode = 'production';
   }
 
+  // Use environment variables for API URLs if available
   const API_URL = {
-    production: JSON.stringify('https://vfb.dev.metacell.us/'),
-    development: JSON.stringify('http://localhost:8080/')
+    production: JSON.stringify(process.env.API_URL_PRODUCTION || 'https://vfb.dev.metacell.us/'),
+    development: JSON.stringify(process.env.API_URL_DEVELOPMENT || 'http://localhost:8080/')
   }
 
   // check environment mode
@@ -101,7 +102,9 @@ module.exports = function webpacking(envVariables) {
 
   const plugins = [
     new webpack.DefinePlugin({
-      'API_URL': API_URL[environment]
+      'API_URL': API_URL[environment],
+      'process.env.API_URL_PRODUCTION': JSON.stringify(process.env.API_URL_PRODUCTION),
+      'process.env.API_URL_DEVELOPMENT': JSON.stringify(process.env.API_URL_DEVELOPMENT)
     }),
     new CleanWebpackPlugin(),
     new CopyWebpackPlugin({ patterns: copyPaths }),

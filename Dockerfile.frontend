@@ -36,9 +36,6 @@ COPY applications/virtual-fly-brain/client/public ./public
 # Modify package.json scripts
 RUN sed -i 's/"start": ".*"/"start": "webpack serve --config webpack.config.dev.js --mode development"/' package.json
 
-# Build the application with NODE_ENV set to production
-# RUN NODE_ENV=production yarn build
-
 # Create and set up volume directories
 RUN mkdir -p /app/build /app/node_modules
 VOLUME ["/app/build", "/app/node_modules"]
@@ -46,8 +43,13 @@ VOLUME ["/app/build", "/app/node_modules"]
 # Expose port
 EXPOSE 3300
 
-# Set environment variable to disable eslint during runtime
-# ENV DISABLE_ESLINT_PLUGIN=true
+# Default API URLs as environment variables
+ENV API_URL_PRODUCTION=https://vfb.dev.metacell.us/
+ENV API_URL_DEVELOPMENT=http://localhost:8080/
+
+# Add after the COPY or ADD commands for your application code
+WORKDIR /path/to/virtual-fly-brain/applications/virtual-fly-brain/client
+RUN yarn remove eslint && yarn add --dev eslint@^8.57.0
 
 # Command to run the application
 CMD ["yarn", "start", "--host", "0.0.0.0"]

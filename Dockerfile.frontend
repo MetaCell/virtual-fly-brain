@@ -23,8 +23,8 @@ RUN yarn install --legacy-peer-deps
 # Set up global dependencies
 RUN npm install -g eslint@^8.57.0
 
-# Install ESLint plugins as dev dependencies in the project
-RUN yarn add --dev eslint-plugin-react@latest eslint-plugin-jest@latest eslint-plugin-react-hooks@latest @typescript-eslint/eslint-plugin@latest @typescript-eslint/parser@latest
+# Install required ESLint plugins globally
+RUN npm install -g eslint-plugin-react@latest eslint-plugin-jest@latest eslint-plugin-react-hooks@latest @typescript-eslint/eslint-plugin@latest @typescript-eslint/parser@latest
 
 # Copy all configuration files
 COPY applications/virtual-fly-brain/client/.* ./

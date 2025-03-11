@@ -91,9 +91,25 @@ export const urlUpdaterMiddleware = store => next => (action) => {
   switch (action.type) {
     case getInstancesTypes.GET_INSTANCES_SUCCESS : {
 
-        const templateLookup = action.payload?.Images || action.payload?.Examples || {} ;
-        const template = Object.keys(templateLookup)?.[0];
+        const templateLookup = action.payload?.Images || action.payload?.Examples || {};
+        const templates = Object.keys(templateLookup);
         const loadedTemplate = launchTemplate?.metadata?.Id;
+
+        // Check if there's an alignment that matches the current template
+        if (!action.payload.IsTemplate && templates.length > 0) {
+          // If we have a direct match to the current template
+          if (templates.includes(loadedTemplate)) {
+            // Use this aligned version instead
+            const alignedInstance = templateLookup[loadedTemplate][0]; // Assume first example is what we want
+            next(action); // Continue with current action
+            getInstanceByID(alignedInstance.id, true, action.payload.focus, action.payload.select);
+          } 
+          // If no match found, show misalignment dialog
+          else if (misalignedIDs[action.payload.Id] == undefined) {
+            store.dispatch(setAlignTemplates(false, action.payload.Id))
+            break;
+          }
+        }
 
         if ( !action.payload?.IsClass ) {
           if ( !action.payload.IsTemplate && !firstIDLoaded ){

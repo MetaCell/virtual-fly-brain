@@ -178,15 +178,14 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         const allLoadedInstances = [...state.allLoadedInstances]
         let matchInstance = allLoadedInstances?.find(i => i.metadata?.Id === response.payload.id);
         
-        // Preserve existing opacity when changing color
-        const opacity = matchInstance.color?.a || 1.0;
-        matchInstance.color = {...response.payload.color, a: opacity};
+        // Use the alpha from the color picker
+        matchInstance.color = response.payload.color;
         
-        // Update fullOpacityColor for skeletons
+        // Update fullOpacityColor for skeletons (keep full opacity for skeletons)
         matchInstance.fullOpacityColor = {...response.payload.color, a: 1.0};
         
-        // Update userSetColor with original opacity
-        matchInstance.userSetColor = {...response.payload.color, a: opacity};
+        // Update userSetColor with the user's choice including alpha
+        matchInstance.userSetColor = response.payload.color;
         
         // Update 3D objects
         const threeDObjects = [...state.threeDObjects];
@@ -194,13 +193,13 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         if (matchObjects?.length > 0) {
           matchObjects?.forEach(mo => {
             mo.children[0].material.color = response.payload.color;
-            // Maintain appropriate opacity based on object type
+            
+            // Use the user-set alpha except for special cases
             if (mo.name.includes('_swc') || mo.name.includes(SKELETON)) {
-              mo.children[0].material.opacity = 1.0;
-            } else if (matchInstance.metadata?.IsTemplate) {
-              mo.children[0].material.opacity = 0.4;
+              mo.children[0].material.opacity = 1.0; // Skeletons always fully opaque
             } else {
-              mo.children[0].material.opacity = 0.3;
+              // Use the alpha from the user's color choice
+              mo.children[0].material.opacity = response.payload.color.a;
             }
           })
         }

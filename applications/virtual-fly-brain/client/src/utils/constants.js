@@ -39,7 +39,7 @@ export const COLOR_PALETTE = [
 let colorIndex = 0;
 
 // Function to get the next color in the sequence
-export const getNextColor = (opacity = 1.0) => {
+export const getNextColor = (opacity = 0.3) => {
   const hexColor = COLOR_PALETTE[colorIndex];
   // Increment and loop back to beginning if needed
   colorIndex = (colorIndex + 1) % COLOR_PALETTE.length;

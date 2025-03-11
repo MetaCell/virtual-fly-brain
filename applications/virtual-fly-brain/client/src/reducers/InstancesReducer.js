@@ -196,10 +196,11 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
             
             // Use the user-set alpha except for special cases
             if (mo.name.includes('_swc') || mo.name.includes(SKELETON)) {
-              mo.children[0].material.opacity = 1.0; // Skeletons always fully opaque
+              mo.children[0].material.opacity = 1.0;
+            } else if (matchInstance.metadata?.IsTemplate) {
+              mo.children[0].material.opacity = 0.4;
             } else {
-              // Use the alpha from the user's color choice
-              mo.children[0].material.opacity = response.payload.color.a;
+              mo.children[0].material.opacity = response.payload.color.a || 0.3;
             }
           })
         }

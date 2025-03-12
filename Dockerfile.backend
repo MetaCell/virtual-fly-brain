@@ -32,7 +32,7 @@ COPY applications/virtual-fly-brain/backend/test-requirements.txt /app/
 
 # Copy and install VFBquery
 # COPY applications/virtual-fly-brain/backend/virtual_fly_brain/libs/VFBquery /app/VFBquery
-RUN cd /app && git clone https://github.com/VirtualFlyBrain/VFBquery/ && cd VFBquery && git checkout v0.3.0 && pip install -e .
+RUN cd /app && git clone https://github.com/VirtualFlyBrain/VFBquery/ && cd VFBquery && git checkout v0.3.1 && pip install -e .
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt -r test-requirements.txt

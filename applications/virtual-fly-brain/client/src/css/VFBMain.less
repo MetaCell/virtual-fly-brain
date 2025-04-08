@@ -284,10 +284,6 @@
     background-color: @primary_color;
 }
 
-.customIconFlexLayout {
-    color: #c0c0c0;
-    font-size: 10px;
-}
 
 .customIconFlexLayout:hover {
     cursor: pointer;
@@ -446,6 +442,10 @@
     height:8px;
 }
 
+.flexlayout__tabset_tabbar_inner_top {
+  width: 95%;
+}
+
 .flexlayout__tab_button_overflow:before {
     // font-family: "Font Awesome 5 Free" !important;
     content: "+";
@@ -463,18 +463,11 @@
 }
 
 .flexlayout__tab_button_overflow {
-    float: left;
-    width: 20px;
-    height:15px;
-    margin-top:2px;
-    padding-left:12px;
     border:none;
     font-size: 14px;
     color:white;
+    cursor: pointer;
     background: transparent;
-    position: absolute;
-    top: 0;
-    z-index: 10;
 }
 
 .flexlayout__tab_button_overflow:hover {
@@ -521,15 +514,6 @@
     background: @background_color_body_0;
 }
 
-.flexlayout__tab_toolbar {
-    position:absolute;
-    display:flex;
-    align-items: center;
-    top:0;
-    bottom:0;
-    right:0;
-}
-
 .flexlayout__tab_toolbar_button-min:before {
     font-family: "Font Awesome" !important;
     content: "\f2d0";
@@ -548,10 +532,12 @@
     outline-width: 0;
     background: transparent;
     font-size: 10px;
+    padding: 5px;
 }
 
 .flexlayout__tab_toolbar_button-min:hover {
-    color: @secondary_color
+    color: @secondary_color;
+    cursor: pointer;
 }
 
 .flexlayout__tab_toolbar_button-max:before {
@@ -571,13 +557,11 @@
     outline-width: 0;
     background: transparent;
     font-size: 12px;
+    padding: 5px;
 }
 
 .flexlayout__tab_toolbar_button-max:hover {
     color: @secondary_color
-}
-
-.flexlayout__popup_menu {
 }
 
 .flexlayout__popup_menu_item {
@@ -601,6 +585,11 @@
     border-radius:3px;
     position:absolute;
     z-index:1000;
+    top: 30px !important;
+}
+
+.fa-window-minimize {
+  display: none;
 }
 
 .flexlayout__border_top {

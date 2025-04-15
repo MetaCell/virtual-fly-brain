@@ -8,18 +8,7 @@ ENV PORT=8080
 ENV BUILDDIR=/app
 
 RUN apk update
-RUN apk add gcc \
-    python3-dev \
-    musl-dev \
-    yarn \
-    git \
-    build-essential \
-    libgl1-mesa-glx \
-    libgl1-mesa-dev \
-    xvfb \
-    libglu1-mesa \
-    libosmesa6 \
-    freeglut3-dev
+RUN apk add gcc python3-dev musl-dev yarn git pkg-config libhdf5-dev python3-h5py
 
 COPY client ${BUILDDIR}
 WORKDIR ${BUILDDIR}

@@ -1,4 +1,4 @@
-ARG CLOUDHARNESS_FLASK
+ARG CLOUDHARNESS_FLASK=flask:v1
 
 FROM $CLOUDHARNESS_FLASK
 
@@ -8,7 +8,7 @@ ENV PORT=8080
 ENV BUILDDIR=/app
 
 RUN apk update
-RUN apk add gcc python3-dev musl-dev yarn git hdf5-dev fontconfig
+RUN apk add gcc python3-dev musl-dev yarn git hdf5-dev fontconfig fontconfig-dev mesa-dev
 
 COPY client ${BUILDDIR}
 WORKDIR ${BUILDDIR}

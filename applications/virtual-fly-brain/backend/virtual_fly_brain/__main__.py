@@ -8,7 +8,7 @@ from flask_cors import CORS, cross_origin
 from services.queries import run_query
 from services.term_info import get_term_info
 
-dev_mode = os.getenv('VFB_DEV', False)
+dev_mode = os.getenv('VFB_DEV', True)
 
 # if not dev_mode:
 #     from cloudharness.utils.server import init_flask
@@ -40,12 +40,12 @@ class NumpyEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 def init_webapp_routes(app):
-    if dev_mode:
-        www_path = os.path.dirname(os.path.abspath(__file__)) + "/www"
+    # if dev_mode:
+    www_path = os.path.dirname(os.path.abspath(__file__)) + "/www"
 
-        @app.route('/', methods=['GET'])
-        def index():
-            return flask.send_from_directory(www_path, 'index.html')
+    @app.route('/', methods=['GET'])
+    def index():
+        return flask.send_from_directory(www_path, 'index.html')
 
     @app.route('/get_instances', methods=['GET'])
     @cross_origin(supports_credentials=True)

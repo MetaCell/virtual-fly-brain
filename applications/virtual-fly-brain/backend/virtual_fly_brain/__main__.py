@@ -55,7 +55,7 @@ def init_webapp_routes(app):
     @app.route('/get_term_info', methods=['GET'])
     @cross_origin(supports_credentials=True)
     def term_info():
-        id = flask.request.args.get('id')
+        id = flask.request.args.get('id')dev_mode
         data = get_term_info(id)
         data_formatted = json.dumps(data, cls=NumpyEncoder)
         return data_formatted
@@ -84,7 +84,7 @@ def init_webapp_routes(app):
 
 # app = None
 # if dev_mode:
-app = app = flask.Flask(__name__)
+app = flask.Flask(__name__)
 CORS(app, support_credentials=True)
 init_webapp_routes(app)
 # else:

@@ -72,7 +72,7 @@ steps:
         type: build
         stage: build
         tag: '${{CF_BUILD_ID}}'
-        dockerfile: ../infrastructure/common-images/cloudharness-flask/Dockerfile
+        dockerfile: Dockerfile
         registry: '${{CODEFRESH_REGISTRY}}'
         buildkit: true
         build_arguments:
@@ -80,10 +80,10 @@ steps:
         - DOMAIN=${{DOMAIN}}
         - NOCACHE=${{CF_BUILD_ID}}
         - REGISTRY=${{REGISTRY}}/virtual-fly-brain
-        - CLOUDHARNESS_BASE_DEBIAN=${{REGISTRY}}/virtual-fly-brain/cloudharness-base-debian:${{CF_BUILD_ID}}
+        - CLOUDHARNESS_BASE=${{REGISTRY}}/virtual-fly-brain/cloudharness-base-debian:${{CF_BUILD_ID}}
         image_name: virtual-fly-brain/cloudharness-flask
         title: Cloudharness flask
-        working_directory: ./cloud-harness/
+        working_directory: ./cloud-harness/infrastructure/common-images/cloudharness-flask
   build_application_images:
     type: parallel
     stage: build

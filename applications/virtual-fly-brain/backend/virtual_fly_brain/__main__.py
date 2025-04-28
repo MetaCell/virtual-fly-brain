@@ -10,8 +10,8 @@ from services.term_info import get_term_info
 
 dev_mode = os.getenv('VFB_DEV', False)
 
-if not dev_mode:
-    from cloudharness.utils.server import init_flask
+# if not dev_mode:
+#     from cloudharness.utils.server import init_flask
 
 class NumpyEncoder(json.JSONEncoder):
     """ Custom encoder for numpy data types """
@@ -82,13 +82,13 @@ def init_webapp_routes(app):
             'error': 'Internal server error'
         }, 500
 
-app = None
-if dev_mode:
-    app = app = flask.Flask(__name__)
-    CORS(app, support_credentials=True)
-    init_webapp_routes(app)
-else:
-    app = init_flask(title="Virtual Fly Brain REST API", webapp=True, init_app_fn=init_webapp_routes)
+# app = None
+# if dev_mode:
+app = app = flask.Flask(__name__)
+CORS(app, support_credentials=True)
+init_webapp_routes(app)
+# else:
+#     app = init_flask(title="Virtual Fly Brain REST API", webapp=True, init_app_fn=init_webapp_routes)
 
 def main():
     app.run(host='0.0.0.0', port=8080)

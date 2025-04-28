@@ -63,21 +63,6 @@ steps:
         image_name: virtual-fly-brain/cloudharness-base-debian
         title: Cloudharness base debian
         working_directory: ./cloud-harness
-      cloudharness-base:
-        type: build
-        stage: build
-        tag: '${{CF_BUILD_ID}}'
-        dockerfile: infrastructure/base-images/cloudharness-base/Dockerfile
-        registry: '${{CODEFRESH_REGISTRY}}'
-        buildkit: true
-        build_arguments:
-        - TAG=${{CF_BUILD_ID}}
-        - DOMAIN=${{DOMAIN}}
-        - NOCACHE=${{CF_BUILD_ID}}
-        - REGISTRY=${{REGISTRY}}/virtual-fly-brain
-        image_name: virtual-fly-brain/cloudharness-base
-        title: Cloudharness base
-        working_directory: ./cloud-harness
   build_static_images:
     title: Build static images
     type: parallel
@@ -87,7 +72,7 @@ steps:
         type: build
         stage: build
         tag: '${{CF_BUILD_ID}}'
-        dockerfile: Dockerfile
+        dockerfile: ../infrastructure/common-images/cloudharness-flask/Dockerfile
         registry: '${{CODEFRESH_REGISTRY}}'
         buildkit: true
         build_arguments:
@@ -95,29 +80,14 @@ steps:
         - DOMAIN=${{DOMAIN}}
         - NOCACHE=${{CF_BUILD_ID}}
         - REGISTRY=${{REGISTRY}}/virtual-fly-brain
-        - CLOUDHARNESS_BASE=${{REGISTRY}}/virtual-fly-brain/cloudharness-base:${{CF_BUILD_ID}}
+        - CLOUDHARNESS_BASE_DEBIAN=${{REGISTRY}}/virtual-fly-brain/cloudharness-base-debian:${{CF_BUILD_ID}}
         image_name: virtual-fly-brain/cloudharness-flask
         title: Cloudharness flask
-        working_directory: ./cloud-harness/infrastructure/common-images/cloudharness-flask
+        working_directory: ./cloud-harness/
   build_application_images:
     type: parallel
     stage: build
     steps:
-      accounts:
-        type: build
-        stage: build
-        tag: '${{CF_BUILD_ID}}'
-        dockerfile: Dockerfile
-        registry: '${{CODEFRESH_REGISTRY}}'
-        buildkit: true
-        build_arguments:
-        - TAG=${{CF_BUILD_ID}}
-        - DOMAIN=${{DOMAIN}}
-        - NOCACHE=${{CF_BUILD_ID}}
-        - REGISTRY=${{REGISTRY}}/virtual-fly-brain
-        image_name: virtual-fly-brain/accounts
-        title: Accounts
-        working_directory: ./cloud-harness/applications/accounts
       virtual-fly-brain:
         type: build
         stage: build
@@ -162,27 +132,11 @@ steps:
         tags:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'
         registry: '${{REGISTRY_PUBLISH_URL}}'
-      publish_cloudharness-base:
-        stage: publish
-        type: push
-        title: Cloudharness base
-        candidate: '${{REGISTRY}}/virtual-fly-brain/cloudharness-base:${{CF_BUILD_ID}}'
-        tags:
-        - '${{DEPLOYMENT_PUBLISH_TAG}}'
-        registry: '${{REGISTRY_PUBLISH_URL}}'
       publish_cloudharness-flask:
         stage: publish
         type: push
         title: Cloudharness flask
         candidate: '${{REGISTRY}}/virtual-fly-brain/cloudharness-flask:${{CF_BUILD_ID}}'
-        tags:
-        - '${{DEPLOYMENT_PUBLISH_TAG}}'
-        registry: '${{REGISTRY_PUBLISH_URL}}'
-      publish_accounts:
-        stage: publish
-        type: push
-        title: Accounts
-        candidate: '${{REGISTRY}}/virtual-fly-brain/accounts:${{CF_BUILD_ID}}'
         tags:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'
         registry: '${{REGISTRY_PUBLISH_URL}}'

@@ -3,15 +3,11 @@ import json
 import flask
 import werkzeug
 import numpy as np
+import pandas as pd
 import vfbquery as vfb
 from flask_cors import CORS, cross_origin
-from services.queries import run_query
-from services.term_info import get_term_info
-
-dev_mode = os.getenv('VFB_DEV', False)
-
-if not dev_mode:
-    from cloudharness.utils.server import init_flask
+from virtual_fly_brain.services.queries import run_query
+from virtual_fly_brain.services.term_info import get_term_info
 
 class NumpyEncoder(json.JSONEncoder):
     """ Custom encoder for numpy data types """
@@ -40,17 +36,19 @@ class NumpyEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 def init_webapp_routes(app):
-    if dev_mode:
-        www_path = os.path.dirname(os.path.abspath(__file__)) + "/www"
-
-        @app.route('/', methods=['GET'])
-        def index():
-            return flask.send_from_directory(www_path, 'index.html')
+    @app.route('/', methods=['GET'])
+    def index():
+        return flask.send_from_directory("www", 'index.html')
 
     @app.route('/get_instances', methods=['GET'])
     @cross_origin(supports_credentials=True)
     def instances():
-        return vfb.get_instances(flask.request.args.get('short_form'))
+        instances = vfb.get_instances(flask.request.args.get('short_form'))
+        if isinstance(instances, pd.DataFrame):
+            instances = instances.to_dict(orient='records')
+        elif isinstance(instances, pd.Series):
+            instances = instances.to_dict()
+        return instances
 
     @app.route('/get_term_info', methods=['GET'])
     @cross_origin(supports_credentials=True)
@@ -82,13 +80,16 @@ def init_webapp_routes(app):
             'error': 'Internal server error'
         }, 500
 
-app = None
-if dev_mode:
-    app = app = flask.Flask(__name__)
-    CORS(app, support_credentials=True)
-    init_webapp_routes(app)
-else:
-    app = init_flask(title="Virtual Fly Brain REST API", webapp=True, init_app_fn=init_webapp_routes)
+www_path = os.path.dirname(os.path.abspath(__file__)) + "/www"
+app = flask.Flask(
+    __name__,
+    static_url_path='',
+    static_folder=www_path,
+    )
+CORS(app, support_credentials=True)
+init_webapp_routes(app)
+# TODO: fix this to use the init_flask function from cloudharness
+#     app = init_flask(title="Virtual Fly Brain REST API", webapp=True, init_app_fn=init_webapp_routes)
 
 def main():
     app.run(host='0.0.0.0', port=8080)

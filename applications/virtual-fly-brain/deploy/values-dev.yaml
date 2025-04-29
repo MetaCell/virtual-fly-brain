@@ -1,3 +1,22 @@
 harness:
   subdomain: virtual-fy-brain
   secured: false
+  service:
+    port: 8080
+    auto: true
+  resources:
+      requests:
+        memory: 1024Mi
+        cpu: 500m
+      limits:
+        memory: 3072Mi
+        cpu: 1500m
+  deployment:
+    auto: true
+    port: 8080
+  dependencies:
+    build:
+      - cloudharness-base-debian
+      - cloudharness-flask
+    soft:
+    - argo

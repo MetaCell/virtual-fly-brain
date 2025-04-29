@@ -38,12 +38,11 @@ class NumpyEncoder(json.JSONEncoder):
 
 def init_webapp_routes(app):
     # if dev_mode:
-    www_path = os.path.dirname(os.path.abspath(__file__)) + "/www"
-    print("www_path is: ", www_path)
+        # www_path = os.path.dirname(os.path.abspath(__file__)) + "/www"
 
     @app.route('/', methods=['GET'])
     def index():
-        return flask.send_from_directory(www_path, 'index.html')
+        return flask.send_from_directory("www", 'index.html')
 
     @app.route('/get_instances', methods=['GET'])
     @cross_origin(supports_credentials=True)
@@ -82,7 +81,12 @@ def init_webapp_routes(app):
 
 # app = None
 # if dev_mode:
-app = flask.Flask(__name__)
+www_path = os.path.dirname(os.path.abspath(__file__)) + "/www"
+app = flask.Flask(
+    __name__,
+    static_url_path='',
+    static_folder=www_path,
+    )
 CORS(app, support_credentials=True)
 init_webapp_routes(app)
 # else:

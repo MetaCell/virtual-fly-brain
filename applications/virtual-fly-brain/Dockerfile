@@ -40,7 +40,7 @@ RUN echo 'test s'
 COPY backend/ /usr/src/app
 RUN pip3 install -e .
 
-RUN cp -r ${BUILDDIR}/dist/ /usr/src/app/www
+RUN cp -r ${BUILDDIR}/dist/ /usr/src/app/virtual_fly_brain/www
 WORKDIR /usr/src/app/virtual_fly_brain
 
 EXPOSE 8080

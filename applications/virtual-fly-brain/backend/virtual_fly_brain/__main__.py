@@ -5,8 +5,8 @@ import werkzeug
 import numpy as np
 import vfbquery as vfb
 from flask_cors import CORS, cross_origin
-from services.queries import run_query
-from services.term_info import get_term_info
+from virtual_fly_brain.services.queries import run_query
+from virtual_fly_brain.services.term_info import get_term_info
 
 dev_mode = os.getenv('VFB_DEV', True)
 

@@ -8,12 +8,12 @@ harness:
     auto: true
     port: 8080
     resources:
-    requests:
-      memory: 1024Mi
-      cpu: 500m
-    limits:
-      memory: 3072Mi
-      cpu: 1500m
+      requests:
+        memory: 1024Mi
+        cpu: 500m
+      limits:
+        memory: 3072Mi
+        cpu: 1500m
   dependencies:
     build:
       - cloudharness-base-debian

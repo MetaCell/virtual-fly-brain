@@ -556,11 +556,11 @@ const TermInfo = ({ open, setOpen }) => {
                         </Tooltip>
                         {displayColorPicker ?
                           <ChromePicker
-                            color={getInstance()?.color}
-                            disableAlpha={true}
+                            color={{ r:getInstance()?.color.r*255, g:getInstance()?.color.g*255, b:getInstance()?.color.b*255, a:getInstance()?.color.a }}
+                            disableAlpha={false}
                             onChangeComplete={(color, event) => {
                               let rgb;
-                              rgb = { r: color.rgb.r / 255, g: color.rgb.g / 255, b: color.rgb.b / 255, a: color.rgb.a }
+                              rgb = { r:color.rgb.r/255, g:color.rgb.g/255, b:color.rgb.b/255, a:color.rgb.a }
                               changeColor(termInfoData?.metadata?.Id, rgb)
                             }}
                             style={{ zIndex: 10 }} />

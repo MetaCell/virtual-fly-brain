@@ -83,9 +83,9 @@ const conf = [
       component.value._root.nodes.forEach( e=> e.nodes?.forEach( n=> { if ( n.entry?.[0] == "tags" ) { tags = n.entry?.[1] } }))
       
       const chips_cutoff = 3;
-      return <div style={{ width: "100%", textAlign: "left", float: "left" }}>
+      return <div style={{ width: "100%", textAlign: "left", float: "left", display: 'flex', gap: '.5rem' }}>
         <div style={{ textAlign: "left", float: "left" }}>
-          <Link 
+          <Link
             component="button"
             underline='none'
             variant="subtitle1"
@@ -96,7 +96,7 @@ const conf = [
             {entityType}
           </Link>
         </div>
-        <div style={{ textAlign: "left", float: "left" }}> 
+        <div style={{ textAlign: "left", float: "left", display: 'flex', gap: '.5rem' }}>
         {tags?.slice(0,chips_cutoff).map((tag, index) => {
           return (<Chip
             key={tag + index}

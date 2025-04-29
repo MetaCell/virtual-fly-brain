@@ -58,7 +58,7 @@ const styles = theme => ({
   root: { 
     position: "absolute",
     bottom: 0,
-    zIndex: 100,
+    zIndex: 1,
     maxWidth : "16.25rem",
     background: secondaryBg,
     color : "white",
@@ -147,7 +147,7 @@ const styles = theme => ({
     right : "1rem",
     backgroundColor : "#3A3A3A",
     borderRadius: '0.4rem',
-    zIndex: 100,
+    zIndex: 1,
     fontSize: '0.875rem'
   },
   legendItem :{
@@ -560,10 +560,10 @@ class Controls extends Component {
     return (
       <ThemeProvider theme={theme}>
         <div>
-          <div style={{ position: "absolute", width: "5vh", height: "100%", zIndex: "100", marginTop: "0.5rem" }}>
-            <div style={{ zIndex : "1000" , cursor : "pointer", backgroundImage: `url(${styling.controlIcons.home})`, width: "1.25rem", height: "1.25rem" }} onClick={self.props.resetCamera }></div>
-            <div style={{ zIndex : "1000" , cursor : "pointer", marginTop: "1rem", backgroundImage: `url(${styling.controlIcons.zoomIn})`, width: "1.25rem", height: "1.25rem" }} onClick={self.props.zoomIn }></div>
-            <div style={{ zIndex : "1000" , cursor : "pointer", marginTop : "5px", backgroundImage: `url(${styling.controlIcons.zoomOut})`, width: "1.25rem", height: "1.25rem" }} onClick={self.props.clear }></div>
+          <div style={{ position: "absolute", width: "5vh", height: "100%", zIndex: 1, marginTop: "0.5rem" }}>
+            <div style={{ cursor : "pointer", backgroundImage: `url(${styling.controlIcons.home})`, width: "1.25rem", height: "1.25rem" }} onClick={self.props.resetCamera }></div>
+            <div style={{ cursor : "pointer", marginTop: "1rem", backgroundImage: `url(${styling.controlIcons.zoomIn})`, width: "1.25rem", height: "1.25rem" }} onClick={self.props.zoomIn }></div>
+            <div style={{ cursor : "pointer", marginTop : "5px", backgroundImage: `url(${styling.controlIcons.zoomOut})`, width: "1.25rem", height: "1.25rem" }} onClick={self.props.clear }></div>
           </div>
           { this.props.resultsAvailable()
             ? <ul className={classes.legend} id="circuitBrowserLegend">
@@ -580,7 +580,7 @@ class Controls extends Component {
             </ul>
             : null
           }
-          <Accordion key={this.state.key} className={classes.root} defaultExpanded={expanded} >
+          <Accordion key={this.state.key} className={classes.root} defaultExpanded={expanded}>
             <AccordionSummary
               expandIcon={<ExpandMoreIcon fontSize="small" />}
               onClick={() => self.setState({ expanded : !expanded })}

@@ -1,6 +1,5 @@
 import vars from "./variables";
 import { createTheme } from "@mui/material/styles";
-import windowMinimizeIcon from "../assets/viewer/window_minimize_icon.svg";
 import maximizeIcon from "../assets/viewer/maximize_icon.svg";
 import minimizeIcon from "../assets/viewer/minimize_icon.svg";
 import closeIcon from "../assets/viewer/close_icon.svg";
@@ -122,12 +121,19 @@ theme = createTheme({
         }
         .flexlayout__tab {
           border-radius: 0px 8px 8px 8px;
-          background-color: ${blackColor};
           padding: 1rem;
+        }
+        .flexlayout__tab #VFBdisplayArea{
+          width: 100%;
+        }
+        .stack-canvas-container {
+          canvas {
+             width: 100%;
+          }
         }
         .flexlayout__tab_toolbar {
           gap: 0.25rem;
-          margin-bottom: 0.25rem;
+          text-align: right;
         }
         .flexlayout__tab_toolbar_button-min {
           background: transparent url(${maximizeIcon}) no-repeat center;
@@ -169,56 +175,7 @@ theme = createTheme({
         }
       }
     },
-
-    MuiCheckbox: {
-      styleOverrides: {
-        root: {
-          padding: 0,
-        }
-      }
-    },
-
-    MuiFormControlLabel: {
-      styleOverrides: {
-        root: {
-          margin: 0,
-        },
-        label: {
-          fontWeight: 400,
-          userSelect: 'none',
-          fontSize: '0.75rem',
-          marginLeft: '0.5rem',
-          lineHeight: '133%',
-          color: outlinedBtnTextColor,
-        }
-      }
-    },
-
-    MuiListItem: {
-      styleOverrides: {
-        root: {
-          padding: 0
-        }
-      }
-    },
-
-    MuiListItemText: {
-      styleOverrides: {
-        root: {
-          margin: 0
-        },
-        primary: {
-          fontWeight: 400,
-          fontSize: '0.75rem',
-          lineHeight: '133%',
-          color: outlinedBtnTextColor,
-          textOverflow: 'ellipsis',
-          overflow: 'hidden',
-          whiteSpace: 'nowrap'
-        }
-      }
-    },
-
+    
     MuiListItemButton: {
       styleOverrides: {
         root: {
@@ -396,7 +353,6 @@ theme = createTheme({
     MuiTableCell: {
       styleOverrides: {
         root: {
-          padding: 0,
           color: outlinedBtnTextColor,
           borderBottomColor: secondaryBg,
           lineHeight: '150%',
@@ -933,15 +889,7 @@ theme = createTheme({
         }
       }
     },
-
-    MuiList: {
-      styleOverrides: {
-        root: {
-          padding: 0
-        }
-      }
-    },
-
+    
     MuiLink: {
       styleOverrides: {
         root: {

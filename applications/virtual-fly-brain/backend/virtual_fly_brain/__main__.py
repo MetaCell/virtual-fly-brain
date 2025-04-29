@@ -3,6 +3,7 @@ import json
 import flask
 import werkzeug
 import numpy as np
+import pandas as pd
 import vfbquery as vfb
 from flask_cors import CORS, cross_origin
 from virtual_fly_brain.services.queries import run_query
@@ -47,7 +48,12 @@ def init_webapp_routes(app):
     @app.route('/get_instances', methods=['GET'])
     @cross_origin(supports_credentials=True)
     def instances():
-        return vfb.get_instances(flask.request.args.get('short_form'))
+        instances = vfb.get_instances(flask.request.args.get('short_form'))
+        if isinstance(instances, pd.DataFrame):
+            instances = instances.to_dict(orient='records')
+        elif isinstance(instances, pd.Series):
+            instances = instances.to_dict()
+        return instances
 
     @app.route('/get_term_info', methods=['GET'])
     @cross_origin(supports_credentials=True)

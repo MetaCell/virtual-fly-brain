@@ -1,0 +1,34 @@
+name: Run ESLint
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  eslint:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Checkout the repository
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Step 2: Set up Node.js
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18' # Adjust the Node.js version as needed
+
+    # Step 3: Install dependencies
+    - name: Install dependencies
+      working-directory: applications/virtual-fly-brain/client
+      run: npm install
+
+    # Step 4: Run ESLint
+    - name: Run ESLint
+      working-directory: applications/virtual-fly-brain/client
+      run: npm run prebuild

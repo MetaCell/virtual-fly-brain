@@ -25,12 +25,12 @@ jobs:
       with:
         node-version: '18' # Adjust the Node.js version as needed
 
-    # Step 3: Install dependencies
+    # Step 3: Install dependencies using Yarn
     - name: Install dependencies
       working-directory: applications/virtual-fly-brain/client
-      run: npm install
+      run: yarn install
 
     # Step 4: Run ESLint
     - name: Run ESLint
       working-directory: applications/virtual-fly-brain/client
-      run: npm run prebuild
+      run: yarn prebuild

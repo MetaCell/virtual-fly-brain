@@ -10,9 +10,6 @@ from services.term_info import get_term_info
 
 dev_mode = os.getenv('VFB_DEV', True)
 
-# if not dev_mode:
-#     from cloudharness.utils.server import init_flask
-
 class NumpyEncoder(json.JSONEncoder):
     """ Custom encoder for numpy data types """
     def default(self, obj):
@@ -42,6 +39,7 @@ class NumpyEncoder(json.JSONEncoder):
 def init_webapp_routes(app):
     # if dev_mode:
     www_path = os.path.dirname(os.path.abspath(__file__)) + "/www"
+    print("www_path is: ", www_path)
 
     @app.route('/', methods=['GET'])
     def index():
@@ -55,7 +53,7 @@ def init_webapp_routes(app):
     @app.route('/get_term_info', methods=['GET'])
     @cross_origin(supports_credentials=True)
     def term_info():
-        id = flask.request.args.get('id')dev_mode
+        id = flask.request.args.get('id')
         data = get_term_info(id)
         data_formatted = json.dumps(data, cls=NumpyEncoder)
         return data_formatted

@@ -32,6 +32,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install -e .
+        cd virtual_fly_brain && mkdir www && cd www && touch index.html
 
     # Step 4: Run the tests
     - name: Run tests

@@ -85,39 +85,49 @@ class ThreeDCanvas extends Component {
     }
   }
 
-  showSkeleton (instanceID, mode, visible, threeDObjects) {
+  showSkeleton(instanceID, mode, visible, threeDObjects) {
     let allLoadedInstances = this.props.allLoadedInstances;
-    let match = allLoadedInstances?.find ( inst => inst.metadata?.Id === instanceID );
+    let match = allLoadedInstances?.find(inst => inst.metadata?.Id === instanceID);
     let that = this;
 
-    if ( match?.skeleton?.[mode] === undefined ) {
-        // Initialize shark viewer to load SWC
-        let sharkviewer = new SharkViewer({ dom_element: "canvas" });
-        sharkviewer.mode = mode;
-        sharkviewer.three_colors = [];
-        Object.keys(sharkviewer.colors).forEach(color => {
-          sharkviewer.three_colors.push(new THREE.Color(sharkviewer.colors[color]));
-        })
-        sharkviewer.three_materials = [];
-        Object.keys(sharkviewer.colors).forEach(color => {
-          sharkviewer.three_materials.push(
-            new THREE.MeshBasicMaterial({
-              color: sharkviewer.colors[color],
-              wireframe: false
-            })
-          );
-        });
-        fetch(match?.metadata?.Images?.[Object.keys(match.metadata?.Images)[0]][0].swc)
-          .then(response => response.text())
-          .then(base64Content => {
-            const swcJSON = swcParser(base64Content);
-            let neuron = sharkviewer.createNeuron(swcJSON, match?.metadata?.Id, that?.canvasRef?.current?.threeDEngine?.renderer);
-            neuron.name = match?.metadata?.Id;
-            add3DSkeleton(neuron, mode, match?.metadata?.Id)
-        })
+    if (match?.skeleton?.[mode] === undefined) {
+      // Initialize shark viewer to load SWC
+      let sharkviewer = new SharkViewer({ dom_element: "canvas" });
+      sharkviewer.mode = mode;
+      sharkviewer.three_colors = [];
+      
+      // Use full opacity for skeletons
+      if (match.fullOpacityColor) {
+        // Use stored full opacity color for consistent coloring
+        sharkviewer.color = match.fullOpacityColor;
+      } else {
+        // If no stored color, use current color with full opacity
+        sharkviewer.color = {...match.color, a: 1.0};
+      }
+      
+      Object.keys(sharkviewer.colors).forEach(color => {
+        sharkviewer.three_colors.push(new THREE.Color(sharkviewer.colors[color]));
+      })
+      sharkviewer.three_materials = [];
+      Object.keys(sharkviewer.colors).forEach(color => {
+        sharkviewer.three_materials.push(
+          new THREE.MeshBasicMaterial({
+            color: sharkviewer.colors[color],
+            wireframe: false
+          })
+        );
+      });
+      fetch(match?.metadata?.Images?.[Object.keys(match.metadata?.Images)[0]][0].swc)
+        .then(response => response.text())
+        .then(base64Content => {
+          const swcJSON = swcParser(base64Content);
+          let neuron = sharkviewer.createNeuron(swcJSON, match?.metadata?.Id, that?.canvasRef?.current?.threeDEngine?.renderer);
+          neuron.name = match?.metadata?.Id;
+          add3DSkeleton(neuron, mode, match?.metadata?.Id)
+      })
     } else {
-      let updatedObjects = threeDObjects?.filter( m => m.visible);
-      this.setState({ ...this.state, threeDObjects : updatedObjects})
+      let updatedObjects = threeDObjects?.filter(m => m.visible);
+      this.setState({ ...this.state, threeDObjects: updatedObjects})
     }
   }
 

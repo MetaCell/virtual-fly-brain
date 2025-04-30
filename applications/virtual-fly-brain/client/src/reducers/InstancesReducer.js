@@ -1,6 +1,6 @@
 import { getGlobalTypes } from './actions/types/GlobalTypes';
 import { getInstancesTypes } from './actions/types/getInstancesTypes';
-import {SELECTED_COLOR, DESELECTED_COLOR, TEMPLATE_COLOR, SKELETON, CYLINDERS } from './../utils/constants';
+import {SELECTED_COLOR, DESELECTED_COLOR, TEMPLATE_COLOR, SKELETON, CYLINDERS, getNextColor } from './../utils/constants';
 import { loadInstances } from './../utils/instancesHelper'
 
 export const initialStateInstancesReducer = {
@@ -174,24 +174,42 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
           isLoading: false
         })
       }
-      case getInstancesTypes.CHANGE_COLOR:{
+      case getInstancesTypes.CHANGE_COLOR: {
         const allLoadedInstances = [...state.allLoadedInstances]
-        let matchInstance = allLoadedInstances?.find( i => i.metadata?.Id === response.payload.id );
+        let matchInstance = allLoadedInstances?.find(i => i.metadata?.Id === response.payload.id);
+        
+        // Use the alpha from the color picker
         matchInstance.color = response.payload.color;
+        
+        // Update fullOpacityColor for skeletons (keep full opacity for skeletons)
+        matchInstance.fullOpacityColor = {...response.payload.color, a: 1.0};
+        
+        // Update userSetColor with the user's choice including alpha
         matchInstance.userSetColor = response.payload.color;
+        
+        // Update 3D objects
         const threeDObjects = [...state.threeDObjects];
-        const matchObjects = threeDObjects.filter( o => o.name.includes(response.payload.id));
-        if ( matchObjects?.length > 0 ) {
-          matchObjects?.forEach( mo => 
-            mo.children[0].material.color = response.payload.color
-          )
+        const matchObjects = threeDObjects.filter(o => o.name.includes(response.payload.id));
+        if (matchObjects?.length > 0) {
+          matchObjects?.forEach(mo => {
+            mo.children[0].material.color = response.payload.color;
+            
+            // Use the user-set alpha except for special cases
+            if (mo.name.includes('_swc') || mo.name.includes(SKELETON)) {
+              mo.children[0].material.opacity = 1.0;
+            } else if (matchInstance.metadata?.IsTemplate) {
+              mo.children[0].material.opacity = 0.4;
+            } else {
+              mo.children[0].material.opacity = response.payload.color.a || 0.3;
+            }
+          })
         }
-
+        
         return Object.assign({}, state, {
-          allLoadedInstances : allLoadedInstances,
-          threeDObjects : threeDObjects,
-          mappedCanvasData : getMappedCanvasData(allLoadedInstances),
-          event : { action : getInstancesTypes.UPDATE_INSTANCES, id : response.payload.id, trigger : Date.now()},
+          allLoadedInstances: allLoadedInstances,
+          threeDObjects: threeDObjects,
+          mappedCanvasData: getMappedCanvasData(allLoadedInstances),
+          event: { action: getInstancesTypes.UPDATE_INSTANCES, id: response.payload.id, trigger: Date.now() },
           isLoading: false
         })
       }
@@ -468,6 +486,45 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         return Object.assign({}, state, {
           cameraEvent : { action : response.payload.action, date : Date.now() },
           event : { action : getGlobalTypes.CAMERA_EVENT, id : response.payload.id, trigger : Date.now()},
+        })
+      }
+      case getInstancesTypes.ADD_INSTANCE_SUCCESS: {
+        let newInstance = response.payload;
+        if (state.allLoadedInstances?.find(i => i.metadata?.Id === newInstance.metadata?.Id && i?.metadata?.IsTemplate !== true)) {
+          newInstance = state.allLoadedInstances?.find(i => i.metadata?.Id === newInstance.metadata?.Id)
+        } else {
+          // If it's a template, use TEMPLATE_COLOR with opacity 0.4
+          if (newInstance.metadata?.IsTemplate) {
+            newInstance.color = {...TEMPLATE_COLOR, a: 0.4};
+          } else {
+            // For other instances, use next color from palette with opacity 0.3
+            newInstance.color = getNextColor(0.3);
+            // Store original color with full opacity for potential skeleton use
+            newInstance.fullOpacityColor = {...newInstance.color, a: 1.0};
+          }
+        }
+        
+        let launchTemplate = state.launchTemplate
+        if (newInstance.metadata.IsTemplate && !state.allLoadedInstances?.find(i => i?.metadata?.IsTemplate)) {
+          launchTemplate = newInstance
+        }
+        
+        let loadedInstances = state.allLoadedInstances?.find(i => i?.metadata?.Id === response.payload.Id) ? 
+          [...state.allLoadedInstances] : [...state.allLoadedInstances, newInstance];
+        
+        let focused = state.focusedInstance;
+        if (response.payload.focus) {
+          focused = loadedInstances?.find(i => i?.metadata?.Id === response.payload.Id)
+        }
+        
+        return Object.assign({}, state, {
+          allLoadedInstances: loadedInstances,
+          launchTemplate: launchTemplate,
+          focusedInstance: focused,
+          event: { action: getInstancesTypes.ADD_INSTANCE, id: response.payload.Id, trigger: Date.now() },
+          isLoading: false,
+          error: false,
+          errorMessage: undefined
         })
       }
       default:

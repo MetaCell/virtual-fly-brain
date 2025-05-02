@@ -34,13 +34,25 @@ export const widgets = {
         props: { size: { height: 600, width: 600 } }
     },
 
+    listViewerWidget : {
+        id: widgetsIDs.listViewerWidgetID,
+        name: "Layers",
+        component: "listViewer",
+        panelName: "bottom",
+        hideOnClose: true,
+        status: WidgetStatus.ACTIVE,
+        defaultPosition: 'RIGHT',
+        pos: 1,
+        props: { size: { height: 600, width: 300 } }
+    },
+
     roiBrowserWidget : {
         id: widgetsIDs.roiBrowserWidgetID,
         name: "Template ROI Browser",
         component: "roiBrowser",
         panelName: "bottom",
         hideOnClose: true,
-        status: WidgetStatus.ACTIVE,
+        status: WidgetStatus.HIDDEN,
         defaultPosition: 'RIGHT',
         pos: 2,
         props: { size: { height: 600, width: 600 } }
@@ -52,7 +64,7 @@ export const widgets = {
         component: "termContext",
         panelName: "bottom",
         hideOnClose: true,
-        status: WidgetStatus.ACTIVE,
+        status: WidgetStatus.HIDDEN,
         defaultPosition: 'RIGHT',
         pos: 3,
         props: { size: { height: 600, width: 300 } }
@@ -64,21 +76,9 @@ export const widgets = {
         component: "circuitBrowser",
         panelName: "bottom",
         hideOnClose: true,
-        status: WidgetStatus.ACTIVE,
+        status: WidgetStatus.HIDDEN,
         defaultPosition: 'RIGHT',
         pos: 4,
         props: { size: { height: 600, width: 300 } }
     },
-
-    listViewerWidget : {
-        id: widgetsIDs.listViewerWidgetID,
-        name: "Layers",
-        component: "listViewer",
-        panelName: "bottom",
-        hideOnClose: true,
-        status: WidgetStatus.ACTIVE,
-        defaultPosition: 'RIGHT',
-        pos: 5,
-        props: { size: { height: 600, width: 300 } }
-    }
 }

@@ -78,4 +78,6 @@ export const RGBAToHexA = (color) => {
     return "#" + r + g + b + a;
   }
 
-
+export const BOTTOM = "bottom";
+export const LEFT = "left";
+export const RIGHT = "right";

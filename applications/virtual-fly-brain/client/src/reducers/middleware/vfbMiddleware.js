@@ -9,6 +9,7 @@ import { widgets } from "./../../components/layout/widgets";
 import { getGlobalTypes } from '../actions/types/GlobalTypes';
 import { add3DPlane, modify3DPlane } from '../../utils/instancesHelper';
 import { widgetsIDs } from './../../components/layout/widgets';
+import { LEFT, BOTTOM, RIGHT } from '../../utils/constants';
 
 const getWidget = (store, viewerId) => {
     const state = store.getState();
@@ -140,6 +141,15 @@ const vfbMiddleware = store => next => (action) => {
                     next(updateWidget({ ...widgets[key], panelName: activePanel, defaultPanel: activePanel, status: WidgetStatus.ACTIVE }));
                 }
             });
+            break;
+        }
+        case getGlobalTypes.FIRST_ID_LOADED : {
+            // hacking flexlayout to change the default value of enableDeleteWhenEmpty since required initially for the first layout
+            const layoutManager = getLayoutManagerInstance();
+            const layout = layoutManager.model.getRoot().getModel();
+            layout.getNodeById(BOTTOM)._attributes['enableDeleteWhenEmpty'] = true;
+            layout.getNodeById(LEFT)._attributes['enableDeleteWhenEmpty'] = true;
+            layout.getNodeById(RIGHT)._attributes['enableDeleteWhenEmpty'] = true;
             break;
         }
         default:

@@ -34,13 +34,25 @@ export const widgets = {
         props: { size: { height: 600, width: 600 } }
     },
 
+    listViewerWidget : {
+        id: widgetsIDs.listViewerWidgetID,
+        name: "Layers",
+        component: "listViewer",
+        panelName: "bottom",
+        hideOnClose: true,
+        status: WidgetStatus.ACTIVE,
+        defaultPosition: 'RIGHT',
+        pos: 1,
+        props: { size: { height: 600, width: 300 } }
+    },
+
     roiBrowserWidget : {
         id: widgetsIDs.roiBrowserWidgetID,
         name: "Template ROI Browser",
         component: "roiBrowser",
-        panelName: "right",
+        panelName: "bottom",
         hideOnClose: true,
-        status: WidgetStatus.ACTIVE,
+        status: WidgetStatus.HIDDEN,
         defaultPosition: 'RIGHT',
         pos: 2,
         props: { size: { height: 600, width: 600 } }
@@ -50,9 +62,9 @@ export const widgets = {
         id: widgetsIDs.termContextWidgetID,
         name: "Term Context",
         component: "termContext",
-        panelName: "right",
+        panelName: "bottom",
         hideOnClose: true,
-        status: WidgetStatus.ACTIVE,
+        status: WidgetStatus.HIDDEN,
         defaultPosition: 'RIGHT',
         pos: 3,
         props: { size: { height: 600, width: 300 } }
@@ -62,23 +74,11 @@ export const widgets = {
         id: widgetsIDs.circuitBrowserWidgetID,
         name: "Circuit Browser",
         component: "circuitBrowser",
-        panelName: "right",
+        panelName: "bottom",
         hideOnClose: true,
-        status: WidgetStatus.ACTIVE,
+        status: WidgetStatus.HIDDEN,
         defaultPosition: 'RIGHT',
         pos: 4,
         props: { size: { height: 600, width: 300 } }
     },
-
-    listViewerWidget : {
-        id: widgetsIDs.listViewerWidgetID,
-        name: "Layers",
-        component: "listViewer",
-        panelName: "right",
-        hideOnClose: true,
-        status: WidgetStatus.ACTIVE,
-        defaultPosition: 'RIGHT',
-        pos: 5,
-        props: { size: { height: 600, width: 300 } }
-    }
 }

@@ -30,7 +30,7 @@ const TerminfoSlider = (props) => {
         display: 'block'
       },
 
-      '& > div:first-child': {
+      '& > div:first-of-type': {
         height: '100%',
         '& > div': {
           height: '100%',

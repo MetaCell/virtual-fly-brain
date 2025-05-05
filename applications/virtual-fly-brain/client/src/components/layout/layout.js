@@ -1,3 +1,5 @@
+import { LEFT, RIGHT, BOTTOM } from "../../utils/constants";
+
 export default {
   global: {
     sideBorders: 8,
@@ -22,23 +24,45 @@ export default {
   layout: {
     type: "row",
     id: "root",
-    enableDeleteWhenEmpty: true,
-    weight: 100,
-    children: [{
-      type: "tabset",
-      id: "left",
-      weight: 60,
-      enableDeleteWhenEmpty: true,
-      tabSetEnableMaximize: true,
-      children: []
-    },
-    {
-      type: "tabset",
-      id: "right",
-      weight: 40,
-      enableDeleteWhenEmpty: true,
-      tabSetEnableMaximize: true,
-      children: []
-    }]
+    children: [
+      {
+        type: "row",
+        id: "root1",
+        weight: 50,
+        children: [
+          {
+            type: "row",
+            id: "root2",
+            weight: 50,
+            children: [
+              {
+                type: "tabset",
+                id: LEFT,
+                weight: 50,
+                enableDeleteWhenEmpty: false,
+                tabSetEnableMaximize: true,
+                children: []
+              },
+              {
+                type: "tabset",
+                id: RIGHT,
+                weight: 50,
+                enableDeleteWhenEmpty: false,
+                tabSetEnableMaximize: true,
+                children: []
+              },
+            ]
+          },
+          {
+            type: "tabset",
+            id: BOTTOM,
+            weight: 30,
+            enableDeleteWhenEmpty: false,
+            tabSetEnableMaximize: true,
+            children: []
+          }
+        ]
+      }
+    ]
   }
 };

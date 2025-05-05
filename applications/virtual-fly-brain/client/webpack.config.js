@@ -8,6 +8,8 @@ const copyPaths = [
   { from: path.resolve(__dirname, "src/assets"), to: 'assets' },
 ];
 module.exports = function webpacking(envVariables) {
+  const api_url = JSON.stringify(process.env.VFB_DOMAIN) || JSON.stringify('https://vfb.dev.metacell.us/');
+
   let env = envVariables;
   if (!env) {
     env = {};
@@ -16,19 +18,16 @@ module.exports = function webpacking(envVariables) {
     env.mode = 'production';
   }
 
-  const API_URL = {
-    production: JSON.stringify('https://vfb.dev.metacell.us/'),
-    development: JSON.stringify('http://localhost:8080/')
-  }
-
-  // check environment mode
-  const environment = env.mode === 'production' ? 'production' : 'development';
-
+  console.log('### VFB Webpack build ###');
+  console.log('### Mode: ', env.mode);
+  console.log('### API URL: ', api_url);
+  console.log('### Webpack build time: ', new Date().toLocaleString());
+  console.log('### Webpack version: ', webpack.version);
+  console.log('### Webpack config:');
   console.log('####################');
-  console.log('####################');
-  console.log('BUILD bundle with parameters:');
-  console.log( env);
-  console.log('####################');
+  console.log('### Environment variables:');
+  console.log('--------------------');
+  console.log('envVariables: ', envVariables);
   console.log('####################');
 
   const { mode } = env;
@@ -101,7 +100,7 @@ module.exports = function webpacking(envVariables) {
 
   const plugins = [
     new webpack.DefinePlugin({
-      'API_URL': API_URL[environment]
+      'API_URL': api_url,
     }),
     new CleanWebpackPlugin(),
     new CopyWebpackPlugin({ patterns: copyPaths }),

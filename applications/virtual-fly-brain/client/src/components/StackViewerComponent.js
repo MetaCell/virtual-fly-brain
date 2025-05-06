@@ -1,6 +1,8 @@
 import React from 'react';
 import { Application, Container, Assets, Sprite, Text, TextStyle, utils, extensions, ExtensionType, Texture , Resource, BLEND_MODES } from 'pixi.js';
 import { getInstanceByID, selectInstance } from '../reducers/actions/instances';
+import ReactResizeDetector from 'react-resize-detector';
+
 import SLICE from "../assets/viewer/slice.svg";
 import ORTH from "../assets/viewer/orth.svg";
 import GLASS from '../assets/viewer/glass.jpg';
@@ -1222,7 +1224,9 @@ const StackViewerComponent = () => createClass({
         scrollTrack: 0,
         loadChanges: true,
         hoverOrthButton : false,
-        hoverOrthSlice : false
+        hoverOrthSlice : false,
+        width: this.props.width,
+        height: this.props.height
       };
     },
 
@@ -1341,6 +1345,8 @@ const StackViewerComponent = () => createClass({
     },
 
     componentDidMount: function () {
+      this.onResize = this.onResize.bind(this);
+
       this._isMounted = true;
 
       // detect event model
@@ -1361,6 +1367,14 @@ const StackViewerComponent = () => createClass({
 
       if (this.props.data && this.props.data != null && this.props.data.instances && this.props.data.instances != null) {
         this.setState(this.handleInstances(this.props.data.instances));
+      }
+      
+      const container = document.getElementById('slice-viewer');
+      if (container) {
+        const { width, height } = container.getBoundingClientRect();
+        console.log({width, height});
+        
+        this.onResize(width, height);
       }
 
       setTimeout(this.onHome, 5000);
@@ -1383,12 +1397,13 @@ const StackViewerComponent = () => createClass({
         var labels = [];
         var ids = [];
         var server = this.props.config.serverUrl.replace('http:', window.location.protocol).replace('https:', window.location.protocol);
-        if (this.props.data.height && this.props.data.height != null) {
+        if (!this.state.height && this.props.data.height != null) {
           newState.height = this.props.data.height;
         }
-        if (this.props.data.width && this.props.data.width != null) {
+        if (!this.state.width && this.props.data.width != null) {
           newState.width = this.props.data.width;
         }
+        
         if (this.props.config && this.props.config != null && this.props.config.subDomains && this.props.config.subDomains != null && this.props.config.subDomains.length && this.props.config.subDomains.length > 0 && this.props.config.subDomains[0] && this.props.config.subDomains[0].length && this.props.config.subDomains[0].length > 2) {
           newState.voxelX = Number(this.props.config.subDomains[0][0] || 0.622088);
           newState.voxelY = Number(this.props.config.subDomains[0][1] || 0.622088);
@@ -1460,6 +1475,30 @@ const StackViewerComponent = () => createClass({
      * Event handler for clicking zoom in. Increments the zoom level
      *
      */
+    onResize: function (width, height) {
+      const autoScale = Number(Math.min(
+        height / (this.state.imageY / 10.0),
+        width / (this.state.imageX / 10.0)
+      ).toFixed(1));
+    
+      const scale = Math.ceil(autoScale);
+    
+      this.setState({
+        width,
+        height,
+        zoomLevel: autoScale,
+        scl: scale,
+        text: 'Auto Zoom on Resize',
+        dst: 0,
+        stackX: 0,
+        stackY: 0
+      });
+    
+      this._resizedManually = true;
+    },
+    
+    
+    
     onZoomIn: function () {
       var zoomLevel = this.state.zoomLevel;
       var scale = this.state.scl;
@@ -1624,7 +1663,10 @@ const StackViewerComponent = () => createClass({
      *
      */
     onHome: function () {
-      var autoScale = Number(Math.min((this.props.data.height / (this.state.imageY / 10.0 )), (this.props.data.width / (this.state.imageX / 10.0 ))).toFixed(1));
+      const autoScale = Number(Math.min(
+        this.state.height / (this.state.imageY / 10.0),
+        this.state.width / (this.state.imageX / 10.0)
+      ).toFixed(1));
       var scale = Math.ceil(autoScale);
       this.setState({ dst: 0, stackX: 0, stackY: 0, text: 'Stack Centred', zoomLevel: autoScale, scl: scale });
     },
@@ -1682,6 +1724,7 @@ const StackViewerComponent = () => createClass({
     },
 
     render: function () {
+      console.log(this.state)
       var homeClass = 'btn fa fa-home';
       var zoomInClass = 'btn fa fa-search-plus';
       var zoomOutClass = 'btn fa fa-search-minus';
@@ -1779,8 +1822,8 @@ const StackViewerComponent = () => createClass({
               stack={this.state.stack} color={this.state.color} setExtent={this.onExtentChange}
               statusText={this.state.text} stackX={this.state.stackX} stackY={this.state.stackY}
               scl={this.state.scl} orth={this.state.orth}
-              label={this.state.label} id={this.state.id} height={this.props.data.height}
-              width={this.props.data.width} voxelX={this.state.voxelX}
+              label={this.state.label} id={this.state.id} height={this.state.height}
+              width={this.state.width} voxelX={this.state.voxelX}
               voxelY={this.state.voxelY} voxelZ={this.state.voxelZ} displayArea={displayArea}
               templateId={this.props.config.templateId}
               templateDomainIds={this.state.tempId}
@@ -1807,7 +1850,11 @@ const StackViewerComponent = () => createClass({
         );
       }
 
-      return markup;
+      return <ReactResizeDetector skipOnMount={true} onResize={this.onResize.bind(this)}>
+        <div id='slice-viewer' style={{width: '100%', height: '100%'}} ref={this.refs.stackCanvas}>
+        {markup}
+        </div>
+        </ReactResizeDetector>
     }
   });
 

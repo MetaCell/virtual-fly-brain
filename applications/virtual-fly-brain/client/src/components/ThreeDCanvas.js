@@ -15,7 +15,7 @@ import { getGlobalTypes } from '../reducers/actions/types/GlobalTypes';
 
 const {
   whiteColor,
-  blackColor
+  blackBG
 } = vars;
 
 const styles = () => ({
@@ -198,30 +198,28 @@ class ThreeDCanvas extends Component {
 
     return (<Box
       sx={{
-        height: 'calc(100% - 0.5rem)',
+        height: '100%',
         color: whiteColor,
         overflow: 'hidden',
         background: {
-          lg: blackColor
+          lg: blackBG
         }
       }}
     >
       {mappedCanvasData?.length > 0 ? (
         <div ref={node => this.node = node} id="canvas" className={classes.container}>
-          <>
             <Canvas
               ref={this.canvasRef}
               data={mappedCanvasData?.filter(d => d?.visibility )}
               threeDObjects={threeDObjects}
               cameraOptions={cameraOptions}
               onMount={scene => this.scene = scene}
-              backgroundColor={blackColor}
+              backgroundColor={blackBG}
               onSelection={this.onSelection}
               selectionStrategy={(selectedMap) => this.selectionStrategy(this.props, selectedMap)}
               onHoverListeners={{ 'hoverId': this.hoverHandler }}
               dracoDecoderPath={'https://raw.githubusercontent.com/ddelpiano/three.js/dev/examples/jsm/libs/draco/'}
             />
-          </>
         </div>
       ) : <div></div> }
     </Box>)

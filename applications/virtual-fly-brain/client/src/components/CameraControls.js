@@ -164,7 +164,7 @@ const CameraControls = (props) => {
   return (
     <Box className="position-toolbar" sx={{
       position: 'absolute',
-      top: '25%',
+      top: '40%',
       width: '4.125rem',
       left: '1rem',
       transform: 'translateY(-50%)'

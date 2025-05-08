@@ -1372,8 +1372,6 @@ const StackViewerComponent = () => createClass({
       const container = document.getElementById('slice-viewer');
       if (container) {
         const { width, height } = container.getBoundingClientRect();
-        console.log({width, height});
-        
         this.onResize(width, height);
       }
 
@@ -1724,7 +1722,6 @@ const StackViewerComponent = () => createClass({
     },
 
     render: function () {
-      console.log(this.state)
       var homeClass = 'btn fa fa-home';
       var zoomInClass = 'btn fa fa-search-plus';
       var zoomOutClass = 'btn fa fa-search-minus';

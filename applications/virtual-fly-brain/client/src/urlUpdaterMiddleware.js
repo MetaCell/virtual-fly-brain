@@ -6,8 +6,6 @@ import { addRecentSearch } from './reducers/actions/globals'
 import { setQueryComponentOpened, setFirstIDLoaded, setAlignTemplates, setTemplateID } from './reducers/actions/globals';
 
 function updateUrlParameterWithCurrentUrl(param, value) {
-  console.log("updateUrlParameterWithCurrentUrl", param, value);
-  
   const urlObj = new URL(window.location.href);
   if (urlObj.searchParams.has(param)) {
     const existingValue = urlObj.searchParams.get(param);

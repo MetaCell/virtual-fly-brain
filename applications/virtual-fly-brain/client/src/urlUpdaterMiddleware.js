@@ -11,13 +11,16 @@ function updateUrlParameterWithCurrentUrl(param, value) {
     const existingValue = urlObj.searchParams.get(param);
     const existingValuesArray = existingValue.split(',');
     const newValuesArray = value?.split(',');
-    const mergedValuesArray = [...new Set(existingValuesArray.concat(newValuesArray))];
+    // Filter out any empty values and ensure unique values
+    const mergedValuesArray = [...new Set([...existingValuesArray, ...newValuesArray].filter(Boolean))];
     const updatedValue = mergedValuesArray.join(',');
-    urlObj.search = urlObj.search.replace(new RegExp(`${param}=[^&]*`), `${param}=${updatedValue}`);
+    // Use decodeURIComponent to ensure commas are displayed correctly
+    urlObj.searchParams.set(param, decodeURIComponent(updatedValue));
   } else {
-    urlObj.searchParams.set(param, value);
+    urlObj.searchParams.set(param, decodeURIComponent(value));
   }
-  window.history.replaceState(null, '', urlObj.toString());
+  // Use decodeURIComponent when setting the URL to ensure proper display
+  window.history.replaceState(null, '', decodeURIComponent(urlObj.toString()));
 }
 
 const DEFAULT_ID = "VFB_00101567"; 
@@ -25,9 +28,8 @@ const APP_LOADED_FLAG_KEY = "CURRENT_LOADED_URL";
 
 const isFirstTimeLoad = (allLoadedInstances) => {
   const appLoadedUrl = localStorage.getItem(APP_LOADED_FLAG_KEY);
-  const currentUrl = window.location.href ;
-  if ( currentUrl != appLoadedUrl )
-  {
+  const currentUrl = window.location.href;
+  if (currentUrl != appLoadedUrl) {
     localStorage.setItem(APP_LOADED_FLAG_KEY, currentUrl);
     // Load id parameter from URL and dispatch action
     const idFromUrl = getUrlParameter("id");
@@ -37,7 +39,10 @@ const isFirstTimeLoad = (allLoadedInstances) => {
       idToUpdate = idFromUrl?.split(',')?.[0];
     }
     
-    getInstance(allLoadedInstances,idToUpdate, true);
+    // Only load if the instance is not already loaded
+    if (!allLoadedInstances?.find(i => i.metadata?.Id === idToUpdate)) {
+      getInstance(allLoadedInstances, idToUpdate, true);
+    }
   }
 };
 
@@ -86,14 +91,19 @@ export const urlUpdaterMiddleware = store => next => (action) => {
   const misalignedIDs = store.getState().globalInfo.misalignedIDs;
 
   const allLoadedInstances = store.getState().instances.allLoadedInstances;
-  isFirstTimeLoad(allLoadedInstances)
   const firstIDLoaded = store.getState().globalInfo.firstIDLoaded;
+  
+  // Only call isFirstTimeLoad if we haven't loaded the first ID yet
+  if (!firstIDLoaded) {
+    isFirstTimeLoad(allLoadedInstances);
+  }
+
   switch (action.type) {
     case getInstancesTypes.GET_INSTANCES_SUCCESS : {
-
         const templateLookup = action.payload?.Images || action.payload?.Examples || {};
         const templates = Object.keys(templateLookup);
         const loadedTemplate = launchTemplate?.metadata?.Id;
+        const template = Object.keys(templateLookup)?.[0];
 
         // Check if there's an alignment that matches the current template
         if (!action.payload.IsTemplate && templates.length > 0) {
@@ -102,7 +112,11 @@ export const urlUpdaterMiddleware = store => next => (action) => {
             // Use this aligned version instead
             const alignedInstance = templateLookup[loadedTemplate][0]; // Assume first example is what we want
             next(action); // Continue with current action
-            getInstanceByID(alignedInstance.id, true, action.payload.focus, action.payload.select);
+            if (!allLoadedInstances?.find(i => i.metadata?.Id === alignedInstance.id)) {
+              getInstanceByID(alignedInstance.id, true, action.payload.focus, action.payload.select);
+              // Update URL with the new instance ID
+              updateUrlParameterWithCurrentUrl("i", alignedInstance.id);
+            }
           } 
           // If no match found, show misalignment dialog
           else if (misalignedIDs[action.payload.Id] == undefined) {
@@ -111,36 +125,40 @@ export const urlUpdaterMiddleware = store => next => (action) => {
           }
         }
 
-        if ( !action.payload?.IsClass ) {
-          if ( !action.payload.IsTemplate && !firstIDLoaded ){
+        if (!action.payload?.IsClass) {
+          if (!action.payload.IsTemplate && !firstIDLoaded) {
             next(action); 
-            if ( action.payload.get3DMesh && !action.payload?.IsClass ){
+            if (action.payload.get3DMesh && !action.payload?.IsClass) {
               get3DMesh(action.payload);
             }
-            getInstanceByID(template, true, false, false)
-            store.dispatch(setTemplateID(template))
-            updateUrlParameterWithCurrentUrl("i", template);
-          } else if ( (action.payload.IsTemplate && launchTemplate) == null || 
-            (!action.payload.IsTemplate && template == loadedTemplate) ){
-            if ( action.payload.get3DMesh && !action.payload?.IsClass ){
-              next(action)
+            // Only load template if it's not already loaded
+            if (template && !allLoadedInstances?.find(i => i.metadata?.Id === template)) {
+              getInstanceByID(template, true, false, false);
+              store.dispatch(setTemplateID(template));
+              updateUrlParameterWithCurrentUrl("i", template);
+            }
+          } else if ((action.payload.IsTemplate && launchTemplate) == null || 
+            (!action.payload.IsTemplate && template == loadedTemplate)) {
+            if (action.payload.get3DMesh && !action.payload?.IsClass) {
+              next(action);
               get3DMesh(action.payload);
             }
-          } else if ( !action.payload.IsTemplate && template != loadedTemplate && misalignedIDs[action.payload.Id] == undefined ) {
-            store.dispatch(setAlignTemplates(false, action.payload.Id))
+          } else if (!action.payload.IsTemplate && template != loadedTemplate && misalignedIDs[action.payload.Id] == undefined) {
+            store.dispatch(setAlignTemplates(false, action.payload.Id));
             break;
-          } else if ( action.payload.IsTemplate && loadedTemplate !== action.payload.Id && misalignedIDs[action.payload.Id] == undefined ) {
-            store.dispatch(setAlignTemplates(false, action.payload.Id))
+          } else if (action.payload.IsTemplate && loadedTemplate !== action.payload.Id && misalignedIDs[action.payload.Id] == undefined) {
+            store.dispatch(setAlignTemplates(false, action.payload.Id));
             break;
-          } else if ( misalignedIDs[action.payload.Id] ) {
-            next(action)
+          } else if (misalignedIDs[action.payload.Id]) {
+            next(action);
+            // Update URL with the new instance ID when it's successfully loaded
+            updateUrlParameterWithCurrentUrl("i", action.payload.Id);
           }
-          loaded(store, firstIDLoaded, allLoadedInstances)
-        } else if ( action.payload?.IsClass ) {
-          next(action)
-          loaded(store, firstIDLoaded, allLoadedInstances)
+          loaded(store, firstIDLoaded, allLoadedInstances);
+        } else if (action.payload?.IsClass) {
+          next(action);
+          loaded(store, firstIDLoaded, allLoadedInstances);
         }
-
         break;
     }
     case getQueriesTypes.UPDATE_QUERIES:

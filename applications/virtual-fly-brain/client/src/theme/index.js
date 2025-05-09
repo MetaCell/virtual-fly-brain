@@ -58,7 +58,10 @@ theme = createTheme({
           box-shadow: none !important;
           border-radius: 4px !important;
         }
-
+        .flexbox-fix > div:nth-child(2) > div:nth-child(1) {
+          margin-right: 0px !important; 
+          margin-top: 2px !important; 
+        }
         .flexbox-fix input:focus {
           outline: none !important;
           border: none !important;
@@ -66,9 +69,10 @@ theme = createTheme({
         }
 
         .flexbox-fix svg {
-          fill: ${whiteColor} !important;
+          path {
+            fill: ${whiteColor} !important;
+          }
         }
-
         .flexbox-fix svg:hover {
           background: transparent !important;
         }

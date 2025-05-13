@@ -24,7 +24,7 @@ const facets_annotations_colors = getUpdatedTags(colors_config)
 const GeneralInformation = ({ data, classes }) => {
   const [toggleReadMore, setToggleReadMore] = useState(false);
   const [fullScreen, setFullScreen] = useState(false)
-  const MAX_LENGTH = 120;
+  const MAX_LENGTH = 80;
 
   const renderTooltipChips = (data) => {
     return <>
@@ -132,17 +132,17 @@ const GeneralInformation = ({ data, classes }) => {
                   color: whiteColor,
                   borderRadius: toggleReadMore ? 1 : 0,
                   textAlign: 'right',
-                  maxHeight: '3.375rem',
-                  overflow: 'auto',
-                  padding: toggleReadMore ? '0.25rem 0.5rem' : 0,
+                  padding: toggleReadMore ? '0.25rem 0.5rem' : "0.10rem 0.12rem",
                   background: {
                     xs: toggleReadMore ? descriptionBg : 'transparent',
                     xl: toggleReadMore ? secondaryBg : 'transparent',
                   }
-                }}>
-                  {toggleReadMore ? data?.metadata?.Meta?.Description : `${data?.metadata?.Meta?.Description?.substr(0, MAX_LENGTH)}...`}
+                }}
+                className='scrollbar'>
+                  {toggleReadMore ? data?.metadata?.Meta?.Description : (data?.metadata?.Meta?.Description.length > MAX_LENGTH ? `${data?.metadata?.Meta?.Description?.substr(0, MAX_LENGTH)}...` : data?.metadata?.Meta?.Description)}
                 </Typography>
-                <Button
+                { data?.metadata?.Meta?.Description.length > 0 && data?.metadata?.Meta?.Description.length > MAX_LENGTH
+                ? <Button
                   onClick={() => setToggleReadMore((prev) => !prev)} disableRipple
                   sx={{
                     padding: 0,
@@ -155,6 +155,7 @@ const GeneralInformation = ({ data, classes }) => {
                   }}>
                   {toggleReadMore ? 'Show Less' : 'Read More'}
                 </Button>
+                : <></> }
               </Box>
             </Box>
 

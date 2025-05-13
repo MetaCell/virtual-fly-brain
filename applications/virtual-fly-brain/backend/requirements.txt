@@ -12,4 +12,4 @@ Flask == 2.2.2
 psycopg2-binary
 gunicorn==20.1.0
 flask_cors==3.0.10
-vfbquery==0.2.11
+vfbquery==0.3.1

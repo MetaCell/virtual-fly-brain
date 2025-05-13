@@ -1847,7 +1847,7 @@ const StackViewerComponent = () => createClass({
         );
       }
 
-      return <ReactResizeDetector skipOnMount={true} onResize={this.onResize.bind(this)}>
+      return <ReactResizeDetector skipOnMount={true} onResize={this.onResize}>
         <div id='slice-viewer' style={{width: '100%', height: '100%'}} ref={this.refs.stackCanvas}>
         {markup}
         </div>

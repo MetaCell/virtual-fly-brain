@@ -181,7 +181,7 @@ const SubHeader = ({ setBottomNav, bottomNav }) => {
               }}
               key={`${item.id}_${item.name}`}
             >
-              <item.icon color={item?.id === bottomNav && tabActiveColor} />
+              <item.icon color={item?.id === bottomNav ? tabActiveColor : "white"} />
             </Button>
           ))}
         </Box>

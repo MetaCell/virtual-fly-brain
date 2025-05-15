@@ -58,7 +58,7 @@ theme = createTheme({
           box-shadow: none !important;
           border-radius: 4px !important;
         }
-        .flexbox-fix > div:nth-child(2) > div:nth-child(1) {
+        .flexbox-fix > div:nth-of-type(2) > div:nth-of-type(1) {
           margin-right: 0px !important; 
           margin-top: 2px !important; 
         }

@@ -18,7 +18,6 @@ import UploadIcon from "../../components/configuration/VFBUploader/upload-icon.p
 import { nanoid } from 'nanoid';
 import FileIcon from "../../components/configuration/VFBUploader/file-icon.png";
 import { CustomStyle, CustomTheme } from "./styles";
-import { createMuiTheme } from "@material-ui/core/styles";
 
 const UNIQUE_ID = "UNIQUE_ID";
 const VFBUploader = (props) => {

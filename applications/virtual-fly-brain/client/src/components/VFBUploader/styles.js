@@ -1,4 +1,4 @@
-import { createMuiTheme } from "@material-ui/core/styles";
+import { createTheme } from "@material-ui/core/styles";
 
 export const CustomStyle = theme => ({
   dropzoneArea: { minHeight: "20vh !important" },
@@ -33,7 +33,7 @@ export const CustomStyle = theme => ({
   }
 })
 
-export const CustomTheme = createMuiTheme({
+export const CustomTheme = createTheme({
   typography: {
     h2: {
       fontSize: 22,

@@ -2,6 +2,7 @@ import React from 'react';
 import { Application, Container, Assets, Sprite, Text, TextStyle, utils, extensions, ExtensionType, Texture , Resource, BLEND_MODES } from 'pixi.js';
 import { getInstanceByID, selectInstance } from '../reducers/actions/instances';
 import ReactResizeDetector from 'react-resize-detector';
+import StackViewerButtons from './StackViewerButtons';
 
 import SLICE from "../assets/viewer/slice.svg";
 import ORTH from "../assets/viewer/orth.svg";
@@ -73,7 +74,8 @@ const rgbToHex = (color) => {
         lastLabelCall: 0,
         bufferRunning: false,
         iBuffer: {},
-        imagesUrl: {}
+        imagesUrl: {},
+        isMenuOpen: false
       };
     },
 
@@ -1182,6 +1184,12 @@ const rgbToHex = (color) => {
       return (
         < div className="stack-canvas-container" ref="stackCanvas"> </div>
       );
+    },
+
+    toggleMenu: function() {
+      this.setState(prevState => ({
+        isMenuOpen: !prevState.isMenuOpen
+      }));
     }
   });
 
@@ -1226,8 +1234,15 @@ const StackViewerComponent = () => createClass({
         hoverOrthButton : false,
         hoverOrthSlice : false,
         width: this.props.width,
-        height: this.props.height
+        height: this.props.height,
+        isMenuOpen: false
       };
+    },
+
+    toggleMenu: function() {
+      this.setState(prevState => ({
+        isMenuOpen: !prevState.isMenuOpen
+      }));
     },
 
     onWheelEvent: function (e) {
@@ -1732,87 +1747,93 @@ const StackViewerComponent = () => createClass({
       var toggleSliceClass = 'btn ';
       var startOffset = 45;
       var displayArea = this.props.data.id + 'displayArea';
+      const isSmallViewport = this.state.width < 300 || this.state.height < 300;
+      console.log(this.state.isMenuOpen);
+      
       var markup = '';
       if (this.state.stack.length > 0) {
         markup = (
           <div id={displayArea} style={{ position: 'absolute'}}>
-            <div  onClick={this.onHome} >
-            <button style={{
-              position: 'absolute',
-              left: 13,
-              top: startOffset + 20,
-              padding: 0,
-              border: 0,
-              id : "home",
-              background: 'transparent'
-            }} className={homeClass} title={'Center Stack'} /></div>
-            <div  onClick={this.onZoomIn} >
-            <button style={{
-              position: 'absolute',
-              left: 15,
-              top: startOffset + 82,
-              padding: 0,
-              border: 0,
-              background: 'transparent'
-            }} className={zoomInClass} title={'Zoom In'} />
-            </div>
-            <div  onClick={this.onZoomOut} >
-            <button style={{
-              position: 'absolute',
-              left: 15,
-              top: startOffset + 104,
-              padding: 0,
-              border: 0,
-              background: 'transparent'
-            }} className={zoomOutClass} title={'Zoom Out'} />
-            </div>
-            <div  onClick={this.onStepIn} >
-            <button style={{
-              position: 'absolute',
-              left: 15,
-              top: startOffset + 40,
-              padding: 0,
-              border: 0,
-              background: 'transparent'
-            }} className={stepInClass} title={'Step Into Stack'} />
-            </div>
-            <div  onClick={this.onStepOut} >
-            <button style={{
-              position: 'absolute',
-              left: 15,
-              top: startOffset,
-              padding: 0,
-              border: 0,
-              background: 'transparent'
-            }} className={stepOutClass} title={'Step Out Of Stack'} />
-            </div>
-            <button style={{
-              position: 'absolute',
-              left: 12,
-              top: startOffset + 55,
-              padding: 0,
-              paddingTop: 3,
-              border: 0,
-              background: 'transparent'
-            }} className={orthClass} onClick={this.toggleOrth} onMouseOver={() => this.mouseOverOrth(true)} onMouseOut={() => this.mouseOverOrth(false)} title={'Change Slice Plane Through Stack'}>
-              <img
-                src={this.state.hoverOrthButton ? ORTHHOVER : ORTH}
-                alt={'Toggle Orth'}
-              />
-            </button>
-            <button style={{
-              position: 'absolute',
-              left: 12,
-              top: startOffset + 125,
-              padding: 0,
-              border: 0,
-              background: 'transparent'
-            }} className={toggleSliceClass} onClick={this.toggleSlice} onMouseOver={() => this.mouseOverSlice(true)} onMouseOut={() => this.mouseOverSlice(false)} title={'Toggle the 3D slice display'}>
-              <img
-                src={this.state.hoverSliceButton ? SLICEHOVER : SLICE}
-                alt={'Add Slices'}
-              />
-            </button>
+            {isSmallViewport ? (
+              <>
+                <div style={{ 
+                  position: 'absolute', 
+                  top: 20, 
+                  left: 10, 
+                }}>
+                  <button 
+                    onClick={this.toggleMenu}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      width: '25px',
+                      height: '25px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      color: 'white',
+                      fontSize: '20px'
+                    }}
+                    title="Toggle Menu"
+                  >
+                    {
+                      this.state.isMenuOpen ? (
+                        <i className="fa fa-times"></i>
+                      ) : (
+                        <i className="fa fa-bars"></i>
+                      )
+                    }
+                  </button>
+                </div>
+
+                {this.state.isMenuOpen && (
+                  <div style={{ 
+                    position: 'absolute', 
+                    top: 13,
+                    left: 35, 
+                    transition: 'all 0.2s ease',
+                  }}>
+                    <StackViewerButtons
+                      onStepOut={this.onStepOut}
+                      onHome={this.onHome}
+                      onStepIn={this.onStepIn}
+                      onZoomIn={this.onZoomIn}
+                      onZoomOut={this.onZoomOut}
+                      toggleOrth={this.toggleOrth}
+                      toggleSlice={this.toggleSlice}
+                      mouseOverOrth={this.mouseOverOrth}
+                      mouseOverSlice={this.mouseOverSlice}
+                      hoverOrthButton={this.state.hoverOrthButton}
+                      hoverSliceButton={this.state.hoverSliceButton}
+                      isSmallViewport={isSmallViewport}
+                    />
+                  </div>
+                )}
+              </>
+            ) : (
+              <div style={{ 
+                position: 'absolute', 
+                top: 20,
+                left: 10, 
+              }}>
+                <StackViewerButtons
+                  onStepOut={this.onStepOut}
+                  onHome={this.onHome}
+                  onStepIn={this.onStepIn}
+                  onZoomIn={this.onZoomIn}
+                  onZoomOut={this.onZoomOut}
+                  toggleOrth={this.toggleOrth}
+                  toggleSlice={this.toggleSlice}
+                  mouseOverOrth={this.mouseOverOrth}
+                  mouseOverSlice={this.mouseOverSlice}
+                  hoverOrthButton={this.state.hoverOrthButton}
+                  hoverSliceButton={this.state.hoverSliceButton}
+                  isSmallViewport={isSmallViewport}
+                />
+              </div>
+            )}
             <Canvas zoomLevel={this.state.zoomLevel} dst={this.state.dst}
               serverUrl={this.props.config.serverUrl} canvasRef={this.props.canvasRef}
               fxp={this.state.fxp} pit={this.state.pit} yaw={this.state.yaw} rol={this.state.rol}

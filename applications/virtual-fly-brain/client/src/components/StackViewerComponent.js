@@ -1748,7 +1748,6 @@ const StackViewerComponent = () => createClass({
       var startOffset = 45;
       var displayArea = this.props.data.id + 'displayArea';
       const isSmallViewport = this.state.width < 300 || this.state.height < 300;
-      console.log(this.state.isMenuOpen);
       
       var markup = '';
       if (this.state.stack.length > 0) {

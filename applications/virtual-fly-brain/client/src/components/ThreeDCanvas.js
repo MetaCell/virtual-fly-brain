@@ -12,6 +12,7 @@ import SharkViewer, { swcParser } from '@janelia/sharkviewer';
 import * as THREE from 'three';
 import { add3DSkeleton, focusInstance, selectInstance } from '../reducers/actions/instances';
 import { getGlobalTypes } from '../reducers/actions/types/GlobalTypes';
+import ReactResizeDetector from 'react-resize-detector';
 
 const {
   whiteColor,
@@ -51,7 +52,9 @@ class ThreeDCanvas extends Component {
       },
       showModel: false,
       mappedCanvasData: [],
-      threeDObjects : []
+      threeDObjects : [],
+      canvasWidth: 0,
+      canvasHeight: 0,
     };
 
     this.canvasRef = React.createRef();
@@ -136,6 +139,8 @@ class ThreeDCanvas extends Component {
   }
 
   componentDidMount () {
+    this.onResize = this.onResize.bind(this);
+
     document.addEventListener('mousedown', this.handleClickOutside);
     this.setState({ mappedCanvasData: mapToCanvasData(this.props.allLoadedInstances) })
   }
@@ -152,6 +157,7 @@ class ThreeDCanvas extends Component {
       }
     }
   }
+
 
   onSelection (selectedInstances){
     selectedInstances?.forEach( id => {
@@ -192,6 +198,25 @@ class ThreeDCanvas extends Component {
 
   hoverHandler () {}
 
+  onResize (width, height) {
+    this.setState({
+      canvasWidth: width,
+      canvasHeight: height,
+      cameraOptions: {
+        ...this.state.cameraOptions,
+        cameraControls: {
+          ...this.state.cameraOptions.cameraControls,
+          props: {
+            ...this.state.cameraOptions.cameraControls.props,
+            canvasWidth: width,
+            canvasHeight: height,
+          }
+        }
+      }
+    });
+  }
+  
+
   render () {
     const { cameraOptions } = this.state
     const { classes , mappedCanvasData, threeDObjects} = this.props
@@ -208,6 +233,7 @@ class ThreeDCanvas extends Component {
     >
       {mappedCanvasData?.length > 0 ? (
         <div ref={node => this.node = node} id="canvas" className={classes.container}>
+          <ReactResizeDetector skipOnMount={true} onResize={this.onResize.bind(this)}>
             <Canvas
               ref={this.canvasRef}
               data={mappedCanvasData?.filter(d => d?.visibility )}
@@ -220,6 +246,7 @@ class ThreeDCanvas extends Component {
               onHoverListeners={{ 'hoverId': this.hoverHandler }}
               dracoDecoderPath={'https://raw.githubusercontent.com/ddelpiano/three.js/dev/examples/jsm/libs/draco/'}
             />
+          </ReactResizeDetector>
         </div>
       ) : <div></div> }
     </Box>)

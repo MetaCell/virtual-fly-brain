@@ -124,7 +124,7 @@ theme = createTheme({
           background-color: transparent;
         }
         .flexlayout__tab {
-          border-radius: 0px 8px 8px 8px;
+          border-radius: 8px;
            background-color: ${blackColor};
           padding: 1rem;
         }

@@ -79,10 +79,10 @@ const conf = [
       component.value._root.nodes.forEach( e=> e.nodes?.forEach( n=> { if ( n.entry?.[0] == "types" ) { entityType = n.entry?.[1] } }))
       entityPath = entityType.match(/\(([^)]+)\)/)[1];
       entityType = entityType.match(/\[(.*?)\]/)[1];
-      
+
       let tags = null;
       component.value._root.nodes.forEach( e=> e.nodes?.forEach( n=> { if ( n.entry?.[0] == "tags" ) { tags = n.entry?.[1] } }))
-      
+
       const chips_cutoff = 3;
       return <div style={{ width: "100%", textAlign: "left", float: "left", display: 'flex', gap: '.5rem' }}>
         <div style={{ textAlign: "left", float: "left" }}>

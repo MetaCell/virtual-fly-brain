@@ -1,23 +1,20 @@
-
+import React, { useState } from 'react';
 import { Box, IconButton, Tooltip } from '@mui/material';
-import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { cameraControlAction } from './../reducers/actions/globals'
-import UP from "../assets/viewer/up.svg";
-import DOWN from "../assets/viewer/down.svg";
-import LEFT from "../assets/viewer/left.svg";
-import RIGHT from "../assets/viewer/right.svg";
-import HOME from "../assets/viewer/home.svg";
-import REPLAY from "../assets/viewer/replay.svg";
-import REPLAY_1 from "../assets/viewer/replay-1.svg";
-import REPLAY_2 from "../assets/viewer/replay_2.svg";
-import REPLAY_3 from "../assets/viewer/replay_3.svg";
-import REPLAY_4 from "../assets/viewer/replay_4.svg";
-import REPLAY_5 from "../assets/viewer/replay_5.svg";
-import VIDEOCAM from "../assets/viewer/videocam.svg";
-import LANG from "../assets/viewer/language.svg";
-import ZOOM_IN from "../assets/viewer/zoom_in.svg";
-import ZOOM_OUT from "../assets/viewer/zoom_out.svg";
+import {
+  KeyboardArrowLeft,
+  KeyboardArrowUp,
+  KeyboardArrowDown,
+  KeyboardArrowRight,
+  HomeOutlined,
+  VideocamOutlined,
+  ZoomInOutlined,
+  ZoomOutOutlined,
+  ReplayOutlined,
+  LanguageOutlined
+} from '@mui/icons-material';
+import { Menu } from '../icons';
+import { cameraControlAction } from '../reducers/actions/globals';
 
 export const cameraControlsActions = {
   PAN_LEFT: 'panLeft',
@@ -48,8 +45,14 @@ const CameraControls = (props) => {
   const {
     cameraControlsHandler,
     viewerId,
+    canvasHeight,
+    canvasWidth
   } = props;
+  
   const dispatch = useDispatch();
+  const [showControls, setShowControls] = useState(false);
+  const isSmallViewport = canvasWidth < 300 || canvasHeight < 300;
+
   const widget = useSelector((state) => state.widgets[viewerId]);
 
   const handleClick = (event, value) => {
@@ -59,195 +62,96 @@ const CameraControls = (props) => {
     }
   };
   
-  const controlsBottom = [
-    {
-      tooltip: 'Wireframe',
-      image: LANG,
-      action : cameraControlsActions.WIREFRAME
-    },
-    {
-      tooltip: 'Zoom In',
-      image: ZOOM_IN,
-      action : cameraControlsActions.ZOOM_IN
-    },
-    {
-      tooltip: 'Zoom Out',
-      image: ZOOM_OUT,
-      action : cameraControlsActions.ZOOM_OUT
-    },
-  ];
+  const iconButton = (label, action, IconComponent, sx = {}) => {
+    return (
+      <Tooltip title={label} placement="top">
+        <IconButton aria-label={label} onClick={() => handleClick(null, { action })}>
+          {typeof IconComponent === 'function'
+            ? IconComponent()
+            : <IconComponent fontSize="small" sx={sx} />}
+        </IconButton>
+      </Tooltip>
+    );
+  };
+  
 
-  const controlsRight = [
-    {
-      tooltip: 'Rotate Up',
-      image: REPLAY,
-      action : cameraControlsActions.ROTATE_UP
-    },
-    {
-      tooltip: 'Rotate Left',
-      image: REPLAY_1,
-      action : cameraControlsActions.ROTATE_LEFT
-    },
-    {
-      tooltip: 'Rotate',
-      image: VIDEOCAM,
-      action : cameraControlsActions.ROTATE
-    },
-    {
-      tooltip: 'Rotate Right',
-      image: REPLAY_2,
-      action : cameraControlsActions.ROTATE_RIGHT
-    },
+  const rotateIcon = (transform) => (
+    <ReplayOutlined sx={{ transform }} fontSize="small" />
+  );
 
-    {
-      tooltip: 'Rotate Z',
-      image: REPLAY_3,
-      action : cameraControlsActions.ROTATE_Z
-    },
-    {
-      tooltip: 'Rotate Down',
-      image: REPLAY_4,
-      action : cameraControlsActions.ROTATE_DOWN
-    },
-    {
-      tooltip: 'Rotate Z',
-      image: REPLAY_5,
-      action : cameraControlsActions.ROTATE_MZ
-    },
-  ];
+  const ControlPanel = () => (
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: isSmallViewport ? 'row' : 'column',
+        alignItems: 'center',
+        p: 1,
+        gap: isSmallViewport ? 0 : 1,
+        backgroundColor: isSmallViewport ? '#3A3A3A' : 'transparent',
+        borderRadius: 2,
+        '& .MuiIconButton-root': { padding: 0 },
+        '& .MuiSvgIcon-root': { fontSize: '1rem', color: 'rgba(255, 255, 255, 0.8)' },
+      }}
+    >
+      {/* Pan */}
+      <Box display="flex" flexDirection="column" alignItems="center" gap={0.5}>
+        {iconButton("Up", cameraControlsActions.PAN_UP, KeyboardArrowUp)}
+        <Box display="flex" gap={0.5}>
+          {iconButton("Left", cameraControlsActions.PAN_LEFT, KeyboardArrowLeft)}
+          {iconButton("Home", cameraControlsActions.PAN_HOME, HomeOutlined)}
+          {iconButton("Right", cameraControlsActions.PAN_RIGHT, KeyboardArrowRight)}
+        </Box>
+        {iconButton("Down", cameraControlsActions.PAN_DOWN, KeyboardArrowDown)}
+      </Box>
 
-  const controlsLeft = [
-    {
-      tooltip: 'Up',
-      image: UP,
-      action : cameraControlsActions.PAN_UP
-    },
-    {
-      tooltip: 'Left',
-      image: LEFT,
-      action : cameraControlsActions.PAN_LEFT
-    },
-    {
-      tooltip: 'Home',
-      image: HOME,
-      action : cameraControlsActions.PAN_HOME
-    },
-    {
-      tooltip: 'Right',
-      image: RIGHT,
-      action : cameraControlsActions.PAN_RIGHT
-    },
+      {/* Divider */}
+      <Box mx={1} height="100%" borderLeft="1px solid rgba(255, 255, 255, 0.1)" />
 
-    {
-      tooltip: 'Down',
-      image: DOWN,
-      action : cameraControlsActions.PAN_DOWN
-    },
-  ];
+      {/* Rotation */}
+      <Box display="flex" flexDirection="column" alignItems="center" gap={0.5}>
+        {iconButton("Rotate Up", cameraControlsActions.ROTATE_UP, () => rotateIcon('scaleX(-1) rotate(-180deg)'))}
+        <Box display="flex" gap={0.5}>
+          {iconButton("Rotate Left", cameraControlsActions.ROTATE_LEFT, () => rotateIcon('rotate(-90deg)'))}
+          {iconButton("Rotate", cameraControlsActions.ROTATE, VideocamOutlined)}
+          {iconButton("Rotate Right", cameraControlsActions.ROTATE_RIGHT, () => rotateIcon('scaleX(-1) rotate(-90deg)'))}
+        </Box>
+        <Box display="flex" gap={0.5}>
+          {iconButton("Rotate Z", cameraControlsActions.ROTATE_Z, () => rotateIcon('rotate(-90deg)'))}
+          {iconButton("Rotate down", cameraControlsActions.ROTATE_DOWN, () => rotateIcon('rotate(0deg)'))}
+          {iconButton("Rotate Z", cameraControlsActions.ROTATE_MZ, () => rotateIcon('scaleX(-1) rotate(-90deg)'))}
+        </Box>
+      </Box>
 
-  const commonStyle = {
-    position: 'absolute',
-    left: '50%',
-    transform: 'translateX(-50%)',
-  }
+      {/* Divider */}
+      <Box mx={1} height="100%" borderLeft="1px solid rgba(255, 255, 255, 0.1)" />
 
-  const firstElementStyle = {
-    ...commonStyle,
-    top: '-1.3125rem'
-  }
-
-  const lastElementStyle = {
-    ...commonStyle,
-    bottom: "-1.5125rem"
-  }
+      {/* Zoom & Other */}
+      <Box display="flex" flexDirection="column" alignItems="center" gap={0.5}>
+        {iconButton("Zoom In", cameraControlsActions.ZOOM_IN, ZoomInOutlined)}
+        {iconButton("Zoom Out", cameraControlsActions.ZOOM_OUT, ZoomOutOutlined)}
+        {iconButton("wireframe", cameraControlsActions.WIREFRAME, LanguageOutlined)}
+      </Box>
+    </Box>
+  );
 
   return (
-    <Box className="position-toolbar" sx={{
-      position: 'absolute',
-      top: '40%',
-      width: '4.125rem',
-      left: '1rem',
-      transform: 'translateY(-50%)'
-    }}>
-      <Box sx={{gap: '0.375rem', display: 'flex', alignItems: 'center'}} className="left position-relative" id="left-controls-id">
-        {
-          controlsLeft.map((value, index) => {
-            let style = {};
-            if (index === 0) {
-              style = firstElementStyle;
-            } else if (index === (controlsLeft.length -1)) {
-              style = lastElementStyle;
-            }
-            return (
-              <Tooltip title={value.tooltip} placement="top" key={`left_'${index}`}>
-                <IconButton
-                  style={ style }
-                  sx={{padding: 0}}
-                  disableRipple
-                  key={value?.tooltip}
-                  onClick={(event) => handleClick(event, value)}
-                >
-                  <img
-                    src={value.image}
-                    alt={value?.tooltip}
-                  />
-                </IconButton>
-              </Tooltip>
-            )
-          })
-        }
-      </Box>
-
-      <Box className="right position-relative" id="right-controls-id" sx={{marginTop: '3.5625rem', gap: '0.355rem', flexWrap: 'wrap', display: 'flex'}}>
-        {
-          controlsRight.map((value, index) => {
-            let style = {};
-            if (index === 0) {
-              style = firstElementStyle;
-            }
-            return (
-              <Tooltip title={value.tooltip} placement="top" key={`right_'${index}`}>
-                <IconButton
-                  style={ style }
-                  sx={{padding: 0}}
-                  disableRipple
-                  key={value?.tooltip}
-                  aria-describedby={value?.tooltip}
-                  ref={value?.ref}
-                  onClick={(event) => handleClick(event, value)}
-                >
-                  <img
-                    src={value.image}
-                    alt={value?.tooltip}
-                  />
-                </IconButton>
-              </Tooltip>
-            )
-          })
-        }
-      </Box>
-
-      <Box className="right position-relative" style={{ display: 'flex', marginTop: '1.75rem', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '0.375rem' }} id="right-controls-id">
-        {
-          controlsBottom.map((value, index) => {
-            return (
-              <Tooltip title={value.tooltip} placement="top" key={`bottom_'${index}`}>
-                <IconButton
-                  sx={{padding: 0}}
-                  disableRipple
-                  key={value?.tooltip}
-                  onClick={(event) => handleClick(event, value)}
-                >
-                  <img
-                    src={value.image}
-                    alt={value?.tooltip}
-                  />
-                </IconButton>
-              </Tooltip>
-            )
-          })
-        }
-      </Box>
+    <Box sx={{ position: 'absolute', top: '10%', left: '1rem' }}>
+      {isSmallViewport ? (
+        <>
+          <IconButton onClick={() => setShowControls((prev) => !prev)}>
+            <Menu />
+          </IconButton>
+          {showControls && (
+            <Box sx={{ position: 'absolute', left: '2rem', top: '-50%' }}>
+              <ControlPanel />
+            </Box>
+          )}
+        </>
+      ) : (
+        <Box sx={{ position: 'absolute', top: '-50%' }}>
+          <ControlPanel />
+        </Box>
+      )}
     </Box>
   );
 };

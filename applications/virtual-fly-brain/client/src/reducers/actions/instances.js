@@ -177,12 +177,14 @@ const templateLoadedMessage = (id, openTemplate) => ({
   }
 });
 
+export const triggerInstanceFailure = (error) => {
+  store.dispatch(getInstancesFailure(error));
+  return;
+}
+
 export const getInstanceByID = async (queryId, get3DMesh, focus, select, stackInstance) => {
-
   store.dispatch(getInstancesStarted())
-
   let response
-
   try {
     response = await get_instance(queryId);
   } catch (error) {
@@ -195,7 +197,12 @@ export const getInstanceByID = async (queryId, get3DMesh, focus, select, stackIn
     return
   }
 
-  store.dispatch(getInstancesSuccess(response, get3DMesh, focus, select , stackInstance))
+  const _get3DMesh = response?.isIndividual ? true : false;
+  const _stackInstance = response?.isIndividual ? true : false;
+  const _focus = focus !== undefined ? focus : true;
+  const _select = select !== undefined ? select : true;
+
+  store.dispatch(getInstancesSuccess(response, _get3DMesh, _focus, _select , _stackInstance))
 }
 
 export const get3DMesh = async (instance) => {

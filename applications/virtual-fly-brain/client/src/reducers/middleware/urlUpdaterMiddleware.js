@@ -1,9 +1,10 @@
 import { getInstancesTypes } from '../actions/types/getInstancesTypes';
 import { getQueriesTypes } from '../actions/types/getQueriesTypes';
-import { getInstanceByID, get3DMesh, getInstancesFailure } from '../actions/instances';
+import { getInstanceByID, get3DMesh, triggerInstanceFailure } from '../actions/instances';
 import { getQueries, getQueriesFailure } from '../actions/queries';
-import { addRecentSearch } from '../actions/globals'
+import { addRecentSearch } from '../actions/globals';
 import { setQueryComponentOpened, setFirstIDLoaded, setAlignTemplates, setTemplateID } from '../actions/globals';
+import * as GeppettoActions from '@metacell/geppetto-meta-client/common/actions';
 
 function updateUrlParameterWithCurrentUrl(param, value, reset) {
   const urlObj = new URL(window.location.href);
@@ -33,7 +34,6 @@ function updateUrlParameterWithCurrentUrl(param, value, reset) {
 // If the i parameter is present, it will be updated with the new value, otherwise it will be added
 function updateUrlWithInstancesAndSelectedId(selectedId) {
   const urlObj = new URL(window.location.href);
-  
   if (urlObj.searchParams.has('id')) {
     const currentId = urlObj.searchParams.get('id');
     updateUrlParameterWithCurrentUrl('i', currentId, false);
@@ -46,67 +46,43 @@ function updateUrlWithInstancesAndSelectedId(selectedId) {
 const DEFAULT_ID = "VFB_00101567";
 const APP_LOADED_FLAG_KEY = "CURRENT_LOADED_URL";
 
-const loaded = (store, firstIDLoaded, allLoadedInstances) => {
-  if ( !firstIDLoaded ) {
-    const iFromUrl = getUrlParameter("i");
-
-    if (iFromUrl) {
-      const idList = iFromUrl.split(',')
-      idList?.forEach( m => getInstance(allLoadedInstances, m, false));
-    }
-
-    const idFromUrl = getUrlParameter("id");
-    if (idFromUrl) {
-      // If an ID is specified in the URL, load it
-      getInstance(allLoadedInstances, idFromUrl, true);
-    }
-    // Load q parameter from URL and dispatch action
-    const qFromUrl = getUrlParameter("q");
-    if (qFromUrl) {
-      const queryList = qFromUrl.split(';')
-      if ( queryList?.length > 0 ) {
-        queryList?.forEach( q => {
-          const query = q.split(",");
-          let type = query[1];
-          if ( type === undefined ) {
-            store.dispatch(getQueriesFailure("Missing query type for ID : " + query[0], query[0]))
-          } else {
-            getQueries( query[0], type)
-            store.dispatch(setQueryComponentOpened(true));
-          }
-        })
-      }
-    }
-    store.dispatch(setFirstIDLoaded())
-  }
-}
-
 const isFirstTimeLoad = (allLoadedInstances) => {
   const appLoadedUrl = localStorage.getItem(APP_LOADED_FLAG_KEY);
   const currentUrl = window.location.href;
   if (currentUrl != appLoadedUrl) {
     localStorage.setItem(APP_LOADED_FLAG_KEY, currentUrl);
     // Load id parameter from URL and dispatch action
+    let idToUpdate = [];
     const idsFromUrl = getUrlParameter("i");
-    let idToUpdate = [DEFAULT_ID];
+    // let idToUpdate = [DEFAULT_ID];
 
     if (idsFromUrl) {
-      idToUpdate = idsFromUrl?.split(',');
+      idToUpdate = [...new Set(idsFromUrl?.split(','))];
+    }
+
+    const idSelected = getUrlParameter("id");
+
+    if (idSelected) {
+      // If an ID is specified in the URL, check if present and if yes move it as last in the list, otherwise add it at the end
+      idToUpdate = idToUpdate.filter(id => id !== idSelected);
+      // If the selected ID is not already in the list, add it
+      if (!idToUpdate.includes(idSelected)) {
+        idToUpdate.push(idSelected);
+      }
+    } else if (idToUpdate.length === 0) {
+      // If no ID is specified in the URL, add the default ID
+      idToUpdate.push(DEFAULT_ID);
     }
 
     idToUpdate?.forEach( id => {
-      if (id) {
+      // if it's the last ID in the list, we need to focus it
+      if (id === idToUpdate[idToUpdate.length - 1]) {
+        getInstance(allLoadedInstances, id, true);
+      }
+      else {
         getInstance(allLoadedInstances, id, false);
       }
     });
-
-    const idSelected = getUrlParameter("id");
-    if (idSelected) {
-      getInstance(allLoadedInstances, idSelected, true);
-    } else {
-      // If no ID is specified, load the default ID
-      getInstance(allLoadedInstances, idToUpdate[0], true);
-    }
   }
 };
 
@@ -117,7 +93,7 @@ const getUrlParameter = (param) => {
 
 const getInstance = (allLoadedInstances, id, focus) => {
   if ( !allLoadedInstances?.find( i => i.metadata?.Id === id ) ){
-    getInstanceByID(id, true, focus, focus);
+    getInstanceByID(id, true, focus, focus, true);
   }
 }
 
@@ -127,13 +103,19 @@ export const urlUpdaterMiddleware = store => next => (action) => {
 
   const allLoadedInstances = store.getState().instances.allLoadedInstances;
   const firstIDLoaded = store.getState().globalInfo.firstIDLoaded;
-  
+
   // Only call isFirstTimeLoad if we haven't loaded the first ID yet
   if (!firstIDLoaded) {
     isFirstTimeLoad(allLoadedInstances);
   }
 
   switch (action.type) {
+    case GeppettoActions.layoutActions.SET_LAYOUT: {
+      if (!firstIDLoaded) {
+        store.dispatch(setFirstIDLoaded())
+      }
+      break;
+    }
     case getInstancesTypes.GET_INSTANCES_SUCCESS : {
       const IsTemplate = action.payload?.IsTemplate || false;
       const isClass = action.payload?.IsClass || false;
@@ -142,11 +124,11 @@ export const urlUpdaterMiddleware = store => next => (action) => {
       if (!IsTemplate && !isClass && !isIndividual) {
         // If the instance is not a template, class, or individual, dispatch the getInstanceFailure with an error message
         if (action.payload?.Id === undefined) {
-          store.dispatch(getInstancesFailure("Instance ID is undefined"));
+          triggerInstanceFailure("Instance ID is undefined");
           return;
         } else {
           // If the instance is not a template, class, or individual, dispatch the getInstanceFailure specifing the ID
-          store.dispatch(getInstancesFailure("Instance not recognized: " + action.payload.Id));
+          triggerInstanceFailure("Instance not recognized: " + action.payload.Id);
           return;
         }
       }
@@ -198,6 +180,10 @@ export const urlUpdaterMiddleware = store => next => (action) => {
           store.dispatch(setAlignTemplates(false, action.payload.Id));
           return;
         }
+      }
+
+      if (!firstIDLoaded) {
+        store.dispatch(setFirstIDLoaded());
       }
       break;
     }

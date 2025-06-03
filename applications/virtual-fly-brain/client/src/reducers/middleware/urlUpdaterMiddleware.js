@@ -28,10 +28,7 @@ function updateUrlParameterWithCurrentUrl(param, value, reset) {
   window.history.replaceState(null, '', decodeURIComponent(urlObj.toString()));
 }
 
-// make a function that updates the URL for id and i params. Id is for the selected instance, i is for the loaded instances
-// If the id is not present in the URL, it will be added, otherwise it will be updated
-// If the i parameter is not present, it will be added, otherwise it will be updated
-// If the i parameter is present, it will be updated with the new value, otherwise it will be added
+// This function updates the URL with the instances and the selected ID
 function updateUrlWithInstancesAndSelectedId(selectedId) {
   const urlObj = new URL(window.location.href);
   if (urlObj.searchParams.has('id')) {
@@ -111,6 +108,7 @@ export const urlUpdaterMiddleware = store => next => (action) => {
 
   switch (action.type) {
     case GeppettoActions.layoutActions.SET_LAYOUT: {
+      // TODO: not sure why we need this, but it seems to be necessary for the initial load to do not screw the layout
       if (!firstIDLoaded) {
         store.dispatch(setFirstIDLoaded())
       }

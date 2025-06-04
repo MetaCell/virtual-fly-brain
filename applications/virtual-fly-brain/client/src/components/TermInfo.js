@@ -47,9 +47,7 @@ import vars from "../theme/variables";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
-import { TreeView, TreeItem } from "@mui/lab";
-// import { TreeView } from '@mui/x-tree-view/TreeView';
-// import { TreeItem } from '@mui/x-tree-view/TreeItem';
+import { SimpleTreeView, TreeItem } from '@mui/x-tree-view';
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import GeneralInformation from "./TermInfo/GeneralInformation";
 import { getQueries, updateQueries } from "./../reducers/actions/queries";
@@ -856,23 +854,23 @@ const TermInfo = ({ open, setOpen }) => {
                 </AccordionSummary>
                 <AccordionDetails>
                   <div>dario test 4</div>
-                  <TreeView
+                  <SimpleTreeView
                     defaultParentIcon={<ArrowRight />}
                   >
-                    <TreeItem nodeId="1" label="Query 1">
+                    <TreeItem itemId="1" label="Query 1">
                       <div>dario test2</div>
                     </TreeItem>
-                    <TreeItem nodeId="2" label="Query 2">
+                    <TreeItem itemId="2" label="Query 2">
                       <div>dario test 2</div>
                     </TreeItem>
-                  </TreeView>
-                  <TreeView
+                  </SimpleTreeView>
+                  <SimpleTreeView
                     aria-label="customized"
                     defaultParentIcon={<ArrowRight />}
                   >
                     {getQueriesLength(termInfoData?.metadata?.Queries) > 0 ? (
                       <TreeItem
-                        nodeId="1"
+                        itemId="terminfo-queries"
                         sx={{ "&:before": { display: "none" } }}
                         label={
                           <CustomBox display="flex" flexWrap="wrap">
@@ -905,7 +903,7 @@ const TermInfo = ({ open, setOpen }) => {
                           query?.preview_results?.rows?.length > 0 ? (
                             <TreeItem
                               key={query.label + index}
-                              nodeId={query.label}
+                              itemId={`query-${index}`}
                               label={
                                 <CustomBox display="flex" flexWrap="wrap">
                                   <Typography>{query.label}</Typography>
@@ -928,6 +926,7 @@ const TermInfo = ({ open, setOpen }) => {
                               }
                             >
                               <TreeItem
+                                itemId="terminfo-queries-table"
                                 label={
                                   <>
                                     <TableContainerBoxWrapper>
@@ -1037,6 +1036,7 @@ const TermInfo = ({ open, setOpen }) => {
                                 }
                               />
                               <TreeItem
+                                itemId={`toggle-${index}`}
                                 label={
                                   <Button
                                     onClick={() =>
@@ -1063,7 +1063,7 @@ const TermInfo = ({ open, setOpen }) => {
                           ) : query?.preview_results?.rows?.length > 0 ? (
                             <TreeItem
                               key={query.label}
-                              nodeId={query.label}
+                              itemId={`query-${index}`}
                               label={
                                 <CustomBox display="flex" flexWrap="wrap">
                                   <Typography>{query.label}</Typography>
@@ -1086,6 +1086,7 @@ const TermInfo = ({ open, setOpen }) => {
                               }
                             >
                               <TreeItem
+                                itemId="5"
                                 label={
                                   <Box display="flex" justifyContent="start">
                                     <Ribbon
@@ -1144,7 +1145,7 @@ const TermInfo = ({ open, setOpen }) => {
                         )}
                       </TreeItem>
                     ) : <div>test from dario</div>}
-                  </TreeView>
+                  </SimpleTreeView>
                 </AccordionDetails>
               </Accordion>
 

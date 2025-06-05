@@ -513,6 +513,7 @@ const TermInfo = ({ open, setOpen }) => {
         {!open ? (
           <Typography
             sx={{
+              maxWidth: "10rem",
               display: "flex",
               alignItems: "center",
               whiteSpace: "nowrap",
@@ -538,6 +539,7 @@ const TermInfo = ({ open, setOpen }) => {
                     <Box>
                       <Typography
                         sx={{
+                          maxWidth: "10rem",
                           fontWeight: 500,
                           fontSize: "1.25rem",
                           color: whiteColor,
@@ -853,17 +855,6 @@ const TermInfo = ({ open, setOpen }) => {
                   </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <div>dario test 4</div>
-                  <SimpleTreeView
-                    defaultParentIcon={<ArrowRight />}
-                  >
-                    <TreeItem itemId="1" label="Query 1">
-                      <div>dario test2</div>
-                    </TreeItem>
-                    <TreeItem itemId="2" label="Query 2">
-                      <div>dario test 2</div>
-                    </TreeItem>
-                  </SimpleTreeView>
                   <SimpleTreeView
                     aria-label="customized"
                     defaultParentIcon={<ArrowRight />}
@@ -902,6 +893,7 @@ const TermInfo = ({ open, setOpen }) => {
                           query.output_format === "table" &&
                           query?.preview_results?.rows?.length > 0 ? (
                             <TreeItem
+                              sx={{ "paddingLeft": "1.25rem" }}
                               key={query.label + index}
                               itemId={`query-${index}`}
                               label={
@@ -1144,7 +1136,7 @@ const TermInfo = ({ open, setOpen }) => {
                           )
                         )}
                       </TreeItem>
-                    ) : <div>test from dario</div>}
+                    ) : null}
                   </SimpleTreeView>
                 </AccordionDetails>
               </Accordion>

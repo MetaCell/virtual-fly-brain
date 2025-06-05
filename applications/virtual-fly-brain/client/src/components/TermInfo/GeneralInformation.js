@@ -54,7 +54,7 @@ const GeneralInformation = ({ data, classes }) => {
         <Grid item xs={12} sm={4} md={5} lg={5}>
           <Box
             sx={{
-              width: '100%',
+              width: '15rem',
               height: {
                 xs: '15.188rem',
                 lg: '14.25rem'
@@ -80,7 +80,7 @@ const GeneralInformation = ({ data, classes }) => {
             sm: 0,
           }
         }} item xs={12} sm={8} md={7} lg={7}>
-          <Box display='flex' flexDirection='column' sx={{ rowGap: { xs: 1.25, sm: 1, lg: 1.25 } }}>
+          <Box display='flex' flexDirection='column' sx={{ rowGap: { xs: 1.25, sm: 1, lg: 1.25 }, width: '15rem' }}>
             <Box display='flex' justifyContent='space-between' columnGap='0.188rem'>
               <Typography sx={classes.heading}>Name</Typography>
               <Typography sx={{

@@ -86,7 +86,7 @@ const BottomNav = ({ setBottomNav, bottomNav }) => {
           onClick={() => setBottomNav(index)}
           key={item.id}
         >
-          <item.icon color={item?.id === bottomNav && tabActiveColor} />
+          <item.icon color={item?.id === bottomNav ? tabActiveColor : 'white'} />
           <Typography>{item.name}</Typography>
         </Button>
       ))}

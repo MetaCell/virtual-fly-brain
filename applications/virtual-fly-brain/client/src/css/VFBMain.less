@@ -420,9 +420,9 @@
 
 .flexlayout__tab_button_trailing:before {
     font-family: "Font Awesome 5 Free" !important;
+    font-weight: 900;
     content: "\f00f";
     font-style: normal;
-    font-weight: normal;
     font-size:40px;
     color: white;
 }
@@ -446,19 +446,23 @@
   width: 95%;
 }
 
+.flexlayout__tab_button_overflow {
+  font-size: 0 !important;
+  position: absolute;
+  left: 6px;
+  top: 6px;
+}
+
 .flexlayout__tab_button_overflow:before {
-    // font-family: "Font Awesome 5 Free" !important;
-    content: "+";
-    margin-right: 2px;
-    font-size:10px;
-    color: white;
+  font-family: "Font Awesome 5 Free" !important;
+  font-weight: 900;
+  content: "\f078";
+  font-size: 12px !important;
+  color: white;
+  margin-right: 2px;
 }
 
 .flexlayout__tab_button_overflow:hover:before {
-  // font-family: "Font Awesome 5 Free" !important;
-  content: "+";
-  margin-right: 2px;
-  font-size:10px;
   color: @primary_color;
 }
 
@@ -564,12 +568,17 @@
     color: @secondary_color
 }
 
+.flexlayout__tab_toolbar {
+  // position: relative;
+}
+
 .flexlayout__popup_menu_item {
     padding: 2px 10px 2px 10px;
     color: white;
-    border: 1px solid;
     font-size: 14px;
     font-family: 'Inter', sans-serif;
+    border-radius: 2px;
+    border-color: #555;
 }
 
 .flexlayout__popup_menu_item:hover {
@@ -581,11 +590,25 @@
 .flexlayout__popup_menu_container {
     box-shadow: inset 0 0 5px rgba(0, 0, 0, .15);
     border: 1px solid #555;
-    background: #1a1a1a;
     border-radius:3px;
     position:absolute;
     z-index:1000;
-    top: 30px !important;
+    height: fit-content;
+    padding: 21px 12px !important;
+    background: transparent;
+    border: 0;
+}
+
+.flexlayout__popup_menu {
+  background: #1a1a1a;
+  border-radius: 5px;
+  border-color: #555;
+  border: 1px solid #555;
+}
+
+.flexlayout__tabset_tabbar_outer {
+  padding-left: 2.5rem;
+  position: relative;
 }
 
 .fa-window-minimize {

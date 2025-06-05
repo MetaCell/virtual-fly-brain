@@ -95,7 +95,7 @@ export const Upload = (props) => {
       </g>
       <defs>
         <clipPath id="clip0_3471_17087">
-          <rect width={props.size || 20} height={props.size || 20} fill={props.color || "white"} transform="translate(0.5)" />
+          <rect width={props.size || 20} height={props.size || 20} fill={props.color ? props.color : "white"} transform="translate(0.5)" />
         </clipPath>
       </defs>
     </svg>

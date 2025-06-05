@@ -24,7 +24,7 @@ import SWCIcon from "../../components/configuration/VFBDownloadContents/swc.png"
 import ReferenceIcon from "../../components/configuration/VFBDownloadContents/reference.png";
 import CloseIcon from "@material-ui/icons/Close";
 import { useSelector, connect } from "react-redux";
-import { createMuiTheme } from "@material-ui/core/styles";
+import { createTheme } from "@material-ui/core/styles";
 
 const iconsMap = {
   obj: OBJIcon,
@@ -64,7 +64,7 @@ const styles = theme => ({
   },
 });
 
-const theme = createMuiTheme({
+const theme = createTheme({
   typography: {
     h2: {
       fontSize: 22,

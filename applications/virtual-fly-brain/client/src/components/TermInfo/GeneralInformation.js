@@ -24,7 +24,7 @@ const facets_annotations_colors = getUpdatedTags(colors_config)
 const GeneralInformation = ({ data, classes }) => {
   const [toggleReadMore, setToggleReadMore] = useState(false);
   const [fullScreen, setFullScreen] = useState(false)
-  const MAX_LENGTH = 120;
+  const MAX_LENGTH = 80;
 
   const renderTooltipChips = (data) => {
     return <>
@@ -54,7 +54,7 @@ const GeneralInformation = ({ data, classes }) => {
         <Grid item xs={12} sm={4} md={5} lg={5}>
           <Box
             sx={{
-              width: '100%',
+              width: '15rem',
               height: {
                 xs: '15.188rem',
                 lg: '14.25rem'
@@ -80,7 +80,7 @@ const GeneralInformation = ({ data, classes }) => {
             sm: 0,
           }
         }} item xs={12} sm={8} md={7} lg={7}>
-          <Box display='flex' flexDirection='column' sx={{ rowGap: { xs: 1.25, sm: 1, lg: 1.25 } }}>
+          <Box display='flex' flexDirection='column' sx={{ rowGap: { xs: 1.25, sm: 1, lg: 1.25 }, width: '15rem' }}>
             <Box display='flex' justifyContent='space-between' columnGap='0.188rem'>
               <Typography sx={classes.heading}>Name</Typography>
               <Typography sx={{
@@ -132,17 +132,17 @@ const GeneralInformation = ({ data, classes }) => {
                   color: whiteColor,
                   borderRadius: toggleReadMore ? 1 : 0,
                   textAlign: 'right',
-                  maxHeight: '3.375rem',
-                  overflow: 'auto',
-                  padding: toggleReadMore ? '0.25rem 0.5rem' : 0,
+                  padding: toggleReadMore ? '0.25rem 0.5rem' : "0.10rem 0.12rem",
                   background: {
                     xs: toggleReadMore ? descriptionBg : 'transparent',
                     xl: toggleReadMore ? secondaryBg : 'transparent',
                   }
-                }}>
-                  {toggleReadMore ? data?.metadata?.Meta?.Description : `${data?.metadata?.Meta?.Description?.substr(0, MAX_LENGTH)}...`}
+                }}
+                className='scrollbar'>
+                  {toggleReadMore ? data?.metadata?.Meta?.Description : (data?.metadata?.Meta?.Description.length > MAX_LENGTH ? `${data?.metadata?.Meta?.Description?.substr(0, MAX_LENGTH)}...` : data?.metadata?.Meta?.Description)}
                 </Typography>
-                <Button
+                { data?.metadata?.Meta?.Description.length > 0 && data?.metadata?.Meta?.Description.length > MAX_LENGTH
+                ? <Button
                   onClick={() => setToggleReadMore((prev) => !prev)} disableRipple
                   sx={{
                     padding: 0,
@@ -155,6 +155,7 @@ const GeneralInformation = ({ data, classes }) => {
                   }}>
                   {toggleReadMore ? 'Show Less' : 'Read More'}
                 </Button>
+                : <></> }
               </Box>
             </Box>
 

@@ -4,7 +4,11 @@ import flask
 import werkzeug
 import numpy as np
 import pandas as pd
-import vfbquery as vfb
+vfb = None
+try:
+    import vfbquery as vfb
+except ImportError as e:
+    print("vfbquery module not found. Please install it using pip.")
 from flask_cors import CORS, cross_origin
 from virtual_fly_brain.services.queries import run_query
 from virtual_fly_brain.services.term_info import get_term_info

@@ -142,6 +142,7 @@ const QueryBuilder = ({ fullWidth, bottomNav, setBottomNav, tabSelected }) => {
       },
     },
   }
+
   return (
     <Box sx={classes.root}>
       <Box sx={classes.header}>

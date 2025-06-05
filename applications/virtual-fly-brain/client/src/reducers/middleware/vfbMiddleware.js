@@ -150,6 +150,7 @@ const vfbMiddleware = store => next => (action) => {
             layout.getNodeById(BOTTOM)._attributes['enableDeleteWhenEmpty'] = true;
             layout.getNodeById(LEFT)._attributes['enableDeleteWhenEmpty'] = true;
             layout.getNodeById(RIGHT)._attributes['enableDeleteWhenEmpty'] = true;
+            next(action);
             break;
         }
         default:

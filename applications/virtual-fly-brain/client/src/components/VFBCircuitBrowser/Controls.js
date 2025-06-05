@@ -20,7 +20,7 @@ import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
 import SwapVertIcon from '@material-ui/icons/SwapVert';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
+import { createTheme, ThemeProvider } from '@material-ui/core/styles';
 import { connect } from "react-redux";
 import { getResultsSOLR } from '../configuration/SOLRclient'
 import ADJUST_ICON from "../../assets/viewer/adjust_icon.svg";
@@ -40,7 +40,7 @@ const {
 /**
  * Create a local theme to override some default values in material-ui components
  */
-const theme = createMuiTheme({
+const theme = createTheme({
   props: { MuiSvgIcon: { htmlColor: whiteColor, } },
   overrides : {
     MuiSlider: {

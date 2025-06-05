@@ -1360,8 +1360,6 @@ const StackViewerComponent = () => createClass({
     },
 
     componentDidMount: function () {
-      this.onResize = this.onResize.bind(this);
-
       this._isMounted = true;
 
       // detect event model
@@ -1383,7 +1381,7 @@ const StackViewerComponent = () => createClass({
       if (this.props.data && this.props.data != null && this.props.data.instances && this.props.data.instances != null) {
         this.setState(this.handleInstances(this.props.data.instances));
       }
-      
+
       const container = document.getElementById('slice-viewer');
       if (container) {
         const { width, height } = container.getBoundingClientRect();
@@ -1867,7 +1865,7 @@ const StackViewerComponent = () => createClass({
         );
       }
 
-      return <ReactResizeDetector skipOnMount={true} onResize={this.onResize.bind(this)}>
+      return <ReactResizeDetector skipOnMount={true} onResize={this.onResize}>
         <div id='slice-viewer' style={{width: '100%', height: '100%'}} ref={this.refs.stackCanvas}>
         {markup}
         </div>

@@ -15,7 +15,7 @@ const facets_annotations_colors = getUpdatedTags(colors_config)
 const ControlsMenu = component => {
   const path = component.value._root.nodes.find( e=> e.entry?.[0] == "path").entry[1] ;
   //let instance = Instances.getInstance(path); anti pattern fix: we don't pass the full instance anymore as we have an indirection level through the reducer
-  //actions should be executed through the reducer, given an instance path 
+  //actions should be executed through the reducer, given an instance path
   return <ListViewerControlsMenu instance={ path }/>;
 }
 
@@ -75,13 +75,14 @@ const conf = [
 
       //const entityType = component.value._root.nodes.find( e=> e.entry?.[0] == "types").entry[1]?.match(/\[(.*?)\]/)[1];
       let entityType = null;
+      let entityPath = null;
       component.value._root.nodes.forEach( e=> e.nodes?.forEach( n=> { if ( n.entry?.[0] == "types" ) { entityType = n.entry?.[1] } }))
+      entityPath = entityType.match(/\(([^)]+)\)/)[1];
       entityType = entityType.match(/\[(.*?)\]/)[1];
-      const entityPath = component.value._root.nodes.find( e=> e.entry?.[0] == "path").entry[1];
-      
+
       let tags = null;
       component.value._root.nodes.forEach( e=> e.nodes?.forEach( n=> { if ( n.entry?.[0] == "tags" ) { tags = n.entry?.[1] } }))
-      
+
       const chips_cutoff = 3;
       return <div style={{ width: "100%", textAlign: "left", float: "left", display: 'flex', gap: '.5rem' }}>
         <div style={{ textAlign: "left", float: "left" }}>

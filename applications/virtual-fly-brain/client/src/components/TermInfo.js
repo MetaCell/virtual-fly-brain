@@ -871,8 +871,8 @@ const TermInfo = ({ open, setOpen }) => {
                                   q.output_format === "table" &&
                                   q?.preview_results?.rows?.length > 0
                               )
-                                ? "Types of neurons with..."
-                                : "Queries for ..." +
+                                ? "Types of neurons with "
+                                : "Queries for " +
                                   termInfoData?.metadata?.Name}
                             </Typography>
                             <Box display="flex" sx={{ zIndex: 1000 }} pl={0.5}>
@@ -1054,6 +1054,7 @@ const TermInfo = ({ open, setOpen }) => {
                             </TreeItem>
                           ) : query?.preview_results?.rows?.length > 0 ? (
                             <TreeItem
+                              sx={{ "paddingLeft": "1.25rem" }}
                               key={query.label}
                               itemId={`query-${index}`}
                               label={
@@ -1106,6 +1107,7 @@ const TermInfo = ({ open, setOpen }) => {
                             >
                               <Typography
                                 sx={{
+                                  paddingLeft: "1.25rem",
                                   flexGrow: 1,
                                   color: outlinedBtnTextColor,
                                   fontSize: {

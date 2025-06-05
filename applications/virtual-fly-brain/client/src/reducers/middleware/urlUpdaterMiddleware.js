@@ -96,8 +96,6 @@ const getInstance = (allLoadedInstances, id, focus) => {
 
 export const urlUpdaterMiddleware = store => next => (action) => {
   const launchTemplate = store.getState().instances.launchTemplate;
-  const misalignedIDs = store.getState().globalInfo.misalignedIDs;
-
   const allLoadedInstances = store.getState().instances.allLoadedInstances;
   const firstIDLoaded = store.getState().globalInfo.firstIDLoaded;
 
@@ -107,13 +105,6 @@ export const urlUpdaterMiddleware = store => next => (action) => {
   }
 
   switch (action.type) {
-    case GeppettoActions.layoutActions.SET_LAYOUT: {
-      // TODO: not sure why we need this, but it seems to be necessary for the initial load to do not screw the layout
-      if (!firstIDLoaded) {
-        store.dispatch(setFirstIDLoaded())
-      }
-      break;
-    }
     case getInstancesTypes.GET_INSTANCES_SUCCESS : {
       const IsTemplate = action.payload?.IsTemplate || false;
       const isClass = action.payload?.IsClass || false;
@@ -133,6 +124,9 @@ export const urlUpdaterMiddleware = store => next => (action) => {
 
       // if is a template and launchTemplate is not defined, we need to set the template ID
       if (IsTemplate && launchTemplate == null) {
+        if (!firstIDLoaded) {
+          store.dispatch(setFirstIDLoaded());
+        }
         get3DMesh(action.payload);
         store.dispatch(setTemplateID(action.payload.Id));
         updateUrlWithInstancesAndSelectedId(action.payload.Id);
@@ -197,23 +191,19 @@ export const urlUpdaterMiddleware = store => next => (action) => {
     }
     case getQueriesTypes.UPDATE_QUERIES:
     case getQueriesTypes.GET_QUERIES_SUCCESS : {
-      next(action);
       const globalRecentSearches = store.getState().globalInfo.recentSearches;
       if ( action.payload.query?.queries?.length < 1 && action.payload.query?.rows === undefined){
         store.dispatch(getQueriesFailure("No queries found for : " + action.payload.short_form, action.payload.short_form))
       } else {
         if ( !globalRecentSearches?.find( recent => recent.short_form === action.payload.short_form && recent.is_query) && (action.payload.query?.rows) ){
           store.dispatch(addRecentSearch(action.payload , true));
-        }  
-        if ( !firstIDLoaded ){
-            store.dispatch(setFirstIDLoaded())
-            store.dispatch(setQueryComponentOpened(true));
         }
       }
+      next(action);
       break;
     }
     default:
-      next(action);  
+      next(action);
       break;
     }
 };

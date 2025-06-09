@@ -61,7 +61,7 @@ export const RecentSearch = ({ getOptionProps, selectedFilters, recentSearches, 
       </Typography>
 
       <Box mt={1.5}>
-      {recentSearches?.map((option, index) => ( hasTag(option.facets_annotation)  &&
+      {recentSearches?.filter(search => search.type === undefined).map((option, index) => ( hasTag(option.facets_annotation)  &&
           <Box key={`recentSearches-${index}`} {...getOptionProps({ option, index })}>
             <Box onClick={() => handleResultSelection(option)} sx={{
               position: 'relative',

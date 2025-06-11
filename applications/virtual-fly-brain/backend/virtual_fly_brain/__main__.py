@@ -39,37 +39,63 @@ class NumpyEncoder(json.JSONEncoder):
 
         return json.JSONEncoder.default(self, obj)
 
+
 def init_webapp_routes(app):
     @app.route('/', methods=['GET'])
     def index():
         return flask.send_from_directory("www", 'index.html')
 
+
     @app.route('/get_instances', methods=['GET'])
     @cross_origin(supports_credentials=True)
     def instances():
-        instances = vfb.get_instances(flask.request.args.get('short_form'))
-        if isinstance(instances, pd.DataFrame):
-            instances = instances.to_dict(orient='records')
-        elif isinstance(instances, pd.Series):
-            instances = instances.to_dict()
-        return instances
+        short_form = flask.request.args.get('short_form')
+        if not short_form:
+            return flask.jsonify({'error': 'Missing required parameter: short_form'}), 400
+
+        try:
+            result = vfb.get_instances(short_form)
+            if isinstance(result, pd.DataFrame):
+                result = result.to_dict(orient='records')
+            elif isinstance(result, pd.Series):
+                result = result.to_dict()
+            return flask.jsonify(result)
+        except Exception as e:
+            return flask.jsonify({'error': str(e)}), 500
+
 
     @app.route('/get_term_info', methods=['GET'])
     @cross_origin(supports_credentials=True)
     def term_info():
-        id = flask.request.args.get('id')
-        data = get_term_info(id)
-        data_formatted = json.dumps(data, cls=NumpyEncoder)
-        return data_formatted
+        term_id = flask.request.args.get('id')
+        if not term_id:
+            return flask.jsonify({'error': 'Missing required parameter: id'}), 400
+        try:
+            data = get_term_info(term_id)
+            return flask.Response(
+                json.dumps(data, cls=NumpyEncoder),
+                mimetype='application/json'
+            )
+        except Exception as e:
+            return flask.jsonify({'error': str(e)}), 500
+
 
     @app.route('/run_query', methods=['GET'])
     @cross_origin(supports_credentials=True)
     def get_query_results():
-        id = flask.request.args.get('id')
+        term_id = flask.request.args.get('id')
         query_type = flask.request.args.get('query_type')
-        query_info_data = run_query(id, query_type)
-        info_data = json.dumps(query_info_data, cls=NumpyEncoder)
-        return info_data
+        if not term_id or not query_type:
+            return flask.jsonify({'error': 'Missing required parameters: id and/or query_type'}), 400
+        try:
+            query_info_data = run_query(term_id, query_type)
+            return flask.Response(
+                json.dumps(query_info_data, cls=NumpyEncoder),
+                mimetype='application/json'
+            )
+        except Exception as e:
+            return flask.jsonify({'error': str(e)}), 500
+
 
     @app.errorhandler(werkzeug.exceptions.NotFound)
     def handle_not_found(e):
@@ -77,12 +103,14 @@ def init_webapp_routes(app):
             'error': 'Page not found'
         }, 404
 
+
     @app.errorhandler(werkzeug.exceptions.BadRequest)
     @app.errorhandler(werkzeug.exceptions.InternalServerError)
     def handle_bad_request(e):
         return {
             'error': 'Internal server error'
         }, 500
+
 
 www_path = os.path.dirname(os.path.abspath(__file__)) + "/www"
 app = flask.Flask(

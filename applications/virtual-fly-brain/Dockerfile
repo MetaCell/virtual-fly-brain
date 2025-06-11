@@ -47,4 +47,4 @@ RUN cp -r ${BUILDDIR}/dist/ /usr/src/app/virtual_fly_brain/www
 WORKDIR /usr/src/app/virtual_fly_brain
 
 EXPOSE 8080
-ENTRYPOINT ["gunicorn", "--log-level=info", "--preload", "--bind=0.0.0.0:8080", "virtual_fly_brain.__main__:app"]
+ENTRYPOINT ["gunicorn", "--log-level=info", "--preload", "--bind=0.0.0.0:8080", "--workers=2", "--timeout=120", "virtual_fly_brain.__main__:app"]

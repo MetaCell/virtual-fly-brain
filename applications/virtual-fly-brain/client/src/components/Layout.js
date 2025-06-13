@@ -9,19 +9,19 @@ import VFBUploader from "./VFBUploader/VFBUploader";
 import { useDispatch, useSelector, useStore } from 'react-redux';
 import { widgets } from "./layout/widgets";
 import VFBDownloadContents from "./VFBDownloadContents/VFBDownloadContents";
-import { setWidgets } from '@metacell/geppetto-meta-client/common/layout/actions';
-import { setTermInfoOpened, setQueryComponentOpened } from './../reducers/actions/globals'
+import { setWidgets, updateWidget } from '@metacell/geppetto-meta-client/common/layout/actions';
+import { setTermInfoOpened } from './../reducers/actions/globals'
 import { getLayoutManagerInstance } from "@metacell/geppetto-meta-client/common/layout/LayoutManager";
-import { templateLoaded,  removeAllInstances, getInstanceByID } from './../reducers/actions/instances';
+import { WidgetStatus } from "@metacell/geppetto-meta-client/common/layout/model";
+import { templateLoaded,  removeAllInstances } from './../reducers/actions/instances';
 import { Box, Button,Modal, useMediaQuery, useTheme, Typography, CircularProgress, Link } from "@mui/material";
 import { activateCircuits, activateImages } from "../reducers/actions/layout";
+import { widgetsIDs } from "./layout/widgets";
 
 const {
   secondaryBg,
   headerBorderColor,
   tabActiveColor,
-  primaryBg,
-  secondaryBtnColor
 } = vars;
 
 const tabsArr = [
@@ -93,8 +93,14 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
   }, [queryComponentOpened]);
 
   useEffect( () => {
-    if ( bottomNav === 2 ){
-      //dispatch(setQueryComponentOpened(true));
+    if ( bottomNav === 3 ){
+      const newWidget = { ...widgets[widgetsIDs.listViewerWidgetID] }
+      const layoutManager = getLayoutManagerInstance();
+      newWidget.defaultPanel = layoutManager.model.getRoot().getModel().getActiveTabset().getId();
+      newWidget.panelName = layoutManager.model.getRoot().getModel().getActiveTabset().getId();
+      newWidget.status = WidgetStatus.ACTIVE;
+      dispatch(updateWidget(newWidget));
+      setBottomNav(undefined)
     }
   }, [bottomNav]);
 

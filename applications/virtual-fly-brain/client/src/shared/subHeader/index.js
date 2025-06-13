@@ -28,12 +28,12 @@ const navArr = [
     name: 'Layer'
   },
   {
-    id: 3,
+    id: 4,
     icon: ClearAll,
     name: 'Clear all'
   },
   {
-    id: 3,
+    id: 5,
     icon: History,
     name: 'Recent'
   },
@@ -147,21 +147,6 @@ const SubHeader = ({ setBottomNav, bottomNav }) => {
         </Box>
         <FilterMenu classes={classes} focused={focused} setFilterOpened={setFilterOpened} setSelectedFilters={setSelectedFilters} />
 
-        {/* <MediaQuery minWidth={1200}>
-          {!focused && (
-            <Button
-              sx={{
-                ...classes.shortcut,
-                flexShrink: 0,
-                p: 0,
-                borderRadius: '0.25rem',
-                minWidth: '4.1875rem'
-              }}
-            >
-              Ctrl + K
-            </Button>
-          )}
-        </MediaQuery> */}
       </Box>
 
       <MediaQuery minWidth={1200}>

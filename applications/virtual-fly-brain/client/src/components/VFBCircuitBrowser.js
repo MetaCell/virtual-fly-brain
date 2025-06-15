@@ -76,6 +76,9 @@ class VFBCircuitBrowser extends Component {
     this.highlightLinks = new Set();
     this.hoverNode = null;
 
+    this.containerRef = React.createRef();
+    this.resizeObserver = null;
+
     this.graphRef = React.createRef();
     this.controlsRef = React.createRef();
     this.__isMounted = false;
@@ -92,6 +95,13 @@ class VFBCircuitBrowser extends Component {
     this.updateGraph(this.state.neurons , Math.ceil((configuration.maxPaths - configuration.minPaths) / 2), this.state.weight);
     const { circuitQuerySelected } = this.props;
     this.circuitQuerySelected = circuitQuerySelected;
+
+    if (!this.resizeObserver && this.containerRef.current) {
+      this.resizeObserver = new ResizeObserver(() => {
+        self.graphRef?.current?.ggv?.current.zoomToFit();
+      });
+      this.resizeObserver.observe(this.containerRef.current);
+    }
   }
 
   componentDidUpdate () {
@@ -113,6 +123,9 @@ class VFBCircuitBrowser extends Component {
 
   componentWillUnmount () {
     this.__isMounted = false;
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
   }
   
   /**
@@ -166,10 +179,11 @@ class VFBCircuitBrowser extends Component {
   zoomOut () {
     let zoom = this.graphRef.current.ggv.current.zoom();
     let out = 1;
-    if (zoom < 2 ){
-      out = .2;
+    if (zoom <= 2){
+      out = 0.2;
     }
-    this.graphRef.current.ggv.current.zoom(zoom - out , 100);
+    const newZoom = Math.max(zoom - out, 0.2);
+    this.graphRef.current.ggv.current.zoom(newZoom , 100);
   }
   
   clearGraph () {
@@ -409,7 +423,8 @@ class VFBCircuitBrowser extends Component {
               key="controls"
             />
           </div>
-          : <GeppettoGraphVisualization
+          : <div ref={this.containerRef} style={{width: '100%', height: '100%'}}>
+            <GeppettoGraphVisualization
             id= { COMPONENT_ID }
             // Graph data with Nodes and Links to populate
             data={this.state.graph}
@@ -570,7 +585,8 @@ class VFBCircuitBrowser extends Component {
               }
             }
             }
-          />
+            />
+          </div>
     )
   }
 }

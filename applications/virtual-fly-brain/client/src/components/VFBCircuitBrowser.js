@@ -57,7 +57,9 @@ class VFBCircuitBrowser extends Component {
       neurons : [{ id : "", label : "" } , { id : "", label : "" }],
       paths : Math.ceil((configuration.maxPaths - configuration.minPaths) / 2),
       weight : 0,
-      reload : false
+      reload : false,
+      width : 0,
+      height : 0
     }
     this.updateGraph = this.updateGraph.bind(this);
     this.queryResults = this.queryResults.bind(this);
@@ -70,6 +72,7 @@ class VFBCircuitBrowser extends Component {
     this.updatePaths = this.updatePaths.bind(this);
     this.updateWeight = this.updateWeight.bind(this);
     this.resize = this.resize.bind(this);
+    this.handleResize = this.handleResize.bind(this);
     this.nodeRendering = this.nodeRendering.bind(this);
     
     this.highlightNodes = new Set();
@@ -96,11 +99,14 @@ class VFBCircuitBrowser extends Component {
     const { circuitQuerySelected } = this.props;
     this.circuitQuerySelected = circuitQuerySelected;
 
-    if (!this.resizeObserver && this.containerRef.current) {
-      this.resizeObserver = new ResizeObserver(() => {
-        self.graphRef?.current?.ggv?.current.zoomToFit();
-      });
-      this.resizeObserver.observe(this.containerRef.current);
+    if (this.containerRef.current) {
+      this.handleResize();
+      if (!this.resizeObserver) {
+        this.resizeObserver = new ResizeObserver(() => {
+          self.handleResize();
+        });
+        this.resizeObserver.observe(this.containerRef.current);
+      }
     }
   }
 
@@ -165,6 +171,17 @@ class VFBCircuitBrowser extends Component {
   resize (){
     this.graphResized = true;
     this.setState( { reload : !this.state.reload } );
+  }
+
+  handleResize () {
+    if (this.containerRef.current && this.graphRef.current?.ggv?.current) {
+      const width = this.containerRef.current.clientWidth;
+      const height = this.containerRef.current.clientHeight;
+      this.setState({ width, height });
+      this.graphRef.current.ggv.current.width(width);
+      this.graphRef.current.ggv.current.height(height);
+      this.graphRef.current.ggv.current.zoomToFit();
+    }
   }
   
   zoomIn () {
@@ -425,6 +442,8 @@ class VFBCircuitBrowser extends Component {
           </div>
           : <div ref={this.containerRef} style={{width: '100%', height: '100%'}}>
             <GeppettoGraphVisualization
+            width={this.state.width}
+            height={this.state.height}
             id= { COMPONENT_ID }
             // Graph data with Nodes and Links to populate
             data={this.state.graph}

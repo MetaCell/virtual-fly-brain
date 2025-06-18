@@ -96,8 +96,6 @@ class VFBCircuitBrowser extends Component {
     this.updateGraph(this.state.neurons , Math.ceil((configuration.maxPaths - configuration.minPaths) / 2), this.state.weight);
     const { circuitQuerySelected } = this.props;
     this.circuitQuerySelected = circuitQuerySelected;
-
-    window.addEventListener('resize', this.handleResize);
   }
 
   componentDidUpdate () {
@@ -119,7 +117,6 @@ class VFBCircuitBrowser extends Component {
 
   componentWillUnmount () {
     this.__isMounted = false;
-    window.removeEventListener('resize', this.handleResize);
   }
   
   /**

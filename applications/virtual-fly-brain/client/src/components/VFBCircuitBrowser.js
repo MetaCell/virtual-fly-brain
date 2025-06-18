@@ -79,7 +79,6 @@ class VFBCircuitBrowser extends Component {
     this.hoverNode = null;
 
     this.containerRef = React.createRef();
-    this.resizeObserver = null;
 
     this.graphRef = React.createRef();
     this.controlsRef = React.createRef();
@@ -97,19 +96,6 @@ class VFBCircuitBrowser extends Component {
     this.updateGraph(this.state.neurons , Math.ceil((configuration.maxPaths - configuration.minPaths) / 2), this.state.weight);
     const { circuitQuerySelected } = this.props;
     this.circuitQuerySelected = circuitQuerySelected;
-
-    if (this.containerRef.current) {
-      this.handleResize();
-      if (!this.resizeObserver) {
-        this.resizeObserver = new ResizeObserver(() => {
-          self.handleResize();
-        });
-        this.resizeObserver.observe(this.containerRef.current);
-      }
-      const width = this.containerRef.current.clientWidth;
-      const height = this.containerRef.current.clientHeight;
-      this.setState({ width, height });
-    }
 
     window.addEventListener('resize', this.handleResize);
   }
@@ -133,9 +119,6 @@ class VFBCircuitBrowser extends Component {
 
   componentWillUnmount () {
     this.__isMounted = false;
-    if (this.resizeObserver) {
-      this.resizeObserver.disconnect();
-    }
     window.removeEventListener('resize', this.handleResize);
   }
   
@@ -605,8 +588,8 @@ class VFBCircuitBrowser extends Component {
             }
             }
             />
-              </div>
-            </ReactResizeDetector>
+          </div>
+        </ReactResizeDetector>
     )
   }
 }

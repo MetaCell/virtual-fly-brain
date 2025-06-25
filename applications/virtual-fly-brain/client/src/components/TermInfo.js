@@ -139,18 +139,6 @@ const CustomBox = styled(Box)(({ theme }) => ({
 
 const TableContainerBoxWrapper = styled(Box)(({ theme }) => ({
   overflowX: "auto",
-  "&:before": {
-    position: "absolute",
-    content: '""',
-    top: 0,
-    right: 0,
-    pointerEvents: "none",
-    background:
-      "linear-gradient(270deg, #222 0%, rgba(34, 34, 34, 0.00) 26.7%)",
-    width: "100%",
-    height: "100%",
-    zIndex: 1,
-  },
   [theme.breakpoints.down("md")]: {
     "&:before": {
       background: "none",
@@ -924,7 +912,6 @@ const TermInfo = ({ open, setOpen }) => {
                                     <TableContainerBoxWrapper>
                                       <TableContainer
                                         component={Paper}
-                                        sx={{ minWidth: "43.75rem" }}
                                       >
                                         <Table
                                           stickyHeader
@@ -974,7 +961,31 @@ const TermInfo = ({ open, setOpen }) => {
                                                     </Button>
                                                   </TableCell>
                                                   <TableCell>
-                                                    {row.name}
+                                                    <Button
+                                                      disableRipple
+                                                      variant="text"
+                                                      color="info"
+                                                      sx={{
+                                                        padding: 0,
+                                                        minWidth: "0.0625rem",
+                                                        textAlign: "left",
+                                                        display: "inline-block",
+                                                        "&:hover": {
+                                                          backgroundColor: "transparent",
+                                                        },
+                                                        "&:not(:hover)": {
+                                                          color: "rgba(255, 255, 255, 0.8)",
+                                                        },
+                                                      }}
+                                                      onClick={() => {
+                                                        const match = row.name.match(/\[(.*?)\]\((.*?)\)/);
+                                                        if (match) {
+                                                          getInstanceByID(match[2]);
+                                                        }
+                                                      }}
+                                                    >
+                                                      {row.name.match(/\[(.*?)\]/)?.[1]}
+                                                    </Button>
                                                   </TableCell>
                                                   <TableCell>
                                                     {row.score}

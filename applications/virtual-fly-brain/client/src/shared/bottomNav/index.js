@@ -1,7 +1,7 @@
 import { Typography } from "@material-ui/core";
 import { Box, Button } from "@mui/material";
 import React from "react";
-import { ClearAll, Download, Query, Upload } from "../../icons";
+import { ClearAll, Download, Query, Upload, Layers } from "../../icons";
 import vars from "../../theme/variables";
 
 const {

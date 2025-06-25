@@ -9,6 +9,7 @@ import { queryParser } from './VFBCircuitBrowser/QueryParser';
 import { connect } from "react-redux";
 import { makeStyles } from '@material-ui/core/styles';
 import { getInstanceByID } from '../reducers/actions/instances';
+import ReactResizeDetector from 'react-resize-detector'
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -70,11 +71,14 @@ class VFBCircuitBrowser extends Component {
     this.updatePaths = this.updatePaths.bind(this);
     this.updateWeight = this.updateWeight.bind(this);
     this.resize = this.resize.bind(this);
+    this.handleResize = this.handleResize.bind(this);
     this.nodeRendering = this.nodeRendering.bind(this);
     
     this.highlightNodes = new Set();
     this.highlightLinks = new Set();
     this.hoverNode = null;
+
+    this.containerRef = React.createRef();
 
     this.graphRef = React.createRef();
     this.controlsRef = React.createRef();
@@ -153,6 +157,12 @@ class VFBCircuitBrowser extends Component {
     this.graphResized = true;
     this.setState( { reload : !this.state.reload } );
   }
+
+  handleResize () {
+    if (this.containerRef.current && this.graphRef.current?.ggv?.current) {
+      this.graphRef.current.ggv.current.zoomToFit();
+    }
+  }
   
   zoomIn () {
     let zoom = this.graphRef.current.ggv.current.zoom();
@@ -166,10 +176,11 @@ class VFBCircuitBrowser extends Component {
   zoomOut () {
     let zoom = this.graphRef.current.ggv.current.zoom();
     let out = 1;
-    if (zoom < 2 ){
-      out = .2;
+    if (zoom <= 2){
+      out = 0.2;
     }
-    this.graphRef.current.ggv.current.zoom(zoom - out , 100);
+    const newZoom = Math.max(zoom - out, 0.2);
+    this.graphRef.current.ggv.current.zoom(newZoom , 100);
   }
   
   clearGraph () {
@@ -409,7 +420,10 @@ class VFBCircuitBrowser extends Component {
               key="controls"
             />
           </div>
-          : <GeppettoGraphVisualization
+          : 
+            <ReactResizeDetector onResize={this.handleResize} skipOnMount={true}>
+              <div ref={this.containerRef} style={{width: '100%', height: '100%'}}>
+            <GeppettoGraphVisualization
             id= { COMPONENT_ID }
             // Graph data with Nodes and Links to populate
             data={this.state.graph}
@@ -570,7 +584,9 @@ class VFBCircuitBrowser extends Component {
               }
             }
             }
-          />
+            />
+          </div>
+        </ReactResizeDetector>
     )
   }
 }

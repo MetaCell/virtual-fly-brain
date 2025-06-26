@@ -4,7 +4,7 @@ import { LinkIcon } from "../../icons";
 import vars from "../../theme/variables";
 import TerminfoSlider from "./TerminfoSlider";
 import FullScreenViewer from "../queryBuilder/FullScreenViewer";
-import { getUpdatedTags } from "../../utils/utils";
+import { getUpdatedTags, formatTagText } from "../../utils/utils";
 
 const {
   whiteColor,
@@ -27,25 +27,22 @@ const GeneralInformation = ({ data, classes }) => {
   const MAX_LENGTH = 80;
 
   const renderTooltipChips = (data) => {
-    return <>
-      {
-        data?.metadata?.Tags?.slice(chips_cutoff)
-          .map((tag, index) => (
-            <Chip
-              key={tag + index}
-              sx={{
-                lineHeight: '140%',
-                fontSize: '0.625rem',
-                backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color,
-                color: facets_annotations_colors[tag]?.textColor || facets_annotations_colors?.default?.textColor,
-                marginRight: '0.25rem',
-                marginBottom: '0.25rem'
-              }}
-              label={tag}
-            />
-          ))
-      }
-    </>
+    return (
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem' }}>
+        {data?.metadata?.Tags?.slice(chips_cutoff).map((tag, i) => (
+          <Chip
+            key={tag + i}
+            sx={{
+              lineHeight: '140%',
+              fontSize: '0.625rem',
+              backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color,
+              color: facets_annotations_colors[tag]?.textColor || facets_annotations_colors?.default?.textColor,
+            }}
+            label={formatTagText(tag)}
+          />
+        ))}
+      </Box>
+    );
   };
 
   return (
@@ -94,7 +91,7 @@ const GeneralInformation = ({ data, classes }) => {
               <Typography sx={classes.heading}>Tags</Typography>
               <Box sx={{ display: 'flex', columnGap: '4px', flexWrap: 'wrap', justifyContent: 'end' }} gap={'0.288rem'}>
                 {
-                  data?.metadata?.Tags?.slice(0, chips_cutoff).map((tag, i) => (<Chip key={tag} sx={{ backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color, color: facets_annotations_colors[tag]?.textColor || facets_annotations_colors?.default?.textColor }} label={tag} />))
+                  data?.metadata?.Tags?.slice(0, chips_cutoff).map((tag, i) => (<Chip key={tag} sx={{ backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color, color: '#ffffff' }} label={formatTagText(tag)} />))
                 }
                 {
                   data?.metadata?.Tags?.length > 3 && <Tooltip

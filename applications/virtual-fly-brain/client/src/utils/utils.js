@@ -24,3 +24,9 @@ export const getTextColor = (color) => {
 
     return tags;
  }
+
+export const formatTagText = (tag) => {
+    return tag.split('_').map(part => 
+        part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()
+    ).join(' ');
+}

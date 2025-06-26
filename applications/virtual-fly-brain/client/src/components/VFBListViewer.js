@@ -72,7 +72,6 @@ class VFBListViewer extends Component {
     return instances?.length > 0 ? (
       <div
         id="VFBLayers_component"
-        style={{ backgroundColor: "rgb(53, 51, 51)" }}
       >
         <ListViewer
           instances={instances}

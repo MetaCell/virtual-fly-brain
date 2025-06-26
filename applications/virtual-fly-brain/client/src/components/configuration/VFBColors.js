@@ -3,10 +3,10 @@ const facets_annotations_colors = {
         color : "#A04E4E"
     },
     Adult: {
-        color: "#ffffb3"
+        color: "#6D4EA0"
     },
     Anatomy: {
-        color: "#33a02c"
+        color: "#68A04E"
     },
     Cholinergic: {
         color: "#bebada"
@@ -21,10 +21,10 @@ const facets_annotations_colors = {
         color: "#fdbf6f"
     },
     Expression_pattern: {
-        color: "#b3de69"
+        color: "#4EA082"
     },
     Expression_pattern_fragment: {
-        color: "#6a3d9a"
+        color: "#4EA060"
     },
     GABAergic: {
         color: "#1f78b4"
@@ -36,46 +36,46 @@ const facets_annotations_colors = {
         color: "#b2df8a"
     },
     Larva: {
-        color: "#ccebc5"
+        color: "#A04E4E"
     },
     Motor_neuron: {
-        color: "#e31a1c"
+        color: "#A0624E"
     },
     Muscle: {
         color: "#a6cee3"
     },
     Nervous_system: {
-        color: "#fdb462"
+        color: "#A0984E"
     },
     Neuromere: {
         color: "#8dd3c7"
     },
     Neuron: {
-        color: "#b15928"
+        color: "#A07A4E"
     },
     Neuron_projection_bundle: {
-        color: "#bc80bd"
+        color: "#994EA0"
     },
     Octopaminergic: {
         color: "#ffff99"
     },
     Peptidergic_neuron: {
-        color: "#80b1d3"
+        color: "#A0624E"
     },
     Sensory_neuron: {
-        color: "#fb9a99"
+        color: "#A0624E"
     },
     Serotonergic: {
         color: "#d9d9d9"
     },
     Synaptic_neuropil_block: {
-        color: "#fccde5"
+        color: "#A04E6C"
     },
     Synaptic_neuropil_domain: {
-        color: "#fb8072"
+        color: "#A04E6C"
     },
     Synaptic_neuropil_subdomain: {
-        color: "#88ffb3"
+        color: "#A04E6C"
     },
     Template: {
         color: "#ff6cc8"
@@ -84,7 +84,7 @@ const facets_annotations_colors = {
         color: "#b700b5"
     },
     Synaptic_neuropil: {
-        color: "#00a2aa"
+        color: "#A04E6C"
     },
     pub: {
         color: "#0164d8"
@@ -111,7 +111,7 @@ const facets_annotations_colors = {
         color: "#005f1d"
     },
     Split: {
-        color: "#e012e3"
+        color: "#4E91A0"
     },
     Deprecated: {
         color: "#ff0000"
@@ -183,7 +183,7 @@ const facets_annotations_colors = {
         color: "#fdc"
     },
     FB_Image: {
-        color: "#fe8"
+        color: "#4E5BA0"
     },
     Thermosensory_system: {
         color: "#AA0000"

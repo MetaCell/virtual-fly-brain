@@ -248,6 +248,12 @@ class VFBCircuitBrowser extends Component {
             self.resetCamera();
             if ( self.graphRef.current !== null ) {
               self.graphRef.current.ggv.current.d3Force('charge').strength(-(self.objectsLoaded * 100 ))
+              if (self.containerRef.current && self.graphRef.current?.ggv?.current) {
+                const width = self.containerRef.current.offsetWidth
+                const height = self.containerRef.current.offsetHeight
+                self.setState({ dimensions: { width, height } });
+                self.graphRef.current.ggv.current.zoomToFit()
+              }
             }
           }, (self.objectsLoaded * 20));
           break;

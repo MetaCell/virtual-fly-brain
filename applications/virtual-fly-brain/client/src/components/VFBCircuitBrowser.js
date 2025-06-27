@@ -11,15 +11,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import { getInstanceByID } from '../reducers/actions/instances';
 import ReactResizeDetector from 'react-resize-detector'
 
-const useStyles = makeStyles((theme) => ({
-  container: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '100vh', // Set the height to desired value
-  },
-}));
-
 /**
  * Read configuration from circuitBrowserConfiguration
  */
@@ -58,7 +49,8 @@ class VFBCircuitBrowser extends Component {
       neurons : [{ id : "", label : "" } , { id : "", label : "" }],
       paths : Math.ceil((configuration.maxPaths - configuration.minPaths) / 2),
       weight : 0,
-      reload : false
+      reload : false,
+      dimensions : { width: 0, height: 0 },
     }
     this.updateGraph = this.updateGraph.bind(this);
     this.queryResults = this.queryResults.bind(this);
@@ -79,7 +71,6 @@ class VFBCircuitBrowser extends Component {
     this.hoverNode = null;
 
     this.containerRef = React.createRef();
-
     this.graphRef = React.createRef();
     this.controlsRef = React.createRef();
     this.__isMounted = false;
@@ -96,11 +87,12 @@ class VFBCircuitBrowser extends Component {
     this.updateGraph(this.state.neurons , Math.ceil((configuration.maxPaths - configuration.minPaths) / 2), this.state.weight);
     const { circuitQuerySelected } = this.props;
     this.circuitQuerySelected = circuitQuerySelected;
+    window.addEventListener('resize', this.handleResize);
   }
 
   componentDidUpdate () {
     let self = this;
-    if ( this.props.visible && ( !this.focused || this.graphResized ) ) {
+    if ( ( !this.focused || this.graphResized ) ) {
       setTimeout( () => {
         self.resetCamera();
         self.focused = true;
@@ -108,6 +100,7 @@ class VFBCircuitBrowser extends Component {
       }, (self.objectsLoaded * 20));
     } else if ( !this.props.visible ) {
       this.focused = false;
+      this.graphRef?.current?.ggv?.current.zoomToFit();
     }
     
     if ( this.circuitQuerySelected !== this.props.circuitQuerySelected ) {
@@ -160,7 +153,10 @@ class VFBCircuitBrowser extends Component {
 
   handleResize () {
     if (this.containerRef.current && this.graphRef.current?.ggv?.current) {
-      this.graphRef.current.ggv.current.zoomToFit();
+      const width = this.containerRef.current.offsetWidth
+      const height = this.containerRef.current.offsetHeight
+      this.setState({ dimensions: { width, height } });
+      this.graphRef.current.ggv.current.zoomToFit()
     }
   }
   
@@ -383,7 +379,7 @@ class VFBCircuitBrowser extends Component {
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
-      height: '100vh', // Set the height to desired value
+      height: '100%', // Set the height to desired value
     };
     
     // Detect when the first load of the Graph component happens
@@ -425,6 +421,7 @@ class VFBCircuitBrowser extends Component {
               <div ref={this.containerRef} style={{width: '100%', height: '100%'}}>
             <GeppettoGraphVisualization
             id= { COMPONENT_ID }
+            dimensions={this.state.dimensions}
             // Graph data with Nodes and Links to populate
             data={this.state.graph}
             // Create the Graph as 2 Dimensional

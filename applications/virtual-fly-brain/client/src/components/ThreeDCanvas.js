@@ -120,11 +120,13 @@ class ThreeDCanvas extends Component {
           })
         );
       });
-      const firstImageKey = Object.keys(match.metadata?.Images)[0];
-      const swcPath = match?.metadata?.Images?.[firstImageKey]?.[0]?.swc;
-      const swcURL = swcPath?.startsWith('http') ? swcPath : `${API_URL}${swcPath}`;
+      const imageKeys = Object.keys(match.metadata?.Images || {});
+      if (imageKeys.length > 0) {
+        const firstImageKey = imageKeys[0];
+        const swcPath = match?.metadata?.Images?.[firstImageKey]?.[0]?.swc;
+        const swcURL = swcPath?.startsWith('http') ? swcPath : `${API_URL}${swcPath}`;
 
-      if (swcURL) {
+        if (swcURL) {
         fetch(swcURL)
           .then(response => {
             if (!response.ok) {

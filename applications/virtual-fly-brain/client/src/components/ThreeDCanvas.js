@@ -120,16 +120,37 @@ class ThreeDCanvas extends Component {
           })
         );
       });
-      const swcPath = match?.metadata?.Images?.[Object.keys(match.metadata?.Images)[0]][0].swc
-      const swcURL = swcPath?.startsWith('http') ? swcPath : `${API_URL}${swcPath}`
-      fetch(swcURL)
-        .then(response => response.text())
-        .then(base64Content => {
-          const swcJSON = swcParser(base64Content);
-          let neuron = sharkviewer.createNeuron(swcJSON, match?.metadata?.Id, that?.canvasRef?.current?.threeDEngine?.renderer);
-          neuron.name = match?.metadata?.Id;
-          add3DSkeleton(neuron, mode, match?.metadata?.Id)
-      })
+      const swcPath = match?.metadata?.Images?.[Object.keys(match.metadata?.Images)[0]]?.[0]?.swc;
+      const swcURL = swcPath?.startsWith('http') ? swcPath : `${API_URL}${swcPath}`;
+
+      if (swcURL) {
+        fetch(swcURL)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error(`Failed to fetch SWC file. Status: ${response.status}`);
+            }
+            return response.text();
+          })
+          .then(base64Content => {
+            try {
+              const swcJSON = swcParser(base64Content);
+              const neuron = sharkviewer.createNeuron(
+                swcJSON,
+                match?.metadata?.Id,
+                that?.canvasRef?.current?.threeDEngine?.renderer
+              );
+              neuron.name = match?.metadata?.Id;
+              add3DSkeleton(neuron, mode, match?.metadata?.Id);
+            } catch (err) {
+              console.error("Error parsing or visualizing SWC content:", err);
+            }
+          })
+          .catch(err => {
+            console.error("Error during SWC fetch or processing:", err);
+          });
+      } else {
+        console.warn("Invalid or missing SWC path in metadata.");
+      }
     } else {
       let updatedObjects = threeDObjects?.filter(m => m.visible);
       this.setState({ ...this.state, threeDObjects: updatedObjects})

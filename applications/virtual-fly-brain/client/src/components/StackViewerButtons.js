@@ -23,10 +23,6 @@ const StackViewerButtons = ({
   onZoomOut,
   toggleOrth,
   toggleSlice,
-  mouseOverOrth,
-  mouseOverSlice,
-  hoverOrthButton,
-  hoverSliceButton,
   isSmallViewport
 }) => {
   const orthClass = 'btn';
@@ -40,8 +36,6 @@ const StackViewerButtons = ({
   const [orthHover, setOrthHover] = React.useState(false);
   const [homeHover, setHomeHover] = React.useState(false);
 
-  console.log('StackViewerButtons rendered');
-  console.log(ZOOM_IN_HOVER, ZOOM_IN, ZOOM_OUT_HOVER, ZOOM_OUT, ORTHHOVER, ORTH, SLICEHOVER, SLICE, HOMEHOVER, HOME, UPHOVER, UP, DOWNHOVER, DOWN);
   return (
     <div style={{
       display: 'flex',

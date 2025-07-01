@@ -920,7 +920,6 @@ const TermInfo = ({ open, setOpen }) => {
                                           <TableHead>
                                             <TableRow>
                                               <TableCell>Name</TableCell>
-                                              <TableCell>Description</TableCell>
                                               <TableCell>Score</TableCell>
                                               <TableCell></TableCell>
                                             </TableRow>
@@ -935,31 +934,6 @@ const TermInfo = ({ open, setOpen }) => {
                                                       { border: 0 },
                                                   }}
                                                 >
-                                                  <TableCell>
-                                                    <Button
-                                                      disableRipple
-                                                      variant="text"
-                                                      color="info"
-                                                      sx={{
-                                                        padding: 0,
-                                                        minWidth: "0.0625rem",
-                                                        textAlign: "left",
-                                                        display: "inline-block",
-
-                                                        "&:hover": {
-                                                          backgroundColor:
-                                                            "transparent",
-                                                        },
-
-                                                        "&:not(:hover)": {
-                                                          color:
-                                                            "rgba(255, 255, 255, 0.8)",
-                                                        },
-                                                      }}
-                                                    >
-                                                      {row.id}
-                                                    </Button>
-                                                  </TableCell>
                                                   <TableCell>
                                                     <Button
                                                       disableRipple

@@ -577,9 +577,9 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       }
 
       const threeDObjects = [...state.threeDObjects];
-      const matchObject = threeDObjects.forEach((o) =>
+      const matchObject = threeDObjects.find((o) =>
         o.name.includes(response.payload.id)
-          ? (matchObject.visible = true)
+          ? (o.visible = true)
           : null
       );
       if (matchObject) {

@@ -825,7 +825,7 @@ theme = createTheme({
         root: {
           fontFamily: primaryFont,
           height: '1.5rem',
-          padding: '0.5rem',
+          padding: '0.1875rem 0.5rem !important',
           fontWeight: 400,
           fontSize: '0.625rem',
           lineHeight: '133%',
@@ -844,7 +844,8 @@ theme = createTheme({
           background: chipPrimaryColor,
 
           '& .MuiChip-label': {
-            color: whiteColor
+            color: whiteColor,
+            padding: '0 !important',
           }
         },
 
@@ -853,7 +854,7 @@ theme = createTheme({
         },
 
         label: {
-          padding: 0,
+          padding: '0 !important',
         },
 
         colorDefault: {

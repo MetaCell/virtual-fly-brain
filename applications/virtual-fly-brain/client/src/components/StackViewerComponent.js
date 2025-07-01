@@ -1231,8 +1231,6 @@ const StackViewerComponent = () => createClass({
         lastUpdate: 0,
         scrollTrack: 0,
         loadChanges: true,
-        hoverOrthButton : false,
-        hoverOrthSlice : false,
         width: this.props.width,
         height: this.props.height,
         isMenuOpen: false
@@ -1546,14 +1544,6 @@ const StackViewerComponent = () => createClass({
       });
     },
 
-    mouseOverOrth : function (over) {
-      this.setState({ hoverOrthButton : over});
-    },
-
-    mouseOverSlice : function (over) {
-      this.setState({ hoverSliceButton : over});
-    },
-
     toggleOrth: function () {
       var orth = this.state.orth += 1;
       var pit, yaw, rol;
@@ -1735,15 +1725,6 @@ const StackViewerComponent = () => createClass({
     },
 
     render: function () {
-      var homeClass = 'btn fa fa-home';
-      var zoomInClass = 'btn fa fa-search-plus';
-      var zoomOutClass = 'btn fa fa-search-minus';
-      var stepInClass = 'btn fa fa-chevron-down';
-      var stepOutClass = 'btn fa fa-chevron-up';
-      var pointerClass = 'btn fa fa-hand-pointer-o';
-      var orthClass = 'btn';
-      var toggleSliceClass = 'btn ';
-      var startOffset = 45;
       var displayArea = this.props.data.id + 'displayArea';
       const isSmallViewport = this.state.width < 300 || this.state.height < 300;
       
@@ -1763,15 +1744,15 @@ const StackViewerComponent = () => createClass({
                     style={{
                       background: 'transparent',
                       border: 'none',
-                      width: '25px',
-                      height: '25px',
+                      width: '1rem',
+                      height: '1rem',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       cursor: 'pointer',
                       transition: 'all 0.2s ease',
                       color: 'white',
-                      fontSize: '20px'
+                      fontSize: '1rem'
                     }}
                     title="Toggle Menu"
                   >
@@ -1798,12 +1779,8 @@ const StackViewerComponent = () => createClass({
                       onStepIn={this.onStepIn}
                       onZoomIn={this.onZoomIn}
                       onZoomOut={this.onZoomOut}
-                      toggleOrth={this.toggleOrth}
-                      toggleSlice={this.toggleSlice}
-                      mouseOverOrth={this.mouseOverOrth}
-                      mouseOverSlice={this.mouseOverSlice}
-                      hoverOrthButton={this.state.hoverOrthButton}
-                      hoverSliceButton={this.state.hoverSliceButton}
+                      toggleOrth={this.toggleSlice}
+                      toggleSlice={this.toggleOrth}
                       isSmallViewport={isSmallViewport}
                     />
                   </div>
@@ -1821,12 +1798,8 @@ const StackViewerComponent = () => createClass({
                   onStepIn={this.onStepIn}
                   onZoomIn={this.onZoomIn}
                   onZoomOut={this.onZoomOut}
-                  toggleOrth={this.toggleOrth}
-                  toggleSlice={this.toggleSlice}
-                  mouseOverOrth={this.mouseOverOrth}
-                  mouseOverSlice={this.mouseOverSlice}
-                  hoverOrthButton={this.state.hoverOrthButton}
-                  hoverSliceButton={this.state.hoverSliceButton}
+                  toggleOrth={this.toggleSlice}
+                  toggleSlice={this.toggleOrth}
                   isSmallViewport={isSmallViewport}
                 />
               </div>

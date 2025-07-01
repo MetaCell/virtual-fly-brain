@@ -978,13 +978,13 @@ const TermInfo = ({ open, setOpen }) => {
                                                         },
                                                       }}
                                                       onClick={() => {
-                                                        const match = row.name.match(/\[(.*?)\]\((.*?)\)/);
+                                                        const match = row?.name?.match(/\[(.*?)\]\((.*?)\)/);
                                                         if (match) {
                                                           getInstanceByID(match[2]);
                                                         }
                                                       }}
                                                     >
-                                                      {row.name.match(/\[(.*?)\]/)?.[1]}
+                                                      {row?.name?.match(/\[(.*?)\]/)?.[1]}
                                                     </Button>
                                                   </TableCell>
                                                   <TableCell>

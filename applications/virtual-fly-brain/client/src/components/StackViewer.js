@@ -7,12 +7,6 @@ import Resources from '@metacell/geppetto-meta-core/Resources';
 import SimpleInstance from "@metacell/geppetto-meta-core/model/SimpleInstance";
 import { modifySliceDisplay, showSliceDisplay } from '../reducers/actions/globals';
 
-const {
-  secondaryBg,
-  whiteColor,
-  blackColor
-} = vars;
-
 let StackComponent = null;
 
 const VFBStackViewer = (props) => {

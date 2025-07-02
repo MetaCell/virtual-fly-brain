@@ -94,12 +94,14 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
 
   useEffect( () => {
     if ( bottomNav === 3 ){
-      const newWidget = { ...widgets[widgetsIDs.listViewerWidgetID] }
       const layoutManager = getLayoutManagerInstance();
-      newWidget.defaultPanel = layoutManager.model.getRoot().getModel().getActiveTabset().getId();
-      newWidget.panelName = layoutManager.model.getRoot().getModel().getActiveTabset().getId();
-      newWidget.status = WidgetStatus.ACTIVE;
-      dispatch(updateWidget(newWidget));
+      if (!layoutManager.model.getNodeById("listViewerWidget").isVisible()) {
+        const newWidget = { ...widgets[widgetsIDs.listViewerWidgetID] }
+        newWidget.defaultPanel = layoutManager.model.getRoot().getModel().getActiveTabset().getId();
+        newWidget.panelName = layoutManager.model.getRoot().getModel().getActiveTabset().getId();
+        newWidget.status = WidgetStatus.ACTIVE;
+        dispatch(updateWidget(newWidget));
+      }
       setBottomNav(undefined)
     }
   }, [bottomNav]);

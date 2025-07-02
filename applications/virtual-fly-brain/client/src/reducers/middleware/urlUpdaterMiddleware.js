@@ -153,6 +153,7 @@ export const urlUpdaterMiddleware = store => next => (action) => {
         const loadedTemplate = launchTemplate?.metadata?.Id;
         if (loadedTemplate && templates.includes(loadedTemplate)) {
           // If the individual is aligned with the current template, continue with the action
+          updateUrlWithInstancesAndSelectedId(action.payload.Id);
           next(action);
           get3DMesh(action.payload);
           return;

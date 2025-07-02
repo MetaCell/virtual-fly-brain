@@ -197,8 +197,8 @@ export const getInstanceByID = async (queryId, get3DMesh, focus, select, stackIn
     return
   }
 
-  const _get3DMesh = response?.isIndividual ? true : false;
-  const _stackInstance = response?.isIndividual ? true : false;
+  const _get3DMesh = response?.IsIndividual ? true : false;
+  const _stackInstance = response?.IsIndividual ? true : false;
   const _focus = focus !== undefined ? focus : true;
   const _select = select !== undefined ? select : true;
 

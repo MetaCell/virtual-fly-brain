@@ -492,7 +492,7 @@ const rgbToHex = (color) => {
                             if (!isSelected && window.shiftDown ) {
                               try {
                                 getInstanceByID(that.props.templateDomainIds[index], true, true, true, true);
-                                selectInstance(that.props.templateDomainIds[index]);
+                                // selectInstance(that.props.templateDomainIds[index]);
                                 //console.log(that.props.templateDomainNames[index] + ' clicked');
                                 that.setStatusText(that.props.templateDomainNames[index] + ' selected');
                                 break;

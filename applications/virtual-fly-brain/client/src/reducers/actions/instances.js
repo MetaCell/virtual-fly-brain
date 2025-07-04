@@ -243,7 +243,16 @@ export const removeAllInstances = async () => {
 }
 
 export const selectInstance = async (id) => {
-  store.dispatch(selectInstanceMessage(id))
+  const state = store.getState();
+  const instanceExists = state.instances.allLoadedInstances?.find(
+    (i) => i.metadata?.Id === id
+  );
+  
+  if (instanceExists) {
+    store.dispatch(selectInstanceMessage(id));
+  } else {
+    await getInstanceByID(id, false, false, true, false);
+  }
 }
 
 export const add3DSkeleton = async (skeleton,mode, id) => {
@@ -291,7 +300,16 @@ export const changeColor = async (id, color) => {
 }
 
 export const focusInstance = async (id) => {
-  store.dispatch(focusInstanceMessage(id))
+  const state = store.getState();
+  const instanceExists = state.instances.allLoadedInstances?.find(
+    (i) => i.metadata?.Id === id
+  );
+  
+  if (instanceExists) {
+    store.dispatch(focusInstanceMessage(id));
+  } else {
+    await getInstanceByID(id, false, true, false, false);
+  }
 }
 
 export const zoomToInstance = async (id) => {

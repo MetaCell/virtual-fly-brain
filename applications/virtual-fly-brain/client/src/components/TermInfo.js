@@ -515,7 +515,7 @@ const TermInfo = ({ open, setOpen }) => {
             {termInfoHeading}
           </Typography>
         ) : (
-          <Box sx={{ height: { lg: "100%" }, p: { lg: 2 } }}>
+          <Box sx={{ height: { lg: "100%" }, overflow: "auto", p: { lg: 2 } }}>
             <Box sx={{ ...classes.header, pb: { xs: 1.5, lg: 2 } }}>
               <Grid
                 container
@@ -805,9 +805,6 @@ const TermInfo = ({ open, setOpen }) => {
 
             <Box
               sx={{
-                overflow: {
-                  lg: "auto",
-                },
                 maxHeight: {
                   lg: "calc(100% - 4.0625rem)",
                 },

@@ -51,6 +51,7 @@
     "react-fontawesome": "^1.6.1",
     "react-force-graph-2d": ">=1.23.8",
     "react-force-graph-3d": ">=1.21.10",
+    "react-markdown": "^10.1.0",
     "react-redux": "^8.0.2",
     "react-resize-detector": "^7.1.2",
     "react-responsive": "^9.0.2",

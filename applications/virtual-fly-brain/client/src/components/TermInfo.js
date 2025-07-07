@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { styled } from "@mui/material/styles";
 import {
   Box,
+  Chip,
   Button,
   Tooltip,
   ButtonGroup,
@@ -77,7 +78,11 @@ import { WidgetStatus } from "@metacell/geppetto-meta-client/common/layout/model
 import useClickOutside from "./useClickOutside";
 import { SKELETON, CYLINDERS, NEURON, RGBAToHexA } from "./../utils/constants";
 import "@flybase/react-ontology-ribbon/dist/style.css";
-import Tree from "./ROIBrowser/Tree";
+import ReactMarkdown from 'react-markdown';
+import { getUpdatedTags, formatTagText } from "../utils/utils";
+const colors_config = require("./configuration/VFBColors").facets_annotations_colors;
+const facets_annotations_colors = getUpdatedTags(colors_config);
+
 
 const {
   whiteColor,
@@ -457,6 +462,94 @@ const TermInfo = ({ open, setOpen }) => {
       (instance) => instance.metadata?.Id == termInfoData?.metadata?.Id
     );
     return instance;
+  };
+
+  // Helper to order headers: Name first, then others by order, then Add (empty)
+  const getOrderedHeaders = (headers) => {
+    const headerArr = Object.entries(headers)
+      .map(([key, value]) => ({ key, ...value }))
+      .filter(h => h.key !== 'id' && h.key !== 'name');
+
+    headerArr.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+    return [
+      { key: 'name', ...headers['name'] },
+      ...headerArr,
+      { key: 'id', ...headers['id'] }
+    ];
+  };
+
+  const handleLinkClick = (href, event) => {
+    event.preventDefault();
+    if (href.startsWith("http")) {
+      window.open(href, "_blank", "noopener,noreferrer");
+    } else {
+      const id = href.split(',').pop().trim();
+      getInstanceByID(id, false, true, false);
+    }
+  };
+
+  // Renderers for each type
+  const renderCellContent = (type, value) => {
+    switch (type) {
+      case 'numeric':
+        return <span>{value}</span>;
+      case 'tags':
+        return value
+          ? value.split('|').map((tag, idx) => (
+              <Chip
+                key={tag + idx}
+                style={{
+                  fontSize: '0.625rem',
+                  alignSelf: 'center',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  width : 'auto',
+                  height : '1.25rem',
+                  padding: '0.1875rem 0.5rem',
+                  backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color,
+                  color: '#ffffff',
+                }}
+                label={formatTagText(tag)}
+              />
+            ))
+          : null;
+      case 'markdown':
+        return (
+          <ReactMarkdown
+            components={{
+              a: ({ href, children, ...props }) => (
+                <span
+                  style={{
+                    fontSize: '0.875rem',
+                    "&:hover": {
+                      color: "#0AB7FE",
+                    }}}
+                  onClick={e => handleLinkClick(href, e)}
+                  {...props}
+                >
+                  {children}
+                </span>
+              ),
+              img: ({node, ...props}) => (
+                <img
+                  {...props}
+                  style={{ maxWidth: 180, maxHeight: 90, width: 'auto', height: 'auto' }}
+                  alt={props.alt}
+                />
+              ),
+            }}
+          >
+            {value}
+          </ReactMarkdown>
+        )
+      case 'selection_id':
+        // This is the Add button column, handled separately.
+        return null;
+      default:
+        return <span>{value}</span>;
+    }
   };
 
   return (
@@ -877,8 +970,10 @@ const TermInfo = ({ open, setOpen }) => {
                           </CustomBox>
                         }
                       >
-                        {termInfoData?.metadata?.Queries?.map((query, index) =>
-                          query.output_format === "table" &&
+
+                        {termInfoData?.metadata?.Queries?.map((query, index) => {
+                          const headers = getOrderedHeaders(query?.preview_results?.headers);
+                          return (query.output_format === "table" &&
                           query?.preview_results?.rows?.length > 0 ? (
                             <TreeItem
                               sx={{ "paddingLeft": "1.25rem" }}
@@ -910,101 +1005,63 @@ const TermInfo = ({ open, setOpen }) => {
                                 label={
                                   <>
                                     <TableContainerBoxWrapper>
-                                      <TableContainer
-                                        component={Paper}
-                                      >
-                                        <Table
-                                          stickyHeader
-                                          aria-label="simple table"
-                                        >
+                                      <TableContainer component={Paper}>
+                                        <Table>
                                           <TableHead>
                                             <TableRow>
-                                              <TableCell>Name</TableCell>
-                                              <TableCell>Score</TableCell>
-                                              <TableCell></TableCell>
+                                              {headers.slice(0, -1).map(h => (
+                                                <TableCell key={h.key}>{h.title}</TableCell>
+                                              ))}
+                                              <TableCell /> {/* Last header is always empty for Add button */}
                                             </TableRow>
                                           </TableHead>
                                           <TableBody>
-                                            {query?.preview_results?.rows.map(
-                                              (row) => (
-                                                <TableRow
-                                                  key={row.name}
-                                                  sx={{
-                                                    "&:last-child td, &:last-child th":
-                                                      { border: 0 },
-                                                  }}
-                                                >
-                                                  <TableCell>
+                                            {query?.preview_results?.rows.map((row, rowIdx) => {
+                                              const isLoaded = allLoadedInstances?.find(
+                                                (instance) => instance.metadata?.Id === row.id
+                                              );
+                                              return ( <TableRow key={row.id + '-' + rowIdx}>
+                                                {headers.slice(0, -1).map((h, idx) =>
+                                                  (
+                                                    <TableCell key={h.key}>
+                                                      {renderCellContent(h.type, row[h.key])}
+                                                    </TableCell>
+                                                  )
+                                                )}
+                                                <TableCell>
+                                                  {isLoaded ? (
                                                     <Button
-                                                      disableRipple
                                                       variant="text"
-                                                      color="info"
-                                                      sx={{
-                                                        padding: 0,
-                                                        minWidth: "0.0625rem",
-                                                        textAlign: "left",
-                                                        display: "inline-block",
-                                                        "&:hover": {
-                                                          backgroundColor: "transparent",
-                                                        },
-                                                        "&:not(:hover)": {
-                                                          color: "rgba(255, 255, 255, 0.8)",
-                                                        },
-                                                      }}
-                                                      onClick={() => {
-                                                        const match = row?.name?.match(/\[(.*?)\]\((.*?)\)/);
-                                                        if (match) {
-                                                          getInstanceByID(match[2]);
-                                                        }
-                                                      }}
+                                                      color="error"
+                                                      onClick={() => deleteId(row.id)}
                                                     >
-                                                      {row?.name?.match(/\[(.*?)\]/)?.[1]}
+                                                      Delete
                                                     </Button>
-                                                  </TableCell>
-                                                  <TableCell>
-                                                    {row.score}
-                                                  </TableCell>
-                                                  <TableCell>
-                                                    {allLoadedInstances?.find(
-                                                      (instance) =>
-                                                        instance.metadata
-                                                          ?.Id === row.id
-                                                    ) ? (
-                                                      <Button
-                                                        variant="text"
-                                                        onClick={() =>
-                                                          deleteId(row.id)
-                                                        }
-                                                        color="error"
-                                                      >
-                                                        Delete
-                                                      </Button>
-                                                    ) : (
-                                                      <Button
-                                                        variant="outlined"
-                                                        onClick={() =>
-                                                          addId(row.id)
-                                                        }
-                                                        color="success"
-                                                        sx={{
-                                                          borderRadius:
-                                                            "0.25rem",
+                                                  ) : (
+                                                    <Button
+                                                      variant="outlined"
+                                                      onClick={() =>
+                                                        addId(row.id)
+                                                      }
+                                                      color="success"
+                                                      sx={{
+                                                        borderRadius:
+                                                          "0.25rem",
+                                                        border:
+                                                          "1px solid #0AB7FE",
+                                                        color: "#0AB7FE",
+                                                        "&:hover": {
                                                           border:
                                                             "1px solid #0AB7FE",
-                                                          color: "#0AB7FE",
-                                                          "&:hover": {
-                                                            border:
-                                                              "1px solid #0AB7FE",
-                                                          },
-                                                        }}
-                                                      >
-                                                        Add
-                                                      </Button>
-                                                    )}
-                                                  </TableCell>
-                                                </TableRow>
-                                              )
-                                            )}
+                                                        },
+                                                      }}
+                                                    >
+                                                      Add
+                                                    </Button>
+                                                  )}
+                                                </TableCell>
+                                              </TableRow>
+                                            )})}
                                           </TableBody>
                                         </Table>
                                       </TableContainer>
@@ -1120,8 +1177,8 @@ const TermInfo = ({ open, setOpen }) => {
                                 />
                               </Box>
                             </Box>
-                          )
-                        )}
+                          ))
+                        })}
                       </TreeItem>
                     ) : null}
                   </SimpleTreeView>

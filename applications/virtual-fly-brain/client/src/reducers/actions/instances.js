@@ -183,26 +183,35 @@ export const triggerInstanceFailure = (error) => {
 }
 
 export const getInstanceByID = async (queryId, get3DMesh, focus, select, stackInstance) => {
-  store.dispatch(getInstancesStarted())
-  let response
   try {
-    response = await get_instance(queryId);
+    let response
+    const found = store.getState().instances.allLoadedInstances.find(
+      (instance) => instance.metadata?.Id === queryId
+    );
+    if (!found) {
+      store.dispatch(getInstancesStarted())
+      response = await get_instance(queryId);
+      if ( response === undefined || response === null ) {
+        store.dispatch(getInstancesFailure("ID not found : " + queryId))
+        return
+      }
+      const _get3DMesh = response?.IsIndividual ? true : false;
+      const _stackInstance = response?.IsIndividual ? true : false;
+      const _focus = focus !== undefined ? focus : true;
+      const _select = select !== undefined ? select : true;
+      store.dispatch(getInstancesSuccess(response, _get3DMesh, _focus, _select , _stackInstance))
+    } else {
+      if (focus) {
+        store.dispatch(focusInstanceMessage(queryId));
+      }
+      if (select) {
+        store.dispatch(selectInstanceMessage(queryId));
+      }
+    }
   } catch (error) {
     store.dispatch(getInstancesFailure(error.message))
     return
   }
-
-  if ( response === undefined || response === null ) {
-    store.dispatch(getInstancesFailure("ID not found : " + queryId))
-    return
-  }
-
-  const _get3DMesh = response?.IsIndividual ? true : false;
-  const _stackInstance = response?.IsIndividual ? true : false;
-  const _focus = focus !== undefined ? focus : true;
-  const _select = select !== undefined ? select : true;
-
-  store.dispatch(getInstancesSuccess(response, _get3DMesh, _focus, _select , _stackInstance))
 }
 
 export const get3DMesh = async (instance) => {

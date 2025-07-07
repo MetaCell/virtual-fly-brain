@@ -1,10 +1,12 @@
-import React, { useState } from "react";
-import { Box, Button, Checkbox, FormControlLabel, FormGroup, IconButton, Popper, Typography } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Box, Button, Checkbox, FormControlLabel, FormGroup, IconButton, Popper, Typography, CircularProgress } from "@mui/material";
 import { AngleLeft, CheckBoxDefault, CheckBoxGreen, CheckBoxRed, CleaningServices, ClearAll, Close, Download, Filter, History, Layers, Query, Search, Tick, Undo, Upload } from "../../icons";
 import vars from "../../theme/variables";
 import MediaQuery from 'react-responsive'
+import { useDispatch, useSelector } from "react-redux";
 import SearchBuilder from "./SearchBuilder";
 import { FilterMenu } from "./FilterMenu";
+import { resetLoadingState } from "../../reducers/actions/instances";
 
 const navArr = [
   {
@@ -49,7 +51,8 @@ const {
   blackColor,
   bottomNavBg,
   outlinedBtnTextColor,
-  headerBorderColor
+  headerBorderColor,
+  lightWhiteColor
 } = vars;
 
 const SubHeader = ({ setBottomNav, bottomNav }) => {
@@ -59,6 +62,9 @@ const SubHeader = ({ setBottomNav, bottomNav }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedFilters, setSelectedFilters] = useState({});
 
+  const loadingInstances = useSelector(state => state.instances.loadingInstances);
+  const finishedLoadedInstances = useSelector(state => state.instances.finishedLoadedInstances);
+  const dispatch = useDispatch();
   const classes = {
     root: {
       position: 'relative',
@@ -80,9 +86,22 @@ const SubHeader = ({ setBottomNav, bottomNav }) => {
     }
   };
 
+  useEffect(() => {
+    if (loadingInstances > 0 && loadingInstances === finishedLoadedInstances) {
+      // Add a small delay to show the final loading state before resetting
+      const timer = setTimeout(() => {
+        dispatch(resetLoadingState());
+      }, 500);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [loadingInstances, finishedLoadedInstances]);
+
   return (
     <Box sx={{
       ...classes.root,
+      display: 'flex',
+      alignItems: 'center',
       py: {
         // xs: 1,
         lg: 0.75
@@ -105,6 +124,21 @@ const SubHeader = ({ setBottomNav, bottomNav }) => {
         lg: secondaryBg
       }
     }}>
+      
+        
+      {loadingInstances > 0 && finishedLoadedInstances > 0 && (
+          <Box sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1
+          }}>
+            <CircularProgress size={20} />
+            <Typography variant="body1" color={lightWhiteColor}>
+            Loading instance {finishedLoadedInstances} of {loadingInstances}
+            </Typography>
+          </Box>
+      )} 
+        
       <Box
         sx={{
           position: 'relative',

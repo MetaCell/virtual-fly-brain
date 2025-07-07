@@ -22,6 +22,8 @@ export const initialStateInstancesReducer = {
   errorMessage: undefined,
   cameraEvent: {},
   selectedInstancesCount: 1,
+  loadingInstances: 0,
+  finishedLoadedInstances: 0,
 };
 
 const getMappedCanvasData = (loadedInstances) => {
@@ -61,9 +63,16 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         return Object.assign({}, state);
       }
     }
+    case getInstancesTypes.RESET_LOADING_STATE: {
+      return Object.assign({}, state, {
+        loadingInstances: 0,
+        finishedLoadedInstances: 0,
+      });
+    }
     case getInstancesTypes.GET_INSTANCES_STARTED: {
       return Object.assign({}, state, {
         isLoading: true,
+        loadingInstances: state.loadingInstances + 1,
       });
     }
     case getInstancesTypes.GET_INSTANCES_SUCCESS: {
@@ -124,12 +133,14 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         isLoading: false,
         error: false,
         errorMessage: undefined,
+        finishedLoadedInstances: state.finishedLoadedInstances + 1,
       });
     }
     case getInstancesTypes.GET_INSTANCES_FAILURE: {
       return Object.assign({}, state, {
         error: true,
         errorMessage: response.payload.error,
+        finishedLoadedInstances: state.finishedLoadedInstances + 1,
       });
     }
     case getInstancesTypes.REMOVE_INSTANCES_SUCCESS: {

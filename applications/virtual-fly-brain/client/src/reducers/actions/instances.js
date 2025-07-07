@@ -177,6 +177,10 @@ const templateLoadedMessage = (id, openTemplate) => ({
   }
 });
 
+export const resetLoadingState = () => ({
+  type: getInstancesTypes.RESET_LOADING_STATE
+});
+
 export const triggerInstanceFailure = (error) => {
   store.dispatch(getInstancesFailure(error));
   return;

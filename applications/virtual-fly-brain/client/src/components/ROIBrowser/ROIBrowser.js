@@ -455,7 +455,7 @@ const ROIBrowser = (props) => {
                                     <div> {rowInfo.node.description} </div>
                                     <div>
                                         <img
-                                            style={{ display: "block", textAlign: "center" }}
+                                            style={{ display: "block", textAlign: "center", width: "100%"}}
                                             src={
                                                 "https://VirtualFlyBrain.org/reports/" +
                                                 rowInfo.node.instanceId +

@@ -53,6 +53,7 @@ class ThreeDCanvas extends Component {
       showModel: false,
       mappedCanvasData: [],
       threeDObjects : [],
+      canvasKey: 0,
       canvasWidth: 0,
       canvasHeight: 0,
     };
@@ -80,8 +81,15 @@ class ThreeDCanvas extends Component {
           break;
         }
         case getInstancesTypes.UPDATE_SKELETON:
-        // Called to create the Neuron skeleton using the THREED Renderer
-        this.showSkeleton(this.props.event.id, this.props.event.mode, this.props.event.visible, this.props.threeDObjects)
+          // Called to create the Neuron skeleton using the THREED Renderer
+          this.showSkeleton(this.props.event.id, this.props.event.mode, this.props.event.visible, this.props.threeDObjects)
+          this.setState({ canvasKey: Date.now() });
+          break;
+        case getInstancesTypes.ADD_INSTANCE:
+        case getInstancesTypes.UPDATE_INSTANCES:
+          // Instances were added or updated, force canvas re-render to display them
+          this.setState({ canvasKey: Date.now() });
+          this.forceUpdate();
           break;
         default:
       }
@@ -154,7 +162,7 @@ class ThreeDCanvas extends Component {
       }
     } else {
       let updatedObjects = threeDObjects?.filter(m => m.visible);
-      this.setState({ ...this.state, threeDObjects: updatedObjects})
+      this.setState({ ...this.state, threeDObjects: updatedObjects, canvasKey: Date.now() })
     }
   }
 

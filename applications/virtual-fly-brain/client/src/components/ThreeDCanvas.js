@@ -53,12 +53,27 @@ class ThreeDCanvas extends Component {
       showModel: false,
       mappedCanvasData: [],
       threeDObjects : [],
-      canvasKey: 0,
       canvasWidth: 0,
       canvasHeight: 0,
     };
 
     this.canvasRef = React.createRef();
+  }
+
+  shouldComponentUpdate (nextProps, nextState) {
+    // Allow re-render when internal canvas key changes
+    if (nextState.canvasKey !== this.state.canvasKey) {
+      return true;
+    }
+    // Re-render when new canvas data or 3D objects arrive
+    if (nextProps.threeDObjects !== this.props.threeDObjects) {
+      return true;
+    }
+    if (nextProps.mappedCanvasData !== this.props.mappedCanvasData) {
+      return true;
+    }
+    // Otherwise skip unnecessary updates
+    return false;
   }
 
   componentDidUpdate(prevProps) {
@@ -83,12 +98,10 @@ class ThreeDCanvas extends Component {
         case getInstancesTypes.UPDATE_SKELETON:
           // Called to create the Neuron skeleton using the THREED Renderer
           this.showSkeleton(this.props.event.id, this.props.event.mode, this.props.event.visible, this.props.threeDObjects)
-          this.setState({ canvasKey: Date.now() });
           break;
         case getInstancesTypes.ADD_INSTANCE:
         case getInstancesTypes.UPDATE_INSTANCES:
           // Instances were added or updated, force canvas re-render to display them
-          this.setState({ canvasKey: Date.now() });
           this.forceUpdate();
           break;
         default:
@@ -162,7 +175,7 @@ class ThreeDCanvas extends Component {
       }
     } else {
       let updatedObjects = threeDObjects?.filter(m => m.visible);
-      this.setState({ ...this.state, threeDObjects: updatedObjects, canvasKey: Date.now() })
+      this.setState({ ...this.state, threeDObjects: updatedObjects })
     }
   }
 

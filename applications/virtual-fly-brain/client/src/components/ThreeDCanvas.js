@@ -61,18 +61,15 @@ class ThreeDCanvas extends Component {
   }
 
   shouldComponentUpdate (nextProps, nextState) {
-    // Allow re-render when internal canvas key changes
     if (nextState.canvasKey !== this.state.canvasKey) {
       return true;
     }
-    // Re-render when new canvas data or 3D objects arrive
     if (nextProps.threeDObjects !== this.props.threeDObjects) {
       return true;
     }
     if (nextProps.mappedCanvasData !== this.props.mappedCanvasData) {
       return true;
     }
-    // Otherwise skip unnecessary updates
     return false;
   }
 
@@ -98,11 +95,6 @@ class ThreeDCanvas extends Component {
         case getInstancesTypes.UPDATE_SKELETON:
           // Called to create the Neuron skeleton using the THREED Renderer
           this.showSkeleton(this.props.event.id, this.props.event.mode, this.props.event.visible, this.props.threeDObjects)
-          break;
-        case getInstancesTypes.ADD_INSTANCE:
-        case getInstancesTypes.UPDATE_INSTANCES:
-          // Instances were added or updated, force canvas re-render to display them
-          this.forceUpdate();
           break;
         default:
       }

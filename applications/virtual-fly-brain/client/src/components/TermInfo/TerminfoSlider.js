@@ -1,12 +1,15 @@
 /* eslint-disable no-undef */
-import React, { useState, useEffect, } from 'react';
+import React, {
+  useState,
+  useEffect,
+} from 'react';
 import vars from '../../theme/variables';
+import { useSelector } from 'react-redux';
 import { Slide } from 'react-slideshow-image';
-import 'react-slideshow-image/dist/styles.css'
+import { ChevronLeft, FullScreen } from '../../icons';
 import { Box, Button, Typography } from '@mui/material';
 import { getInstanceByID } from '../../reducers/actions/instances';
-import { ChevronLeft, ChevronRight, FullScreen } from '../../icons';
-import { useSelector } from 'react-redux';
+import 'react-slideshow-image/dist/styles.css'
 
 const { whiteColor, listHeadingColor } = vars;
 
@@ -155,7 +158,18 @@ const TerminfoSlider = (props) => {
 
   return (
     <Box sx={classes.root}>
-      <Slide canSwipe={ false } slidesToShow={ 1 } slidesToScroll={ 1 } infinite={ false } indicators={ true } prevArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } nextArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } arrows={ true }>
+      <Slide
+        transitionDuration={250}
+        canSwipe={ false }
+        slidesToShow={ 1 }
+        slidesToScroll={ 1 }
+        infinite={ false }
+        indicators={ true }
+        autoplay={ false }
+        prevArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> }
+        nextArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } 
+        arrows={ true }
+      >
             {slideImages?.map((slideImage, index) => (
                 <img
                   key={index}

@@ -16,7 +16,7 @@ import { DatasourceTypes } from '@metacell/geppetto-meta-ui/search/datasources/d
 import { getInstanceByID } from './../../reducers/actions/instances';
 import { addRecentSearch } from '../../reducers/actions/globals';
 import { useSelector, useDispatch } from 'react-redux'
-import { getQueries, deleteQuery, updateQueries } from '../../reducers/actions/queries';
+import { getQueries, deleteQuery, updateQueries, getQueriesFinished, getQueriesStarted} from '../../reducers/actions/queries';
 import { getUpdatedTags } from '../../utils/utils';
 import { debounce } from '@mui/material';
 
@@ -165,6 +165,7 @@ export default function SearchBuilder(props) {
   };
 
   const checkResults = () => {
+    // getQueriesStarted();
     props.setBottomNav(2)
     setIsOpen(false)
     props.setFocused(false);

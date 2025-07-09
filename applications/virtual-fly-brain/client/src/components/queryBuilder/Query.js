@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useImperativeHandle, forwardRef } from "react";
 import { Box, Button, Chip, Divider, Grid, Tooltip } from "@mui/material";
 import QueryCard from "./Card";
 import { Cross } from "../../icons";
@@ -7,8 +7,8 @@ import vars from "../../theme/variables";
 import Filter from "./Filter";
 import { getUpdatedTags } from "../../utils/utils";
 import { updateQueries } from "./../../reducers/actions/queries"
-import { removeRecentSearch } from "./../../reducers/actions/globals"
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import CircularProgress from '@mui/material/CircularProgress';
 
 const { headerBorderColor, searchHeadingColor, secondaryBg, listHeadingColor, primaryBg } = vars;
 const colors_config = require("../configuration/VFBColors").facets_annotations_colors;
@@ -22,37 +22,74 @@ const getTags = (tags) => {
   return tags.split("|")
 }
 
-const getQueries = (newQueries) => {
-  let updatedQueries = []
-  newQueries?.forEach( (query, index ) => {
-    if ( query.queries ) {
-      Object.keys(query.queries).map( key => {
-        if ( query.queries[key]?.active ) {
+const getQueries = (newQueries, searchTerm) => {
+  let updatedQueries = [];
+  const term = searchTerm ? searchTerm.toLowerCase() : undefined;
+  newQueries?.forEach((query) => {
+    if (query.queries) {
+      Object.keys(query.queries).forEach((key) => {
+        if (query.queries[key]?.active) {
           let rows = [];
-          if ( query.queries[key]?.rows ){
+          if (query.queries[key]?.rows) {
             rows = query.queries[key]?.rows;
-          } 
-          updatedQueries = updatedQueries.concat(rows)
+          }
+          if (term) {
+            rows = rows.filter(row =>
+              Object.values(row).some(
+                v => v && v.toString().toLowerCase().includes(term)
+              )
+            );
+          }
+          updatedQueries = updatedQueries.concat(rows);
         }
       });
     }
-  })
-
+  });
   return updatedQueries;
 }
 
-const Query = ({ fullWidth, queries }) => {
+const getInitialFiltersFromHeaders = (queries) => {
+  // Fallback if queries or headers are missing
+  if (!queries?.length) return { filters: {}, tags: "tags", defaultSort: null };
+  // Find the first query with headers
+  let headers = null;
+  for (const q of queries) {
+    const keys = Object.keys(q.queries || {});
+    for (const k of keys) {
+      if (q.queries[k]?.headers) {
+        headers = q.queries[k].headers;
+        break;
+      }
+    }
+    if (headers) break;
+  }
+  if (!headers) return { filters: {}, tags: "tags", defaultSort: null };
+  // Build filters and find default sort
+  const filters = {};
+  let defaultSort = null;
+  Object.entries(headers).forEach(([key, val]) => {
+    if (val.order !== -1) {
+      filters[val.title] = key;
+    }
+    if (val.sort && val.sort["0"] !== undefined) {
+      defaultSort = key;
+    }
+  });
+  return { filters, tags: "tags", defaultSort };
+};
+
+const Query = forwardRef(({ fullWidth, queries, searchTerm }, ref) => {
   const [chipTags , setChipTags] = useState([]);
   const [count, setCount] = useState(0)
-  const [filteredSearches, setFilteredSearches] = React.useState(getQueries(queries));
+  const [filteredSearches, setFilteredSearches] = React.useState(getQueries(queries, searchTerm));
+  const { filters: headerFilters, tags: tagsKey, defaultSort } = getInitialFiltersFromHeaders(queries);
   const initialFilters = {
-    "filters" : {
-      "Id" : "id",
-      "Name" : "label"
-    },
-    "tags" : "tags"
+    filters: headerFilters,
+    tags: tagsKey,
+    defaultSort: defaultSort
   };
   const [filters, setFilters] = React.useState(initialFilters);
+  const isLoading = useSelector( state => state.queries.isLoading );
   const dispatch = useDispatch();
 
   const updateFilters = (searches) => {
@@ -60,7 +97,7 @@ const Query = ({ fullWidth, queries }) => {
   }
 
   useEffect( () => {
-    let tags = {...initialFilters.filters};
+    let tags = {...headerFilters};
     queries?.forEach( (query, index ) => {
       query.Tags?.forEach( tag => {
         if ( tags?.[tag] == undefined ){
@@ -68,7 +105,7 @@ const Query = ({ fullWidth, queries }) => {
         }
       })
     })
-    setFilters({...filters, filters : tags});
+    setFilters(f => ({...f, filters: tags}));
   }, [queries])
 
   const getCount = () => {
@@ -101,10 +138,10 @@ const Query = ({ fullWidth, queries }) => {
         }
       });
     })
-    setFilteredSearches(getQueries(queries))
+    setFilteredSearches(getQueries(queries, searchTerm))
     setChipTags(tags);
-  }, [queries])
-  
+  }, [queries, searchTerm])
+
   const handleChipDelete = (label) => {
     let filtered = [...chipTags];
     filtered.find((tag) => tag?.label === label).active = false;
@@ -165,10 +202,44 @@ const Query = ({ fullWidth, queries }) => {
     setFilteredSearches(updatedSearches)
   }
 
+  useImperativeHandle(ref, () => ({
+    downloadCSV: () => {
+      if (!filteredSearches || filteredSearches.length === 0) return;
+      // Get all unique keys from all rows
+      const allKeys = Array.from(
+        filteredSearches.reduce((set, row) => {
+          Object.keys(row).forEach(k => set.add(k));
+          return set;
+        }, new Set())
+      );
+      // CSV header
+      const header = allKeys.join(",");
+      // CSV rows
+      const rows = filteredSearches.map(row =>
+        allKeys.map(k => {
+          let val = row[k];
+          if (val === undefined || val === null) return '';
+          // Escape quotes and commas
+          return '"' + String(val).replace(/"/g, '""') + '"';
+        }).join(",")
+      );
+      const csvContent = [header, ...rows].join("\n");
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `vfb_${Date.now()}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  }));
+
   return (
     <>
-      <QueryHeader 
-        title={ count + " Query results"}
+      <QueryHeader
+        title={ isLoading ? "Loading results ..." : count + " Query results"}
         filters={filters}
         recentSearches={filteredSearches}
         setFilteredSearches={updateFilters}
@@ -281,36 +352,42 @@ const Query = ({ fullWidth, queries }) => {
               }
             }}
           >
-            Clear all
+            Reset Filters
           </Button>
         </Box>
       </Box>
 
       <Box overflow='auto' height='calc(100% - 5.375rem)' p={1.5}>
-        <Grid container spacing={1.5}>
-          {filteredSearches?.map((row, index) => {
-            const tags = getTags(row.tags);
-            if ( chipTags?.filter(f => f.active)?.some(v => tags.includes(v.label)) ) {
-              return (
-                <Grid
-                  key={index}
-                  item
-                  xs={12}
-                  sm={6}
-                  md={4}
-                  lg={fullWidth ? 4 : 3}
-                  xl={3}
-                >
-                  <QueryCard facets_annotation={tags} query={row} fullWidth={fullWidth} />
-                </Grid>
-              )
-            }
-            })
-          }
-        </Grid>
+        {isLoading ? (
+          <Box display="flex" justifyContent="center" alignItems="center" height="40vh">
+            <CircularProgress />
+          </Box>
+        ) : (
+          <Grid container spacing={1.5}>
+            {filteredSearches?.map((row, index) => {
+              const tags = getTags(row.tags);
+              if ( chipTags?.filter(f => f.active)?.some(v => tags.includes(v.label)) ) {
+                return (
+                  <Grid
+                    key={index}
+                    item
+                    xs={12}
+                    sm={6}
+                    md={4}
+                    lg={fullWidth ? 4 : 3}
+                    xl={3}
+                  >
+                    <QueryCard facets_annotation={tags} query={row} fullWidth={fullWidth} />
+                  </Grid>
+                )
+              }
+              return null;
+            })}
+          </Grid>
+        )}
       </Box>
     </>
   )
-};
+});
 
 export default Query;

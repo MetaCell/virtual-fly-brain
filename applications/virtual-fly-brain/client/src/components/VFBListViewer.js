@@ -50,7 +50,7 @@ class VFBListViewer extends Component {
   }
 
   render() {
-    const instances =
+    const _instances =
       this.props.allLoadedInstances
         .filter((i) => i.meshCreated)
         .map((instance) => ({
@@ -67,7 +67,11 @@ class VFBListViewer extends Component {
             : undefined,
           static: true,
           selected: instance.selected,
+          isTemplate: instance.metadata?.isTemplate === true,
         })) || [];
+
+    // Sort so that isTemplate === true is first
+    const instances = _instances.sort((a, b) => (b.isTemplate ? 1 : 0) - (a.isTemplate ? 1 : 0));
 
     return instances?.length > 0 ? (
       <div

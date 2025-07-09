@@ -86,6 +86,7 @@ const conf = [
           underline='none'
           variant="subtitle1"
           onClick={() => {
+            selectInstance(entityPath);
             focusInstance(entityPath);
           }}>
           {entityType}

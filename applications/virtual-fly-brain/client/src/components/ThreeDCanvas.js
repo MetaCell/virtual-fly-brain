@@ -60,6 +60,19 @@ class ThreeDCanvas extends Component {
     this.canvasRef = React.createRef();
   }
 
+  shouldComponentUpdate (nextProps, nextState) {
+    if (nextState.canvasKey !== this.state.canvasKey) {
+      return true;
+    }
+    if (nextProps.threeDObjects !== this.props.threeDObjects) {
+      return true;
+    }
+    if (nextProps.mappedCanvasData !== this.props.mappedCanvasData) {
+      return true;
+    }
+    return false;
+  }
+
   componentDidUpdate(prevProps) {
     if(this.props.event.trigger !== prevProps.event.trigger){
       switch(this.props.event.action){
@@ -80,8 +93,8 @@ class ThreeDCanvas extends Component {
           break;
         }
         case getInstancesTypes.UPDATE_SKELETON:
-        // Called to create the Neuron skeleton using the THREED Renderer
-        this.showSkeleton(this.props.event.id, this.props.event.mode, this.props.event.visible, this.props.threeDObjects)
+          // Called to create the Neuron skeleton using the THREED Renderer
+          this.showSkeleton(this.props.event.id, this.props.event.mode, this.props.event.visible, this.props.threeDObjects)
           break;
         default:
       }
@@ -154,7 +167,7 @@ class ThreeDCanvas extends Component {
       }
     } else {
       let updatedObjects = threeDObjects?.filter(m => m.visible);
-      this.setState({ ...this.state, threeDObjects: updatedObjects})
+      this.setState({ ...this.state, threeDObjects: updatedObjects })
     }
   }
 

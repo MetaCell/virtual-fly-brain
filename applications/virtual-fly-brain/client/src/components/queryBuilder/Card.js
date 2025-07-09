@@ -1,12 +1,12 @@
 import React from "react";
-import { Box, Button, Card, CardContent, CardMedia, Chip, IconButton, Tooltip, Typography } from "@mui/material";
-import LinkIcon from '@mui/icons-material/Link';
+import { Box, Card, CardContent, CardMedia, Chip, IconButton, Tooltip, Typography } from "@mui/material";
 import vars from "../../theme/variables";
 import { useState } from "react";
 import FullScreenViewer from "./FullScreenViewer";
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
-import { Compare } from "../../icons";
 import { getUpdatedTags } from "../../utils/utils";
+import ReactMarkdown from 'react-markdown';
+import { getInstanceByID } from "../../reducers/actions/instances";
 
 const {
   listHeadingColor,
@@ -104,211 +104,166 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
     return matches;
   }
 
+  const handleLinkClick = (href, event) => {
+    event.preventDefault();
+    if (href.startsWith("http")) {
+      window.open(href, "_blank", "noopener,noreferrer");
+    } else {
+      const id = href.split(',').pop().trim();
+      getInstanceByID(id, false, true, false);
+    }
+  };
+
   return (
     <>
       <Card sx={{
-        height: '19.875rem',
+        height: '20rem',
+        width: '20rem',
         display: 'flex',
         flexDirection: 'column',
-        background: secondaryBg,
-        transition: 'all ease-in-out .3s',
-
+        background: primaryBg,
+          '&:hover': { background: secondaryBg },
+        borderRadius: '8px', // Rounded corners
+        boxShadow: '0 4px 16px 0 rgba(0,0,0,0.10)', // Subtle shadow
+        border: '1px solid',
+        borderColor: secondaryBg,
+        transition: 'box-shadow 0.2s',
+        overflow: 'hidden',
+        fontFamily: 'Inter, Arial, sans-serif',
         '&:hover': {
-          background: primaryBg,
-
-          '& .default-chip': {
-            backgroundColor: outlinedBtnBorderColor,
-          }
+          boxShadow: '0 8px 24px 0 rgba(0,0,0,0.16)',
         }
       }}>
         <CardMedia
           sx={{
-            height: '100%',
+            height: '7.5rem',
+            backgroundSize: 'cover',
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'center',
+            borderTopLeftRadius: '8px',
+            borderTopRightRadius: '8px',
+            borderBottom: '1px solid',
+            borderColor: secondaryBg,
+            position: 'relative',
           }}
           image={getThumbnail(query.thumbnail)}
         >
           <IconButton onClick={(e) => {
             e.stopPropagation();
             setShowFullScreen(true)
+          }}
+          sx={{
+            position: 'absolute',
+            top: 8,
+            right: 8,
+            background: 'rgba(255,255,255,0.7)',
+            '&:hover': { background: 'rgba(255,255,255,0.9)' },
+            boxShadow: '0 2px 8px 0 rgba(0,0,0,0.10)'
           }}>
-            <FullscreenIcon sx={{fill: '#fff !important', fontSize: '1.0625rem', m: '0 !important'}} />
+            <FullscreenIcon sx={{fill: '#333', fontSize: '1.2rem'}} />
           </IconButton>
         </CardMedia>
-
-        <CardContent>
-          <Tooltip placement="right"
-            arrow title={query.label}>
-            <Typography sx={{
-              ...classes.ellipsis,
-              fontSize: '1rem',
-              color: whiteColor,
-              fontWeight: 400,
-              lineHeight: '1.25rem',
-            }}>
-              {query.label}
-            </Typography>
-          </Tooltip>
-
+        <CardContent sx={{overflowY: 'auto', flex: 1, padding: "8px", paddingBottom: "6px !important", paddingTop: "4px !important"}}>
           <Box
-            mt={1.5}
             display='flex'
             flexDirection='column'
-            rowGap={1}
+            rowGap={0.10} // Tighter spacing
           >
-            { query?.description && <Box
-              display='flex'
-              justifyContent='space-between'
-              columnGap={1}
-            >
-              <Typography sx={classes.heading}>
-                {query.description}
-              </Typography>
-              <Box display='flex' flexDirection='column' alignItems='flex-end'>
-                <Typography sx={{
-                  ...classes.heading,
-                  color: whiteColor,
-                  textAlign: 'right'
-                }}>
-                  {toggleReadMore ? "" : `${""?.substr(0, MAX_LENGTH)}...`}
-                </Typography>
-                <Button
-                  onClick={() => setToggleReadMore((prev) => !prev)} disableRipple
-                  sx={{
-                    fontSize: '0.75rem',
-                    padding: 0,
-                    marginTop: '0',
-                    height: 'auto',
-                    color: tabActiveColor,
-                    '&:hover': {
-                      backgroundColor: 'transparent'
-                    }
-                  }}>
-                  {toggleReadMore ? 'Show Less' : 'Read More'}
-                </Button>
-              </Box>
-
-            </Box> }
-
-            { query?.type && <Box
-              display='flex'
-              justifyContent='space-between'
-              columnGap={1}
-            >
-              <Typography sx={classes.heading}>
-                Type
-              </Typography>
-
-              <Tooltip
-                placement="right"
-                arrow
-                title={`P{GMR80G01-GAL4} expression pattern; anatomical entity`}
-              >
-                <Typography sx={{
-                  ...classes.ellipsis,
-                  ...classes.heading,
-                  color: whiteColor,
-                  textAlign: 'right'
-                }}>
-                   {query.type}
-                </Typography>
-              </Tooltip>
-            </Box> }
-
-            { query?.imaging_tecnique && <Box
-              display='flex'
-              justifyContent='space-between'
-              columnGap={1}
-            >
-              <Typography sx={classes.heading}>
-                {query.imaging_tecnique}
-              </Typography>
-
-              <Tooltip
-                placement="right"
-                arrow
-                title='Confocal'
-              >
-                <Typography sx={{
-                  ...classes.ellipsis,
-                  ...classes.heading,
-                  color: whiteColor,
-                  textAlign: 'right'
-                }}>
-                  {query.confocal}
-                </Typography>
-              </Tooltip>
-            </Box> }
-
-            { query?.template_space && <Box
-              display='flex'
-              justifyContent='space-between'
-              columnGap={1}
-            >
-              <Typography sx={classes.heading}>
-               {query.template_space}
-              </Typography>
-
-              <Tooltip
-                placement="right"
-                arrow
-                title={query.template}
-              >
-                <Chip className="default-chip" sx={{ backgroundColor: primaryBg, gap: 0.5 }} onClick={() => console.log('Clicked!')} icon={<LinkIcon sx={{fill: '#fff !important', fontSize: '1.0625rem', m: '0 !important'}} />} label={query.template} />
-              </Tooltip>
-            </Box> }
-
-
-
-
             {facets_annotation?.length > 0 && <Box
               display='flex'
               justifyContent='flex-end'
-              columnGap={1}
+              columnGap={0.5}
+              mt={1}
             >
-              <Box display='flex' gap={0.5} flexWrap='wrap'>
+              <Box display='flex' gap={0.125} flexWrap='wrap'>
                 {facets_annotation?.slice(0, fullWidth ? 3 : 4)?.map((tag, index) => (
                   <Chip
                   key={tag + index}
                   sx={{
                     lineHeight: '140%',
-                    fontSize: '0.625rem',
+                    fontSize: '0.7rem',
                     backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color,
-                    color: facets_annotations_colors[tag]?.textColor || facets_annotations_colors?.default?.textColor
+                    color: facets_annotations_colors[tag]?.textColor || facets_annotations_colors?.default?.textColor,
+                    borderRadius: '8px',
+                    fontWeight: 500
                   }}
                   label={tag} />
                 ))}
-
-                <Tooltip
-                  arrow
-                  title={
-                    <Box display='flex' py={1} flexWrap='wrap' gap={0.5}>
-                      {facets_annotation?.slice(fullWidth ? 3 : 4).map((tag, index) => (
-                        <Chip
-                          key={tag + index}
-                          sx={{
-                            lineHeight: '140%',
-                            fontSize: '0.625rem',
-                            backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color,
-                            color: facets_annotations_colors[tag]?.textColor || facets_annotations_colors?.default?.textColor
-                          }}
-                          label={tag} />
-                      ))}
-                    </Box>
-                  }
-                >
-                  <Chip
-                    className="default-chip"
-                    sx={{ background: primaryBg }}
-                    label={`+${facets_annotation?.slice(fullWidth ? 3 : 4).length}`}
-                  />
-                </Tooltip>
-
+                {facets_annotation.length > (fullWidth ? 3 : 4) && (
+                  <Tooltip
+                    arrow
+                    title={
+                      <Box display='flex' py={1} flexWrap='wrap' gap={0.5}>
+                        {facets_annotation?.slice(fullWidth ? 3 : 4).map((tag, index) => (
+                          <Chip
+                            key={tag + index}
+                            sx={{
+                              lineHeight: '140%',
+                              fontSize: '0.7rem',
+                              backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color,
+                              color: facets_annotations_colors[tag]?.textColor || facets_annotations_colors?.default?.textColor,
+                              borderRadius: '8px',
+                              fontWeight: 500
+                            }}
+                            label={tag} />
+                        ))}
+                      </Box>
+                    }
+                  >
+                    <Chip
+                      className="default-chip"
+                      sx={{ background: '#F5F5F5', color: '#333', borderRadius: '8px', fontWeight: 500 }}
+                      label={`+${facets_annotation?.slice(fullWidth ? 3 : 4).length}`}
+                    />
+                  </Tooltip>
+                )}
               </Box>
             </Box> }
+            {Object.entries(query).map(([key, value]) => {
+              if (key === 'thumbnail' || key === 'tags' || value === undefined || value === null || typeof value === 'object') return null;
+              return (
+                <Box key={key} display='flex' justifyContent='space-between' alignItems='center' sx={{mb: 0}}>
+                  <Typography sx={{fontWeight: 500, fontSize: '0.875rem', color: listHeadingColor, textTransform: 'capitalize', flex: 1, lineHeight: 0, py: 0.25}}>{key}</Typography>
+                  <Tooltip placement="right" arrow title={String(value)}>
+                    <Box
+                      sx={{
+                        color: whiteColor,
+                        textAlign: 'right',
+                        lineHeight: 0,
+                        fontSize: '0.875rem',
+                        fontWeight: 400,
+                        pl: 1,
+                        wordBreak: 'break-word',
+                        py: 0.25,
+                      }}>
+                      <ReactMarkdown
+                        components={{
+                          a: ({ href, children, ...props }) => (
+                            <span
+                              style={{
+                                fontSize: '0.875rem',
+                                ":hover": {
+                                  color: tabActiveColor,
+                                  cursor: 'pointer',
+                                }}}
+                              onClick={e => handleLinkClick(href, e)}
+                              {...props}
+                            >
+                              {children}
+                            </span>
+                          ),
+                        }}
+                      >
+                        {String(value)}
+                      </ReactMarkdown>
+                    </Box>
+                  </Tooltip>
+                </Box>
+              );
+            })}
           </Box>
         </CardContent>
       </Card>
-
       {showFullScreen && (
         <FullScreenViewer open={ showFullScreen } onClose={ () => setShowFullScreen( false ) } images={ { [query.id] : [{ thumbnail : getThumbnail(query.thumbnail)[0], label : query.label }]} } />
       )}

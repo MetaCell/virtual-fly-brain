@@ -523,8 +523,9 @@ const TermInfo = ({ open, setOpen }) => {
                 <span
                   style={{
                     fontSize: '0.875rem',
-                    "&:hover": {
-                      color: "#0AB7FE",
+                    ":hover": {
+                      color: tabActiveColor,
+                      cursor: 'pointer',
                     }}}
                   onClick={e => handleLinkClick(href, e)}
                   {...props}

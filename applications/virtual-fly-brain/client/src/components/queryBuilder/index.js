@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState, useRef } from "react";
 import PropTypes from 'prop-types';
 import { Add, ClearAll, Cross, Delete, Download, Next, Prev, Remove } from "../../icons"
 import { Box, Button, ButtonGroup, IconButton, InputAdornment, Pagination, PaginationItem, Tab, Tabs, TextField } from "@mui/material";
@@ -52,7 +52,10 @@ const QueryBuilder = ({ fullWidth, bottomNav, setBottomNav, tabSelected }) => {
   const [page, setPage] = React.useState(1);
   const count = 10;
   const [historyItems, setHistoryItems] = React.useState(recentSearches.slice(page * count - count, count))
-  
+  const [searchTerm, setSearchTerm] = useState();
+  const debounceTimeout = useRef();
+  const queryRef = useRef();
+
   const queryComponentOpened = useSelector( state => state.globalInfo?.queryComponentOpened );
 
   React.useEffect( () => {
@@ -89,6 +92,20 @@ const QueryBuilder = ({ fullWidth, bottomNav, setBottomNav, tabSelected }) => {
     dispatch(setQueryComponentOpened(false));
     setBottomNav(undefined);
   }
+
+  const handleDownload = () => {
+    if (queryRef.current && queryRef.current.downloadCSV) {
+      queryRef.current.downloadCSV();
+    }
+  };
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+    debounceTimeout.current = setTimeout(() => {
+      setSearchTerm(value === "" ? undefined : value);
+    }, 350);
+  };
 
   const classes = {
     root: {
@@ -186,7 +203,7 @@ const QueryBuilder = ({ fullWidth, bottomNav, setBottomNav, tabSelected }) => {
 
       <Box sx={classes.body}>
         <TabPanel value={value} index={0}>
-          <Query fullWidth={fullWidth} queries={queries} />
+          <Query ref={queryRef} fullWidth={fullWidth} queries={queries} searchTerm={searchTerm} />
         </TabPanel>
         <TabPanel value={value} index={1}>
           <History recentSearches={historyItems} totalResults={recentSearches?.length}/>
@@ -202,6 +219,7 @@ const QueryBuilder = ({ fullWidth, bottomNav, setBottomNav, tabSelected }) => {
           <>
             <TextField
               placeholder="Search here"
+              onChange={handleSearchChange}
               InputProps={{
                 endAdornment: <InputAdornment position="end">
                   <IconButton>
@@ -249,13 +267,13 @@ const QueryBuilder = ({ fullWidth, bottomNav, setBottomNav, tabSelected }) => {
                 height: '100%'
               }
             }} variant="contained">
-              <Button color="secondary">
+              <Button color="secondary" disabled>
                 <Add />
               </Button>
-              <Button color="secondary">
+              <Button color="secondary" disabled>
                 <Delete />
               </Button>
-              <Button color="secondary">
+              <Button color="secondary" onClick={handleDownload}>
                 <Download color={outlinedBtnTextColor} />
               </Button>
             </ButtonGroup>

@@ -228,7 +228,7 @@ const Query = forwardRef(({ fullWidth, queries, searchTerm }, ref) => {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'query_results.csv';
+      a.download = `vfb_${Date.now()}.csv`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);

@@ -129,7 +129,7 @@ const VFBStackViewer = (props) => {
         const slices = new SimpleInstance(instance1spec);
         slices.parent = parent;
         parent[stackViewerData.metadata?.Id + "_slices"] = slices;
-        if (stackViewerData.visible !== false) {
+        if (stackViewerData.visible) {
           instances.push(slices);
         }
       }

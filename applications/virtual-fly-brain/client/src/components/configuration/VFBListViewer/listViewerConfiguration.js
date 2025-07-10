@@ -21,15 +21,15 @@ const ControlsMenu = component => {
 
 const Thumbnail = component => (
   <Tooltip
+    leaveDelay={100000000000}
+    placement="top-end"
     title={
-      <React.Fragment>
-        <img src={component.value}
-          className="thumbnail-img" />
-      </React.Fragment>
+      <div style={{ backgroundColor: "transparent !important" }}>
+        <img src={component.value} className="thumbnail-listviewer" />
+      </div>
     }
   >
-    <img src={component.value}
-      className="thumbnail-img" />
+    <img src={component.value} className="thumbnail-img" />
   </Tooltip>
 )
 

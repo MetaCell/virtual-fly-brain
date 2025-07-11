@@ -22,7 +22,6 @@ const colors_config = require("../configuration/VFBColors").facets_annotations_c
 const facets_annotations_colors = getUpdatedTags(colors_config)
 
 const QueryCard = ({ fullWidth, facets_annotation, query }) => {
-  const [toggleReadMore, setToggleReadMore] = useState(false);
   const [showFullScreen, setShowFullScreen] = useState(false);
 
   const MAX_LENGTH = 40;
@@ -220,7 +219,7 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
               </Box>
             </Box> }
             {Object.entries(query).map(([key, value]) => {
-              if (key === 'thumbnail' || key === 'tags' || value === undefined || value === null || typeof value === 'object') return null;
+              if (key === 'thumbnail' || key === 'tags' || value === "" || value === undefined || value === null || typeof value === 'object') return null;
               return (
                 <Box key={key} display='flex' justifyContent='space-between' alignItems='center' sx={{mb: 0}}>
                   <Typography sx={{fontWeight: 500, fontSize: '0.875rem', color: listHeadingColor, textTransform: 'capitalize', flex: 1, lineHeight: 0, py: 0.25}}>{key}</Typography>
@@ -229,12 +228,30 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
                       sx={{
                         color: whiteColor,
                         textAlign: 'right',
-                        lineHeight: 0,
+                        lineHeight: 1.2,
                         fontSize: '0.875rem',
                         fontWeight: 400,
                         pl: 1,
                         wordBreak: 'break-word',
                         py: 0.25,
+                        maxWidth: '60%',
+                        overflow: 'hidden',
+                        '& p': {
+                          margin: 0,
+                          lineHeight: 1.2,
+                          fontSize: '0.875rem',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis'
+                        },
+                        '& a': {
+                          fontSize: '0.875rem',
+                          color: 'inherit',
+                          textDecoration: 'underline',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis'
+                        }
                       }}>
                       <ReactMarkdown
                         components={{
@@ -242,16 +259,23 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
                             <span
                               style={{
                                 fontSize: '0.875rem',
-                                ":hover": {
-                                  color: tabActiveColor,
-                                  cursor: 'pointer',
-                                }}}
+                                cursor: 'pointer',
+                                textDecoration: 'underline',
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                display: 'inline-block',
+                                maxWidth: '100%'
+                              }}
                               onClick={e => handleLinkClick(href, e)}
                               {...props}
                             >
                               {children}
                             </span>
                           ),
+                          p: ({ children, ...props }) => (
+                            <span {...props}>{children}</span>
+                          )
                         }}
                       >
                         {String(value)}

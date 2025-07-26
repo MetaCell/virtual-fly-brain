@@ -230,14 +230,37 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
       >
         <Box sx={classes.modalStyle}>
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            Template Alignation
+            ID not aligned
           </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+          <Typography id="modal-modal-description" sx={{ mt: 2, mb: 3 }}>
             The image you requested is aligned to another template. Click Okay
             to open in a new tab or Cancel to just view the image metadata.
           </Typography>
-          <Button variant="contained" color={"primary"} onClick={() => handleModalClose(misalignedTemplate, true )} target="_blank" href={window.location.origin + "/?id=" + misalignedTemplate}>Okay</Button>
-          <Button variant="outlined" color={"secondary"} onClick={() => handleModalClose(misalignedTemplate, false )}>Cancel</Button>
+          <Box sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            position: 'absolute',
+            bottom: 16,
+            left: 16,
+            right: 16
+          }}>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => handleModalClose(misalignedTemplate, false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => handleModalClose(misalignedTemplate, true)}
+              target="_blank"
+              href={window.location.origin + "/?id=" + misalignedTemplate}
+            >
+              Okay
+            </Button>
+          </Box>
         </Box>
       </Modal>
       <Box

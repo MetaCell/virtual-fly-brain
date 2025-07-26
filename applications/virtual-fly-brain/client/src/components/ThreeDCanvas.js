@@ -57,22 +57,44 @@ class ThreeDCanvas extends Component {
       canvasWidth: 0,
       canvasHeight: 0,
     };
-
     this.canvasRef = React.createRef();
   }
 
+  compareArrays(arr1, arr2) {
+    let found = true;
+    const set1 = arr1.map((e) => e.instancePath);
+    const set2 = arr2.map((e) => e.instancePath);
+    if (set1.length !== set2.length) return false; // If lengths differ, return false
+    set1.forEach((instance, index) => {
+      const index2 = set2.indexOf(instance);
+      if (index2 === -1) {
+        found = false; // If any instance is not found in arr2, return false
+      }
+      if (arr1[index].selected !== arr2[index2].selected) {
+        found = false; // If selected state is different, return false
+      }
+      if (arr1[index].visibility !== arr2[index2].visibility) {
+        found = false; // If visibility state is different, return false
+      }
+      if (arr1[index].color.r !== arr2[index2].color.r ||
+          arr1[index].color.g !== arr2[index2].color.g ||
+          arr1[index].color.b !== arr2[index2].color.b ||
+          arr1[index].color.a !== arr2[index2].color.a) {
+        found = false; // If color state is different, return false
+      }
+    });
+    return found;
+  }
+
   shouldComponentUpdate(nextProps, nextState) {
-    if (nextProps.threeDObjects.length !== this.props.threeDObjects.length
-      || nextProps.mappedCanvasData.length !== this.props.mappedCanvasData.length
-      || nextProps.allLoadedInstances.length !== this.props.allLoadedInstances.length)
-    {
-      this.canvasRef.current?.threeDEngine?.updateVisibleChildren()
-      return true;
+    if (this.compareArrays(this.props.mappedCanvasData, nextProps.mappedCanvasData)) {
+      return false; // If the arrays are the same, no update is needed
     }
-    return false;
+    return true;
   }
 
   componentDidUpdate(prevProps) {
+    this.canvasRef.current?.threeDEngine?.updateVisibleChildren();
     if (this.props.event.trigger !== prevProps.event.trigger) {
       switch (this.props.event.action) {
         // TODO : Remove and let custom camera handler control this action. Issue #VFB-136

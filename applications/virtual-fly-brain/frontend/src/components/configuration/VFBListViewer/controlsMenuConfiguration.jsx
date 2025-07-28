@@ -23,7 +23,7 @@ const controlsMenuConf = {
   global: {
     buttonsStyle: {
       standard: {
-        background: 'rgb(53, 51, 51)',
+        background: 'transparent',
         borderRadius: 0,
         border: 0,
         boxShadow: '0px 0px',
@@ -37,7 +37,11 @@ const controlsMenuConf = {
         textAlign: 'left',
         justifyContent: 'start',
         marginTop: '1px',
-        fontWeight: '300'
+        fontWeight: '300',
+
+        '&:hover': {
+          background: 'transparent',
+        }
       }
     },
     labelsStyle: {

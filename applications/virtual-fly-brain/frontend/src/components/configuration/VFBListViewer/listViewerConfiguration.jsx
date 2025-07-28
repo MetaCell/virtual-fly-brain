@@ -2,10 +2,10 @@ import React from 'react';
 import Tooltip from '@material-ui/core/Tooltip';
 import Chip from '@material-ui/core/Chip';
 import ListViewerControlsMenu from '../../VFBListViewer/ListViewerControlsMenu';
-import { getUpdatedTags } from '../../../utils/utils';
+import { getUpdatedTags, formatTagText } from '../../../utils/utils';
 import Link from '@mui/material/Link';
 import { focusInstance, selectInstance } from '../../../reducers/actions/instances';
-import { facets_annotations_colors as colors_config } from '../VFBColors';
+import { facets_annotations_colors as colors_config } from "../VFBColors";
 
 const facets_annotations_colors = getUpdatedTags(colors_config)
 
@@ -21,15 +21,15 @@ const ControlsMenu = component => {
 
 const Thumbnail = component => (
   <Tooltip
+    leaveDelay={100000000000}
+    placement="top-end"
     title={
-      <React.Fragment>
-        <img src={component.value}
-          className="thumbnail-img" />
-      </React.Fragment>
+      <div style={{ backgroundColor: "transparent !important" }}>
+        <img src={component.value} className="thumbnail-listviewer" />
+      </div>
     }
   >
-    <img src={component.value}
-      className="thumbnail-img" />
+    <img src={component.value} className="thumbnail-img" />
   </Tooltip>
 )
 
@@ -38,7 +38,7 @@ const conf = [
     id: "controls",
     title: "Controls",
     customComponent: ControlsMenu,
-    source: entity => entity
+    source: entity => entity,
   },
   {
     id: "name",
@@ -80,45 +80,50 @@ const conf = [
       entityPath = entityType.match(/\(([^)]+)\)/)[1];
       entityType = entityType.match(/\[(.*?)\]/)[1];
 
+      return <div style={{ width: "100%", textAlign: "left", float: "left" }}>
+        <Link
+          component="button"
+          underline='none'
+          variant="subtitle1"
+          onClick={() => {
+            selectInstance(entityPath);
+            focusInstance(entityPath);
+          }}>
+          {entityType}
+        </Link>
+      </div>
+    },
+    source : entity => entity
+  },
+  {
+    id: "tags",
+    title: "Tags",
+    customComponent: component => {
       let tags = null;
       component.value._root.nodes.forEach( e=> e.nodes?.forEach( n=> { if ( n.entry?.[0] == "tags" ) { tags = n.entry?.[1] } }))
 
       const chips_cutoff = 3;
+      
       return <div style={{ width: "100%", textAlign: "left", float: "left", display: 'flex', gap: '.5rem' }}>
-        <div style={{ textAlign: "left", float: "left" }}>
-          <Link
-            component="button"
-            underline='none'
-            variant="subtitle1"
-            color="#428bca"
-            onClick={() => {
-              focusInstance(entityPath);
-            }}>
-            {entityType}
-          </Link>
-        </div>
-        <div style={{ textAlign: "left", float: "left", display: 'flex', gap: '.5rem' }}>
         {tags?.slice(0,chips_cutoff).map((tag, index) => {
           return (<Chip
             key={tag + index}
             style={{
-              lineHeight: '140%',
               fontSize: '0.625rem',
               alignSelf: 'center',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
-              height : 'auto',
               width : 'auto',
-              maxWidth: '5.9375rem',
+              height : '1.25rem',
+              padding: '0.1875rem 0.5rem',
               backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color,
-              color: facets_annotations_colors[tag]?.textColor || facets_annotations_colors?.default?.textColor
+              color: '#ffffff',
             }}
-            label={tag}
+            label={formatTagText(tag)}
           />)
         }
         )}
-        </div>
       </div>
     },
     source : entity => entity

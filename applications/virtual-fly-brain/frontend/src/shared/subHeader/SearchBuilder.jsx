@@ -13,11 +13,12 @@ import { QueriesSelection } from './QueriesSelection';
 import { ResultSelectionOptions } from './ResultSelectionOptions';
 import  { getResultsSOLR } from '../../components/configuration/SOLRclient'
 import { DatasourceTypes } from '@metacell/geppetto-meta-ui/search/datasources/datasources';
+import { facets_annotations_colors as colors_config } from "../../components/configuration/VFBColors";
 import { searchConfiguration, datasourceConfiguration } from '../../components/configuration/VFBSearchBuilder/searchConfiguration';
 import { getInstanceByID } from './../../reducers/actions/instances';
 import { addRecentSearch } from '../../reducers/actions/globals';
 import { useSelector, useDispatch } from 'react-redux'
-import { getQueries, deleteQuery, updateQueries } from '../../reducers/actions/queries';
+import { getQueries, deleteQuery, updateQueries, getQueriesFinished, getQueriesStarted} from '../../reducers/actions/queries';
 import { getUpdatedTags } from '../../utils/utils';
 import { debounce } from '@mui/material';
 
@@ -135,7 +136,6 @@ const Listbox = styled('div')(
 
 const searchResults = [];
 
-import { facets_annotations_colors as colors_config } from "../../components/configuration/VFBColors";
 const facets_annotations_colors = getUpdatedTags(colors_config)
 
 export default function SearchBuilder(props) {
@@ -166,6 +166,7 @@ export default function SearchBuilder(props) {
   };
 
   const checkResults = () => {
+    // getQueriesStarted();
     props.setBottomNav(2)
     setIsOpen(false)
     props.setFocused(false);

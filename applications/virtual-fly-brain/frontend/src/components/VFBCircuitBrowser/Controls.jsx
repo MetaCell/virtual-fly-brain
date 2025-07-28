@@ -187,9 +187,7 @@ const styles = theme => ({
 /**
  * Read configuration from circuitBrowserConfiguration
  */
-import { configuration } from '../configuration/VFBCircuitBrowser/circuitBrowserConfiguration';
-import { styling } from '../configuration/VFBCircuitBrowser/circuitBrowserConfiguration';
-import { Neo4jLabels } from '../configuration/VFBCircuitBrowser/circuitBrowserConfiguration';
+import { configuration, styling, Neo4jLabels } from '../configuration/VFBCircuitBrowser/circuitBrowserConfiguration.js';
 
 import { searchConfiguration } from '../configuration/SOLRclient';
 import { defaultDatasourceConfiguration } from '../configuration/SOLRclient';
@@ -563,7 +561,7 @@ class Controls extends Component {
           <div style={{ position: "absolute", width: "5vh", height: "100%", zIndex: 1, marginTop: "0.5rem" }}>
             <div style={{ cursor : "pointer", backgroundImage: `url(${styling.controlIcons.home})`, width: "1.25rem", height: "1.25rem" }} onClick={self.props.resetCamera }></div>
             <div style={{ cursor : "pointer", marginTop: "1rem", backgroundImage: `url(${styling.controlIcons.zoomIn})`, width: "1.25rem", height: "1.25rem" }} onClick={self.props.zoomIn }></div>
-            <div style={{ cursor : "pointer", marginTop : "5px", backgroundImage: `url(${styling.controlIcons.zoomOut})`, width: "1.25rem", height: "1.25rem" }} onClick={self.props.clear }></div>
+            <div style={{ cursor : "pointer", marginTop : "5px", backgroundImage: `url(${styling.controlIcons.zoomOut})`, width: "1.25rem", height: "1.25rem" }} onClick={self.props.zoomOut }></div>
           </div>
           { this.props.resultsAvailable()
             ? <ul className={classes.legend} id="circuitBrowserLegend">

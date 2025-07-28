@@ -3,4 +3,6 @@ const ribbonConfiguration = {
     rgbColor: [1, 191, 254]
 }
 
-export { ribbonConfiguration };
+export {
+    ribbonConfiguration
+}

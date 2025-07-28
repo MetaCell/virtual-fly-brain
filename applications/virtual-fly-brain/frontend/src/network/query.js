@@ -1,7 +1,9 @@
 import Resources from '@metacell/geppetto-meta-core/Resources';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export const get_term_info = async (queryId) => {
-  const url =`${import.meta.env.VITE_API_URL}/get_term_info?id=${queryId}`;
+  const url =`${API_URL}/get_term_info?id=${queryId}`;
   let response = await fetch(url)
   .then(response => {
     return response.json()
@@ -13,7 +15,7 @@ export const get_term_info = async (queryId) => {
 }
 
 export const get_queries = async (queryId) => {
-  const url =`${import.meta.env.VITE_API_URL}/get_term_info?id=${queryId}`;
+  const url =`${API_URL}/get_term_info?id=${queryId}`;
   let response = await fetch(url)
   .then(response => {
     return response.json()
@@ -25,7 +27,7 @@ export const get_queries = async (queryId) => {
 }
 
 export const get_query_results = async (id, queryType) => {
-  const url =`${import.meta.env.VITE_API_URL}/run_query?id=${id}&query_type=${queryType}`;
+  const url =`${API_URL}/run_query?id=${id}&query_type=${queryType}`;
   let response = await fetch(url)
   .then(response => {
     return response.json()
@@ -37,7 +39,7 @@ export const get_query_results = async (id, queryType) => {
 }
 
 export const get_instance = async (short_form) => {
-  const url =`${import.meta.env.VITE_API_URL}/get_term_info?id=${short_form}`;
+  const url =`${API_URL}/get_term_info?id=${short_form}`;
   let response = await fetch(url)
   .then(response => {
     return response.json()

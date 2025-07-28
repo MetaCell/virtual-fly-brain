@@ -83,4 +83,4 @@ const modelJson = {
   }
 };
 
-module.exports = { modelJson };
+export { modelJson };

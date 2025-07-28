@@ -1,5 +1,5 @@
-    import React from 'react';
-    import SortableTree, { toggleExpandedForAll, changeNodeAtPath, walk } from '@nosferatu500/react-sortable-tree';
+import React from 'react';
+import SortableTree, { toggleExpandedForAll, changeNodeAtPath, walk } from '@nosferatu500/react-sortable-tree';
 
     class Tree extends React.Component {
   

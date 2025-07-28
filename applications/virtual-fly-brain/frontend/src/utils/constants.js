@@ -36,10 +36,10 @@ export const COLOR_PALETTE = [
 ];
 
 // Index to track the current color in the palette
-let colorIndex = 0;
+// let colorIndex = 0;
 
 // Function to get the next color in the sequence
-export const getNextColor = (opacity = 0.3) => {
+export const getNextColor = (colorIndex = 0, opacity = 0.3) => {
   const hexColor = COLOR_PALETTE[colorIndex];
   // Increment and loop back to beginning if needed
   colorIndex = (colorIndex + 1) % COLOR_PALETTE.length;
@@ -49,7 +49,7 @@ export const getNextColor = (opacity = 0.3) => {
   const g = parseInt(hexColor.substring(4, 6), 16) / 255;
   const b = parseInt(hexColor.substring(6, 8), 16) / 255;
   
-  return { r, g, b, a: opacity };
+  return { r, g, b, a: 0.3 };
 }
 
 // Convert hex to RGBA for existing functions

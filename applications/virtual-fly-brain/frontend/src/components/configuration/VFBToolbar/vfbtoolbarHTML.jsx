@@ -358,4 +358,4 @@ var contribute
   + "   </div>"
   + "   </div>";
 
-module.exports = { about, feedback, contribute };
+export { about, feedback, contribute };

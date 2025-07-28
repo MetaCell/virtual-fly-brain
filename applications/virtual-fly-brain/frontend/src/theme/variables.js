@@ -45,7 +45,8 @@ const vars = {
   sliderRailBgColor: '#EEF9FF',
   dialogBgColor: 'rgba(58, 58, 58, 0.80)',
   dialogContentTextColor: 'rgba(255, 255, 255, 0.80)',
-  dialogBoxShadow: '0px 0px 80px 0px rgba(0, 0, 0, 0.60), 0px 4px 94px 0px rgba(0, 0, 0, 0.20)'
+  dialogBoxShadow: '0px 0px 80px 0px rgba(0, 0, 0, 0.60), 0px 4px 94px 0px rgba(0, 0, 0, 0.20)',
+  lightWhiteColor: 'rgba(255, 255, 255, 0.80)'
 };
 
 export default vars;

@@ -9,24 +9,13 @@ import { queryParser } from './VFBCircuitBrowser/QueryParser';
 import { connect } from "react-redux";
 import { makeStyles } from '@material-ui/core/styles';
 import { getInstanceByID } from '../reducers/actions/instances';
-
-const useStyles = makeStyles((theme) => ({
-  container: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '100vh', // Set the height to desired value
-  },
-}));
+import ReactResizeDetector from 'react-resize-detector'
 
 /**
  * Read configuration from circuitBrowserConfiguration
  */
 
-import { restPostConfig } from './configuration/VFBCircuitBrowser/circuitBrowserConfiguration';
-import { configuration } from './configuration/VFBCircuitBrowser/circuitBrowserConfiguration';
-import { locationCypherQuery } from './configuration/VFBCircuitBrowser/circuitBrowserConfiguration';
-import { styling } from './configuration/VFBCircuitBrowser/circuitBrowserConfiguration';
+import { restPostConfig, configuration, locationCypherQuery, styling } from './configuration/VFBCircuitBrowser/circuitBrowserConfiguration.js';
 
 /**
  * If no configuration is given for queries in graphConfiguration.js, we use this configuration.
@@ -57,7 +46,8 @@ class VFBCircuitBrowser extends Component {
       neurons : [{ id : "", label : "" } , { id : "", label : "" }],
       paths : Math.ceil((configuration.maxPaths - configuration.minPaths) / 2),
       weight : 0,
-      reload : false
+      reload : false,
+      dimensions : { width: 0, height: 0 },
     }
     this.updateGraph = this.updateGraph.bind(this);
     this.queryResults = this.queryResults.bind(this);
@@ -70,12 +60,14 @@ class VFBCircuitBrowser extends Component {
     this.updatePaths = this.updatePaths.bind(this);
     this.updateWeight = this.updateWeight.bind(this);
     this.resize = this.resize.bind(this);
+    this.handleResize = this.handleResize.bind(this);
     this.nodeRendering = this.nodeRendering.bind(this);
     
     this.highlightNodes = new Set();
     this.highlightLinks = new Set();
     this.hoverNode = null;
 
+    this.containerRef = React.createRef();
     this.graphRef = React.createRef();
     this.controlsRef = React.createRef();
     this.__isMounted = false;
@@ -92,11 +84,12 @@ class VFBCircuitBrowser extends Component {
     this.updateGraph(this.state.neurons , Math.ceil((configuration.maxPaths - configuration.minPaths) / 2), this.state.weight);
     const { circuitQuerySelected } = this.props;
     this.circuitQuerySelected = circuitQuerySelected;
+    window.addEventListener('resize', this.handleResize);
   }
 
   componentDidUpdate () {
     let self = this;
-    if ( this.props.visible && ( !this.focused || this.graphResized ) ) {
+    if ( ( !this.focused || this.graphResized ) ) {
       setTimeout( () => {
         self.resetCamera();
         self.focused = true;
@@ -104,6 +97,7 @@ class VFBCircuitBrowser extends Component {
       }, (self.objectsLoaded * 20));
     } else if ( !this.props.visible ) {
       this.focused = false;
+      this.graphRef?.current?.ggv?.current.zoomToFit();
     }
     
     if ( this.circuitQuerySelected !== this.props.circuitQuerySelected ) {
@@ -153,6 +147,15 @@ class VFBCircuitBrowser extends Component {
     this.graphResized = true;
     this.setState( { reload : !this.state.reload } );
   }
+
+  handleResize () {
+    if (this.containerRef.current && this.graphRef.current?.ggv?.current) {
+      const width = this.containerRef.current.offsetWidth
+      const height = this.containerRef.current.offsetHeight
+      this.setState({ dimensions: { width, height } });
+      this.graphRef.current.ggv.current.zoomToFit()
+    }
+  }
   
   zoomIn () {
     let zoom = this.graphRef.current.ggv.current.zoom();
@@ -166,10 +169,11 @@ class VFBCircuitBrowser extends Component {
   zoomOut () {
     let zoom = this.graphRef.current.ggv.current.zoom();
     let out = 1;
-    if (zoom < 2 ){
-      out = .2;
+    if (zoom <= 2){
+      out = 0.2;
     }
-    this.graphRef.current.ggv.current.zoom(zoom - out , 100);
+    const newZoom = Math.max(zoom - out, 0.2);
+    this.graphRef.current.ggv.current.zoom(newZoom , 100);
   }
   
   clearGraph () {
@@ -241,6 +245,12 @@ class VFBCircuitBrowser extends Component {
             self.resetCamera();
             if ( self.graphRef.current !== null ) {
               self.graphRef.current.ggv.current.d3Force('charge').strength(-(self.objectsLoaded * 100 ))
+              if (self.containerRef.current && self.graphRef.current?.ggv?.current) {
+                const width = self.containerRef.current.offsetWidth
+                const height = self.containerRef.current.offsetHeight
+                self.setState({ dimensions: { width, height } });
+                self.graphRef.current.ggv.current.zoomToFit()
+              }
             }
           }, (self.objectsLoaded * 20));
           break;
@@ -372,7 +382,7 @@ class VFBCircuitBrowser extends Component {
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
-      height: '100vh', // Set the height to desired value
+      height: '100%', // Set the height to desired value
     };
     
     // Detect when the first load of the Graph component happens
@@ -409,8 +419,12 @@ class VFBCircuitBrowser extends Component {
               key="controls"
             />
           </div>
-          : <GeppettoGraphVisualization
+          : 
+            <ReactResizeDetector onResize={this.handleResize} skipOnMount={true}>
+              <div ref={this.containerRef} style={{width: '100%', height: '100%'}}>
+            <GeppettoGraphVisualization
             id= { COMPONENT_ID }
+            dimensions={this.state.dimensions}
             // Graph data with Nodes and Links to populate
             data={this.state.graph}
             // Create the Graph as 2 Dimensional
@@ -570,7 +584,9 @@ class VFBCircuitBrowser extends Component {
               }
             }
             }
-          />
+            />
+          </div>
+        </ReactResizeDetector>
     )
   }
 }

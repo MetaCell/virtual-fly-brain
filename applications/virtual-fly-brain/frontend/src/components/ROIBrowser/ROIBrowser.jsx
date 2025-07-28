@@ -13,20 +13,20 @@ import vars from "../../theme/variables";
 import { useSelector, connect } from "react-redux";
 import { getInstanceByID, changeColor, hide3DMesh, show3DMesh } from '../../reducers/actions/instances';
 import theme from "../../theme/index";
-import { restPostConfig, treeCypherQuery } from "../../components/configuration/ROIBrowser/ROIBrowserConfiguration";
 import useClickOutside from "./../useClickOutside";
-import { 
-  isNumber, 
-  sortData, 
-  findRoot, 
-  convertEdges, 
-  convertNodes, 
-  searchChildren, 
-  defaultComparator, 
-  parseGraphResultData, 
-  buildDictClassToIndividual 
-} from "./helper";
 import { VisibilityOff, Eye } from "../../icons";
+import { restPostConfig, treeCypherQuery } from "../../components/configuration/ROIBrowser/ROIBrowserConfiguration";
+import { 
+    isNumber, 
+    sortData, 
+    findRoot, 
+    convertEdges, 
+    convertNodes, 
+    searchChildren, 
+    defaultComparator, 
+    parseGraphResultData, 
+    buildDictClassToIndividual 
+} from "./helper";
 
 const {
     secondaryBg,
@@ -453,7 +453,7 @@ const ROIBrowser = (props) => {
                                     <div> {rowInfo.node.description} </div>
                                     <div>
                                         <img
-                                            style={{ display: "block", textAlign: "center" }}
+                                            style={{ display: "block", textAlign: "center", width: "100%"}}
                                             src={
                                                 "https://VirtualFlyBrain.org/reports/" +
                                                 rowInfo.node.instanceId +

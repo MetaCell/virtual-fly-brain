@@ -2,7 +2,6 @@ import { getGlobalTypes } from "./actions/types/GlobalTypes";
 import { getInstancesTypes } from "./actions/types/getInstancesTypes";
 import {
   SELECTED_COLOR,
-  DESELECTED_COLOR,
   TEMPLATE_COLOR,
   SKELETON,
   CYLINDERS,
@@ -22,6 +21,9 @@ export const initialStateInstancesReducer = {
   error: false,
   errorMessage: undefined,
   cameraEvent: {},
+  selectedInstancesCount: 1,
+  loadingInstances: 0,
+  finishedLoadedInstances: 0,
 };
 
 const getMappedCanvasData = (loadedInstances) => {
@@ -61,9 +63,16 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         return Object.assign({}, state);
       }
     }
+    case getInstancesTypes.RESET_LOADING_STATE: {
+      return Object.assign({}, state, {
+        loadingInstances: 0,
+        finishedLoadedInstances: 0,
+      });
+    }
     case getInstancesTypes.GET_INSTANCES_STARTED: {
       return Object.assign({}, state, {
         isLoading: true,
+        loadingInstances: state.loadingInstances + 1,
       });
     }
     case getInstancesTypes.GET_INSTANCES_SUCCESS: {
@@ -74,7 +83,8 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         newInstance.userSetColor = TEMPLATE_COLOR;
         newInstance.stackInstance = true;
       } else {
-        newInstance.color = DESELECTED_COLOR;
+        newInstance.color = getNextColor(state.selectedInstancesCount);
+        newInstance.colorIndex = state.selectedInstancesCount;
       }
 
       let launchTemplate = state.launchTemplate;
@@ -104,7 +114,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         focused.color = SELECTED_COLOR;
         loadedInstances?.forEach((i) => {
           if (i.metadata?.Id !== focused.metadata?.Id) {
-            i.color = i.userSetColor || DESELECTED_COLOR;
+            i.color = i.userSetColor || getNextColor(i.colorIndex || 0);
             i.selected = false;
           }
         });
@@ -114,6 +124,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         allLoadedInstances: loadedInstances,
         launchTemplate: launchTemplate,
         focusedInstance: focused,
+        selectedInstancesCount: newInstance.metadata?.IsTemplate ? state.selectedInstancesCount : state.selectedInstancesCount + 1,
         event: {
           action: getInstancesTypes.ADD_INSTANCE,
           id: response.payload.Id,
@@ -122,12 +133,14 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         isLoading: false,
         error: false,
         errorMessage: undefined,
+        finishedLoadedInstances: state.finishedLoadedInstances + 1,
       });
     }
     case getInstancesTypes.GET_INSTANCES_FAILURE: {
       return Object.assign({}, state, {
         error: true,
         errorMessage: response.payload.error,
+        finishedLoadedInstances: state.finishedLoadedInstances + 1,
       });
     }
     case getInstancesTypes.REMOVE_INSTANCES_SUCCESS: {
@@ -324,6 +337,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       });
     }
     case getInstancesTypes.SELECT_INSTANCE: {
+      const selectedInstancesCount = state.selectedInstancesCount;
       const allLoadedInstances = [...state.allLoadedInstances];
       const findInstance = allLoadedInstances?.find(
         (i) => i.metadata?.Id === response.payload.id
@@ -334,12 +348,12 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
           findInstance.color = SELECTED_COLOR;
           allLoadedInstances?.forEach((i) => {
             if (i.metadata?.Id !== findInstance.metadata?.Id) {
-              i.color = i.userSetColor || DESELECTED_COLOR;
+              i.color = i.userSetColor || getNextColor(i.colorIndex);
               i.selected = false;
             }
           });
         } else {
-          findInstance.color = findInstance.userSetColor || DESELECTED_COLOR;
+          findInstance.color = findInstance.userSetColor || getNextColor(findInstance.colorIndex);
         }
       }
 
@@ -351,14 +365,19 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         matchObject.selected = !matchObject.selected;
         if (matchObject.selected) matchObject.color = SELECTED_COLOR;
         else {
-          matchObject.color = DESELECTED_COLOR;
+          const instance = allLoadedInstances.find(i => i.metadata?.Id === response.payload.id);
+          matchObject.color = getNextColor(instance?.colorIndex);
         }
       }
+
+      // Only increment the counter if we're selecting a new instance
+      const newCount = findInstance && !findInstance.selected ? selectedInstancesCount + 1 : selectedInstancesCount;
 
       return Object.assign({}, state, {
         allLoadedInstances: allLoadedInstances,
         threeDObjects: threeDObjects,
         mappedCanvasData: getMappedCanvasData(allLoadedInstances),
+        selectedInstancesCount: newCount,
         event: {
           action: getInstancesTypes.UPDATE_INSTANCES,
           id: response.payload.id,
@@ -569,9 +588,9 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       }
 
       const threeDObjects = [...state.threeDObjects];
-      const matchObject = threeDObjects.forEach((o) =>
+      const matchObject = threeDObjects.find((o) =>
         o.name.includes(response.payload.id)
-          ? (matchObject.visible = true)
+          ? (o.visible = true)
           : null
       );
       if (matchObject) {
@@ -650,7 +669,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
           newInstance.color = { ...TEMPLATE_COLOR, a: 0.4 };
         } else {
           // For other instances, use next color from palette with opacity 0.3
-          newInstance.color = getNextColor(0.3);
+          newInstance.color = getNextColor(0, 0.3);
           // Store original color with full opacity for potential skeleton use
           newInstance.fullOpacityColor = { ...newInstance.color, a: 1.0 };
         }

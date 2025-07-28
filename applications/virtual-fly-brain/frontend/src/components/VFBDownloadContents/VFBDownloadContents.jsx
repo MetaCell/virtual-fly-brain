@@ -13,7 +13,7 @@ import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { Checkbox, Divider, IconButton } from "@material-ui/core";
 import Box from "@material-ui/core/Box";
-import configuration from "../../components/configuration/VFBDownloadContents/configuration.json";
+import configuration from "../../components/configuration/VFBDownloadContents/configuration";
 import { MuiThemeProvider } from "@material-ui/core/styles";
 import axios from "axios";
 import { withStyles } from "@material-ui/styles";

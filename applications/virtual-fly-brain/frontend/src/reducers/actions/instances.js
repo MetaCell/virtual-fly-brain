@@ -177,32 +177,45 @@ const templateLoadedMessage = (id, openTemplate) => ({
   }
 });
 
+export const resetLoadingState = () => ({
+  type: getInstancesTypes.RESET_LOADING_STATE
+});
+
 export const triggerInstanceFailure = (error) => {
   store.dispatch(getInstancesFailure(error));
   return;
 }
 
 export const getInstanceByID = async (queryId, get3DMesh, focus, select, stackInstance) => {
-  store.dispatch(getInstancesStarted())
-  let response
   try {
-    response = await get_instance(queryId);
+    let response
+    const found = store.getState().instances.allLoadedInstances.find(
+      (instance) => instance.metadata?.Id === queryId
+    );
+    if (!found) {
+      store.dispatch(getInstancesStarted())
+      response = await get_instance(queryId);
+      if ( response === undefined || response === null ) {
+        store.dispatch(getInstancesFailure("ID not found : " + queryId))
+        return
+      }
+      const _get3DMesh = response?.IsIndividual ? true : false;
+      const _stackInstance = response?.IsIndividual ? true : false;
+      const _focus = focus !== undefined ? focus : true;
+      const _select = select !== undefined ? select : true;
+      store.dispatch(getInstancesSuccess(response, _get3DMesh, _focus, _select , _stackInstance))
+    } else {
+      if (focus) {
+        store.dispatch(focusInstanceMessage(queryId));
+      }
+      if (select) {
+        store.dispatch(selectInstanceMessage(queryId));
+      }
+    }
   } catch (error) {
     store.dispatch(getInstancesFailure(error.message))
     return
   }
-
-  if ( response === undefined || response === null ) {
-    store.dispatch(getInstancesFailure("ID not found : " + queryId))
-    return
-  }
-
-  const _get3DMesh = response?.isIndividual ? true : false;
-  const _stackInstance = response?.isIndividual ? true : false;
-  const _focus = focus !== undefined ? focus : true;
-  const _select = select !== undefined ? select : true;
-
-  store.dispatch(getInstancesSuccess(response, _get3DMesh, _focus, _select , _stackInstance))
 }
 
 export const get3DMesh = async (instance) => {
@@ -243,7 +256,16 @@ export const removeAllInstances = async () => {
 }
 
 export const selectInstance = async (id) => {
-  store.dispatch(selectInstanceMessage(id))
+  const state = store.getState();
+  const instanceExists = state.instances.allLoadedInstances?.find(
+    (i) => i.metadata?.Id === id
+  );
+  
+  if (instanceExists) {
+    store.dispatch(selectInstanceMessage(id));
+  } else {
+    await getInstanceByID(id, false, false, true, false);
+  }
 }
 
 export const add3DSkeleton = async (skeleton,mode, id) => {
@@ -291,7 +313,16 @@ export const changeColor = async (id, color) => {
 }
 
 export const focusInstance = async (id) => {
-  store.dispatch(focusInstanceMessage(id))
+  const state = store.getState();
+  const instanceExists = state.instances.allLoadedInstances?.find(
+    (i) => i.metadata?.Id === id
+  );
+  
+  if (instanceExists) {
+    store.dispatch(focusInstanceMessage(id));
+  } else {
+    await getInstanceByID(id, false, true, false, false);
+  }
 }
 
 export const zoomToInstance = async (id) => {

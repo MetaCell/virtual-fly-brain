@@ -26,9 +26,10 @@ const updateQuerySuccess = queries => ({
 });
 
 
-const getQueriesStarted = () => ({
+const _getQueriesStarted = () => ({
   type: getQueriesTypes.GET_QUERIES_STARTED
 });
+
 
 export const getQueriesFailure = ( error, id) => ({
   type: getQueriesTypes.GET_QUERIES_FAILURE,
@@ -40,7 +41,7 @@ export const getQueriesFailure = ( error, id) => ({
 
 export const getQueries = async (short_form, type) => {
 
-  store.dispatch(getQueriesStarted())
+  store.dispatch(_getQueriesStarted())
   let response;
   try {
     response = await get_query_results(short_form, type);
@@ -57,4 +58,13 @@ export const deleteQuery = async (instance) => {
 
 export const updateQueries = async (instance) => {
   store.dispatch(updateQuerySuccess(instance))
+}
+
+export const getQueriesStarted = () => {
+  store.dispatch(_getQueriesStarted())
+}
+
+export const getQueriesFinished = () => {
+  // This function may be used to dispatch a finished action
+  // Currently no implementation needed as the success/failure actions handle completion
 }

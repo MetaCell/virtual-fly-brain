@@ -122,7 +122,7 @@ var restPostConfig = {
   contentType: "application/json"
 };
 
-export { 
+export {
   configuration,
   styling,
   restPostConfig,

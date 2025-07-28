@@ -13,7 +13,7 @@ import ReplayIcon from '@material-ui/icons/Replay';
 import { MuiThemeProvider } from "@material-ui/core/styles";
 import { withStyles } from "@material-ui/styles";
 import axios from "axios";
-import configuration from "../../components/configuration/VFBUploader/configuration.json";
+import configuration from "../../components/configuration/VFBUploader/configuration";
 import { DropzoneArea } from "material-ui-dropzone";
 import UploadIcon from "../../components/configuration/VFBUploader/upload-icon.png";
 import { nanoid } from 'nanoid';

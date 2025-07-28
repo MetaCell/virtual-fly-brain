@@ -9,19 +9,19 @@ import VFBUploader from "./VFBUploader/VFBUploader";
 import { useDispatch, useSelector, useStore } from 'react-redux';
 import { widgets } from "./layout/widgets";
 import VFBDownloadContents from "./VFBDownloadContents/VFBDownloadContents";
-import { setWidgets } from '@metacell/geppetto-meta-client/common/layout/actions';
-import { setTermInfoOpened, setQueryComponentOpened } from './../reducers/actions/globals'
+import { setWidgets, updateWidget } from '@metacell/geppetto-meta-client/common/layout/actions';
+import { setTermInfoOpened } from './../reducers/actions/globals'
 import { getLayoutManagerInstance } from "@metacell/geppetto-meta-client/common/layout/LayoutManager";
-import { templateLoaded,  removeAllInstances, getInstanceByID } from './../reducers/actions/instances';
+import { WidgetStatus } from "@metacell/geppetto-meta-client/common/layout/model";
+import { templateLoaded,  removeAllInstances } from './../reducers/actions/instances';
 import { Box, Button,Modal, useMediaQuery, useTheme, Typography, CircularProgress, Link } from "@mui/material";
 import { activateCircuits, activateImages } from "../reducers/actions/layout";
+import { widgetsIDs } from "./layout/widgets";
 
 const {
   secondaryBg,
   headerBorderColor,
   tabActiveColor,
-  primaryBg,
-  secondaryBtnColor
 } = vars;
 
 const tabsArr = [
@@ -93,8 +93,16 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
   }, [queryComponentOpened]);
 
   useEffect( () => {
-    if ( bottomNav === 2 ){
-      //dispatch(setQueryComponentOpened(true));
+    if ( bottomNav === 3 ){
+      const layoutManager = getLayoutManagerInstance();
+      if (!layoutManager.model.getNodeById("listViewerWidget").isVisible()) {
+        const newWidget = { ...widgets[widgetsIDs.listViewerWidgetID] }
+        newWidget.defaultPanel = layoutManager.model.getRoot().getModel().getActiveTabset().getId();
+        newWidget.panelName = layoutManager.model.getRoot().getModel().getActiveTabset().getId();
+        newWidget.status = WidgetStatus.ACTIVE;
+        dispatch(updateWidget(newWidget));
+      }
+      setBottomNav(undefined)
     }
   }, [bottomNav]);
 
@@ -222,14 +230,37 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
       >
         <Box sx={classes.modalStyle}>
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            Template Alignation
+            ID not aligned
           </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+          <Typography id="modal-modal-description" sx={{ mt: 2, mb: 3 }}>
             The image you requested is aligned to another template. Click Okay
             to open in a new tab or Cancel to just view the image metadata.
           </Typography>
-          <Button variant="contained" color={"primary"} onClick={() => handleModalClose(misalignedTemplate, true )} target="_blank" href={window.location.origin + "/?id=" + misalignedTemplate}>Okay</Button>
-          <Button variant="outlined" color={"secondary"} onClick={() => handleModalClose(misalignedTemplate, false )}>Cancel</Button>
+          <Box sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            position: 'absolute',
+            bottom: 16,
+            left: 16,
+            right: 16
+          }}>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => handleModalClose(misalignedTemplate, false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => handleModalClose(misalignedTemplate, true)}
+              target="_blank"
+              href={window.location.origin + "/?id=" + misalignedTemplate}
+            >
+              Okay
+            </Button>
+          </Box>
         </Box>
       </Modal>
       <Box

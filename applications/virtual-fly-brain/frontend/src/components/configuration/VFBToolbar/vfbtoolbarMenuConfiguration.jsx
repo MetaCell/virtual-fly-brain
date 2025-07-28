@@ -1,5 +1,4 @@
 import React from 'react';
-import { useDispatch, useSelector } from "react-redux";
 import vars from "../../../theme/variables";
 import { widgets } from "../../layout/widgets";
 const { primaryFont, whiteColor, tabActiveColor, primaryBg } = vars;
@@ -68,7 +67,7 @@ export const toolbarMenu = (autoSaveLayout) => { return {
       standard: {
         top: '0.0625rem',
         backgroundColor: primaryBg,
-        borderRadius: '0 20px 24px -4px rgba(16, 24, 40, 0.08), 0 8px 8px -4px rgba(16, 24, 40, 0.03)',
+        // borderRadius: '0 20px 24px -4px rgba(16, 24, 40, 0.08), 0 8px 8px -4px rgba(16, 24, 40, 0.03)',
         borderRadius: '0.125rem',
         color: whiteColor,
         fontSize: '0.875rem',
@@ -79,7 +78,7 @@ export const toolbarMenu = (autoSaveLayout) => { return {
       hover: {
         top: '0.0625rem',
         backgroundColor: primaryBg,
-        borderRadius: '0 20px 24px -4px rgba(16, 24, 40, 0.08), 0 8px 8px -4px rgba(16, 24, 40, 0.03)',
+        // borderRadius: '0 20px 24px -4px rgba(16, 24, 40, 0.08), 0 8px 8px -4px rgba(16, 24, 40, 0.03)',
         borderRadius: '0.125rem',
         color: whiteColor,
         fontSize: '0.875rem',

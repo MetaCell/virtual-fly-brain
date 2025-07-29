@@ -149,15 +149,6 @@ theme = createTheme({
         .customIconFlexLayout:hover {
           color: #c0c0c0;
         }
-        .flexlayout__tab_toolbar_button-min:before {
-          content: "";
-        }
-        .flexlayout__tab_toolbar_button-max:before {
-          content: "";
-        }
-        .flexlayout__tab_button_trailing:before {
-          content: "";
-        }
         .flexlayout__splitter {
           background: transparent;
         }

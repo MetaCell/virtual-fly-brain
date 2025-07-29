@@ -17,7 +17,7 @@ import layout3 from "../../components/layout/layout3";
 import { WidgetStatus } from "@metacell/geppetto-meta-client/common/layout/model";
 import { getLayoutManagerInstance } from "@metacell/geppetto-meta-client/common/layout/LayoutManager";
 
-const { primaryBg, headerBoxShadow, headerBorderColor } = vars;
+const { primaryBg, headerBoxShadow } = vars;
 
 const Header = ({setBottomNav}) => {
   const classes = {
@@ -65,13 +65,33 @@ const Header = ({setBottomNav}) => {
   /**
    * Handler function triggered when a Menu item is clicked.
    */
-  const menuHandler = (action, component) => {
+  const menuHandler = (action, _component) => {
     switch (action.handlerAction){
       case ACTIONS.SHOW_WIDGET: {
         const newWidget = { ...widgets[action.parameters[0]] }
         const layoutManager = getLayoutManagerInstance();
-        newWidget.defaultPanel = layoutManager.model.getRoot().getModel().getActiveTabset().getId();
-        newWidget.panelName = layoutManager.model.getRoot().getModel().getActiveTabset().getId();
+        const activeTabset = layoutManager.model.getRoot().getModel().getActiveTabset();
+        if (activeTabset) {
+          newWidget.defaultPanel = layoutManager.model.getRoot().getModel().getActiveTabset().getId();
+          newWidget.panelName = layoutManager.model.getRoot().getModel().getActiveTabset().getId();
+        } else {
+          // dig from the root children, check the type, if tabset, then set the default panel, if not then get the children of the child and continue until you find a tabset.
+          // if a tabset is not found, then raise an error
+          let root = layoutManager.model.getRoot();
+          let tabset = undefined;
+          while (!tabset) {
+            tabset = root.getChildren().find(child => child.getType() === 'tabset');
+            if (!tabset) {
+              root = root.getChildren()[0];
+            }
+          }
+          if (tabset) {
+            newWidget.defaultPanel = tabset.getId();
+            newWidget.panelName = tabset.getId();
+          } else {
+            console.error('No tabset found in the root children');
+          }
+        }
         newWidget.status = WidgetStatus.ACTIVE;
         dispatch(updateWidget(newWidget));
         break;
@@ -84,7 +104,7 @@ const Header = ({setBottomNav}) => {
         break;
       }
       case ACTIONS.OPEN_NEW_TAB:
-        action.parameters.map((item, index) => {
+        action.parameters.map((item, _index) => {
           window.open(item, '_blank');
         })
         break;

@@ -1,9 +1,9 @@
-import { getInstancesTypes } from '../actions/types/getInstancesTypes';
-import { getQueriesTypes } from '../actions/types/getQueriesTypes';
-import { getInstanceByID, get3DMesh, triggerInstanceFailure } from '../actions/instances';
-import { getQueries, getQueriesFailure } from '../actions/queries';
 import { addRecentSearch } from '../actions/globals';
-import { setQueryComponentOpened, setFirstIDLoaded, setAlignTemplates, setTemplateID } from '../actions/globals';
+import { getQueriesFailure } from '../actions/queries';
+import { getQueriesTypes } from '../actions/types/getQueriesTypes';
+import { getInstancesTypes } from '../actions/types/getInstancesTypes';
+import { setFirstIDLoaded, setAlignTemplates, setTemplateID } from '../actions/globals';
+import { getInstanceByID, get3DMesh, triggerInstanceFailure } from '../actions/instances';
 import * as GeppettoActions from '@metacell/geppetto-meta-client/common/actions';
 
 function updateUrlParameterWithCurrentUrl(param, value, reset) {
@@ -105,6 +105,14 @@ export const urlUpdaterMiddleware = store => next => (action) => {
   }
 
   switch (action.type) {
+    case getInstancesTypes.REMOVE_ALL_INSTANCES_SUCCESS: {
+      // If all instances are removed, reset the URL parameters
+      const urlObj = new URL(window.location.href);
+      urlObj.searchParams.delete('i');
+      urlObj.searchParams.delete('id');
+      window.history.replaceState(null, '', urlObj.toString());
+      break;
+    }
     case getInstancesTypes.GET_INSTANCES_SUCCESS : {
       const IsTemplate = action.payload?.IsTemplate || false;
       const isClass = action.payload?.IsClass || false;

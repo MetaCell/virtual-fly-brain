@@ -2,30 +2,17 @@ import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
-  Checkbox,
-  FormControlLabel,
-  FormGroup,
-  IconButton,
-  Popper,
   Typography,
   CircularProgress,
 } from "@mui/material";
 import {
   AngleLeft,
-  CheckBoxDefault,
-  CheckBoxGreen,
-  CheckBoxRed,
-  CleaningServices,
   ClearAll,
-  Close,
   Download,
-  Filter,
   History,
   Layers,
   Query,
   Search,
-  Tick,
-  Undo,
   Upload,
 } from "../../icons";
 import vars from "../../theme/variables";
@@ -77,7 +64,6 @@ const {
   shortcutBg,
   blackColor,
   bottomNavBg,
-  outlinedBtnTextColor,
   headerBorderColor,
   lightWhiteColor,
 } = vars;
@@ -85,8 +71,6 @@ const {
 const SubHeader = ({ setBottomNav, bottomNav }) => {
   const [focused, setFocused] = useState(false);
   const [filterOpened, setFilterOpened] = useState(false);
-  const [handleFocused, setHandleFocused] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null);
   const [selectedFilters, setSelectedFilters] = useState({});
 
   const isLoading = useSelector((state) => state.instances.isLoading);

@@ -1,6 +1,6 @@
 // import './App.css';
+import React from 'react';
 import Main from './components/Main'
-import React, { useEffect, useState } from 'react';
 
 const App = () => {
   return (

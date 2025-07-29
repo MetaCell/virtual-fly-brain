@@ -31,10 +31,6 @@ const get3DOBJSuccess = query => ({
   }
 });
 
-const get3DOBJStarted = () => ({
-  type: getInstancesTypes.GET_3D_OBJ_TYPE_STARTED
-});
-
 const get3DOBJFailure = error => ({
   type: getInstancesTypes.GET_3D_OBJ_TYPE_FAILURE,
   payload: {
@@ -58,13 +54,6 @@ const selectInstanceMessage = id => ({
   type: getInstancesTypes.SELECT_INSTANCE,
   payload: {
     id
-  }
-});
-
-const augmentedInstances = instancesList => ({
-  type: getInstancesTypes.AUGMENTED_INSTANCES,
-  payload: {
-    instancesList
   }
 });
 
@@ -186,7 +175,8 @@ export const triggerInstanceFailure = (error) => {
   return;
 }
 
-export const getInstanceByID = async (queryId, get3DMesh, focus, select, stackInstance) => {
+// eslint-disable-next-line no-unused-vars
+export const getInstanceByID = async (queryId, get3DMesh, focus, select, _stackInstance) => {
   try {
     let response
     const found = store.getState().instances.allLoadedInstances.find(
@@ -231,7 +221,7 @@ export const get3DMesh = async (instance) => {
   }
 
   if ( mesh_response === undefined ) {
-    store.dispatch(get3DOBJFailure("ID not found : " + queryId))
+    store.dispatch(get3DOBJFailure("ID not found : " + instance))
     return
   }
   store.dispatch(get3DOBJSuccess(mesh_response))

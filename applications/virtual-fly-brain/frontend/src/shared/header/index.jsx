@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
 import vars from '../../theme/variables';
 import MediaQuery from 'react-responsive';
@@ -8,7 +9,7 @@ import { History, Logo, Menu as MenuIcon, QueryStats } from "../../icons";
 import { getQueries, updateQueries } from '../../reducers/actions/queries';
 import { loadCustomLayout, saveCustomLayout } from "../../reducers/actions/layout";
 import { updateWidget } from "@metacell/geppetto-meta-client/common/layout/actions";
-import { selectInstance, focusInstance, getInstanceByID } from '../../reducers/actions/instances';
+import { selectInstance, focusInstance, getInstanceByID, triggerInstanceFailure } from '../../reducers/actions/instances';
 import { toolbarMenu } from "../../components/configuration/VFBToolbar/vfbtoolbarMenuConfiguration";
 import { setTermInfoOpened } from "../../reducers/actions/globals";
 import layout1 from "../../components/layout/layout1";
@@ -155,7 +156,7 @@ const Header = ({setBottomNav}) => {
       }
       case ACTIONS.LOAD_LAYOUT:{
         if (!firstIdLoaded) {
-          store.dispatch(getInstancesFailure('No instance loaded, wait please ...'));
+          dispatch(triggerInstanceFailure('No instance loaded, wait please ...'));
           break;
         }
         switch (action.parameters[0]){

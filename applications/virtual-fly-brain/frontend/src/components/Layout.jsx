@@ -42,8 +42,8 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
   const misalignedTemplate = useSelector(state => state.globalInfo.misalignedTemplate)
   const alignedTemplates = useSelector( state => state.globalInfo.alignedTemplates)
   const dispatch = useDispatch();
-  let templateRef = window.location.origin + "?id=" + misalignedTemplate;
   const store = useStore();
+  let _templateRef = window.location.origin + "?id=" + misalignedTemplate;
 
   //global reducers errors
   const instancesError = useSelector(state => state.instances.error);
@@ -171,7 +171,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
   const handleModalClose = (id, openTemplate) => {
     if ( openTemplate) {
       templateLoaded(id, openTemplate);
-      templateRef = window.location.href.replace(id + ",", "")
+      _templateRef = window.location.href.replace(id + ",", "")
     }
     setModalOpen(false)
   }

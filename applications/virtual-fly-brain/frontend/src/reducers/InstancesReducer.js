@@ -618,7 +618,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
     case getGlobalTypes.SHOW_SLICE_DISPLAY: {
       let objectFound = null;
       for (let child of state.threeDObjects) {
-        if (params.id === child.material?.name) {
+        if (child.material?.name) {
           objectFound = true;
           break;
         }

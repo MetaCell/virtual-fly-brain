@@ -56,6 +56,7 @@ class ThreeDCanvas extends Component {
       threeDObjects: [],
       canvasWidth: 0,
       canvasHeight: 0,
+      trigger: undefined,
     };
     this.canvasRef = React.createRef();
   }
@@ -82,7 +83,10 @@ class ThreeDCanvas extends Component {
         // TOOD : Geppetto-meta bug opened to handle this. Once it's close, this can be removed.
         case getGlobalTypes.CAMERA_EVENT: {
           // Force Canvas re-render after a camera event
-          this.forceUpdate();
+          setTimeout(() => {
+            this.canvasRef.current?.threeDEngine?.updateVisibleChildren();
+            this.forceUpdate();
+          }, 100);
           break;
         }
         case getInstancesTypes.UPDATE_SKELETON:
@@ -93,6 +97,15 @@ class ThreeDCanvas extends Component {
             this.props.event.visible,
             this.props.threeDObjects
           );
+          this.canvasRef.current?.threeDEngine?.updateVisibleChildren();
+          break;
+        case getInstancesTypes.GET_3D_OBJ_TYPE_SUCCESS:
+        case getInstancesTypes.UPDATE_INSTANCES:
+          // Called to update the 3D objects in the canvas
+          setTimeout(() => {
+            this.canvasRef.current?.threeDEngine?.updateVisibleChildren();
+            this.forceUpdate();
+          }, 250);
           break;
         default:
       }

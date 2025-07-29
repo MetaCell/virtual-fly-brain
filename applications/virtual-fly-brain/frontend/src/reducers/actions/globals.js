@@ -19,7 +19,7 @@ export const removeRecentSearch = (id, isQuery) => ({
   }
 })
 
-export const removeAllRecentSearch = (id, isQuery) => ({
+export const removeAllRecentSearch = () => ({
   type: getGlobalTypes.REMOVE_ALL_RECENT_SEARCH,
   payload : {}
 })

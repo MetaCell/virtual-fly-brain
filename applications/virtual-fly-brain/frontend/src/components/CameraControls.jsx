@@ -1,6 +1,7 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { useState } from 'react';
 import { Box, IconButton, Tooltip } from '@mui/material';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import {
   KeyboardArrowLeft,
   KeyboardArrowUp,
@@ -44,24 +45,21 @@ export const cameraControlsRotateState = {
 const CameraControls = (props) => {
   const {
     cameraControlsHandler,
-    viewerId,
     canvasHeight,
     canvasWidth
   } = props;
-  
+
   const dispatch = useDispatch();
   const [showControls, setShowControls] = useState(false);
   const isSmallViewport = canvasWidth < 300 || canvasHeight < 300;
 
-  const widget = useSelector((state) => state.widgets[viewerId]);
-
   const handleClick = (event, value) => {
     cameraControlsHandler(value?.action);
-    if ( value?.action === cameraControlAction.WIREFRAME ){
+    if ( value?.action === cameraControlsActions.WIREFRAME ){
       dispatch(cameraControlAction(value?.action))
     }
   };
-  
+
   const iconButton = (label, action, IconComponent, sx = {}) => {
     return (
       <Tooltip title={label} placement="top">
@@ -73,7 +71,7 @@ const CameraControls = (props) => {
       </Tooltip>
     );
   };
-  
+
 
   const rotateIcon = (transform) => (
     <ReplayOutlined sx={{ transform }} fontSize="small" />

@@ -1,6 +1,5 @@
 import React from 'react';
-import vars from "../theme/variables";
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useCallback, useRef } from 'react';
 import {useSelector, useDispatch} from 'react-redux'
 import StackViewerComponent from './StackViewerComponent';
 import Resources from '@metacell/geppetto-meta-core/Resources';
@@ -11,13 +10,10 @@ let StackComponent = null;
 
 const VFBStackViewer = (props) => {
   const data = useSelector(state => state.instances.allLoadedInstances);
+  const templateID = useSelector(state => state.globalInfo.templateID);
   const dispatch = useDispatch();
   
-  let config = {
-    serverUrl: 'http://www.virtualflybrain.org/fcgi/wlziipsrv.fcgi',
-    templateId: 'NOTSET'
-  };
-  let voxelSize = { x:0.622088, y:0.622088, z:0.622088 };
+  const voxelSizeRef = useRef({ x:0.622088, y:0.622088, z:0.622088 });
 
   if ( StackComponent == null ){
     StackComponent = StackViewerComponent()
@@ -27,45 +23,30 @@ const VFBStackViewer = (props) => {
     id: props.id, height: props.size?.height, width: props.size?.width, instances: [], selected: []
   });
 
-  const addSlices = (instances) => {
-    let added = undefined;
-    let curr = stackData.instances.length;
-    let data = stackData;
-    if (instances.length == undefined) {
-      added = [instances];
-      if (instances?.parent) {
-        // FIXME
-        // this.props.vfbIdLoaded(instances.parent.getId(), "StackViewer");
-        if (instances.parent.getId() == templateID){
-          data.instances.unshift(instances);
+  const addSlices = useCallback((instances) => {
+    setStackData(prevData => {
+      let newData = {...prevData};
+      if (instances.length == undefined) {
+        if (instances?.parent) {
+          // FIXME
+          // this.props.vfbIdLoaded(instances.parent.getId(), "StackViewer");
+          if (instances.parent.getId() == templateID){
+            newData.instances.unshift(instances);
+          } else {
+            newData.instances[newData.instances.length] = instances;
+          }
         } else {
-          data.instances[data.instances.length] = instances;
+          // FIXME
+          window.test = instances;
         }
       } else {
-        // FIXME
-        window.test = instances;
+        newData.instances = instances;
       }
-    } else {
-      added = instances;
-      data.instances = instances;
-    }
-    setStackData(data);
-  }
+      return newData;
+    });
+  }, [templateID]);
 
-  const updateStackWidget = () => {
-    addSlices(getSliceInstances());
-  }
-
-  const showSliceDisplayControl = (data) => {
-    dispatch(showSliceDisplay(data))
-  }
-
-  const modifySliceDisplayControl = (data) => {
-    dispatch(modifySliceDisplay(data))
-  }
-
-  // stack widget helper methods
-  const getSliceInstances = () => {
+  const getSliceInstances = useCallback(() => {
     // FIXME
     let instances = stackData.instances;
     let potentialInstances = instances;
@@ -89,8 +70,20 @@ const VFBStackViewer = (props) => {
     } else {
       return sliceInstances
     }
-  }
-  
+  }, [stackData.instances, templateID]);
+
+  const updateStackWidget = useCallback(() => {
+    addSlices(getSliceInstances());
+  }, [addSlices, getSliceInstances]);
+
+  const showSliceDisplayControl = useCallback((data) => {
+    dispatch(showSliceDisplay(data))
+  }, [dispatch]);
+
+  const modifySliceDisplayControl = useCallback((data) => {
+    dispatch(modifySliceDisplay(data))
+  }, [dispatch]);
+
   // FIXME
   useEffect(() => {
     const instances = [];
@@ -134,63 +127,64 @@ const VFBStackViewer = (props) => {
         }
       }
     });
-    const newData = {
-      ...stackData,
+    setStackData(prevData => ({
+      ...prevData,
       id: "VFB",
       height: props.size.height,
       width: props.size.width,
       instances: instances,
-    };
-    setStackData(newData);
-  }, [data]);
+    }));
+  }, [data, props.size.height, props.size.width]);
 
   // Update height and width of the stackwidget, happens when flex layout resizes tabs
   useEffect( () => {
     if (stackData?.height !== props?.size?.height || stackData?.width !== props?.size?.width) {
-      let newData = stackData;
-      newData.height = props.size?.height;
-      newData.width = props.size?.width;
-      setStackData(newData);
+      setStackData(prevData => ({
+        ...prevData,
+        height: props.size?.height,
+        width: props.size?.width,
+      }));
       updateStackWidget();
     }
-  }, [props?.size?.height, props?.size?.width])
+  }, [props?.size?.height, props?.size?.width, stackData?.height, stackData?.width, updateStackWidget])
 
 
   // Update config and voxel size before re-rendering
-  useMemo(() => {
+  const config = useMemo(() => {
+    let result = {
+      serverUrl: 'http://www.virtualflybrain.org/fcgi/wlziipsrv.fcgi',
+      templateId: 'NOTSET'
+    };
+    
     data?.forEach( stackViewerData => {
-    if (stackViewerData?.metadata?.IsTemplate) {
-      let keys = Object.keys(stackViewerData.metadata?.Images);
-      config = stackViewerData.metadata?.Images[keys[0]]?.[0];
-      config.serverUrl = 'http://www.virtualflybrain.org/fcgi/wlziipsrv.fcgi';
-      if ( stackViewerData?.metadata?.Domains ){
-        keys = Object.keys(stackViewerData?.metadata?.Domains);
-      }
-      let ids = [parseInt(keys[keys?.length - 1]) + 1], labels = [parseInt(keys[keys?.length - 1]) + 1], classID = [parseInt(keys[keys?.length - 1]) + 1]; 
-      keys?.forEach( key => {
-        ids[parseInt(key)] = (stackViewerData?.metadata?.Domains?.[key]?.id);
-        labels[parseInt(key)] = (stackViewerData?.metadata?.Domains?.[key]?.type_label);
-        classID[parseInt(key)] = (stackViewerData?.metadata?.Domains?.[key]?.type_id);
-      })
-      let voxels = [];
-      if (config?.voxel != undefined) {
-        voxelSize.x = Number(config.voxel.X || 0.622088);
-        voxelSize.y = Number(config.voxel.Y || 0.622088);
-        voxelSize.z = Number(config.voxel.Z || 0.622088);
-        voxels = [voxelSize.x, voxelSize.y, voxelSize.z];
-      }
+      if (stackViewerData?.metadata?.IsTemplate) {
+        let keys = Object.keys(stackViewerData.metadata?.Images);
+        result = stackViewerData.metadata?.Images[keys[0]]?.[0];
+        result.serverUrl = 'http://www.virtualflybrain.org/fcgi/wlziipsrv.fcgi';
+        if ( stackViewerData?.metadata?.Domains ){
+          keys = Object.keys(stackViewerData?.metadata?.Domains);
+        }
+        let ids = [parseInt(keys[keys?.length - 1]) + 1], labels = [parseInt(keys[keys?.length - 1]) + 1], classID = [parseInt(keys[keys?.length - 1]) + 1]; 
+        keys?.forEach( key => {
+          ids[parseInt(key)] = (stackViewerData?.metadata?.Domains?.[key]?.id);
+          labels[parseInt(key)] = (stackViewerData?.metadata?.Domains?.[key]?.type_label);
+          classID[parseInt(key)] = (stackViewerData?.metadata?.Domains?.[key]?.type_id);
+        })
+        let voxels = [];
+        if (result?.voxel != undefined) {
+          voxelSizeRef.current.x = Number(result.voxel.X || 0.622088);
+          voxelSizeRef.current.y = Number(result.voxel.Y || 0.622088);
+          voxelSizeRef.current.z = Number(result.voxel.Z || 0.622088);
+          voxels = [voxelSizeRef.current.x, voxelSizeRef.current.y, voxelSizeRef.current.z];
+        }
 
-      let subDomains = [voxels, ids, labels, classID]
-      config.subDomains = subDomains;
-    }
-    if (config == undefined) {
-      config = {
-        serverUrl: 'http://www.virtualflybrain.org/fcgi/wlziipsrv.fcgi',
-        templateId: 'NOTSET'
-      };
-    }
-  });
-  }, [stackData]);
+        let subDomains = [voxels, ids, labels, classID]
+        result.subDomains = subDomains;
+      }
+    });
+    
+    return result;
+  }, [data]);
 
   return (
       stackData?.instances?.length > 0 ? <StackComponent
@@ -200,7 +194,7 @@ const VFBStackViewer = (props) => {
       modifySliceDisplay={modifySliceDisplayControl}
       width={stackData.width}
       config={config}
-      voxel={voxelSize}/> : null
+      voxel={voxelSizeRef.current}/> : null
   )
 }
 

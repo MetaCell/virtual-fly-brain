@@ -238,8 +238,61 @@ export const removeInstanceByID = async (queryId) => {
 
 export const removeAllInstances = async () => {
   try {
-    store.dispatch(removeAllInstancesSuccess())
+    console.log('=== CLEAR ALL INSTANCES CALLED ===');
+    const state = store.getState();
+    const allInstances = state.instances.allLoadedInstances || [];
+    
+    console.log('Total instances found:', allInstances.length);
+    console.log('All instances:', allInstances.map(i => ({ 
+      id: i.metadata?.Id, 
+      IsTemplate: i.metadata?.IsTemplate,
+      isTemplate: i.metadata?.isTemplate,
+      visible: i.visible,
+      visibleMesh: i.visibleMesh,
+      meshCreated: i.meshCreated,
+      selected: i.selected
+    })));
+    
+    // Find all non-template instances (check both possible property names for compatibility)
+    const nonTemplateInstances = allInstances.filter(
+      instance => !instance.metadata?.IsTemplate && !instance.metadata?.isTemplate
+    );
+    
+    const templateInstances = allInstances.filter(
+      instance => instance.metadata?.IsTemplate || instance.metadata?.isTemplate
+    );
+    
+    console.log('Found', nonTemplateInstances.length, 'non-template instances');
+    console.log('Found', templateInstances.length, 'template instances');
+    console.log('Template instances details:', templateInstances.map(i => ({ 
+      id: i.metadata?.Id, 
+      visible: i.visible,
+      visibleMesh: i.visibleMesh,
+      meshCreated: i.meshCreated,
+      selected: i.selected
+    })));
+    
+    if (nonTemplateInstances.length === 0) {
+      console.log('No non-template instances to remove!');
+      return;
+    }
+    
+    // Dispatch the remove all instances action immediately (this will filter out non-templates in the reducer)
+    store.dispatch(removeAllInstancesSuccess());
+    
+    // Log the state after the action
+    setTimeout(() => {
+      const newState = store.getState();
+      console.log('=== AFTER CLEAR ALL ===');
+      console.log('Remaining instances:', newState.instances.allLoadedInstances.length);
+      console.log('MappedCanvasData length:', newState.instances.mappedCanvasData?.length);
+      console.log('ThreeDObjects length:', newState.instances.threeDObjects?.length);
+      console.log('Focused instance:', newState.instances.focusedInstance?.metadata?.Id);
+      console.log('Event triggered:', newState.instances.event);
+    }, 100);
+    
   } catch (error) {
+    console.error('Error in removeAllInstances:', error);
     store.dispatch(removeInstancesFailure(error.message))
     return
   }
@@ -322,3 +375,6 @@ export const zoomToInstance = async (id) => {
 export const templateLoaded = async (id, openTemplate) => {
   store.dispatch(templateLoadedMessage(id, openTemplate))
 }
+
+// Export action creators for direct use
+export { focusInstanceMessage, selectInstanceMessage, removeAllInstancesSuccess };

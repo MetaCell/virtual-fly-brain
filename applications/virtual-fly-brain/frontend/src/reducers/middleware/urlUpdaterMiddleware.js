@@ -111,6 +111,7 @@ export const urlUpdaterMiddleware = store => next => (action) => {
       urlObj.searchParams.delete('i');
       urlObj.searchParams.delete('id');
       window.history.replaceState(null, '', urlObj.toString());
+      next(action);
       break;
     }
     case getInstancesTypes.GET_INSTANCES_SUCCESS : {

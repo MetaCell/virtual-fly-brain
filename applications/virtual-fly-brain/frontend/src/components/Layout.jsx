@@ -92,6 +92,15 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
     }
   }, [queryComponentOpened]);
 
+  // Handle Clear All functionality
+  useEffect(() => {
+    if (bottomNav === 4 && allLoadedInstances?.length > 1) {
+      removeAllInstances();
+      // Reset bottomNav to clear the "Clear All" state
+      setBottomNav(undefined);
+    }
+  }, [bottomNav, allLoadedInstances?.length, setBottomNav]);
+
   useEffect( () => {
     if ( bottomNav === 3 ){
       const layoutManager = getLayoutManagerInstance();
@@ -300,7 +309,6 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
             {bottomNav === 0 && < VFBUploader open={true} setBottomNav={setBottomNav} />}
             {bottomNav === 1 && <VFBDownloadContents open={true} setBottomNav={setBottomNav} />}
             {bottomNav === 2 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} tabSelected={0}/>}
-            {bottomNav === 4 && ( allLoadedInstances?.length > 1 && removeAllInstances())}
             {bottomNav === 5 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} tabSelected={1}/>}
           </>
         ) : (
@@ -311,7 +319,6 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
             {bottomNav === 0 && <VFBUploader open={true} setBottomNav={setBottomNav} />}
             {bottomNav === 1 && <VFBDownloadContents open={true} setBottomNav={setBottomNav} />}
             {bottomNav === 2 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} tabSelected={0}/>}
-            {bottomNav === 4 && ( allLoadedInstances?.length > 1 && removeAllInstances())}
             {bottomNav === 5 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} tabSelected={1}/>}
           </>
         )}

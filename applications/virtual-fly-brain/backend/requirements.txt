@@ -13,6 +13,7 @@ psycopg2-binary
 gunicorn==20.1.0
 flask_cors==3.0.10
 dataclasses_json >= 0.5.7
+dacite >= 1.6.0
 pandas >= 1.0.0
 numpy >= 1.19.0
 git+https://github.com/VirtualFlyBrain/VFBquery.git

@@ -6,18 +6,16 @@ import Resources from '@metacell/geppetto-meta-core/Resources';
 import SimpleInstance from "@metacell/geppetto-meta-core/model/SimpleInstance";
 import { modifySliceDisplay, showSliceDisplay } from '../reducers/actions/globals';
 
-let StackComponent = null;
-
 const VFBStackViewer = (props) => {
   const data = useSelector(state => state.instances.allLoadedInstances);
   const templateID = useSelector(state => state.globalInfo.templateID);
+  const instanceEvent = useSelector(state => state.instances.event);
   const dispatch = useDispatch();
   
   const voxelSizeRef = useRef({ x:0.622088, y:0.622088, z:0.622088 });
 
-  if ( StackComponent == null ){
-    StackComponent = StackViewerComponent()
-  }
+  // Get the StackViewerComponent class
+  const StackComponent = StackViewerComponent();
 
   const [stackData, setStackData] = React.useState({
     id: props.id, height: props.size?.height, width: props.size?.width, instances: [], selected: []
@@ -85,9 +83,9 @@ const VFBStackViewer = (props) => {
   }, [dispatch]);
 
   // FIXME
-  useEffect(() => {
+  useEffect(() => {    
     const instances = [];
-    data?.forEach((stackViewerData) => {
+    data?.forEach((stackViewerData) => {      
       if (stackViewerData?.stackInstance) {
         const keys = Object.keys(stackViewerData.metadata?.Images);
         const instancespec = {
@@ -127,6 +125,7 @@ const VFBStackViewer = (props) => {
         }
       }
     });
+    
     setStackData(prevData => ({
       ...prevData,
       id: "VFB",
@@ -134,7 +133,7 @@ const VFBStackViewer = (props) => {
       width: props.size.width,
       instances: instances,
     }));
-  }, [data, props.size.height, props.size.width]);
+  }, [data, instanceEvent, props.size.height, props.size.width]);
 
   // Update height and width of the stackwidget, happens when flex layout resizes tabs
   useEffect( () => {

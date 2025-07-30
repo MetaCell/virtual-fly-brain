@@ -172,25 +172,9 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       });
     }
     case getInstancesTypes.REMOVE_ALL_INSTANCES_SUCCESS: {
-      console.log('=== REDUCER: REMOVE_ALL_INSTANCES_SUCCESS ===');
-      console.log('Current state before:', {
-        allLoadedInstances: state.allLoadedInstances?.length,
-        focusedInstance: state.focusedInstance?.metadata?.Id,
-        mappedCanvasData: state.mappedCanvasData?.length,
-        threeDObjects: state.threeDObjects?.length
-      });
-      
       let loadedInstances = state.allLoadedInstances.filter(
         (i) => i?.metadata?.IsTemplate || i?.metadata?.isTemplate
       );
-
-      console.log('Template instances after filtering:', loadedInstances.map(i => ({
-        id: i.metadata?.Id,
-        visible: i.visible,
-        visibleMesh: i.visibleMesh,
-        meshCreated: i.meshCreated,
-        selected: i.selected
-      })));
 
       // Set the template as focused and selected
       let focusedInstance = loadedInstances[0];
@@ -199,21 +183,9 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         focusedInstance.visible = true;
         focusedInstance.visibleMesh = true;
         // Keep template color as-is
-        
-        console.log('Setting focused instance:', {
-          id: focusedInstance.metadata?.Id,
-          visible: focusedInstance.visible,
-          visibleMesh: focusedInstance.visibleMesh,
-          meshCreated: focusedInstance.meshCreated,
-          selected: focusedInstance.selected
-        });
       }
 
       const newMappedCanvasData = getMappedCanvasData(loadedInstances);
-      
-      console.log('New mapped canvas data length:', newMappedCanvasData?.length);
-      console.log('Event action:', getInstancesTypes.UPDATE_INSTANCES);
-      console.log('Event id:', focusedInstance?.metadata?.Id);
 
       return Object.assign({}, state, {
         allLoadedInstances: loadedInstances,

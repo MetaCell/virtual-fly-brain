@@ -111,8 +111,9 @@ const rgbToHex = (color) => {
       this.disp = new Container({ width : this.props.width, height : this.props.height});
       this.disp.pivot.x = 0;
       this.disp.pivot.y = 0;
-      this.disp.scale.x = this.props.zoomLevel / this.props.scl;
-      this.disp.scale.y = this.props.zoomLevel / this.props.scl;
+      // Start with a conservative scale that will be updated when proper zoom is calculated
+      this.disp.scale.x = 0.1; // Start zoomed out until proper scale is calculated
+      this.disp.scale.y = 0.1;
       this.app.stage.addChild(this.disp);
       this.stack = new Container();
       this.stack.pivot.x = 0;
@@ -270,7 +271,7 @@ const rgbToHex = (color) => {
             //console.log('Stack Depth: ' + ((max - min) / 10.0).toFixed(0));
             that.checkStack();
             that.callPlaneEdges();
-            that.iBuffer = {};
+            that.state.iBuffer = {};
             that.state.lastUpdate = 0;
             that.bufferStack();
             that.animate();
@@ -298,7 +299,7 @@ const rgbToHex = (color) => {
             that.setState({ tileX: tileX, tileY: tileY });
             that.checkStack();
             that.callPlaneEdges();
-            that.iBuffer = {};
+            that.state.iBuffer = {};
             that.state.lastUpdate = 0;
             that.bufferStack();
             that.animate();
@@ -327,7 +328,7 @@ const rgbToHex = (color) => {
             that.props.setExtent(extent);
             that.checkStack();
             that.callPlaneEdges();
-            that.iBuffer = {};
+            that.state.iBuffer = {};
             that.state.lastUpdate = 0;
             that.bufferStack();
             that.animate();
@@ -770,8 +771,7 @@ const rgbToHex = (color) => {
       }
 
       if (this.state.stack.length < 1) {
-        this.state.images = [];
-        this.stack.removeChildren();
+        this.clearVisualState('empty stack');
       }
 
       if (this.state.txtUpdated < Date.now() - this.state.txtStay) {
@@ -949,6 +949,17 @@ const rgbToHex = (color) => {
     },
 
     /**
+     * Helper function to clear all visual state consistently
+     */
+    clearVisualState: function(reason) {
+      this.state.images = [];
+      this.state.visibleTiles = [];
+      this.state.iBuffer = {};
+      this.state.imagesUrl = {};
+      this.stack.removeChildren();
+    },
+
+    /**
      * When we get new props, run the appropriate imperative functions
      *
      */
@@ -960,7 +971,28 @@ const rgbToHex = (color) => {
         this.createImages();
         return true;
       }
+      
+      // Clear stack when instances are significantly reduced (like Clear All)
+      // Only trigger on substantial reductions (more than 1 instance removed) to avoid
+      // triggering on normal updates/renders
+      if (this.props.data && this.props.data.instances && nextProps.data && nextProps.data.instances) {
+        const currentLength = this.props.data.instances.length;
+        const nextLength = nextProps.data.instances.length;
+        const reduction = currentLength - nextLength;
+        
+        // Only clear visual state for significant reductions (2+ instances removed)
+        // This prevents clearing on normal re-renders but catches Clear All operations
+        if (reduction >= 2) {
+          this.clearVisualState('instances significantly reduced');
+          this._instancesWereReduced = true;
+        }
+      }
+      
       if (nextProps.stack !== this.state.stack || nextProps.color !== this.state.color || this.state.serverUrl !== nextProps.serverUrl.replace('http:', window.location.protocol).replace('https:', window.location.protocol) || this.state.id !== nextProps.id) {
+        // Reset the flag when stack actually updates
+        if (this._instancesWereReduced) {
+          this._instancesWereReduced = false;
+        }
         this.setState({
           stack: nextProps.stack,
           color: nextProps.color,
@@ -970,20 +1002,27 @@ const rgbToHex = (color) => {
         });
         this.checkStack();
       }
-      if (nextProps.scl !== this.state.scl || nextProps.zoomLevel !== this.props.zoomLevel || nextProps.width !== this.props.width || nextProps.height !== this.props.height || nextProps.stackX !== this.stack.position.x || nextProps.stackY !== this.stack.position.y){
-        if (nextProps.scl < this.state.scl) {
-          // wipe the stack if image is getting smaller
-          this.state.images = [];
-          this.stack.removeChildren();
+      if (nextProps.width !== this.props.width || nextProps.height !== this.props.height || nextProps.stackX !== this.stack.position.x || nextProps.stackY !== this.stack.position.y){
+        // Only update position if it's different from current stack position
+        if (nextProps.stackX !== this.stack.position.x || nextProps.stackY !== this.stack.position.y) {
+          this.stack.position.x = nextProps.stackX;
+          this.stack.position.y = nextProps.stackY;
         }
-        this.stack.position.x = nextProps.stackX;
-        this.stack.position.y = nextProps.stackY;
-        this.state.scl = nextProps.scl;
-        this.state.iBuffer = {};
-        this.setState({ scl: nextProps.scl, iBuffer: {} });
-        this.updateZoomLevel(nextProps);
+        
         this.bufferStack();
         updDst = true;
+      }
+      
+      // Handle scale and zoom changes from user interactions, explicit zoom commands, or initial setup
+      // Accept changes when: zoomLevel changes (user zoom), during initial setup (!this._initialized), or user-initiated flag is set
+      if ((nextProps.scl !== this.state.scl || nextProps.zoomLevel !== this.props.zoomLevel) && 
+          (nextProps.zoomLevel !== this.props.zoomLevel || !this._initialized)) {
+        this.state.scl = nextProps.scl;
+        this.setState({ scl: nextProps.scl });
+        this.updateZoomLevel(nextProps);
+        updDst = true;
+      } else if (nextProps.scl !== this.state.scl) {
+        // Ignoring scale-only change - preserving user zoom level
       }
       if (nextProps.fxp[0] !== this.props.fxp[0] || nextProps.fxp[1] !== this.props.fxp[1] || nextProps.fxp[2] !== this.props.fxp[2]) {
         this.state.dst = nextProps.dst;
@@ -998,7 +1037,6 @@ const rgbToHex = (color) => {
       if (nextProps.orth !== this.state.orth || nextProps.pit !== this.state.pit || nextProps.yaw !== this.state.yaw || nextProps.rol !== this.state.rol) {
         if (nextProps.orth !== this.state.orth) {
           this.state.recenter = true;
-          this.state.iBuffer = {};
         }
         this.changeOrth(nextProps);
         this.bufferStack();
@@ -1045,8 +1083,7 @@ const rgbToHex = (color) => {
         rol: props.rol,
         orth: props.orth
       });
-      this.state.images = [];
-      this.stack.removeChildren();
+      this.clearVisualState('orientation change');
       if (props.orth == 0) {
         // console.log('Frontal');
         this.setStatusText('Frontal');
@@ -1818,7 +1855,7 @@ const StackViewerComponent = () => createClass({
               templateDomainTypeIds={this.state.tempType}
               templateDomainNames={this.state.tempName}
               slice={this.state.slice} onHome={this.onHome} onZoomIn={this.onZoomIn}
-              onResize={this.onResize} showSliceDisplay={this.props.showSliceDisplay} 
+              onZoomOut={this.onZoomOut} onResize={this.onResize} showSliceDisplay={this.props.showSliceDisplay} 
               modifySliceDisplay={this.props.modifySliceDisplay}/>
           </div>
         );

@@ -33,4 +33,4 @@ jobs:
     # Step 4: Run ESLint
     - name: Run ESLint
       working-directory: applications/virtual-fly-brain/frontend
-      run: yarn prebuild
+      run: yarn build

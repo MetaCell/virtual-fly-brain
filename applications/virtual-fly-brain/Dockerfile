@@ -30,9 +30,9 @@ RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
 # Set up virtual display for OpenGL
 ENV DISPLAY=:99
 
-COPY client ${BUILDDIR}
+COPY frontend ${BUILDDIR}
 WORKDIR ${BUILDDIR}
-RUN export VFB_DOMAIN="https://"${DOMAIN}
+ENV VFB_DOMAIN=https://${DOMAIN}
 RUN yarn install
 RUN yarn run build
 

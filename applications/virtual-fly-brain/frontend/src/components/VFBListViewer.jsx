@@ -15,11 +15,6 @@ class VFBListViewer extends Component {
     super(props);
   }
 
-  filter(pathObj) {
-    const { path, type } = pathObj;
-    return false;
-  }
-
   getColumnConfiguration() {
     return listViewerConf;
   }
@@ -35,7 +30,7 @@ class VFBListViewer extends Component {
         selected: instance.selected,
       })) || [];
     instances.forEach((instance) => {
-      const { path, metaType, type } = instance;
+      const { path, type } = instance;
       const id = path.split(".")[0];
       const instanceVisual = {
         id,
@@ -80,7 +75,8 @@ class VFBListViewer extends Component {
           instances={instances}
           className="vfbListViewer"
           handler={this}
-          filter={(instance) => true}
+          // eslint-disable-next-line no-unused-vars
+          filter={(_instance) => true}
           filterFn={() => console.log("Filtering")}
           columnConfiguration={this.getColumnConfiguration()}
           infiniteScroll={true}

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Application, Container, Assets, Sprite, Text, TextStyle, utils, extensions, ExtensionType, Texture , Resource, BLEND_MODES } from 'pixi.js';
-import { getInstanceByID, selectInstance } from '../reducers/actions/instances';
+import { getInstanceByID } from '../reducers/actions/instances';
 import ReactResizeDetector from 'react-resize-detector';
 import StackViewerButtons from './StackViewerButtons';
 import createClass from 'create-react-class';
@@ -450,17 +450,17 @@ const rgbToHex = (color) => {
       }
       if (this.disp.width > 0 && this.props.slice) {
         this.state.stackViewerPlane = true;
-      } 
+      }
       this.state.planeUpdating = false;
     },
 
     callObjects: function () {
 
-      var i, j, result, id, label;
+      var j, result;
       var that = this;
       var isSelected = false;
       [this.state.stack[0]]?.forEach( (item,i) => {
-        (function (i, that, shift) {
+        (function (i, that) {
           var image = that.state.serverUrl.toString() + '?wlz=' + item + '&sel=0,255,255,255&mod=zeta&fxp=' + that.props.fxp.join(',') + '&scl=' + Number(that.state.scl).toFixed(1) + '&dst=' + Number(that.state.dst).toFixed(1) + '&pit=' + Number(that.state.pit).toFixed(0) + '&yaw=' + Number(that.state.yaw).toFixed(0) + '&rol=' + Number(that.state.rol).toFixed(0);
           // get image size;
           let file = image + '&prl=-1,' + that.state.posX.toFixed(0) + ',' + that.state.posY.toFixed(0) + '&obj=Wlz-foreground-objects';
@@ -497,13 +497,13 @@ const rgbToHex = (color) => {
                                 //console.log(that.props.templateDomainNames[index] + ' clicked');
                                 that.setStatusText(that.props.templateDomainNames[index] + ' selected');
                                 break;
-                              } catch (ignore) {
+                              // eslint-disable-next-line no-unused-vars
+                              } catch (_ignore) {
                                 //console.log(that.props.templateDomainNames[index] + ' requested');
                                 that.setStatusText(that.props.templateDomainNames[index] + ' requested');
                                 if (window.shiftDown) {
                                   //console.log('Adding ' + that.props.templateDomainNames[index]);
                                   that.setStatusText('Adding ' + that.props.templateDomainNames[index]);
-                                  var varriableId = that.props.templateDomainIds[index];
                                   isSelected = true;
                                   break;
                                 } else {
@@ -516,6 +516,7 @@ const rgbToHex = (color) => {
                                 getInstanceByID(that.props.templateDomainTypeIds[index], false, true, false, false);
                                 that.setStatusText(that.props.templateDomainNames[index] + ' selected');
                                 break;
+                              // eslint-disable-next-line no-unused-vars
                               } catch (ignore) {
                                 console.log(that.props.templateDomainTypeIds[index] + ' requested');
                                 that.setStatusText(that.props.templateDomainNames[index] + ' requested');
@@ -540,12 +541,11 @@ const rgbToHex = (color) => {
       });
     },
 
-    loadProgressHandler : function (loader, resource) {
+    loadProgressHandler : function (loader) {
       this.setStatusText('Buffering stack ' + loader.progress.toFixed(1) + "%");
     },
 
     setup : function (images) {
-      var k;
       images.forEach ( ( k, index) => {
         this.state.iBuffer[index] = k;
       });
@@ -567,12 +567,12 @@ const rgbToHex = (color) => {
       if (!this.state.loadingLabels || this.state.lastLabelCall < (Date.now() - 500)) {
         this.state.lastLabelCall = Date.now();
         this.state.objects = [];
-        var i, j, result;
+        var j, result;
         var that = this;
         var callX = that.state.posX.toFixed(0), callY = that.state.posY.toFixed(0);
 
         [this.state.stack[0]]?.forEach( (item, i) => {
-          (function (i, that, shift) {
+          (function (i, that) {
             if (i == 0) {
               that.state.loadingLabels = true;
             }
@@ -647,7 +647,7 @@ const rgbToHex = (color) => {
         this.state.bufferRunning = true;
         var loadList = new Set();
         this.state.lastUpdate = Date.now();
-        var i, j, dst, image;
+        var i, j, image;
         var min = (this.state.minDst / 10.0) * this.state.scl;
         var max = (this.state.maxDst / 10.0) * this.state.scl;
         var buffMax = 2000;
@@ -754,7 +754,7 @@ const rgbToHex = (color) => {
           })
           let results = await Promise.allSettled(images);
           results = results.map( result => result.value );
-            
+
           this.setup(results);
 
         } else {
@@ -785,6 +785,7 @@ const rgbToHex = (color) => {
             delete this.state.images[Object.keys(this.state.images)[i]];
             try {
               this.stack.removeChildAt(i);
+            // eslint-disable-next-line no-unused-vars
             } catch (ignore) {
               // ignore if it doesn't exist
             }
@@ -902,7 +903,6 @@ const rgbToHex = (color) => {
                   this.state.images[d].tint = this.state.color[i];
                 }
               }
-              
             }
           } else {
             for (i in this.state.stack) {
@@ -951,6 +951,7 @@ const rgbToHex = (color) => {
     /**
      * Helper function to clear all visual state consistently
      */
+    // eslint-disable-next-line no-unused-vars
     clearVisualState: function(reason) {
       this.state.images = [];
       this.state.visibleTiles = [];
@@ -971,7 +972,7 @@ const rgbToHex = (color) => {
         this.createImages();
         return true;
       }
-      
+
       // Clear stack when instances are significantly reduced (like Clear All)
       // Only trigger on substantial reductions (more than 1 instance removed) to avoid
       // triggering on normal updates/renders
@@ -979,7 +980,7 @@ const rgbToHex = (color) => {
         const currentLength = this.props.data.instances.length;
         const nextLength = nextProps.data.instances.length;
         const reduction = currentLength - nextLength;
-        
+
         // Only clear visual state for significant reductions (2+ instances removed)
         // This prevents clearing on normal re-renders but catches Clear All operations
         if (reduction >= 2) {
@@ -987,7 +988,7 @@ const rgbToHex = (color) => {
           this._instancesWereReduced = true;
         }
       }
-      
+
       if (nextProps.stack !== this.state.stack || nextProps.color !== this.state.color || this.state.serverUrl !== nextProps.serverUrl.replace('http:', window.location.protocol).replace('https:', window.location.protocol) || this.state.id !== nextProps.id) {
         // Reset the flag when stack actually updates
         if (this._instancesWereReduced) {
@@ -1008,14 +1009,14 @@ const rgbToHex = (color) => {
           this.stack.position.x = nextProps.stackX;
           this.stack.position.y = nextProps.stackY;
         }
-        
+
         this.bufferStack();
         updDst = true;
       }
-      
+
       // Handle scale and zoom changes from user interactions, explicit zoom commands, or initial setup
       // Accept changes when: zoomLevel changes (user zoom), during initial setup (!this._initialized), or user-initiated flag is set
-      if ((nextProps.scl !== this.state.scl || nextProps.zoomLevel !== this.props.zoomLevel) && 
+      if ((nextProps.scl !== this.state.scl || nextProps.zoomLevel !== this.props.zoomLevel) &&
           (nextProps.zoomLevel !== this.props.zoomLevel || !this._initialized)) {
         this.state.scl = nextProps.scl;
         this.setState({ scl: nextProps.scl });
@@ -1127,6 +1128,7 @@ const rgbToHex = (color) => {
       }
     },
 
+    // eslint-disable-next-line no-unused-vars
     onDragStart: function (event) {
       /*
        * store a reference to the data
@@ -1230,7 +1232,7 @@ const rgbToHex = (color) => {
     }
   });
 
-  var prefix = "", _addEventListener, onwheel, support;
+  var prefix = "", _addEventListener, support;
 
 const StackViewerComponent = () => createClass({
     _isMounted: false,
@@ -1427,17 +1429,17 @@ const StackViewerComponent = () => createClass({
 
     },
 
-    componentDidUpdate: function (prevProps, prevState) {
+    componentDidUpdate: function (prevProps) {
       if (prevProps.data != undefined && prevProps.data != null && prevProps.data.instances != undefined) {
         this.setState(this.handleInstances(this.props.data.instances));
-      } 
+      }
     },
 
     handleInstances: function (instances) {
       var newState = {...this.state};
       if (instances && instances != null && instances.length > 0) {
         var instance;
-        var data, vals;
+        var data;
         var files = [];
         var colors = [];
         var labels = [];
@@ -1449,7 +1451,7 @@ const StackViewerComponent = () => createClass({
         if (!this.state.width && this.props.data.width != null) {
           newState.width = this.props.data.width;
         }
-        
+
         if (this.props.config && this.props.config != null && this.props.config.subDomains && this.props.config.subDomains != null && this.props.config.subDomains.length && this.props.config.subDomains.length > 0 && this.props.config.subDomains[0] && this.props.config.subDomains[0].length && this.props.config.subDomains[0].length > 2) {
           newState.voxelX = Number(this.props.config.subDomains[0][0] || 0.622088);
           newState.voxelY = Number(this.props.config.subDomains[0][1] || 0.622088);
@@ -1509,7 +1511,7 @@ const StackViewerComponent = () => createClass({
         if (colors && colors != null && colors.length > 0 && colors.toString() != this.state.color.toString()) {
           newState.color = colors;
         }
-      } 
+      }
       return newState;
     },
 
@@ -1526,9 +1528,9 @@ const StackViewerComponent = () => createClass({
         height / (this.state.imageY / 10.0),
         width / (this.state.imageX / 10.0)
       ).toFixed(1));
-    
+
       const scale = Math.ceil(autoScale);
-    
+
       this.setState({
         width,
         height,
@@ -1539,12 +1541,12 @@ const StackViewerComponent = () => createClass({
         stackX: 0,
         stackY: 0
       });
-    
+
       this._resizedManually = true;
     },
-    
-    
-    
+
+
+
     onZoomIn: function () {
       var zoomLevel = this.state.zoomLevel;
       var scale = this.state.scl;
@@ -1631,7 +1633,7 @@ const StackViewerComponent = () => createClass({
       }
       if (zoomLevel > 0.1) {
         scale = Number(Math.ceil(zoomLevel).toFixed(1));
-        text = 'Zooming out to (X' + Number(zoomLevel).toFixed(1) + ')'; 
+        text = 'Zooming out to (X' + Number(zoomLevel).toFixed(1) + ')';
       } else {
         zoomLevel = 0.1;
         scale = 1.0;
@@ -1764,19 +1766,19 @@ const StackViewerComponent = () => createClass({
     render: function () {
       var displayArea = this.props.data.id + 'displayArea';
       const isSmallViewport = this.state.width < 300 || this.state.height < 300;
-      
+
       var markup = '';
       if (this.state.stack.length > 0) {
         markup = (
           <div id={displayArea} style={{ position: 'absolute'}}>
             {isSmallViewport ? (
               <>
-                <div style={{ 
-                  position: 'absolute', 
-                  top: 20, 
-                  left: 10, 
+                <div style={{
+                  position: 'absolute',
+                  top: 20,
+                  left: 10,
                 }}>
-                  <button 
+                  <button
                     onClick={this.toggleMenu}
                     style={{
                       background: 'transparent',
@@ -1804,10 +1806,10 @@ const StackViewerComponent = () => createClass({
                 </div>
 
                 {this.state.isMenuOpen && (
-                  <div style={{ 
-                    position: 'absolute', 
+                  <div style={{
+                    position: 'absolute',
                     top: 13,
-                    left: 35, 
+                    left: 35,
                     transition: 'all 0.2s ease',
                   }}>
                     <StackViewerButtons
@@ -1824,10 +1826,10 @@ const StackViewerComponent = () => createClass({
                 )}
               </>
             ) : (
-              <div style={{ 
-                position: 'absolute', 
+              <div style={{
+                position: 'absolute',
                 top: 20,
-                left: 10, 
+                left: 10,
               }}>
                 <StackViewerButtons
                   onStepOut={this.onStepOut}
@@ -1855,7 +1857,7 @@ const StackViewerComponent = () => createClass({
               templateDomainTypeIds={this.state.tempType}
               templateDomainNames={this.state.tempName}
               slice={this.state.slice} onHome={this.onHome} onZoomIn={this.onZoomIn}
-              onZoomOut={this.onZoomOut} onResize={this.onResize} showSliceDisplay={this.props.showSliceDisplay} 
+              onZoomOut={this.onZoomOut} onResize={this.onResize} showSliceDisplay={this.props.showSliceDisplay}
               modifySliceDisplay={this.props.modifySliceDisplay}/>
           </div>
         );

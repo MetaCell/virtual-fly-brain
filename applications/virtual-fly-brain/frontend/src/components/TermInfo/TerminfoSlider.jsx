@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import React, {
   useState,
   useEffect,
@@ -16,9 +15,12 @@ const { whiteColor, listHeadingColor } = vars;
 const imageStyle =  {
   height: '100%',
   width: '100%',
-  objectFit: 'scale-down',
+  objectFit: 'contain',
   backgroundColor: 'black',
-  cursor: 'pointer'
+  cursor: 'pointer',
+  display: 'block',
+  maxWidth: '100%',
+  maxHeight: '100%'
 }
 
 const TerminfoSlider = (props) => {
@@ -45,18 +47,6 @@ const TerminfoSlider = (props) => {
 
       '& .react-slideshow-container': {
         height: '100%',
-      },
-
-      '& .images-wrap': {
-        height: '100%',
-        width: '100% !important',
-        transform: "translate(0px) !important",
-        '& > div': {
-        height: '100%',
-        '& > div': {
-          height: '100%',
-        }
-      },
       },
 
       '& .react-slideshow-container .nav': {
@@ -152,13 +142,17 @@ const TerminfoSlider = (props) => {
           });
         });
       });
+      console.log('TerminfoSlider: Setting slideImages', images);
       setSlideImages(images);
+    } else {
+      setSlideImages([]);
     }
   }, [props.examples]);
 
   return (
     <Box sx={classes.root}>
       <Slide
+        key={`${slideImages.length}-${slideImages[0]?.id || 'empty'}`}
         transitionDuration={250}
         canSwipe={ false }
         slidesToShow={ 1 }
@@ -166,17 +160,20 @@ const TerminfoSlider = (props) => {
         infinite={ false }
         indicators={ true }
         autoplay={ false }
+        defaultIndex={0}
         prevArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> }
         nextArrow={ <Typography><ChevronLeft color={ listHeadingColor } /></Typography> } 
         arrows={ true }
       >
             {slideImages?.map((slideImage, index) => (
                 <img
-                  key={index}
+                  key={`${slideImage.id}-${index}`}
                   style={imageStyle}
                   src={slideImage.url}
                   onClick={() => imageClick(slideImage.id)}
                   alt={slideImage.caption}
+                  onLoad={() => console.log(`Image ${index} loaded:`, slideImage.url)}
+                  onError={() => console.log(`Image ${index} failed to load:`, slideImage.url)}
                 />
             ))}
       </Slide>

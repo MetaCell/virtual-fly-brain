@@ -91,7 +91,7 @@ const GeneralInformation = ({ data, classes }) => {
               <Typography sx={classes.heading}>Tags</Typography>
               <Box sx={{ display: 'flex', columnGap: '4px', flexWrap: 'wrap', justifyContent: 'end' }} gap={'0.288rem'}>
                 {
-                  data?.metadata?.Tags?.slice(0, chips_cutoff).map((tag, i) => (<Chip key={tag} sx={{ backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color, color: '#ffffff' }} label={formatTagText(tag)} />))
+                  data?.metadata?.Tags?.slice(0, chips_cutoff).map((tag) => (<Chip key={tag} sx={{ backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color, color: '#ffffff' }} label={formatTagText(tag)} />))
                 }
                 {
                   data?.metadata?.Tags?.length > 3 && <Tooltip

@@ -133,8 +133,42 @@ const TerminfoSlider = (props) => {
     if(props?.examples) {
       const images = [];
       const keys = Object.keys(props.examples);
-      keys.forEach( k => {
-        props.examples[k].forEach( e => {
+      
+      // Get current template from store
+      const currentTemplate = reduxState.instances.launchTemplate?.metadata?.Id;
+      
+      // Define the priority order for templates
+      const templatePriorityOrder = [
+        "VFB_00101567", "VFB_00200000", "VFB_00017894", "VFB_00101384", 
+        "VFB_00050000", "VFB_00049000", "VFB_00100000", "VFB_00030786", 
+        "VFB_00110000", "VFB_00120000"
+      ];
+      
+      // Create ordered keys array: current template first, then by priority order
+      const orderedKeys = [];
+      
+      // Add current template first if it exists in the examples
+      if (currentTemplate && keys.includes(currentTemplate)) {
+        orderedKeys.push(currentTemplate);
+      }
+      
+      // Add remaining templates based on priority order
+      templatePriorityOrder.forEach(templateId => {
+        if (keys.includes(templateId) && templateId !== currentTemplate) {
+          orderedKeys.push(templateId);
+        }
+      });
+      
+      // Add any remaining templates that weren't in the priority list
+      keys.forEach(k => {
+        if (!orderedKeys.includes(k)) {
+          orderedKeys.push(k);
+        }
+      });
+      
+      // Build images array using ordered keys
+      orderedKeys.forEach(k => {
+        props.examples[k].forEach(e => {
           images.push({
             url: e.thumbnail,
             caption: e.label,
@@ -142,12 +176,13 @@ const TerminfoSlider = (props) => {
           });
         });
       });
-      console.log('TerminfoSlider: Setting slideImages', images);
+      
+      console.log('TerminfoSlider: Setting slideImages with priority order', images);
       setSlideImages(images);
     } else {
       setSlideImages([]);
     }
-  }, [props.examples]);
+  }, [props.examples, reduxState.instances.launchTemplate?.metadata?.Id]);
 
   return (
     <Box sx={classes.root}>

@@ -14,8 +14,8 @@ const VFBStackViewer = (props) => {
   
   const voxelSizeRef = useRef({ x:0.622088, y:0.622088, z:0.622088 });
 
-  // Get the StackViewerComponent class
-  const StackComponent = StackViewerComponent();
+  // Get the StackViewerComponent class - memoize to prevent recreating on every render
+  const StackComponent = useMemo(() => StackViewerComponent(), []);
 
   const [stackData, setStackData] = React.useState({
     id: props.id, height: props.size?.height, width: props.size?.width, instances: [], selected: []

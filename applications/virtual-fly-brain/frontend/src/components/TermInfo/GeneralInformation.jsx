@@ -360,9 +360,14 @@ const GeneralInformation = ({ data, classes }) => {
                     color: whiteColor,
                     textAlign: 'right',
                     fontWeight: 'bold',
-                    cursor: 'default',
-                    marginBottom: '0.5rem'
+                    cursor: parsedItem.relationship.id ? 'pointer' : 'default',
+                    transition: 'color 0.2s ease-in-out',
+                    marginBottom: '0.5rem',
+                    '&:hover': parsedItem.relationship.id ? {
+                      color: tabActiveColor
+                    } : {}
                   }}
+                  onClick={() => handleTermClick(parsedItem.relationship.id)}
                 >
                   {parsedItem.relationship.text};
                 </Typography>
@@ -434,138 +439,63 @@ const GeneralInformation = ({ data, classes }) => {
       return images;
     };
 
-    // Parse cross reference format: "![alt](img) [text](link): [text2](link2)"
-    const parseCrossReference = (text) => {
-      // Remove images from text for parsing
-      const textWithoutImages = text.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '').trim();
-      
-      // Pattern to match: [text](link): [text2](link2)
-      const pattern = /\[([^\]]+)\]\(([^)]+)\):\s*\[([^\]]+)\]\(([^)]+)\)/;
-      const match = textWithoutImages.match(pattern);
-      
-      if (match) {
-        return {
-          mainText: match[1],
-          mainLink: match[2],
-          secondaryText: match[3],
-          secondaryLink: match[4]
-        };
-      }
-      
-      // Fallback: try to parse just main link without secondary
-      const singlePattern = /\[([^\]]+)\]\(([^)]+)\)/;
-      const singleMatch = textWithoutImages.match(singlePattern);
-      
-      if (singleMatch) {
-        return {
-          mainText: singleMatch[1],
-          mainLink: singleMatch[2],
-          secondaryText: null,
-          secondaryLink: null
-        };
-      }
-      
-      return null;
+    // Remove images from text, keeping only the text content
+    const getTextOnlyContent = (text) => {
+      return text.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '').trim();
     };
 
     const images = typeof crossReferences === 'string' ? extractImageUrls(crossReferences) : [];
-    const parsedRef = typeof crossReferences === 'string' ? parseCrossReference(crossReferences) : null;
+    const textContent = typeof crossReferences === 'string' ? getTextOnlyContent(crossReferences) : String(crossReferences);
+    
+    // Split by semicolon and render each part on a new line
+    const crossRefItems = textContent.split(';').filter(item => item.trim());
     
     const content = (
       <Box sx={{ textAlign: 'right' }}>
-        {parsedRef ? (
-          <Box>
-            <a 
-              href={parsedRef.mainLink} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              style={{ 
-                color: tabActiveColor,
-                textDecoration: 'none',
-                fontSize: 'inherit'
-              }}
-            >
-              <Typography 
-                component="span"
-                sx={{
-                  ...classes.heading,
-                  color: tabActiveColor,
-                  '&:hover': {
-                    textDecoration: 'underline'
-                  }
+        {crossRefItems.length > 0 ? (
+          crossRefItems.map((item, index) => (
+            <Box key={index} sx={{ 
+              marginBottom: index < crossRefItems.length - 1 ? '0.5rem' : 0 
+            }}>
+              <ReactMarkdown 
+                components={{
+                  a: ({ href, children }) => (
+                    <a 
+                      href={href} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      style={{ 
+                        color: tabActiveColor,
+                        textDecoration: 'underline' 
+                      }}
+                    >
+                      {children}
+                    </a>
+                  ),
+                  p: ({ children }) => (
+                    <Typography sx={{
+                      ...classes.heading,
+                      color: whiteColor,
+                      textAlign: 'right',
+                      margin: 0
+                    }}>
+                      {children}
+                    </Typography>
+                  )
                 }}
               >
-                {parsedRef.mainText}
-              </Typography>
-            </a>
-            {parsedRef.secondaryText && (
-              <>
-                <Typography 
-                  component="span"
-                  sx={{
-                    ...classes.heading,
-                    color: whiteColor,
-                    margin: '0 0.25rem'
-                  }}
-                >
-                  :
-                </Typography>
-                <a 
-                  href={parsedRef.secondaryLink} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  style={{ 
-                    color: tabActiveColor,
-                    textDecoration: 'none',
-                    fontSize: 'inherit'
-                  }}
-                >
-                  <Typography 
-                    component="span"
-                    sx={{
-                      ...classes.heading,
-                      color: tabActiveColor,
-                      '&:hover': {
-                        textDecoration: 'underline'
-                      }
-                    }}
-                  >
-                    {parsedRef.secondaryText}
-                  </Typography>
-                </a>
-              </>
-            )}
-          </Box>
+                {item.trim()}
+              </ReactMarkdown>
+            </Box>
+          ))
         ) : (
-          <ReactMarkdown 
-            components={{
-              a: ({ href, children }) => (
-                <a 
-                  href={href} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  style={{ 
-                    color: tabActiveColor,
-                    textDecoration: 'underline' 
-                  }}
-                >
-                  {children}
-                </a>
-              ),
-              p: ({ children }) => (
-                <Typography sx={{
-                  ...classes.heading,
-                  color: whiteColor,
-                  textAlign: 'right',
-                  margin: 0
-                }}>
-                  {children}
-                </Typography>
-              )
-            }}
-          >
-            {typeof crossReferences === 'string' ? crossReferences.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '').trim() : String(crossReferences)}
-          </ReactMarkdown>
+          <Typography sx={{
+            ...classes.heading,
+            color: whiteColor,
+            textAlign: 'right'
+          }}>
+            {typeof crossReferences === 'string' ? 'Cross Reference' : String(crossReferences)}
+          </Typography>
         )}
       </Box>
     );
@@ -748,10 +678,6 @@ const GeneralInformation = ({ data, classes }) => {
           <Box
             sx={{
               width: '15rem',
-              height: {
-                xs: '15.188rem',
-                lg: '14.25rem'
-              },
               background: {
                 xs: carouselBg,
                 lg: headerBorderColor
@@ -829,6 +755,11 @@ const GeneralInformation = ({ data, classes }) => {
           </Box>
         </Grid>
       </Grid>
+
+      {/* Full-width area below both columns */}
+      <Box sx={{ width: '100%', mt: 2 }}>
+        {/* Place any full-width content here, e.g. additional info, charts, etc. */}
+      </Box>
 
       {fullScreen && (
         <FullScreenViewer open={fullScreen} onClose={() => setFullScreen(false)} images={data?.metadata?.Images ? data?.metadata?.Images : data?.metadata?.Examples} />

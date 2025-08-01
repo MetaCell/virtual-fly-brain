@@ -23,14 +23,14 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '18' # Adjust the Node.js version as needed
+        node-version: '20' # Adjust the Node.js version as needed
 
     # Step 3: Install dependencies using Yarn
     - name: Install dependencies
-      working-directory: applications/virtual-fly-brain/client
+      working-directory: applications/virtual-fly-brain/frontend
       run: yarn install
 
     # Step 4: Run ESLint
     - name: Run ESLint
-      working-directory: applications/virtual-fly-brain/client
-      run: yarn prebuild
+      working-directory: applications/virtual-fly-brain/frontend
+      run: yarn build

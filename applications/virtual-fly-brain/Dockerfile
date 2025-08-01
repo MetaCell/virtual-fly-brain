@@ -21,6 +21,12 @@ RUN apt-get update && apt-get install -y \
     git \
     && rm -rf /var/lib/apt/lists/*
 
+RUN apt-get remove -y nodejs npm || true
+
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs && \
+    node --version
+
 RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
     echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
     apt-get update && \
@@ -30,9 +36,9 @@ RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
 # Set up virtual display for OpenGL
 ENV DISPLAY=:99
 
-COPY client ${BUILDDIR}
+COPY frontend ${BUILDDIR}
 WORKDIR ${BUILDDIR}
-RUN export VFB_DOMAIN="https://"${DOMAIN}
+ENV VFB_DOMAIN=https://${DOMAIN}
 RUN yarn install
 RUN yarn run build
 

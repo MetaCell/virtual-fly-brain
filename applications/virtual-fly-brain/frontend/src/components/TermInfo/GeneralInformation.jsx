@@ -360,14 +360,9 @@ const GeneralInformation = ({ data, classes }) => {
                     color: whiteColor,
                     textAlign: 'right',
                     fontWeight: 'bold',
-                    cursor: parsedItem.relationship.id ? 'pointer' : 'default',
-                    transition: 'color 0.2s ease-in-out',
-                    marginBottom: '0.5rem',
-                    '&:hover': parsedItem.relationship.id ? {
-                      color: tabActiveColor
-                    } : {}
+                    cursor: 'default',
+                    marginBottom: '0.5rem'
                   }}
-                  onClick={() => handleTermClick(parsedItem.relationship.id)}
                 >
                   {parsedItem.relationship.text};
                 </Typography>
@@ -439,63 +434,138 @@ const GeneralInformation = ({ data, classes }) => {
       return images;
     };
 
-    // Remove images from text, keeping only the text content
-    const getTextOnlyContent = (text) => {
-      return text.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '').trim();
+    // Parse cross reference format: "![alt](img) [text](link): [text2](link2)"
+    const parseCrossReference = (text) => {
+      // Remove images from text for parsing
+      const textWithoutImages = text.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '').trim();
+      
+      // Pattern to match: [text](link): [text2](link2)
+      const pattern = /\[([^\]]+)\]\(([^)]+)\):\s*\[([^\]]+)\]\(([^)]+)\)/;
+      const match = textWithoutImages.match(pattern);
+      
+      if (match) {
+        return {
+          mainText: match[1],
+          mainLink: match[2],
+          secondaryText: match[3],
+          secondaryLink: match[4]
+        };
+      }
+      
+      // Fallback: try to parse just main link without secondary
+      const singlePattern = /\[([^\]]+)\]\(([^)]+)\)/;
+      const singleMatch = textWithoutImages.match(singlePattern);
+      
+      if (singleMatch) {
+        return {
+          mainText: singleMatch[1],
+          mainLink: singleMatch[2],
+          secondaryText: null,
+          secondaryLink: null
+        };
+      }
+      
+      return null;
     };
 
     const images = typeof crossReferences === 'string' ? extractImageUrls(crossReferences) : [];
-    const textContent = typeof crossReferences === 'string' ? getTextOnlyContent(crossReferences) : String(crossReferences);
-    
-    // Split by semicolon and render each part on a new line
-    const crossRefItems = textContent.split(';').filter(item => item.trim());
+    const parsedRef = typeof crossReferences === 'string' ? parseCrossReference(crossReferences) : null;
     
     const content = (
       <Box sx={{ textAlign: 'right' }}>
-        {crossRefItems.length > 0 ? (
-          crossRefItems.map((item, index) => (
-            <Box key={index} sx={{ 
-              marginBottom: index < crossRefItems.length - 1 ? '0.5rem' : 0 
-            }}>
-              <ReactMarkdown 
-                components={{
-                  a: ({ href, children }) => (
-                    <a 
-                      href={href} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      style={{ 
-                        color: tabActiveColor,
-                        textDecoration: 'underline' 
-                      }}
-                    >
-                      {children}
-                    </a>
-                  ),
-                  p: ({ children }) => (
-                    <Typography sx={{
-                      ...classes.heading,
-                      color: whiteColor,
-                      textAlign: 'right',
-                      margin: 0
-                    }}>
-                      {children}
-                    </Typography>
-                  )
+        {parsedRef ? (
+          <Box>
+            <a 
+              href={parsedRef.mainLink} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              style={{ 
+                color: tabActiveColor,
+                textDecoration: 'none',
+                fontSize: 'inherit'
+              }}
+            >
+              <Typography 
+                component="span"
+                sx={{
+                  ...classes.heading,
+                  color: tabActiveColor,
+                  '&:hover': {
+                    textDecoration: 'underline'
+                  }
                 }}
               >
-                {item.trim()}
-              </ReactMarkdown>
-            </Box>
-          ))
+                {parsedRef.mainText}
+              </Typography>
+            </a>
+            {parsedRef.secondaryText && (
+              <>
+                <Typography 
+                  component="span"
+                  sx={{
+                    ...classes.heading,
+                    color: whiteColor,
+                    margin: '0 0.25rem'
+                  }}
+                >
+                  :
+                </Typography>
+                <a 
+                  href={parsedRef.secondaryLink} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  style={{ 
+                    color: tabActiveColor,
+                    textDecoration: 'none',
+                    fontSize: 'inherit'
+                  }}
+                >
+                  <Typography 
+                    component="span"
+                    sx={{
+                      ...classes.heading,
+                      color: tabActiveColor,
+                      '&:hover': {
+                        textDecoration: 'underline'
+                      }
+                    }}
+                  >
+                    {parsedRef.secondaryText}
+                  </Typography>
+                </a>
+              </>
+            )}
+          </Box>
         ) : (
-          <Typography sx={{
-            ...classes.heading,
-            color: whiteColor,
-            textAlign: 'right'
-          }}>
-            {typeof crossReferences === 'string' ? 'Cross Reference' : String(crossReferences)}
-          </Typography>
+          <ReactMarkdown 
+            components={{
+              a: ({ href, children }) => (
+                <a 
+                  href={href} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  style={{ 
+                    color: tabActiveColor,
+                    textDecoration: 'underline' 
+                  }}
+                >
+                  {children}
+                </a>
+              ),
+              p: ({ children }) => (
+                <Typography sx={{
+                  ...classes.heading,
+                  color: whiteColor,
+                  textAlign: 'right',
+                  margin: 0
+                }}>
+                  {children}
+                </Typography>
+              )
+            }}
+          >
+            {typeof crossReferences === 'string' ? crossReferences.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '').trim() : String(crossReferences)}
+          </ReactMarkdown>
         )}
       </Box>
     );
@@ -535,6 +605,73 @@ const GeneralInformation = ({ data, classes }) => {
     return content;
   };
 
+  // Render Synonyms array
+  const renderSynonyms = (synonyms) => {
+    if (!Array.isArray(synonyms) || synonyms.length === 0) return null;
+    
+    const handlePublicationClick = (publication) => {
+      // Extract ID from markdown format [text](id)
+      const match = publication.match(/\[([^\]]+)\]\(([^)]+)\)/);
+      if (match && match[2]) {
+        getInstanceByID(match[2], true, true, true);
+      }
+    };
+
+    return (
+      <Box sx={{ textAlign: 'right' }}>
+        {synonyms.map((synonym, index) => {
+          if (!synonym || !synonym.label) return null;
+          
+          return (
+            <Box key={index} sx={{ 
+              marginBottom: index < synonyms.length - 1 ? '0.5rem' : 0 
+            }}>
+              <Typography 
+                component="span"
+                sx={{
+                  ...classes.heading,
+                  color: whiteColor,
+                  textAlign: 'right'
+                }}
+              >
+                {synonym.label}
+              </Typography>
+              {synonym.publication && (
+                <>
+                  <Typography 
+                    component="span"
+                    sx={{
+                      ...classes.heading,
+                      color: whiteColor,
+                      margin: '0 0.25rem'
+                    }}
+                  >
+                    ,
+                  </Typography>
+                  <Typography 
+                    component="span"
+                    sx={{
+                      ...classes.heading,
+                      color: tabActiveColor,
+                      cursor: 'pointer',
+                      transition: 'color 0.2s ease-in-out',
+                      '&:hover': {
+                        textDecoration: 'underline'
+                      }
+                    }}
+                    onClick={() => handlePublicationClick(synonym.publication)}
+                  >
+                    {synonym.publication.replace(/\[([^\]]+)\]\(([^)]+)\)/, '$1')}
+                  </Typography>
+                </>
+              )}
+            </Box>
+          );
+        })}
+      </Box>
+    );
+  };
+
   // Generic property renderer
   const renderProperty = (key, value) => {
     // Skip special properties that we handle separately or don't want to display
@@ -546,6 +683,13 @@ const GeneralInformation = ({ data, classes }) => {
 
     // Skip object properties (but allow arrays) - except for Meta and Licenses which we handle specially
     if (typeof value === 'object' && value !== null && !Array.isArray(value) && key !== 'Meta' && key !== 'Licenses') return null;
+
+    // Skip empty values
+    if (value === null || value === undefined || value === '' || 
+        (Array.isArray(value) && value.length === 0) ||
+        (typeof value === 'string' && value.trim() === '')) {
+      return null;
+    }
 
     // Handle special cases
     switch (key) {
@@ -561,6 +705,8 @@ const GeneralInformation = ({ data, classes }) => {
         return renderRelationships(value);
       case 'Cross References':
         return renderCrossReferences(value);
+      case 'Synonyms':
+        return renderSynonyms(value);
       default:
         // Handle different value types
         if (Array.isArray(value)) {
@@ -612,10 +758,20 @@ const GeneralInformation = ({ data, classes }) => {
     const properties = [];
     const seenKeys = new Set(); // Track seen property names to avoid duplicates
     
+    // Helper function to check if a value is empty
+    const isEmpty = (value) => {
+      return value === null || 
+             value === undefined || 
+             value === '' || 
+             (Array.isArray(value) && value.length === 0) ||
+             (typeof value === 'string' && value.trim() === '') ||
+             (typeof value === 'object' && value !== null && !Array.isArray(value) && Object.keys(value).length === 0);
+    };
+    
     // Add standard properties in specific order: Name, Tags, Description only
     const standardOrder = ['Name', 'Tags'];
     standardOrder.forEach(key => {
-      if (data.metadata[key] !== undefined) {
+      if (data.metadata[key] !== undefined && !isEmpty(data.metadata[key])) {
         properties.push({ key, value: data.metadata[key] });
         seenKeys.add(key);
       }
@@ -632,8 +788,7 @@ const GeneralInformation = ({ data, classes }) => {
     Object.entries(data.metadata).forEach(([key, value]) => {
       if (!skipKeys.includes(key) && 
           !seenKeys.has(key) &&
-          value !== undefined && 
-          value !== null &&
+          !isEmpty(value) &&
           typeof value !== 'boolean' &&
           !(typeof value === 'object' && !Array.isArray(value))) {
         properties.push({ key, value });
@@ -645,8 +800,7 @@ const GeneralInformation = ({ data, classes }) => {
     if (data.metadata.Meta && typeof data.metadata.Meta === 'object') {
       Object.entries(data.metadata.Meta).forEach(([key, value]) => {
         if (!seenKeys.has(key) &&
-            value !== undefined && 
-            value !== null &&
+            !isEmpty(value) &&
             typeof value !== 'boolean' &&
             !(typeof value === 'object' && !Array.isArray(value))) {
           // Special check for Comment - don't render if empty
@@ -678,6 +832,10 @@ const GeneralInformation = ({ data, classes }) => {
           <Box
             sx={{
               width: '15rem',
+              height: {
+                xs: '15.188rem',
+                lg: '14.25rem'
+              },
               background: {
                 xs: carouselBg,
                 lg: headerBorderColor
@@ -689,7 +847,7 @@ const GeneralInformation = ({ data, classes }) => {
             <TerminfoSlider
               allowFullscreen
               setFullScreen={setFullScreen}
-              examples={data?.metadata?.Images ? data?.metadata?.Images : data?.metadata?.Examples}
+              examples={data?.metadata?.Images && Object.keys(data?.metadata?.Images).length > 0 ? data?.metadata?.Images : data?.metadata?.Examples}
             />
           </Box>
         </Grid>
@@ -755,11 +913,6 @@ const GeneralInformation = ({ data, classes }) => {
           </Box>
         </Grid>
       </Grid>
-
-      {/* Full-width area below both columns */}
-      <Box sx={{ width: '100%', mt: 2 }}>
-        {/* Place any full-width content here, e.g. additional info, charts, etc. */}
-      </Box>
 
       {fullScreen && (
         <FullScreenViewer open={fullScreen} onClose={() => setFullScreen(false)} images={data?.metadata?.Images ? data?.metadata?.Images : data?.metadata?.Examples} />

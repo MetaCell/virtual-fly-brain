@@ -1,4 +1,3 @@
-import { Return } from '../icons';
 import { getGlobalTypes } from './actions/types/GlobalTypes';
 import { getInstancesTypes } from './actions/types/getInstancesTypes';
 import { getLayoutTypes } from './actions/types/getLayoutTypes';

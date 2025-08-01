@@ -158,13 +158,13 @@ const Query = forwardRef(({ fullWidth, queries, searchTerm }, ref) => {
   const dispatch = useDispatch();
 
   // Memoize callbacks to prevent unnecessary re-renders
-  const updateFilters = useCallback((searches) => {
+  const updateFilters = useCallback((_searches) => {
     // This function might need implementation based on your needs
   }, []);
 
   const handleChipDelete = useCallback((label) => {
-    setChipTags(prevTags => 
-      prevTags.map(tag => 
+    setChipTags(prevTags =>
+      prevTags.map(tag =>
         tag.label === label ? { ...tag, active: false } : tag
       )
     );
@@ -368,7 +368,7 @@ const Query = forwardRef(({ fullWidth, queries, searchTerm }, ref) => {
               if ( chipTags?.filter(f => f.active)?.some(v => tags.includes(v.label)) ) {
                 return (
                   <Grid
-                    key={row.id || index}
+                    key={row.id || index + row.label}
                     item
                     xs={12}
                     sm={6}

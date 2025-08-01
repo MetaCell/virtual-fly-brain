@@ -21,7 +21,7 @@ const GraphReducer = (state = initialStateGraphReducer, response) => {
       return Object.assign({}, state, {
         selection : response.payload.data.selection,
         instanceOnFocus : response.payload.data.instance
-      })
+      });
     default:
         return state;
   }

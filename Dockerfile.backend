@@ -1,0 +1,61 @@
+# Use Python base image
+FROM python:3.9-slim
+
+# Set working directory
+WORKDIR /app
+
+# Install git, build tools, and OpenGL dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    build-essential \
+    libgl1-mesa-glx \
+    libgl1-mesa-dev \
+    xvfb \
+    libglu1-mesa \
+    libosmesa6 \
+    freeglut3-dev \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set up virtual display for OpenGL
+ENV DISPLAY=:99
+
+# Install Cloud harness
+RUN git clone -b 'release/2.1.0' https://github.com/metacell/cloud-harness 
+RUN cd cloud-harness && sh install.sh
+
+# Copy backend files first
+COPY applications/virtual-fly-brain/backend/virtual_fly_brain /app/virtual_fly_brain
+COPY applications/virtual-fly-brain/backend/setup.py /app/
+COPY applications/virtual-fly-brain/backend/requirements.txt /app/
+COPY applications/virtual-fly-brain/backend/test-requirements.txt /app/
+
+# Copy and install VFBquery
+# COPY applications/virtual-fly-brain/backend/virtual_fly_brain/libs/VFBquery /app/VFBquery
+RUN cd /app && git clone https://github.com/VirtualFlyBrain/VFBquery/ && cd VFBquery && git checkout v0.3.1 && pip install -e .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt -r test-requirements.txt
+
+# Add virtual_fly_brain to PYTHONPATH
+ENV PYTHONPATH=/app:/app/virtual_fly_brain:${PYTHONPATH} \
+    PYTHONUNBUFFERED=1 \
+    VFB_DEV=true
+
+# Create and set up volume directories
+RUN mkdir -p /app/data /app/cache
+VOLUME ["/app/data", "/app/cache"]
+
+# Expose port
+EXPOSE 8080
+
+# Create startup script
+RUN echo '#!/bin/bash\n\
+Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &\n\
+sleep 1\n\
+cd /app/virtual_fly_brain\n\
+python __main__.py' > /start.sh && \
+    chmod +x /start.sh
+
+# Command to run the application
+CMD ["/start.sh"]

@@ -17,16 +17,17 @@ steps:
     type: parallel
     stage: prepare
     steps:
-    - title: Cloning cloud-harness repository...
-      type: git-clone
-      stage: prepare
-      repo: https://github.com/MetaCell/cloud-harness.git
-      revision: '${{CLOUDHARNESS_BRANCH}}'
-      working_directory: .
-      git: github
+      cloning_cloudharness:
+        title: Cloning cloud-harness repository...
+        type: git-clone
+        stage: prepare
+        repo: https://github.com/MetaCell/cloud-harness.git
+        revision: '${{CLOUDHARNESS_BRANCH}}'
+        working_directory: .
+        git: github
   prepare_deployment:
     title: Prepare helm chart
-    image: python:3.9.10
+    image: python:3.10
     stage: prepare
     working_directory: .
     commands:
@@ -62,21 +63,6 @@ steps:
         image_name: virtual-fly-brain/cloudharness-base-debian
         title: Cloudharness base debian
         working_directory: ./cloud-harness
-      cloudharness-base:
-        type: build
-        stage: build
-        tag: '${{CF_BUILD_ID}}'
-        dockerfile: infrastructure/base-images/cloudharness-base/Dockerfile
-        registry: '${{CODEFRESH_REGISTRY}}'
-        buildkit: true
-        build_arguments:
-        - TAG=${{CF_BUILD_ID}}
-        - DOMAIN=${{DOMAIN}}
-        - NOCACHE=${{CF_BUILD_ID}}
-        - REGISTRY=${{REGISTRY}}/virtual-fly-brain
-        image_name: virtual-fly-brain/cloudharness-base
-        title: Cloudharness base
-        working_directory: ./cloud-harness
   build_static_images:
     title: Build static images
     type: parallel
@@ -94,7 +80,7 @@ steps:
         - DOMAIN=${{DOMAIN}}
         - NOCACHE=${{CF_BUILD_ID}}
         - REGISTRY=${{REGISTRY}}/virtual-fly-brain
-        - CLOUDHARNESS_BASE=${{REGISTRY}}/virtual-fly-brain/cloudharness-base:${{CF_BUILD_ID}}
+        - CLOUDHARNESS_BASE=${{REGISTRY}}/virtual-fly-brain/cloudharness-base-debian:${{CF_BUILD_ID}}
         image_name: virtual-fly-brain/cloudharness-flask
         title: Cloudharness flask
         working_directory: ./cloud-harness/infrastructure/common-images/cloudharness-flask
@@ -102,21 +88,6 @@ steps:
     type: parallel
     stage: build
     steps:
-      accounts:
-        type: build
-        stage: build
-        tag: '${{CF_BUILD_ID}}'
-        dockerfile: Dockerfile
-        registry: '${{CODEFRESH_REGISTRY}}'
-        buildkit: true
-        build_arguments:
-        - TAG=${{CF_BUILD_ID}}
-        - DOMAIN=${{DOMAIN}}
-        - NOCACHE=${{CF_BUILD_ID}}
-        - REGISTRY=${{REGISTRY}}/virtual-fly-brain
-        image_name: virtual-fly-brain/accounts
-        title: Accounts
-        working_directory: ./cloud-harness/applications/accounts
       virtual-fly-brain:
         type: build
         stage: build
@@ -149,14 +120,6 @@ steps:
     - HELM_REPO_CONTEXT_PATH=
     - TIMEOUT=600s
     - VALUESFILE_values=./deployment/helm/values.yaml
-  approval:
-    type: pending-approval
-    stage: publish
-    title: Approve build
-    description: Approve build release and tagging
-    timeout:
-      duration: 168
-      finalState: denied
   publish:
     type: parallel
     stage: publish
@@ -169,27 +132,11 @@ steps:
         tags:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'
         registry: '${{REGISTRY_PUBLISH_URL}}'
-      publish_cloudharness-base:
-        stage: publish
-        type: push
-        title: Cloudharness base
-        candidate: '${{REGISTRY}}/virtual-fly-brain/cloudharness-base:${{CF_BUILD_ID}}'
-        tags:
-        - '${{DEPLOYMENT_PUBLISH_TAG}}'
-        registry: '${{REGISTRY_PUBLISH_URL}}'
       publish_cloudharness-flask:
         stage: publish
         type: push
         title: Cloudharness flask
         candidate: '${{REGISTRY}}/virtual-fly-brain/cloudharness-flask:${{CF_BUILD_ID}}'
-        tags:
-        - '${{DEPLOYMENT_PUBLISH_TAG}}'
-        registry: '${{REGISTRY_PUBLISH_URL}}'
-      publish_accounts:
-        stage: publish
-        type: push
-        title: Accounts
-        candidate: '${{REGISTRY}}/virtual-fly-brain/accounts:${{CF_BUILD_ID}}'
         tags:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'
         registry: '${{REGISTRY_PUBLISH_URL}}'

@@ -1,0 +1,41 @@
+name: Run Tests
+
+on:
+  push:
+    branches:
+      - main
+      - development
+  pull_request:
+    branches:
+      - main
+      - development
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Checkout the repository
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Step 2: Set up Python
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9' # Adjust the Python version as needed
+
+    # Step 3: Install dependencies
+    - name: Install dependencies
+      working-directory: applications/virtual-fly-brain/backend
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r test-requirements.txt
+        pip install -e .
+        cd virtual_fly_brain && mkdir www && cd www && touch index.html
+
+    # Step 4: Run the tests
+    - name: Run tests
+      run: |
+        python -m unittest discover -s applications/virtual-fly-brain/backend/tests -p "test_main.py"

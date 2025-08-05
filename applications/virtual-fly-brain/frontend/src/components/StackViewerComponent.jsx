@@ -137,12 +137,19 @@ const rgbToHex = (color) => {
         .on('touchendoutside', this.onDragEnd)
         // events for drag move
         .on('mousemove', this.onDragMove)
-        .on('touchmove', this.onDragMove);
+        .on('touchmove', this.onDragMove)
+        // events for click (backup handler)
+        .on('click', this.onStackClick)
+        .on('tap', this.onStackClick);
 
       this.disp.addChild(this.stack);
 
-      // block move event outside stack
-      this.app.renderer.plugins.interaction.moveWhenInside = true;
+      // Configure interaction plugin for newer PIXI.js versions
+      if (this.app.renderer.plugins.interaction) {
+        this.app.renderer.plugins.interaction.moveWhenInside = true;
+      } else if (this.app.renderer.events) {
+        this.app.renderer.events.moveWhenInside = true;
+      }
 
       // call metadata from server
       this.callDstRange();
@@ -222,9 +229,27 @@ const rgbToHex = (color) => {
 
 
     componentWillUnmount: function () {
-      // this.refs.stackCanvas?.removeChild(this.app.view);
-      // this.app.destroy(true,true);
-      // this.app = null;
+      // Properly cleanup PIXI application and WebGL context
+      if (this.app) {
+        // Remove canvas from DOM
+        if (this.refs.stackCanvas && this.app.view && this.app.view.parentNode) {
+          this.app.view.parentNode.removeChild(this.app.view);
+        }
+        
+        // Destroy PIXI application and free WebGL context
+        this.app.destroy(true, true);
+        this.app = null;
+      }
+
+      // Cleanup containers
+      if (this.disp) {
+        this.disp.destroy();
+        this.disp = null;
+      }
+      if (this.stack) {
+        this.stack.destroy();
+        this.stack = null;
+      }
 
       window.addEventListener? document.removeEventListener('keydown', this.setShiftDown, false) : document.attachEvent('keydown', this.setShiftDown);
       window.addEventListener? document.removeEventListener('keyup', this.setShiftUp, false) : document.detachEvent('keyup', this.setShiftUp);
@@ -953,11 +978,31 @@ const rgbToHex = (color) => {
      */
     // eslint-disable-next-line no-unused-vars
     clearVisualState: function(reason) {
+      // Properly dispose of existing sprites and textures to prevent memory leaks
+      if (this.stack && this.stack.children) {
+        this.stack.children.forEach(child => {
+          // Don't destroy the status text buffer
+          if (child !== this.state.buffer[-1]) {
+            if (child.texture) {
+              child.texture.destroy(true);
+            }
+            if (child.destroy) {
+              child.destroy();
+            }
+          }
+        });
+      }
+      
+      // Clear arrays and objects
       this.state.images = [];
       this.state.visibleTiles = [];
       this.state.iBuffer = {};
       this.state.imagesUrl = {};
-      this.stack.removeChildren();
+      
+      // Remove all children from stack container (but preserve status text)
+      if (this.stack) {
+        this.stack.removeChildren();
+      }
     },
 
     /**
@@ -1103,6 +1148,10 @@ const rgbToHex = (color) => {
     },
 
     setStatusText: function (text) {
+      // Ensure status text buffer exists
+      if (!this.state.buffer[-1]) {
+        this.createStatusText();
+      }
       this.state.buffer[-1].x = (40);
       this.state.buffer[-1].y = (8);
       this.state.buffer[-1].text = text;
@@ -1111,6 +1160,10 @@ const rgbToHex = (color) => {
     },
 
     setHoverText: function (x,y,text) {
+      // Ensure status text buffer exists
+      if (!this.state.buffer[-1]) {
+        this.createStatusText();
+      }
       this.state.buffer[-1].x = this.disp.position.x + (this.stack.position.x * this.disp.scale.x) + (Number(x) * this.disp.scale.x) - 10;
       this.state.buffer[-1].y = this.disp.position.y + (this.stack.position.y * this.disp.scale.y) + (Number(y) * this.disp.scale.y) + 15;
       this.state.buffer[-1].text = text;
@@ -1172,6 +1225,24 @@ const rgbToHex = (color) => {
         this.state.buffer[-1].text = '';
       }
       this.state.dragging = false;
+    },
+
+    onStackClick: function (event) {
+      // Backup click handler for when drag doesn't register as a click
+      if (!this.state.dragging) {
+        var clickPosition;
+        if (event.data && typeof event.data.getLocalPosition === "function") {
+          clickPosition = event.data.getLocalPosition(this.stack);
+          this.state.posX = Number(clickPosition.x.toFixed(0));
+          this.state.posY = Number(clickPosition.y.toFixed(0));
+          this.callObjects();
+        } else if (this.state.data && typeof this.state.data.getLocalPosition === "function") {
+          clickPosition = this.state.data.getLocalPosition(this.stack);
+          this.state.posX = Number(clickPosition.x.toFixed(0));
+          this.state.posY = Number(clickPosition.y.toFixed(0));
+          this.callObjects();
+        }
+      }
     },
 
     onHoverEvent: function (event) {

@@ -40,7 +40,6 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
   const [LayoutComponent, setLayoutComponent] = useState(undefined);
   const [isLayoutMobile, setIsLayoutMobile] = useState(window.innerWidth < 1200);
   const misalignedTemplate = useSelector(state => state.globalInfo.misalignedTemplate)
-  const alignedTemplates = useSelector( state => state.globalInfo.alignedTemplates)
   const dispatch = useDispatch();
   const store = useStore();
   let _templateRef = window.location.origin + "?id=" + misalignedTemplate;
@@ -68,9 +67,9 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
     setTab(defaultActiveTab)
   }, [desktopScreen])
 
-  useEffect(() => {
-    setModalOpen(!alignedTemplates)
-  }, [alignedTemplates])
+  // useEffect(() => {
+  //   setModalOpen(!alignedTemplates)
+  // }, [alignedTemplates])
 
   useEffect(() => {
     if (LayoutComponent === undefined) {

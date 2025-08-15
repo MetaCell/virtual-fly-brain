@@ -225,40 +225,45 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
               marginBottom: index < Object.values(licenses).length - 1 ? '0.5rem' : 0
             }}>
               {/* License Label */}
-              <Typography 
-                sx={{
-                  ...classes.heading,
-                  color: whiteColor,
-                  textAlign: 'right',
-                  cursor: license.short_form ? 'pointer' : 'default',
-                  transition: 'color 0.2s ease-in-out',
-                  '&:hover': license.short_form ? {
-                    color: tabActiveColor
-                  } : {}
-                }}
-                onClick={() => handleLabelClick(license.short_form)}
-              >
-                {license.label}
-              </Typography>
-              
-              {/* License Icon */}
-              {license.icon && (
-                <Box
-                  component="img"
-                  src={license.icon}
-                  alt={license.label}
-                  sx={{
-                    height: '1em',
-                    width: 'auto',
-                    cursor: 'pointer',
-                    transition: 'opacity 0.2s ease-in-out',
-                    '&:hover': {
-                      opacity: 0.8
-                    }
-                  }}
-                  onClick={() => handleIconClick(license.iri)}
-                />
-              )}
+              {(() => {
+                const typographyElement = (
+                  <Typography 
+                    sx={{
+                      ...classes.heading,
+                      color: whiteColor,
+                      textAlign: 'right',
+                      cursor: license.short_form ? 'pointer' : 'default',
+                      transition: 'color 0.2s ease-in-out',
+                      '&:hover': license.short_form ? {
+                        color: tabActiveColor
+                      } : {}
+                    }}
+                    onClick={() => handleLabelClick(license.short_form)}
+                  >
+                    {license.label}
+                  </Typography>
+                );
+
+                return license.icon ? (
+                  <Tooltip title={ <Box
+                      component="img"
+                      src={license.icon}
+                      alt={license.label}
+                      sx={{
+                        height: 'auto',
+                        width: '100px',
+                        cursor: 'pointer',
+                        transition: 'opacity 0.2s ease-in-out',
+                        '&:hover': {
+                          opacity: 0.8
+                        }
+                      }}
+                      onClick={() => handleIconClick(license.iri)}
+                    />} placement="bottom" arrow> 
+                    {typographyElement}
+                  </Tooltip>
+                ) : typographyElement;
+              })()}
             </Box>
           );
         })}
@@ -624,8 +629,13 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
           
           return (
             <Box key={index} sx={{ 
-              marginBottom: index < synonyms.length - 1 ? '0.5rem' : 0 
+              marginBottom: index < synonyms.length - 1 ? '0.5rem' : 0 ,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              columnGap: '0.5rem'
             }}>
+             
               <Typography 
                 component="span"
                 sx={{
@@ -637,6 +647,27 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
                 {synonym.label}
               </Typography>
               {synonym.publication && (
+              <Box onClick={() => handlePublicationClick(synonym.publication)} sx={{
+                backgroundColor: '#0164d8',
+                width: 'fit-content',
+                padding: '0.2rem 0.3rem',
+                borderRadius: '0.25rem',
+                cursor: 'pointer'
+              }}>
+                <Tooltip title={`${synonym.publication.replace(/\[([^\]]+)\]\(([^)]+)\)/, '$1')}`} placement="top" arrow>
+                  <Typography sx={{
+                    ...classes.heading,
+                    color: whiteColor,
+                    textAlign: 'right',
+                    fontSize: '0.75rem',
+                    fontWeight: 'bold'
+                  }}>
+                    Pub
+                  </Typography>
+                </Tooltip>
+              </Box>
+              )}
+              {/* {synonym.publication && (
                 <>
                   <Typography 
                     component="span"
@@ -664,7 +695,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
                     {synonym.publication.replace(/\[([^\]]+)\]\(([^)]+)\)/, '$1')}
                   </Typography>
                 </>
-              )}
+              )} */}
             </Box>
           );
         })}
@@ -675,7 +706,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
   // Generic property renderer
   const renderProperty = (key, value) => {
     // Skip special properties that we handle separately or don't want to display
-    const skipProperties = ['Images', 'Examples'];
+    const skipProperties = ['Images', 'Examples', 'SuperTypes'];
     if (skipProperties.includes(key)) return null;
 
     // Skip boolean properties
@@ -696,7 +727,6 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
       case 'Name':
         return renderName(value, data?.metadata?.Id);
       case 'Tags':
-      case 'SuperTypes':
       case 'Types':
         return renderTags(value);
       case 'Licenses':
@@ -834,8 +864,10 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
       }
     }
     
-    // Add "Aligned To" at the end
-    properties.push({ key: 'Aligned To', value: null, isAlignedTo: true });
+    // Add "Aligned To" only when showMetadataOnly is true
+    if (showMetadataOnly) {
+      properties.push({ key: 'Aligned To', value: null, isAlignedTo: true });
+    }
     
     return properties;
   };

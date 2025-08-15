@@ -24,7 +24,7 @@ const chips_cutoff = 2;
 
 const facets_annotations_colors = getUpdatedTags(colors_config)
 
-const GeneralInformation = ({ data, classes }) => {
+const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
   const [toggleReadMore, setToggleReadMore] = useState({});
   const [fullScreen, setFullScreen] = useState(false)
   const reduxState = useSelector(state => state);
@@ -768,55 +768,70 @@ const GeneralInformation = ({ data, classes }) => {
              (typeof value === 'object' && value !== null && !Array.isArray(value) && Object.keys(value).length === 0);
     };
     
-    // Add standard properties in specific order: Name, Tags, Description only
-    const standardOrder = ['Name', 'Tags'];
-    standardOrder.forEach(key => {
-      if (data.metadata[key] !== undefined && !isEmpty(data.metadata[key])) {
-        properties.push({ key, value: data.metadata[key] });
-        seenKeys.add(key);
+    if (showMetadataOnly) {
+      // When showMetadataOnly is true, show everything EXCEPT Name, Synonyms, and Licenses
+      
+      // Add Tags
+      if (data.metadata.Tags && !isEmpty(data.metadata.Tags)) {
+        properties.push({ key: 'Tags', value: data.metadata.Tags });
+        seenKeys.add('Tags');
       }
-    });
-    
-    // Add Description from Meta if it exists (special handling for Description)
-    if (data.metadata.Meta?.Description && data.metadata.Meta.Description.trim()) {
-      properties.push({ key: 'Description', value: data.metadata.Meta.Description });
-      seenKeys.add('Description');
-    }
-    
-    // Add other properties from main metadata (excluding already handled ones)
-    const skipKeys = ['Meta', 'Licenses', 'Images', 'Examples', 'Id', 'Queries'];
-    Object.entries(data.metadata).forEach(([key, value]) => {
-      if (!skipKeys.includes(key) && 
-          !seenKeys.has(key) &&
-          !isEmpty(value) &&
-          typeof value !== 'boolean' &&
-          !(typeof value === 'object' && !Array.isArray(value))) {
-        properties.push({ key, value });
-        seenKeys.add(key);
+      
+      // Add Description from Meta if it exists
+      if (data.metadata.Meta?.Description && data.metadata.Meta.Description.trim()) {
+        properties.push({ key: 'Description', value: data.metadata.Meta.Description });
+        seenKeys.add('Description');
       }
-    });
-    
-    // Add all Meta properties (excluding duplicates and already handled ones)
-    if (data.metadata.Meta && typeof data.metadata.Meta === 'object') {
-      Object.entries(data.metadata.Meta).forEach(([key, value]) => {
-        if (!seenKeys.has(key) &&
+      
+      // Add other properties from main metadata (excluding Name, Synonyms, Licenses)
+      const skipKeys = ['Meta', 'Licenses', 'Images', 'Examples', 'Id', 'Queries', 'Name', 'Synonyms'];
+      Object.entries(data.metadata).forEach(([key, value]) => {
+        if (!skipKeys.includes(key) && 
+            !seenKeys.has(key) &&
             !isEmpty(value) &&
             typeof value !== 'boolean' &&
             !(typeof value === 'object' && !Array.isArray(value))) {
-          // Special check for Comment - don't render if empty
-          if (key === 'Comment' && (!value || !value.trim())) {
-            return;
-          }
           properties.push({ key, value });
           seenKeys.add(key);
         }
       });
-    }
-    
-    // Add Licenses as a single property if they exist
-    if (data.metadata.Licenses && typeof data.metadata.Licenses === 'object' && Object.keys(data.metadata.Licenses).length > 0) {
-      properties.push({ key: 'Licenses', value: data.metadata.Licenses });
-      seenKeys.add('Licenses');
+      
+      // Add all Meta properties (excluding duplicates and already handled ones)
+      if (data.metadata.Meta && typeof data.metadata.Meta === 'object') {
+        Object.entries(data.metadata.Meta).forEach(([key, value]) => {
+          if (!seenKeys.has(key) &&
+              !isEmpty(value) &&
+              typeof value !== 'boolean' &&
+              !(typeof value === 'object' && !Array.isArray(value))) {
+            // Special check for Comment - don't render if empty
+            if (key === 'Comment' && (!value || !value.trim())) {
+              return;
+            }
+            properties.push({ key, value });
+            seenKeys.add(key);
+          }
+        });
+      }
+    } else {
+      // When showMetadataOnly is false, show ONLY Name, Synonyms, and Licenses
+      
+      // Add Name
+      if (data.metadata.Name && !isEmpty(data.metadata.Name)) {
+        properties.push({ key: 'Name', value: data.metadata.Name });
+        seenKeys.add('Name');
+      }
+      
+      // Add Synonyms
+      if (data.metadata.Synonyms && !isEmpty(data.metadata.Synonyms)) {
+        properties.push({ key: 'Synonyms', value: data.metadata.Synonyms });
+        seenKeys.add('Synonyms');
+      }
+      
+      // Add Licenses
+      if (data.metadata.Licenses && typeof data.metadata.Licenses === 'object' && Object.keys(data.metadata.Licenses).length > 0) {
+        properties.push({ key: 'Licenses', value: data.metadata.Licenses });
+        seenKeys.add('Licenses');
+      }
     }
     
     // Add "Aligned To" at the end
@@ -828,7 +843,7 @@ const GeneralInformation = ({ data, classes }) => {
   return (
     <>
       <Grid container columnSpacing={2}>
-        <Grid item xs={12} sm={4} md={5} lg={5}>
+        {!showMetadataOnly && <Grid item xs={12} sm={4} md={5} lg={5}>
           <Box
             sx={{
               width: '15rem',
@@ -850,15 +865,16 @@ const GeneralInformation = ({ data, classes }) => {
               examples={data?.metadata?.Images && Object.keys(data?.metadata?.Images).length > 0 ? data?.metadata?.Images : data?.metadata?.Examples}
             />
           </Box>
-        </Grid>
+        </Grid>}
         <Grid sx={{
           mt: {
             xs: 2,
             sm: 0,
-          }
-        }} item xs={12} sm={8} md={7} lg={7}>
-          <Box display='flex' flexDirection='column' sx={{ rowGap: { xs: 1.25, sm: 1, lg: 1.25 }, width: '15rem' }}>
-            {getMetadataProperties().map(({ key, value, isStatic, isAlignedTo }) => {
+          },
+          width: showMetadataOnly ? '100%' : 'initial'
+        }} item xs={12} sm={showMetadataOnly ? 12 : 8} md={showMetadataOnly ? 12 : 7} lg={showMetadataOnly ? 12 : 7}>
+          <Box display='flex' flexDirection='column' sx={{ rowGap: { xs: 1.25, sm: 1, lg: 1.25 }, width: showMetadataOnly ? '100%' : '15rem' }}>
+          {getMetadataProperties().map(({ key, value, isStatic, isAlignedTo }) => {
               // Handle special cases
               if (key === 'Description' || key === 'Comment') {
                 // Don't render if value is empty

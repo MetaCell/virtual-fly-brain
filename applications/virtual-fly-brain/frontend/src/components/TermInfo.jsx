@@ -915,13 +915,29 @@ const TermInfo = ({ open, setOpen }) => {
                   <Typography>General Information</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <GeneralInformation data={termInfoData} classes={classes} />
+                  <GeneralInformation data={termInfoData} classes={classes} showMetadataOnly={false} />
                 </AccordionDetails>
               </Accordion>
 
               <Accordion
                 expanded={expanded[sections[1]]}
                 onChange={() => handleSection(sections[1])}
+              >
+                <AccordionSummary
+                  expandIcon={<ChevronDown />}
+                  aria-controls="panel1a-content"
+                  id="panel1a-header"
+                >
+                  <Typography>Metadata</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <GeneralInformation data={termInfoData} classes={classes} showMetadataOnly={true} />
+                </AccordionDetails>
+              </Accordion>
+
+              <Accordion
+                expanded={expanded[sections[2]]}
+                onChange={() => handleSection(sections[2])}
               >
                 <AccordionSummary
                   expandIcon={<ChevronDown />}
@@ -1183,8 +1199,8 @@ const TermInfo = ({ open, setOpen }) => {
               </Accordion>
 
               <Accordion
-                expanded={expanded[sections[2]]}
-                onChange={() => handleSection(sections[2])}
+                expanded={expanded[sections[3]]}
+                onChange={() => handleSection(sections[3])}
               >
                 <AccordionSummary
                   expandIcon={<ChevronDown />}

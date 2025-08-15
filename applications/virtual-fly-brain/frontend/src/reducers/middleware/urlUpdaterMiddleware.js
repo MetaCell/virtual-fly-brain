@@ -144,8 +144,6 @@ export const urlUpdaterMiddleware = store => next => (action) => {
         next(action);
         return;
       } else if (IsTemplate && launchTemplate?.metadata?.Id !== action.payload.Id) {
-        console.log('first');
-        
         // If it's a template and the launchTemplate is defined, we need to show the widget to open this template in a new tab
         store.dispatch(setAlignTemplates(false, action.payload.Id));
         return;
@@ -182,7 +180,6 @@ export const urlUpdaterMiddleware = store => next => (action) => {
           get3DMesh(action.payload);
           return;
         } else if (!templates.includes(loadedTemplate) && !IsTemplate) {
-          console.log('second');
             if(Object.keys(action.payload?.Images || {}).length === 0 && Object.keys(action.payload?.Examples || {}).length === 0) {
               next(action);
               return;

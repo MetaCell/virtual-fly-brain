@@ -1,4 +1,4 @@
-import { Box, Button, Chip, Grid, Typography, Tooltip } from "@mui/material";
+import { Box, Button, Chip, Grid, Typography, Tooltip, Stack } from "@mui/material";
 import React, { useState } from "react";
 import { useSelector } from 'react-redux';
 import ReactMarkdown from 'react-markdown';
@@ -272,8 +272,43 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
   };
 
   // Render "Aligned To" chip
-  const renderAlignedTo = () => {
+  const renderAlignedTo = (data) => {
+    const images = Object.keys(data?.Images).length !== 0 ? data?.Images : data?.Examples;
+    const templateIds = Object.keys(images);
+
+    if (templateIds.length === 0) {
+      return null;
+    }
+
+    const AllAlignedTo = () => {
+      return (
+        <>
+        {
+        templateIds.map((templateId) => {
+          return (
+            templateId !== currentTemplateId && <Chip 
+              icon={<LinkIcon />} 
+              label={templateId} 
+                sx={{ 
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s ease-in-out',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  '&:hover': {
+                    backgroundColor: tabActiveColor
+                  }
+                }}
+              onClick={() => getInstanceByID(templateId, true, true, true)}
+            />
+          )
+        })
+      }
+        </>
+      )
+    }
     return currentTemplateId ? (
+      <>
       <Chip 
         icon={<LinkIcon />} 
         label={currentTemplateName} 
@@ -281,16 +316,24 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
         sx={{ 
           cursor: 'pointer',
           transition: 'background-color 0.2s ease-in-out',
+          backgroundColor: tabActiveColor,
           '&:hover': {
             backgroundColor: tabActiveColor
           }
         }}
       />
+      <AllAlignedTo />
+      </>
+      
     ) : (
-      <Chip 
+      <>
+       <Chip 
         label={currentTemplateName} 
         sx={{ cursor: 'default' }}
       />
+      <AllAlignedTo />
+      </>
+     
     );
   };
 
@@ -933,7 +976,9 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
                 return (
                   <Box key={key} display='flex' justifyContent='space-between' columnGap={1}>
                     <Typography sx={classes.heading}>{key}</Typography>
-                    {renderAlignedTo()}
+                    <Stack direction='row' gap={1} alignItems='center' flexWrap='wrap'>
+                      {renderAlignedTo(data?.metadata)}
+                    </Stack>
                   </Box>
                 );
               }

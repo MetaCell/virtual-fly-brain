@@ -42,26 +42,58 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
   const currentTemplateName = currentTemplate?.metadata?.Name || 'Unknown Template';
   const currentTemplateId = currentTemplate?.metadata?.Id;
 
-  const handleTemplateClick = () => {
-    if (currentTemplateId) {
+  const handleTemplateClick = (templateId) => {
+    if (currentTemplateId && templateId === currentTemplateId) {
       getInstanceByID(
         currentTemplateId, 
         true, 
         true, 
         true
       );
+    } else {
+      // Check if template is aligned
+      const alignedTemplates = reduxState.globalInfo.alignedTemplates;
+      const isAligned = alignedTemplates[templateId];
+      
+      // If template is aligned, load it directly
+      if (isAligned) {
+        setIsLoading(true);
+        try {
+          getInstanceByID(templateId, true, true, true);
+        } finally {
+          setIsLoading(false);
+        }
+        return;
+      }
+      
+      // If template is not aligned, show confirmation modal
+      setConfirmationModal({
+        open: true,
+        shortForm: templateId,
+        message: "The template you requested is aligned to another template. Click Okay to open in a new tab or Cancel to just view the template metadata."
+      });
     }
   };
 
   const handleConfirmLoad = async () => {
     setIsLoading(true);
     try {
-      await getInstanceByID(
-        confirmationModal.shortForm, 
-        true, 
-        true, 
-        true
-      );
+      // Check if this is a template click (from handleTemplateClick)
+      if (confirmationModal.shortForm && confirmationModal.message.includes("template")) {
+        // For template clicks, open in new tab
+        window.open(
+          window.location.origin + '/?id=' + confirmationModal.shortForm,
+          '_blank'
+        );
+      } else {
+        // For other cases (licenses, synonyms), load in current tab
+        await getInstanceByID(
+          confirmationModal.shortForm, 
+          true, 
+          true, 
+          true
+        );
+      }
     } catch (error) {
       console.error('Error loading instance:', error);
     } finally {
@@ -338,6 +370,8 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
     const images = Object.keys(data?.Images).length !== 0 ? data?.Images : data?.Examples;
     const templateIds = Object.keys(images);
 
+    console.log(templateIds, currentTemplateId)
+
     if (templateIds.length === 0) {
       return null;
     }
@@ -361,7 +395,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
                     backgroundColor: tabActiveColor
                   }
                 }}
-              onClick={() => getInstanceByID(templateId, true, true, true)}
+              onClick={() => handleTemplateClick(templateId)}
             />
           )
         })

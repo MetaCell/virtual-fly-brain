@@ -9,6 +9,7 @@ import FullScreenViewer from "../queryBuilder/FullScreenViewer";
 import { getUpdatedTags, formatTagText } from "../../utils/utils";
 import { facets_annotations_colors as colors_config } from "../../components/configuration/VFBColors";
 import { getInstanceByID } from "../../reducers/actions/instances";
+import Modal from "../../shared/modal/Modal";
 
 const {
   whiteColor,
@@ -26,7 +27,13 @@ const facets_annotations_colors = getUpdatedTags(colors_config)
 
 const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
   const [toggleReadMore, setToggleReadMore] = useState({});
-  const [fullScreen, setFullScreen] = useState(false)
+  const [fullScreen, setFullScreen] = useState(false);
+  const [confirmationModal, setConfirmationModal] = useState({
+    open: false,
+    shortForm: null,
+    message: ''
+  });
+  const [isLoading, setIsLoading] = useState(false);
   const reduxState = useSelector(state => state);
   const MAX_LENGTH = 35;
 
@@ -37,8 +44,34 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
 
   const handleTemplateClick = () => {
     if (currentTemplateId) {
-      getInstanceByID(currentTemplateId, true, true, true);
+      getInstanceByID(
+        currentTemplateId, 
+        true, 
+        true, 
+        true
+      );
     }
+  };
+
+  const handleConfirmLoad = async () => {
+    setIsLoading(true);
+    try {
+      await getInstanceByID(
+        confirmationModal.shortForm, 
+        true, 
+        true, 
+        true
+      );
+    } catch (error) {
+      console.error('Error loading instance:', error);
+    } finally {
+      setIsLoading(false);
+      setConfirmationModal({ open: false, shortForm: null, message: '' });
+    }
+  };
+
+  const handleCancelLoad = () => {
+    setConfirmationModal({ open: false, shortForm: null, message: '' });
   };
 
   // Check if a string contains markdown
@@ -199,9 +232,38 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
   const renderLicensesList = (licenses) => {
     if (!licenses || typeof licenses !== 'object') return null;
     
-    const handleLabelClick = (shortForm) => {
-      if (shortForm) {
-        getInstanceByID(shortForm, true, true, true);
+    const handleLabelClick = async (shortForm) => {
+      if (!shortForm) return;
+      
+      try {
+        const alignedTemplates = reduxState.globalInfo.alignedTemplates;
+        const isAligned = alignedTemplates[shortForm];
+        
+        // If template is aligned, load it directly
+        if (isAligned) {
+          setIsLoading(true);
+          try {
+            await getInstanceByID(
+              shortForm, 
+              true, 
+              true, 
+              true
+            );
+          } finally {
+            setIsLoading(false);
+          }
+          return;
+        }
+        
+        // If template is not aligned, show confirmation modal
+        setConfirmationModal({
+          open: true,
+          shortForm,
+          message: "The image you requested is aligned to another template. Click Okay to open in a new tab or Cancel to just view the image metadata."
+        });
+      } catch (error) {
+        console.error('Error loading instance:', error);
+        // TODO: Show user-friendly error message
       }
     };
 
@@ -657,11 +719,36 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
   const renderSynonyms = (synonyms) => {
     if (!Array.isArray(synonyms) || synonyms.length === 0) return null;
     
-    const handlePublicationClick = (publication) => {
+    const handlePublicationClick = async (publication) => {
       // Extract ID from markdown format [text](id)
       const match = publication.match(/\[([^\]]+)\]\(([^)]+)\)/);
-      if (match && match[2]) {
-        getInstanceByID(match[2], true, true, true);
+      if (!match || !match[2]) return;
+      
+      const instanceId = match[2];
+      
+      try {
+        const alignedTemplates = reduxState.globalInfo.alignedTemplates;
+        const isAligned = alignedTemplates[instanceId];
+        
+        // If template is aligned, load it directly
+        if (isAligned) {
+          setIsLoading(true);
+          try {
+            await getInstanceByID(instanceId, true, true, true);
+          } finally {
+            setIsLoading(false);
+          }
+          return;
+        }
+        
+        // If template is not aligned, show confirmation modal
+        setConfirmationModal({
+          open: true,
+          shortForm: instanceId,
+          message: "The image you requested is aligned to another template. Click Okay to open in a new tab or Cancel to just view the image metadata."
+        });
+      } catch (error) {
+        console.error('Error loading instance:', error);
       }
     };
 
@@ -1010,6 +1097,21 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
       {fullScreen && (
         <FullScreenViewer open={fullScreen} onClose={() => setFullScreen(false)} images={data?.metadata?.Images ? data?.metadata?.Images : data?.metadata?.Examples} />
       )}
+
+      {/* Confirmation Modal for License Loading */}
+      <Modal
+        open={confirmationModal.open}
+        handleClose={handleCancelLoad}
+        title="ID not aligned"
+        description={confirmationModal.message}
+      >
+        <Button onClick={handleCancelLoad} variant="outlined" disabled={isLoading}>
+          Cancel
+        </Button>
+        <Button onClick={handleConfirmLoad} variant="contained" disabled={isLoading}>
+          {isLoading ? 'Loading...' : 'Load Template'}
+        </Button>
+      </Modal>
     </>
   )
 };

@@ -13,7 +13,7 @@ import { setWidgets, updateWidget } from '@metacell/geppetto-meta-client/common/
 import { setTermInfoOpened } from './../reducers/actions/globals'
 import { getLayoutManagerInstance } from "@metacell/geppetto-meta-client/common/layout/LayoutManager";
 import { WidgetStatus } from "@metacell/geppetto-meta-client/common/layout/model";
-import { templateLoaded,  removeAllInstances } from './../reducers/actions/instances';
+import { removeAllInstances } from './../reducers/actions/instances';
 import { Box, Button,Modal, useMediaQuery, useTheme, Typography, CircularProgress, Link } from "@mui/material";
 import { activateCircuits, activateImages } from "../reducers/actions/layout";
 import { widgetsIDs } from "./layout/widgets";
@@ -33,14 +33,12 @@ const tabsArr = [
 const MainLayout = ({ bottomNav, setBottomNav }) => {
   const theme = useTheme();
   const sidebarOpen = useSelector(state => state.globalInfo.termInfoOpened)
-  const [modalOpen, setModalOpen] = useState(false);
   const desktopScreen = useMediaQuery(theme.breakpoints.up('lg'));
   const defaultActiveTab = desktopScreen ? [0, 1, 2, 3, 4] : [0];
   const [tab, setTab] = useState([]);
   const [LayoutComponent, setLayoutComponent] = useState(undefined);
   const [isLayoutMobile, setIsLayoutMobile] = useState(window.innerWidth < 1200);
   const misalignedTemplate = useSelector(state => state.globalInfo.misalignedTemplate)
-  const alignedTemplates = useSelector( state => state.globalInfo.alignedTemplates)
   const dispatch = useDispatch();
   const store = useStore();
   let _templateRef = window.location.origin + "?id=" + misalignedTemplate;
@@ -67,10 +65,6 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
   useEffect(() => {
     setTab(defaultActiveTab)
   }, [desktopScreen])
-
-  useEffect(() => {
-    setModalOpen(!alignedTemplates)
-  }, [alignedTemplates])
 
   useEffect(() => {
     if (LayoutComponent === undefined) {
@@ -176,15 +170,6 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
     dispatch(setTermInfoOpened(opened))
   }
 
-
-  const handleModalClose = (id, openTemplate) => {
-    if ( openTemplate) {
-      templateLoaded(id, openTemplate);
-      _templateRef = window.location.href.replace(id + ",", "")
-    }
-    setModalOpen(false)
-  }
-
   const tabContent = isLayoutMobile ? (
     <>
       {tab.includes(0) && (
@@ -232,46 +217,6 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
       </MediaQuery>
 
       <ErrorDialog display={modalError} message={modalErrorMessage}/>
-      <Modal
-        open={modalOpen}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={classes.modalStyle}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            ID not aligned
-          </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2, mb: 3 }}>
-            The image you requested is aligned to another template. Click Okay
-            to open in a new tab or Cancel to just view the image metadata.
-          </Typography>
-          <Box sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            position: 'absolute',
-            bottom: 16,
-            left: 16,
-            right: 16
-          }}>
-            <Button
-              variant="outlined"
-              color="secondary"
-              onClick={() => handleModalClose(misalignedTemplate, false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => handleModalClose(misalignedTemplate, true)}
-              target="_blank"
-              href={window.location.origin + "/?id=" + misalignedTemplate}
-            >
-              Okay
-            </Button>
-          </Box>
-        </Box>
-      </Modal>
       <Box
         display='flex'
         flexWrap='wrap'

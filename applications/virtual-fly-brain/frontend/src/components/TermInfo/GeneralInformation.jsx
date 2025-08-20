@@ -370,8 +370,6 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
     const images = Object.keys(data?.Images).length !== 0 ? data?.Images : data?.Examples;
     const templateIds = Object.keys(images);
 
-    console.log(templateIds, currentTemplateId)
-
     if (templateIds.length === 0) {
       return null;
     }

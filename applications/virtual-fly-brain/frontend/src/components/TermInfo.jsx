@@ -53,6 +53,7 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import { SimpleTreeView, TreeItem } from '@mui/x-tree-view';
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import GeneralInformation from "./TermInfo/GeneralInformation";
+import Modal from "../shared/modal/Modal";
 import { getQueries, updateQueries } from "./../reducers/actions/queries";
 import { setQueryComponentOpened } from "./../reducers/actions/globals";
 import {
@@ -257,6 +258,11 @@ const TermInfo = ({ open, setOpen }) => {
 
   const [termInfoData, setTermInfoData] = useState(data);
   const [toggleReadMore, setToggleReadMore] = useState(false);
+  const [confirmationModal, setConfirmationModal] = useState({
+    open: false,
+    id: null,
+    message: ''
+  });
   const dispatch = useDispatch();
 
   const popover = React.useRef();
@@ -292,7 +298,27 @@ const TermInfo = ({ open, setOpen }) => {
   };
 
   const addId = (id) => {
-    getInstanceByID(id, false);
+    console.log(id);
+    
+    setConfirmationModal({
+      open: true,
+      id: id,
+      message: `The image you requested is aligned to another template. Click Okay to open in a new tab or Cancel to just view the image metadata.?`
+    });
+  };
+
+  const handleConfirmAdd = () => {
+    if (confirmationModal.id) {
+      window.open(
+        window.location.origin + '/?id=' + confirmationModal.id,
+        '_blank'
+      );
+    }
+    setConfirmationModal({ open: false, id: null, message: '' });
+  };
+
+  const handleCancelAdd = () => {
+    setConfirmationModal({ open: false, id: null, message: '' });
   };
 
   const handleVisibility = () => {
@@ -1245,6 +1271,21 @@ const TermInfo = ({ open, setOpen }) => {
           </Box>
         )}
       </Box>
+
+      {/* Confirmation Modal for Adding Instance */}
+      <Modal
+        open={confirmationModal.open}
+        handleClose={handleCancelAdd}
+        title="ID not aligned"
+        description={confirmationModal.message}
+      >
+        <Button onClick={handleCancelAdd} variant="outlined">
+          Cancel
+        </Button>
+        <Button onClick={handleConfirmAdd} variant="contained">
+          Okay
+        </Button>
+      </Modal>
 
       <MediaQuery minWidth={1200}>
         <Box

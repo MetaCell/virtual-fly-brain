@@ -976,7 +976,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
                 return (
                   <Box key={key} display='flex' justifyContent='space-between' columnGap={1}>
                     <Typography sx={classes.heading}>{key}</Typography>
-                    <Stack direction='row' gap={1} alignItems='center' flexWrap='wrap'>
+                    <Stack direction='row' gap={1} alignItems='center' justifyContent='flex-end' flexWrap='wrap'>
                       {renderAlignedTo(data?.metadata)}
                     </Stack>
                   </Box>

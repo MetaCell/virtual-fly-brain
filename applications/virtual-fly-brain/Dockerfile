@@ -1,6 +1,6 @@
-# ARG CLOUDHARNESS_FLASK
+ARG CLOUDHARNESS_FLASK
 
-FROM flask_debian:v1
+FROM ${CLOUDHARNESS_FLASK}
 
 ARG DOMAIN
 
@@ -8,8 +8,6 @@ ENV MODULE_NAME=virtual_fly_brain
 ENV WORKERS=2
 ENV PORT=8080
 ENV BUILDDIR=/app
-
-RUN echo "Building ${MODULE_NAME} for domain ${DOMAIN}"
 
 RUN apt-get update && apt-get install -y \
     git \

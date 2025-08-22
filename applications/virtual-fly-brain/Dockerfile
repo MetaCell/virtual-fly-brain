@@ -1,6 +1,6 @@
-ARG CLOUDHARNESS_FLASK
+# ARG CLOUDHARNESS_FLASK
 
-FROM $CLOUDHARNESS_FLASK
+FROM flask_debian:v1
 
 ARG DOMAIN
 
@@ -9,10 +9,13 @@ ENV WORKERS=2
 ENV PORT=8080
 ENV BUILDDIR=/app
 
+RUN echo "Building ${MODULE_NAME} for domain ${DOMAIN}"
+
 RUN apt-get update && apt-get install -y \
     git \
     build-essential \
-    libgl1-mesa-glx \
+    libgl1 \
+    libglx-mesa0 \
     libgl1-mesa-dev \
     xvfb \
     libglu1-mesa \

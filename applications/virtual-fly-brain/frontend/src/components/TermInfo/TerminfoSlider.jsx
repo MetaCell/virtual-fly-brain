@@ -8,6 +8,7 @@ import { Slide } from 'react-slideshow-image';
 import { ChevronLeft, FullScreen } from '../../icons';
 import { Box, Button, Typography } from '@mui/material';
 import { getInstanceByID } from '../../reducers/actions/instances';
+import Modal from '../../shared/modal/Modal';
 import 'react-slideshow-image/dist/styles.css'
 
 const { whiteColor, listHeadingColor } = vars;
@@ -107,7 +108,34 @@ const TerminfoSlider = (props) => {
     }
   };
   const [slideImages, setSlideImages] = useState([]);
+  const [confirmationModal, setConfirmationModal] = useState({
+    open: false,
+    example: null,
+    message: ''
+  });
+  const [isLoading, setIsLoading] = useState(false);
   const reduxState = useSelector(state => state);
+
+  const handleConfirmLoad = async () => {
+    if (!confirmationModal.example) return;
+    
+    setIsLoading(true);
+    try {
+      window.open(
+        window.location.origin + '/?id=' + confirmationModal.example.template + '&i=' + confirmationModal.example.id,
+        '_blank'
+      );
+    } catch (error) {
+      console.error('Error loading instance:', error);
+    } finally {
+      setIsLoading(false);
+      setConfirmationModal({ open: false, example: null, message: '' });
+    }
+  };
+
+  const handleCancelLoad = () => {
+    setConfirmationModal({ open: false, example: null, message: '' });
+  };
 
   const imageClick = (image) => {
     if (image !== reduxState.instances.launchTemplate?.metadata?.Id) {
@@ -120,9 +148,11 @@ const TerminfoSlider = (props) => {
       });
       const example = examples.get(image);
       if (example.template !== reduxState.instances.launchTemplate?.metadata?.Id) {
-        if(confirm("The image selected is aligned with another template, do you want to load it?")) {
-          window.open(window.location.origin + '/?id=' + example.template + '&i=' + example.id,'_blank');
-        }
+        setConfirmationModal({
+          open: true,
+          example,
+          message: "The image selected is aligned with another template, do you want to load it?"
+        });
       } else {
         getInstanceByID(image, true, true, true);
       }
@@ -225,7 +255,19 @@ const TerminfoSlider = (props) => {
           <FullScreen size="20" />
         </Button>
       )}
-
+      <Modal
+        open={confirmationModal.open}
+        handleClose={handleCancelLoad}
+        title="Template not aligned"
+        description={confirmationModal.message}
+        >
+          <Button onClick={handleCancelLoad} variant="outlined" disabled={isLoading}>
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmLoad} variant="contained" disabled={isLoading}>
+            {isLoading ? 'Loading...' : 'Load Template'}
+          </Button>
+      </Modal>
     </Box>
   )
 }

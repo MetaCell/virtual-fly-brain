@@ -119,6 +119,8 @@ export const urlUpdaterMiddleware = store => next => (action) => {
       const isClass = action.payload?.IsClass || false;
       const isIndividual = action.payload?.IsIndividual || false;
 
+    
+      
       if (!IsTemplate && !isClass && !isIndividual) {
         // If the instance is not a template, class, or individual, dispatch the getInstanceFailure with an error message
         if (action.payload?.Id === undefined) {
@@ -178,6 +180,10 @@ export const urlUpdaterMiddleware = store => next => (action) => {
           get3DMesh(action.payload);
           return;
         } else if (!templates.includes(loadedTemplate) && !IsTemplate) {
+            if(Object.keys(action.payload?.Images || {}).length === 0 && Object.keys(action.payload?.Examples || {}).length === 0) {
+              next(action);
+              return;
+            }
           // If the individual is not aligned with the current template, we need to show the misalignment dialog
           store.dispatch(setAlignTemplates(false, action.payload.Id));
           return;

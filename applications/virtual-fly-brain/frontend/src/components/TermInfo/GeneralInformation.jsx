@@ -1,4 +1,4 @@
-import { Box, Button, Chip, Grid, Typography, Tooltip } from "@mui/material";
+import { Box, Button, Chip, Grid, Typography, Tooltip, Stack } from "@mui/material";
 import React, { useState } from "react";
 import { useSelector } from 'react-redux';
 import ReactMarkdown from 'react-markdown';
@@ -9,6 +9,7 @@ import FullScreenViewer from "../queryBuilder/FullScreenViewer";
 import { getUpdatedTags, formatTagText } from "../../utils/utils";
 import { facets_annotations_colors as colors_config } from "../../components/configuration/VFBColors";
 import { getInstanceByID } from "../../reducers/actions/instances";
+import Modal from "../../shared/modal/Modal";
 
 const {
   whiteColor,
@@ -24,9 +25,15 @@ const chips_cutoff = 2;
 
 const facets_annotations_colors = getUpdatedTags(colors_config)
 
-const GeneralInformation = ({ data, classes }) => {
+const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
   const [toggleReadMore, setToggleReadMore] = useState({});
-  const [fullScreen, setFullScreen] = useState(false)
+  const [fullScreen, setFullScreen] = useState(false);
+  const [confirmationModal, setConfirmationModal] = useState({
+    open: false,
+    shortForm: null,
+    message: ''
+  });
+  const [isLoading, setIsLoading] = useState(false);
   const reduxState = useSelector(state => state);
   const MAX_LENGTH = 35;
 
@@ -35,10 +42,68 @@ const GeneralInformation = ({ data, classes }) => {
   const currentTemplateName = currentTemplate?.metadata?.Name || 'Unknown Template';
   const currentTemplateId = currentTemplate?.metadata?.Id;
 
-  const handleTemplateClick = () => {
-    if (currentTemplateId) {
-      getInstanceByID(currentTemplateId, true, true, true);
+  const handleTemplateClick = (templateId) => {
+    if (currentTemplateId && templateId === currentTemplateId) {
+      getInstanceByID(
+        currentTemplateId, 
+        true, 
+        true, 
+        true
+      );
+    } else {
+      // Check if template is aligned
+      const alignedTemplates = reduxState.globalInfo.alignedTemplates;
+      const isAligned = alignedTemplates[templateId];
+      
+      // If template is aligned, load it directly
+      if (isAligned) {
+        setIsLoading(true);
+        try {
+          getInstanceByID(templateId, true, true, true);
+        } finally {
+          setIsLoading(false);
+        }
+        return;
+      }
+      
+      // If template is not aligned, show confirmation modal
+      setConfirmationModal({
+        open: true,
+        shortForm: templateId,
+        message: "The template you requested is aligned to another template. Click Okay to open in a new tab or Cancel to just view the template metadata."
+      });
     }
+  };
+
+  const handleConfirmLoad = async () => {
+    setIsLoading(true);
+    try {
+      // Check if this is a template click (from handleTemplateClick)
+      if (confirmationModal.shortForm && confirmationModal.message.includes("template")) {
+        // For template clicks, open in new tab
+        window.open(
+          window.location.origin + '/?id=' + confirmationModal.shortForm,
+          '_blank'
+        );
+      } else {
+        // For other cases (licenses, synonyms), load in current tab
+        await getInstanceByID(
+          confirmationModal.shortForm, 
+          true, 
+          true, 
+          true
+        );
+      }
+    } catch (error) {
+      console.error('Error loading instance:', error);
+    } finally {
+      setIsLoading(false);
+      setConfirmationModal({ open: false, shortForm: null, message: '' });
+    }
+  };
+
+  const handleCancelLoad = () => {
+    setConfirmationModal({ open: false, shortForm: null, message: '' });
   };
 
   // Check if a string contains markdown
@@ -199,9 +264,38 @@ const GeneralInformation = ({ data, classes }) => {
   const renderLicensesList = (licenses) => {
     if (!licenses || typeof licenses !== 'object') return null;
     
-    const handleLabelClick = (shortForm) => {
-      if (shortForm) {
-        getInstanceByID(shortForm, true, true, true);
+    const handleLabelClick = async (shortForm) => {
+      if (!shortForm) return;
+      
+      try {
+        const alignedTemplates = reduxState.globalInfo.alignedTemplates;
+        const isAligned = alignedTemplates[shortForm];
+        
+        // If template is aligned, load it directly
+        if (isAligned) {
+          setIsLoading(true);
+          try {
+            await getInstanceByID(
+              shortForm, 
+              true, 
+              true, 
+              true
+            );
+          } finally {
+            setIsLoading(false);
+          }
+          return;
+        }
+        
+        // If template is not aligned, show confirmation modal
+        setConfirmationModal({
+          open: true,
+          shortForm,
+          message: "The image you requested is aligned to another template. Click Okay to open in a new tab or Cancel to just view the image metadata."
+        });
+      } catch (error) {
+        console.error('Error loading instance:', error);
+        // TODO: Show user-friendly error message
       }
     };
 
@@ -225,40 +319,45 @@ const GeneralInformation = ({ data, classes }) => {
               marginBottom: index < Object.values(licenses).length - 1 ? '0.5rem' : 0
             }}>
               {/* License Label */}
-              <Typography 
-                sx={{
-                  ...classes.heading,
-                  color: whiteColor,
-                  textAlign: 'right',
-                  cursor: license.short_form ? 'pointer' : 'default',
-                  transition: 'color 0.2s ease-in-out',
-                  '&:hover': license.short_form ? {
-                    color: tabActiveColor
-                  } : {}
-                }}
-                onClick={() => handleLabelClick(license.short_form)}
-              >
-                {license.label}
-              </Typography>
-              
-              {/* License Icon */}
-              {license.icon && (
-                <Box
-                  component="img"
-                  src={license.icon}
-                  alt={license.label}
-                  sx={{
-                    height: '1em',
-                    width: 'auto',
-                    cursor: 'pointer',
-                    transition: 'opacity 0.2s ease-in-out',
-                    '&:hover': {
-                      opacity: 0.8
-                    }
-                  }}
-                  onClick={() => handleIconClick(license.iri)}
-                />
-              )}
+              {(() => {
+                const typographyElement = (
+                  <Typography 
+                    sx={{
+                      ...classes.heading,
+                      color: whiteColor,
+                      textAlign: 'right',
+                      cursor: license.short_form ? 'pointer' : 'default',
+                      transition: 'color 0.2s ease-in-out',
+                      '&:hover': license.short_form ? {
+                        color: tabActiveColor
+                      } : {}
+                    }}
+                    onClick={() => handleLabelClick(license.short_form)}
+                  >
+                    {license.label}
+                  </Typography>
+                );
+
+                return license.icon ? (
+                  <Tooltip title={ <Box
+                      component="img"
+                      src={license.icon}
+                      alt={license.label}
+                      sx={{
+                        height: 'auto',
+                        width: '100px',
+                        cursor: 'pointer',
+                        transition: 'opacity 0.2s ease-in-out',
+                        '&:hover': {
+                          opacity: 0.8
+                        }
+                      }}
+                      onClick={() => handleIconClick(license.iri)}
+                    />} placement="bottom" arrow> 
+                    {typographyElement}
+                  </Tooltip>
+                ) : typographyElement;
+              })()}
             </Box>
           );
         })}
@@ -267,8 +366,43 @@ const GeneralInformation = ({ data, classes }) => {
   };
 
   // Render "Aligned To" chip
-  const renderAlignedTo = () => {
+  const renderAlignedTo = (data) => {
+    const images = Object.keys(data?.Images).length !== 0 ? data?.Images : data?.Examples;
+    const templateIds = Object.keys(images);
+
+    if (templateIds.length === 0) {
+      return null;
+    }
+
+    const AllAlignedTo = () => {
+      return (
+        <>
+        {
+        templateIds.map((templateId) => {
+          return (
+            templateId !== currentTemplateId && <Chip 
+              icon={<LinkIcon />} 
+              label={templateId} 
+                sx={{ 
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s ease-in-out',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  '&:hover': {
+                    backgroundColor: tabActiveColor
+                  }
+                }}
+              onClick={() => handleTemplateClick(templateId)}
+            />
+          )
+        })
+      }
+        </>
+      )
+    }
     return currentTemplateId ? (
+      <>
       <Chip 
         icon={<LinkIcon />} 
         label={currentTemplateName} 
@@ -276,16 +410,24 @@ const GeneralInformation = ({ data, classes }) => {
         sx={{ 
           cursor: 'pointer',
           transition: 'background-color 0.2s ease-in-out',
+          backgroundColor: tabActiveColor,
           '&:hover': {
             backgroundColor: tabActiveColor
           }
         }}
       />
+      <AllAlignedTo />
+      </>
+      
     ) : (
-      <Chip 
+      <>
+       <Chip 
         label={currentTemplateName} 
         sx={{ cursor: 'default' }}
       />
+      <AllAlignedTo />
+      </>
+     
     );
   };
 
@@ -609,11 +751,36 @@ const GeneralInformation = ({ data, classes }) => {
   const renderSynonyms = (synonyms) => {
     if (!Array.isArray(synonyms) || synonyms.length === 0) return null;
     
-    const handlePublicationClick = (publication) => {
+    const handlePublicationClick = async (publication) => {
       // Extract ID from markdown format [text](id)
       const match = publication.match(/\[([^\]]+)\]\(([^)]+)\)/);
-      if (match && match[2]) {
-        getInstanceByID(match[2], true, true, true);
+      if (!match || !match[2]) return;
+      
+      const instanceId = match[2];
+      
+      try {
+        const alignedTemplates = reduxState.globalInfo.alignedTemplates;
+        const isAligned = alignedTemplates[instanceId];
+        
+        // If template is aligned, load it directly
+        if (isAligned) {
+          setIsLoading(true);
+          try {
+            await getInstanceByID(instanceId, true, true, true);
+          } finally {
+            setIsLoading(false);
+          }
+          return;
+        }
+        
+        // If template is not aligned, show confirmation modal
+        setConfirmationModal({
+          open: true,
+          shortForm: instanceId,
+          message: "The image you requested is aligned to another template. Click Okay to open in a new tab or Cancel to just view the image metadata."
+        });
+      } catch (error) {
+        console.error('Error loading instance:', error);
       }
     };
 
@@ -624,8 +791,13 @@ const GeneralInformation = ({ data, classes }) => {
           
           return (
             <Box key={index} sx={{ 
-              marginBottom: index < synonyms.length - 1 ? '0.5rem' : 0 
+              marginBottom: index < synonyms.length - 1 ? '0.5rem' : 0 ,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              columnGap: '0.5rem'
             }}>
+             
               <Typography 
                 component="span"
                 sx={{
@@ -637,6 +809,27 @@ const GeneralInformation = ({ data, classes }) => {
                 {synonym.label}
               </Typography>
               {synonym.publication && (
+              <Box onClick={() => handlePublicationClick(synonym.publication)} sx={{
+                backgroundColor: '#0164d8',
+                width: 'fit-content',
+                padding: '0.2rem 0.3rem',
+                borderRadius: '0.25rem',
+                cursor: 'pointer'
+              }}>
+                <Tooltip title={`${synonym.publication.replace(/\[([^\]]+)\]\(([^)]+)\)/, '$1')}`} placement="top" arrow>
+                  <Typography sx={{
+                    ...classes.heading,
+                    color: whiteColor,
+                    textAlign: 'right',
+                    fontSize: '0.75rem',
+                    fontWeight: 'bold'
+                  }}>
+                    Pub
+                  </Typography>
+                </Tooltip>
+              </Box>
+              )}
+              {/* {synonym.publication && (
                 <>
                   <Typography 
                     component="span"
@@ -664,7 +857,7 @@ const GeneralInformation = ({ data, classes }) => {
                     {synonym.publication.replace(/\[([^\]]+)\]\(([^)]+)\)/, '$1')}
                   </Typography>
                 </>
-              )}
+              )} */}
             </Box>
           );
         })}
@@ -675,7 +868,7 @@ const GeneralInformation = ({ data, classes }) => {
   // Generic property renderer
   const renderProperty = (key, value) => {
     // Skip special properties that we handle separately or don't want to display
-    const skipProperties = ['Images', 'Examples'];
+    const skipProperties = ['Images', 'Examples', 'SuperTypes'];
     if (skipProperties.includes(key)) return null;
 
     // Skip boolean properties
@@ -696,7 +889,6 @@ const GeneralInformation = ({ data, classes }) => {
       case 'Name':
         return renderName(value, data?.metadata?.Id);
       case 'Tags':
-      case 'SuperTypes':
       case 'Types':
         return renderTags(value);
       case 'Licenses':
@@ -722,7 +914,7 @@ const GeneralInformation = ({ data, classes }) => {
         } else if (typeof value === 'string') {
           if (containsMarkdown(value)) {
             return (
-              <Box sx={{ textAlign: 'right' }}>
+              <Box sx={{ textAlign: 'right', '& p': { margin: 0 } }}>
                 <ReactMarkdown>{value}</ReactMarkdown>
               </Box>
             );
@@ -742,7 +934,7 @@ const GeneralInformation = ({ data, classes }) => {
             <Typography sx={{
               ...classes.heading,
               color: whiteColor,
-              textAlign: 'right'
+              textAlign: 'right',
             }}>
               {String(value)}
             </Typography>
@@ -768,67 +960,85 @@ const GeneralInformation = ({ data, classes }) => {
              (typeof value === 'object' && value !== null && !Array.isArray(value) && Object.keys(value).length === 0);
     };
     
-    // Add standard properties in specific order: Name, Tags, Description only
-    const standardOrder = ['Name', 'Tags'];
-    standardOrder.forEach(key => {
-      if (data.metadata[key] !== undefined && !isEmpty(data.metadata[key])) {
-        properties.push({ key, value: data.metadata[key] });
-        seenKeys.add(key);
+    if (showMetadataOnly) {
+      // When showMetadataOnly is true, show everything EXCEPT Name, Synonyms, and Licenses
+      
+      // Add Tags
+      if (data.metadata.Tags && !isEmpty(data.metadata.Tags)) {
+        properties.push({ key: 'Tags', value: data.metadata.Tags });
+        seenKeys.add('Tags');
       }
-    });
-    
-    // Add Description from Meta if it exists (special handling for Description)
-    if (data.metadata.Meta?.Description && data.metadata.Meta.Description.trim()) {
-      properties.push({ key: 'Description', value: data.metadata.Meta.Description });
-      seenKeys.add('Description');
-    }
-    
-    // Add other properties from main metadata (excluding already handled ones)
-    const skipKeys = ['Meta', 'Licenses', 'Images', 'Examples', 'Id', 'Queries'];
-    Object.entries(data.metadata).forEach(([key, value]) => {
-      if (!skipKeys.includes(key) && 
-          !seenKeys.has(key) &&
-          !isEmpty(value) &&
-          typeof value !== 'boolean' &&
-          !(typeof value === 'object' && !Array.isArray(value))) {
-        properties.push({ key, value });
-        seenKeys.add(key);
+      
+      // Add Description from Meta if it exists
+      if (data.metadata.Meta?.Description && data.metadata.Meta.Description.trim()) {
+        properties.push({ key: 'Description', value: data.metadata.Meta.Description });
+        seenKeys.add('Description');
       }
-    });
-    
-    // Add all Meta properties (excluding duplicates and already handled ones)
-    if (data.metadata.Meta && typeof data.metadata.Meta === 'object') {
-      Object.entries(data.metadata.Meta).forEach(([key, value]) => {
-        if (!seenKeys.has(key) &&
+
+     
+      
+      // Add other properties from main metadata (excluding Name, Synonyms, Licenses)
+      const skipKeys = ['Meta', 'Licenses', 'Images', 'Examples', 'Id', 'Queries', 'Synonyms', 'Aligned To', 'Name'];
+      Object.entries(data.metadata).forEach(([key, value]) => {
+        if (!skipKeys.includes(key) && 
+            !seenKeys.has(key) &&
             !isEmpty(value) &&
             typeof value !== 'boolean' &&
             !(typeof value === 'object' && !Array.isArray(value))) {
-          // Special check for Comment - don't render if empty
-          if (key === 'Comment' && (!value || !value.trim())) {
-            return;
-          }
           properties.push({ key, value });
           seenKeys.add(key);
         }
       });
+      // Add all Meta properties (excluding duplicates and already handled ones)
+      if (data.metadata.Meta && typeof data.metadata.Meta === 'object') {
+        Object.entries(data.metadata.Meta).forEach(([key, value]) => {
+          if (!seenKeys.has(key) &&
+              !isEmpty(value) &&
+              typeof value !== 'boolean' &&
+              !(typeof value === 'object' && !Array.isArray(value))) {
+            // Special check for Comment - don't render if empty
+            if (key === 'Comment' && (!value || !value.trim())) {
+              return;
+            }
+            if (key === 'Name') {
+              return;
+            }
+          
+            properties.push({ key, value });
+            seenKeys.add(key);
+          }
+        });
+      }
+      properties.push({ key: 'Aligned To', value: null, isAlignedTo: true });
+      
+    } else {
+      // When showMetadataOnly is false, show ONLY Name, Synonyms, and Licenses
+      
+      // Add Name
+      if (data.metadata.Name && !isEmpty(data.metadata.Name)) {
+        properties.push({ key: 'Name', value: data.metadata.Name });
+        seenKeys.add('Name');
+      }
+      
+      // Add Synonyms
+      if (data.metadata.Synonyms && !isEmpty(data.metadata.Synonyms)) {
+        properties.push({ key: 'Synonyms', value: data.metadata.Synonyms });
+        seenKeys.add('Synonyms');
+      }
+      
+      // Add Licenses
+      if (data.metadata.Licenses && typeof data.metadata.Licenses === 'object' && Object.keys(data.metadata.Licenses).length > 0) {
+        properties.push({ key: 'Licenses', value: data.metadata.Licenses });
+        seenKeys.add('Licenses');
+      }
     }
-    
-    // Add Licenses as a single property if they exist
-    if (data.metadata.Licenses && typeof data.metadata.Licenses === 'object' && Object.keys(data.metadata.Licenses).length > 0) {
-      properties.push({ key: 'Licenses', value: data.metadata.Licenses });
-      seenKeys.add('Licenses');
-    }
-    
-    // Add "Aligned To" at the end
-    properties.push({ key: 'Aligned To', value: null, isAlignedTo: true });
-    
     return properties;
   };
 
   return (
     <>
       <Grid container columnSpacing={2}>
-        <Grid item xs={12} sm={4} md={5} lg={5}>
+        {!showMetadataOnly && <Grid item xs={12} sm={4} md={5} lg={5}>
           <Box
             sx={{
               width: '15rem',
@@ -850,15 +1060,16 @@ const GeneralInformation = ({ data, classes }) => {
               examples={data?.metadata?.Images && Object.keys(data?.metadata?.Images).length > 0 ? data?.metadata?.Images : data?.metadata?.Examples}
             />
           </Box>
-        </Grid>
+        </Grid>}
         <Grid sx={{
           mt: {
             xs: 2,
             sm: 0,
-          }
-        }} item xs={12} sm={8} md={7} lg={7}>
-          <Box display='flex' flexDirection='column' sx={{ rowGap: { xs: 1.25, sm: 1, lg: 1.25 }, width: '15rem' }}>
-            {getMetadataProperties().map(({ key, value, isStatic, isAlignedTo }) => {
+          },
+          width: showMetadataOnly ? '100%' : 'initial'
+        }} item xs={12} sm={showMetadataOnly ? 12 : 8} md={showMetadataOnly ? 12 : 7} lg={showMetadataOnly ? 12 : 7}>
+          <Box display='flex' flexDirection='column' sx={{ rowGap: { xs: 1.25, sm: 1, lg: 1.25 }, width: showMetadataOnly ? '100%' : '15rem' }}>
+          {getMetadataProperties().map(({ key, value, isStatic, isAlignedTo }) => {
               // Handle special cases
               if (key === 'Description' || key === 'Comment') {
                 // Don't render if value is empty
@@ -884,8 +1095,10 @@ const GeneralInformation = ({ data, classes }) => {
               if (isAlignedTo) {
                 return (
                   <Box key={key} display='flex' justifyContent='space-between' columnGap={1}>
-                    <Typography sx={classes.heading}>{key}</Typography>
-                    {renderAlignedTo()}
+                    <Typography sx={classes.heading} flexShrink={0}>{key}</Typography>
+                    <Stack direction='row' gap={1} alignItems='center' justifyContent='flex-end' flexWrap='wrap'>
+                      {renderAlignedTo(data?.metadata)}
+                    </Stack>
                   </Box>
                 );
               }
@@ -917,6 +1130,21 @@ const GeneralInformation = ({ data, classes }) => {
       {fullScreen && (
         <FullScreenViewer open={fullScreen} onClose={() => setFullScreen(false)} images={data?.metadata?.Images ? data?.metadata?.Images : data?.metadata?.Examples} />
       )}
+
+      {/* Confirmation Modal for License Loading */}
+      <Modal
+        open={confirmationModal.open}
+        handleClose={handleCancelLoad}
+        title="ID not aligned"
+        description={confirmationModal.message}
+      >
+        <Button onClick={handleCancelLoad} variant="outlined" disabled={isLoading}>
+          Cancel
+        </Button>
+        <Button onClick={handleConfirmLoad} variant="contained" disabled={isLoading}>
+          {isLoading ? 'Loading...' : 'Load Template'}
+        </Button>
+      </Modal>
     </>
   )
 };

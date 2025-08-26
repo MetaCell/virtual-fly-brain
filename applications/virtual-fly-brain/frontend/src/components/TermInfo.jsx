@@ -53,10 +53,10 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import { SimpleTreeView, TreeItem } from '@mui/x-tree-view';
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import GeneralInformation from "./TermInfo/GeneralInformation";
+import Modal from "../shared/modal/Modal";
 import { getQueries, updateQueries } from "./../reducers/actions/queries";
 import { setQueryComponentOpened } from "./../reducers/actions/globals";
 import {
-  getInstanceByID,
   selectInstance,
   hide3DMesh,
   hide3D,
@@ -100,7 +100,6 @@ const {
 const getRibbonData = (query) => {
   let terms = query?.preview_results?.rows?.map((row) => {
     const regExp = /\(([^)]+)\)/g;
-    const matches = [...row.Neurotransmitter.matchAll(regExp)].flat();
     return {
       id: row.Neurotransmitter,
       name: (
@@ -241,7 +240,7 @@ const TermInfo = ({ open, setOpen }) => {
     Queries: configuration.sectionsExpanded,
     Graphs: configuration.sectionsExpanded,
   });
-  const [sections, setSections] = useState([
+  const [sections,] = useState([
     "General Information",
     "Queries",
     "Graphs",
@@ -257,6 +256,12 @@ const TermInfo = ({ open, setOpen }) => {
 
   const [termInfoData, setTermInfoData] = useState(data);
   const [toggleReadMore, setToggleReadMore] = useState(false);
+  const [confirmationModal, setConfirmationModal] = useState({
+    open: false,
+    id: null,
+    message: ''
+  });
+  
   const dispatch = useDispatch();
 
   const popover = React.useRef();
@@ -286,13 +291,31 @@ const TermInfo = ({ open, setOpen }) => {
     setExpanded(newState);
   };
 
-  const deleteId = (id) => {
+  const deleteId = () => {
     hide3DMesh(termInfoData?.metadata?.Id);
     removeInstanceByID(termInfoData?.metadata?.Id);
   };
 
   const addId = (id) => {
-    getInstanceByID(id, false);
+    setConfirmationModal({
+      open: true,
+      id: id,
+      message: `The image you requested is aligned to another template. Click Okay to open in a new tab or Cancel to just view the image metadata.?`
+    });
+  };
+
+  const handleConfirmAdd = () => {
+    if (confirmationModal.id) {
+      window.open(
+        window.location.origin + '/?id=' + confirmationModal.id,
+        '_blank'
+      );
+    }
+    setConfirmationModal({ open: false, id: null, message: '' });
+  };
+
+  const handleCancelAdd = () => {
+    setConfirmationModal({ open: false, id: null, message: '' });
   };
 
   const handleVisibility = () => {
@@ -319,15 +342,15 @@ const TermInfo = ({ open, setOpen }) => {
     }
   };
 
-  const handleFocus = (event) => {
+  const handleFocus = () => {
     zoomToInstance(termInfoData?.metadata?.Id);
   };
 
-  const handleSelection = (event) => {
+  const handleSelection = () => {
     selectInstance(termInfoData?.metadata?.Id);
   };
 
-  const handleSkeleton = (event) => {
+  const handleSkeleton = () => {
     if (
       !allLoadedInstances.find(
         (instance) => instance.metadata?.Id == termInfoData?.metadata?.Id
@@ -339,7 +362,7 @@ const TermInfo = ({ open, setOpen }) => {
     }
   };
 
-  const handleCylinder = (event) => {
+  const handleCylinder = () => {
     if (
       !allLoadedInstances.find(
         (instance) => instance.metadata?.Id == termInfoData?.metadata?.Id
@@ -351,16 +374,19 @@ const TermInfo = ({ open, setOpen }) => {
     }
   };
 
-  const handleTermClick = (term, evt) => {
+  const handleTermClick = (term) => {
     const regExp = /\(([^)]+)\)/g;
     const matches = [...term.id.matchAll(regExp)].flat();
-    getInstanceByID(matches[1], false);
+    
+    setConfirmationModal({
+      open: true,
+      id: matches[1],
+      message: `The image you requested is aligned to another template. Click Okay to open in a new tab or Cancel to just view the image metadata.`
+    });
   };
 
   const customColorCalculation = ({
-    numTerms,
     baseRGB,
-    heatLevels,
     itemData,
   }) => {
     let red = baseRGB[0] * itemData.descendant_terms[0];
@@ -484,7 +510,11 @@ const TermInfo = ({ open, setOpen }) => {
       window.open(href, "_blank", "noopener,noreferrer");
     } else {
       const id = href.split(',').pop().trim();
-      getInstanceByID(id, false, true, false);
+      setConfirmationModal({
+        open: true,
+        id: id,
+        message: `The image you requested is aligned to another template. Click Okay to open in a new tab or Cancel to just view the image metadata.`
+      });
     }
   };
 
@@ -782,7 +812,7 @@ const TermInfo = ({ open, setOpen }) => {
                               a: getInstance()?.color.a,
                             }}
                             disableAlpha={false}
-                            onChangeComplete={(color, event) => {
+                            onChangeComplete={(color) => {
                               let rgb;
                               rgb = {
                                 r: color.rgb.r / 255,
@@ -833,7 +863,7 @@ const TermInfo = ({ open, setOpen }) => {
                               : "Show 3D Mesh"
                           }
                         >
-                          <Button onClick={(event) => handleMeshVisibility()}>
+                          <Button onClick={() => handleMeshVisibility()}>
                             {getInstance()?.visibleMesh ? (
                               <ArViewOff />
                             ) : (
@@ -915,13 +945,29 @@ const TermInfo = ({ open, setOpen }) => {
                   <Typography>General Information</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <GeneralInformation data={termInfoData} classes={classes} />
+                  <GeneralInformation data={termInfoData} classes={classes} showMetadataOnly={false} />
                 </AccordionDetails>
               </Accordion>
 
               <Accordion
                 expanded={expanded[sections[1]]}
                 onChange={() => handleSection(sections[1])}
+              >
+                <AccordionSummary
+                  expandIcon={<ChevronDown />}
+                  aria-controls="panel1a-content"
+                  id="panel1a-header"
+                >
+                  <Typography>Metadata</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <GeneralInformation data={termInfoData} classes={classes} showMetadataOnly={true} />
+                </AccordionDetails>
+              </Accordion>
+
+              <Accordion
+                expanded={expanded[sections[2]]}
+                onChange={() => handleSection(sections[2])}
               >
                 <AccordionSummary
                   expandIcon={<ChevronDown />}
@@ -1018,7 +1064,7 @@ const TermInfo = ({ open, setOpen }) => {
                                                 (instance) => instance.metadata?.Id === row.id
                                               );
                                               return ( <TableRow key={row.id + '-' + rowIdx}>
-                                                {headers.slice(0, -1).map((h, idx) =>
+                                                {headers.slice(0, -1).map((h) =>
                                                   (
                                                     <TableCell key={h.key}>
                                                       {renderCellContent(h.type, row[h.key])}
@@ -1183,8 +1229,8 @@ const TermInfo = ({ open, setOpen }) => {
               </Accordion>
 
               <Accordion
-                expanded={expanded[sections[2]]}
-                onChange={() => handleSection(sections[2])}
+                expanded={expanded[sections[3]]}
+                onChange={() => handleSection(sections[3])}
               >
                 <AccordionSummary
                   expandIcon={<ChevronDown />}
@@ -1229,6 +1275,21 @@ const TermInfo = ({ open, setOpen }) => {
           </Box>
         )}
       </Box>
+
+      {/* Confirmation Modal for Adding Instance */}
+      <Modal
+        open={confirmationModal.open}
+        handleClose={handleCancelAdd}
+        title="ID not aligned"
+        description={confirmationModal.message}
+      >
+        <Button onClick={handleCancelAdd} variant="outlined">
+          Cancel
+        </Button>
+        <Button onClick={handleConfirmAdd} variant="contained">
+          Okay
+        </Button>
+      </Modal>
 
       <MediaQuery minWidth={1200}>
         <Box

@@ -914,7 +914,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
         } else if (typeof value === 'string') {
           if (containsMarkdown(value)) {
             return (
-              <Box sx={{ textAlign: 'right' }}>
+              <Box sx={{ textAlign: 'right', '& p': { margin: 0 } }}>
                 <ReactMarkdown>{value}</ReactMarkdown>
               </Box>
             );
@@ -934,7 +934,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
             <Typography sx={{
               ...classes.heading,
               color: whiteColor,
-              textAlign: 'right'
+              textAlign: 'right',
             }}>
               {String(value)}
             </Typography>
@@ -974,9 +974,11 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
         properties.push({ key: 'Description', value: data.metadata.Meta.Description });
         seenKeys.add('Description');
       }
+
+     
       
       // Add other properties from main metadata (excluding Name, Synonyms, Licenses)
-      const skipKeys = ['Meta', 'Licenses', 'Images', 'Examples', 'Id', 'Queries', 'Name', 'Synonyms'];
+      const skipKeys = ['Meta', 'Licenses', 'Images', 'Examples', 'Id', 'Queries', 'Synonyms', 'Aligned To'];
       Object.entries(data.metadata).forEach(([key, value]) => {
         if (!skipKeys.includes(key) && 
             !seenKeys.has(key) &&
@@ -1004,6 +1006,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
           }
         });
       }
+      properties.push({ key: 'Aligned To', value: null, isAlignedTo: true });
     } else {
       // When showMetadataOnly is false, show ONLY Name, Synonyms, and Licenses
       
@@ -1025,12 +1028,6 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
         seenKeys.add('Licenses');
       }
     }
-    
-    // Add "Aligned To" only when showMetadataOnly is true
-    if (showMetadataOnly) {
-      properties.push({ key: 'Aligned To', value: null, isAlignedTo: true });
-    }
-    
     return properties;
   };
 

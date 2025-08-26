@@ -978,7 +978,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
      
       
       // Add other properties from main metadata (excluding Name, Synonyms, Licenses)
-      const skipKeys = ['Meta', 'Licenses', 'Images', 'Examples', 'Id', 'Queries', 'Synonyms', 'Aligned To'];
+      const skipKeys = ['Meta', 'Licenses', 'Images', 'Examples', 'Id', 'Queries', 'Synonyms', 'Aligned To', 'Name'];
       Object.entries(data.metadata).forEach(([key, value]) => {
         if (!skipKeys.includes(key) && 
             !seenKeys.has(key) &&
@@ -989,7 +989,6 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
           seenKeys.add(key);
         }
       });
-      
       // Add all Meta properties (excluding duplicates and already handled ones)
       if (data.metadata.Meta && typeof data.metadata.Meta === 'object') {
         Object.entries(data.metadata.Meta).forEach(([key, value]) => {
@@ -1001,12 +1000,17 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
             if (key === 'Comment' && (!value || !value.trim())) {
               return;
             }
+            if (key === 'Name') {
+              return;
+            }
+          
             properties.push({ key, value });
             seenKeys.add(key);
           }
         });
       }
       properties.push({ key: 'Aligned To', value: null, isAlignedTo: true });
+      
     } else {
       // When showMetadataOnly is false, show ONLY Name, Synonyms, and Licenses
       
@@ -1091,7 +1095,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
               if (isAlignedTo) {
                 return (
                   <Box key={key} display='flex' justifyContent='space-between' columnGap={1}>
-                    <Typography sx={classes.heading}>{key}</Typography>
+                    <Typography sx={classes.heading} flexShrink={0}>{key}</Typography>
                     <Stack direction='row' gap={1} alignItems='center' justifyContent='flex-end' flexWrap='wrap'>
                       {renderAlignedTo(data?.metadata)}
                     </Stack>

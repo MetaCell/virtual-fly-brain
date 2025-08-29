@@ -246,7 +246,16 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
                   color: whiteColor,
                   textAlign: 'right',
                   margin: 0,
-                  transition: 'color 0.2s ease-in-out'
+                  transition: 'color 0.2s ease-in-out',
+
+                  '& a': {
+                    textDecoration: 'none',
+                    color: whiteColor,
+
+                    '&:hover': {
+                      textDecoration: 'underline',
+                    }
+                  }
                 }}
               >
                 {children}
@@ -255,6 +264,52 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
           }}
         >
           {`${name}`}
+        </ReactMarkdown>
+      </Box>
+    );
+  };
+
+  // Render Name with ID
+  const renderID = (name, id) => {
+    
+    const handleNameClick = () => {
+      if (id) {
+        getInstanceByID(id, true, true, true);
+      }
+    };
+
+    return (
+      <Box 
+        onClick={handleNameClick} 
+        sx={{ 
+          textAlign: 'right',
+          cursor: id ? 'pointer' : 'default',
+          '&:hover': id ? { 
+            '& .name-text': { 
+              color: tabActiveColor
+            }
+          } : {}
+        }}
+      >
+        <ReactMarkdown 
+          components={{
+            p: ({ children }) => (
+              <Typography 
+                className="name-text"
+                sx={{
+                  ...classes.heading,
+                  color: whiteColor,
+                  textAlign: 'right',
+                  margin: 0,
+                  transition: 'color 0.2s ease-in-out',
+                }}
+              >
+                {children}
+              </Typography>
+            )
+          }}
+        >
+          {`${id}`}
         </ReactMarkdown>
       </Box>
     );
@@ -887,7 +942,10 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
     // Handle special cases
     switch (key) {
       case 'Name':
+      case 'Symbol':
         return renderName(value, data?.metadata?.Id);
+      case 'Id':
+        return renderID(value, data?.metadata?.Id);
       case 'Tags':
       case 'Types':
         return renderTags(value);
@@ -914,7 +972,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
         } else if (typeof value === 'string') {
           if (containsMarkdown(value)) {
             return (
-              <Box sx={{ textAlign: 'right', '& p': { margin: 0 } }}>
+              <Box sx={{ textAlign: 'right', '& p': { margin: 0, fontSize: '0.875rem', color: 'red !important' } }}>
                 <ReactMarkdown>{value}</ReactMarkdown>
               </Box>
             );
@@ -990,8 +1048,8 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
         }
       });
       // Add all Meta properties (excluding duplicates and already handled ones)
-      if (data.metadata.Meta && typeof data.metadata.Meta === 'object') {
-        Object.entries(data.metadata.Meta).forEach(([key, value]) => {
+      if (data?.metadata?.Meta && typeof data?.metadata?.Meta === 'object') {
+        Object.entries(data.metadata?.Meta).forEach(([key, value]) => {
           if (!seenKeys.has(key) &&
               !isEmpty(value) &&
               typeof value !== 'boolean' &&
@@ -1001,6 +1059,9 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
               return;
             }
             if (key === 'Name') {
+              return;
+            }
+            if (key === 'Symbol') {
               return;
             }
           
@@ -1014,10 +1075,19 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
     } else {
       // When showMetadataOnly is false, show ONLY Name, Synonyms, and Licenses
       
-      // Add Name
-      if (data.metadata.Name && !isEmpty(data.metadata.Name)) {
-        properties.push({ key: 'Name', value: data.metadata.Name });
+      if (data.metadata?.Meta?.Name && !isEmpty(data.metadata?.Meta?.Name)) {
+        properties.push({ key: 'Name', value: data.metadata?.Meta?.Name });
         seenKeys.add('Name');
+      }
+
+      if (data.metadata?.Meta?.Symbol && !isEmpty(data.metadata?.Meta?.Symbol)) {
+        properties.push({ key: 'Symbol', value: data.metadata?.Meta?.Symbol });
+        seenKeys.add('Symbol');
+      }
+
+      if (data.metadata?.Id && !isEmpty(data.metadata?.Id)) {
+        properties.push({ key: 'ID', value: data.metadata?.Id });
+        seenKeys.add('ID');
       }
       
       // Add Synonyms

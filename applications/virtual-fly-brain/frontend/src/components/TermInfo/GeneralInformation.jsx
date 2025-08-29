@@ -35,7 +35,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const reduxState = useSelector(state => state);
-  const MAX_LENGTH = 35;
+  const MAX_LENGTH = 300;
 
   // Get current template information
   const currentTemplate = reduxState.instances.launchTemplate;
@@ -141,10 +141,28 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
 
   // Render Tags with chips
   const renderTags = (tags) => {
+
     if (!Array.isArray(tags)) return null;
+    // Global max character count for chips (2 lines worth)
+    const MAX_CHIP_CHAR = 130; // adjust as needed for 2 lines visually
+    let charCount = 0;
+    let visibleTags = [];
+    let overflowTags = [];
+
+    for (let i = 0; i < tags.length; i++) {
+      const tagText = formatTagText(tags[i]);
+      if (charCount + tagText.length <= MAX_CHIP_CHAR) {
+        visibleTags.push(tags[i]);
+        charCount += tagText.length;
+      } else {
+        overflowTags = tags.slice(i);
+        break;
+      }
+    }
+
     return (
       <Box sx={{ display: 'flex', columnGap: '4px', flexWrap: 'wrap', justifyContent: 'end' }} gap={'0.288rem'}>
-        {tags.slice(0, chips_cutoff).map((tag) => (
+        {visibleTags.map((tag) => (
           <Chip 
             key={tag} 
             sx={{ 
@@ -154,7 +172,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
             label={formatTagText(tag)} 
           />
         ))}
-        {tags.length > chips_cutoff && (
+        {overflowTags.length > 0 && (
           <Tooltip
             title={renderTooltipChips({ metadata: { Tags: tags } })}
             placement="bottom-end"
@@ -166,7 +184,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
                 fontSize: '0.625rem',
                 backgroundColor: searchBoxBg
               }}
-              label={`+${tags.length - chips_cutoff}`}
+              label={`+${overflowTags.length}`}
             />
           </Tooltip>
         )}
@@ -546,9 +564,9 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
           if (parsedItem.type === 'hierarchy') {
             return (
               <Box key={index} sx={{ 
-                marginBottom: index < rootItems.length - 1 ? '1rem' : 0,
                 borderBottom: index < rootItems.length - 1 ? `1px solid ${headerBorderColor}` : 'none',
-                paddingBottom: index < rootItems.length - 1 ? '0.75rem' : 0
+                display: 'flex',
+                gap: 1
               }}>
                 {/* Relationship property with semicolon */}
                 <Typography 
@@ -561,7 +579,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
                     marginBottom: '0.5rem'
                   }}
                 >
-                  {parsedItem.relationship.text};
+                  {parsedItem.relationship.text}:
                 </Typography>
                 {/* Target (nested on new line) */}
                 <Typography 
@@ -569,7 +587,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
                     ...classes.heading,
                     color: whiteColor,
                     textAlign: 'right',
-                    marginLeft: '1rem',
+                    flex: 1,
                     cursor: parsedItem.target.id ? 'pointer' : 'default',
                     transition: 'color 0.2s ease-in-out',
                     '&:hover': parsedItem.target.id ? {

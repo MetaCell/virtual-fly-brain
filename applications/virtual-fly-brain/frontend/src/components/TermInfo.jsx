@@ -99,6 +99,7 @@ const {
 
 const getRibbonData = (query) => {
   let terms = query?.preview_results?.rows?.map((row) => {
+    // eslint-disable-next-line no-unused-vars
     const regExp = /\(([^)]+)\)/g;
     return {
       id: row.Neurotransmitter,
@@ -562,6 +563,7 @@ const TermInfo = ({ open, setOpen }) => {
                   {children}
                 </span>
               ),
+              // eslint-disable-next-line no-unused-vars
               img: ({node, ...props}) => (
                 <img
                   {...props}

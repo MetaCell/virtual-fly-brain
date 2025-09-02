@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import PropTypes from 'prop-types';
-import { Add, ClearAll, Cross, Delete, Download, Next, Prev, Remove } from "../../icons"
+import { Add, Cross, Delete, Download, Next, Prev } from "../../icons"
 import { Box, Button, ButtonGroup, IconButton, InputAdornment, Pagination, PaginationItem, Tab, Tabs, TextField } from "@mui/material";
 import Query from "./Query";
 import History from "./History";
@@ -8,7 +8,7 @@ import vars from "../../theme/variables";
 import { useDispatch, useSelector } from 'react-redux'
 import { setQueryComponentOpened } from "../../reducers/actions/globals";
 
-const { secondaryBg, outlinedBtnTextColor, headerBorderColor, blackColor, queryBuilderBg, whiteColor, primaryBg } = vars;
+const { secondaryBg, outlinedBtnTextColor, headerBorderColor, queryBuilderBg, whiteColor, primaryBg } = vars;
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -44,6 +44,7 @@ function a11yProps(index) {
   };
 }
 
+// eslint-disable-next-line no-unused-vars
 const QueryBuilder = ({ fullWidth, bottomNav, setBottomNav, tabSelected }) => {
   const [value, setValue] = React.useState(tabSelected || 0);
   const storeQueries = useSelector(state => state.queries.queries);
@@ -83,11 +84,13 @@ const QueryBuilder = ({ fullWidth, bottomNav, setBottomNav, tabSelected }) => {
   
   const handleTabChange = (event, newValue) => {
     setValue(newValue);
-    if ( newValue == 1 && queryComponentOpened ) {
-      dispatch(setQueryComponentOpened(false));
-    }
+    // Not sure why the below was done since they history component is a variation of the query builder.
+    // if ( newValue == 1 && queryComponentOpened ) {
+    //    dispatch(setQueryComponentOpened(false));
+    // }
   };
 
+  // eslint-disable-next-line no-unused-vars
   const handleClose = (event) => {
     dispatch(setQueryComponentOpened(false));
     setBottomNav(undefined);

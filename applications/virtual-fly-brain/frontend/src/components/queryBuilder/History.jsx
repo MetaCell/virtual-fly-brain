@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import QueryHeader from "./QueryHeader";
 import { Item } from "./HistoryItem";
 import { Box } from "@mui/material";
-import { useSelector } from 'react-redux'
 import { removeAllRecentSearch } from "../../reducers/actions/globals";
 import { useDispatch } from "react-redux";
 import { facets_annotations_colors } from "../configuration/VFBColors";
@@ -21,6 +20,7 @@ const History = ({recentSearches, totalResults}) => {
 
   useEffect( () => {
     let tags = {...initialFilters.filters};
+    // eslint-disable-next-line no-unused-vars
     recentSearches?.forEach( (query, index ) => {
       query.facets_annotation?.forEach( tag => {
         if ( tags?.[tag] == undefined ){

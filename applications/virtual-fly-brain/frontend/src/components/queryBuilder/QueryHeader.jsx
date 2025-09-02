@@ -1,19 +1,16 @@
 import { Box, Button, Divider, Typography } from "@mui/material";
 import React from "react";
-import { Add, ChevronDown, ImportExport } from "../../icons";
+import { ChevronDown, ImportExport } from "../../icons";
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import vars from "../../theme/variables";
-import { dividerStyle } from "./Query";
-import { removeAllRecentSearch } from "../../reducers/actions/globals";
-import { useDispatch } from "react-redux";
+import { dividerStyle } from "./constants";
 
 const { searchHeadingColor, whiteColor, secondaryBg, primaryBg } = vars
 
-const QueryHeader = ({ title, filters, handleSort, handleCrescentEvent, clearAll, setFilteredSearches }) => {
+const QueryHeader = ({ title, filters, handleSort, handleCrescentEvent, clearAll }) => {
   const [sort, setSort] = React.useState('Name');
-  const dispatch = useDispatch();
   const [crescent , setCrescent] = React.useState(1);
 
   const handleChange = (value) => {
@@ -156,7 +153,7 @@ const QueryHeader = ({ title, filters, handleSort, handleCrescentEvent, clearAll
         <Button
             disableRipple
             variant="text"
-            onClick={(event) => clearAll()}
+            onClick={() => clearAll()}
             sx={{
               minWidth: '0.0625rem',
               padding: 0,

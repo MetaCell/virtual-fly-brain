@@ -54,10 +54,10 @@ const theme = createTheme({
 /**
  * Styling changes that can't be applied to theme to avoid making it global
  */
-const styles = theme => ({
+const styles = () => ({
   root: { 
     position: "absolute",
-    bottom: 0,
+    top: 0,
     zIndex: 1,
     maxWidth : "16.25rem",
     background: secondaryBg,
@@ -221,7 +221,7 @@ class AutocompleteResults extends Component {
   /**
    * Receives SOLR results and creates an map with those results that match the input text
    */
-  handleResults (status, data, value){
+  handleResults (status, data){
     let results = {};
     data?.map(result => {
       results[result?.label] = result;
@@ -231,21 +231,21 @@ class AutocompleteResults extends Component {
   }
   
   clearResults () {
-    this.setState({ filteredResults : {} });  
+    this.setState({ filteredResults : {} });
   }
   
   getFilteredResults (){
     return this.state.filteredResults;
   }
   
-  shouldComponentUpdate (nextProps, nextState) {
+  shouldComponentUpdate (nextProps) {
     this.fieldLabel = nextProps.getLatestNeuronFields()[this.props.index].label;
     return true;
   }
   
   render () {
     const label = "Neuron " + (this.props.index + 1) .toString();
-    const options = Object.keys(this.state.filteredResults).map(option => this.state.filteredResults[option].label);
+    // const options = Object.keys(this.state.filteredResults).map(option => this.state.filteredResults[option].label);
     
     return (
       <Autocomplete
@@ -557,7 +557,7 @@ class Controls extends Component {
     
     return (
       <ThemeProvider theme={theme}>
-        <div>
+        <div style={{ position: "absolute", top: '5vh', left: '2vw' }}>
           <div style={{ position: "absolute", width: "5vh", height: "100%", zIndex: 1, marginTop: "0.5rem" }}>
             <div style={{ cursor : "pointer", backgroundImage: `url(${styling.controlIcons.home})`, width: "1.25rem", height: "1.25rem" }} onClick={self.props.resetCamera }></div>
             <div style={{ cursor : "pointer", marginTop: "1rem", backgroundImage: `url(${styling.controlIcons.zoomIn})`, width: "1.25rem", height: "1.25rem" }} onClick={self.props.zoomIn }></div>
@@ -724,4 +724,5 @@ function mapDispatchToProps (dispatch) {
   return { vfbCircuitBrowser: (type, neurons) => dispatch ( { type : type, data : { instance : neurons } }), }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps, null, { forwardRef : true } )(withStyles(styles)(Controls));
+const ConnectedControls = connect(mapStateToProps, mapDispatchToProps, null, { forwardRef : true })(withStyles(styles)(Controls));
+export default ConnectedControls;

@@ -18,4 +18,3 @@ harness:
     build:
       - cloudharness-base-debian
       - cloudharness-flask
-    soft:

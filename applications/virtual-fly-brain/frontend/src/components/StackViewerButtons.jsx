@@ -140,7 +140,7 @@ const StackViewerButtons = ({
         }} className={orthClass} onClick={toggleOrth} onMouseOver={() => setOrthHover(true)} onMouseOut={() => setOrthHover(false)} title={'Toggle the 3D slice display'}>
           <img
             src={orthHover ? ORTHHOVER : ORTH}
-            alt={'Toggle Orth'}
+            alt={'Add Slices'}
             style={{ width: '1.2rem', height: '1.2rem' }}
           />
         </button>
@@ -156,7 +156,7 @@ const StackViewerButtons = ({
           }} className={toggleSliceClass} onClick={toggleSlice} onMouseOver={() => setSliceHover(true)} onMouseOut={() => setSliceHover(false)} title={'Change Slice Plane Through Stack'}>
           <img
             src={sliceHover ? SLICEHOVER : SLICE}
-            alt={'Add Slices'}
+            alt={'Toggle Orth'}
             style={{ width: '1.2rem', height: '1.2rem' }}
           />
         </button>

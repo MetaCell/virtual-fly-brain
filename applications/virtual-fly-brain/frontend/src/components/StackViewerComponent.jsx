@@ -472,6 +472,7 @@ const rgbToHex = (color) => {
         if (this.state.stackViewerPlane) {
           this.state.stackViewerPlane = true;
         }
+        this.checkStack();
       }
       if (this.disp.width > 0 && this.props.slice) {
         this.state.stackViewerPlane = true;
@@ -999,9 +1000,14 @@ const rgbToHex = (color) => {
       this.state.iBuffer = {};
       this.state.imagesUrl = {};
       
-      // Remove all children from stack container (but preserve status text)
+      // Remove all children from stack container except status text buffer
       if (this.stack) {
+        const statusTextBuffer = this.state.buffer[-1];
         this.stack.removeChildren();
+        // Re-add the status text buffer if it exists
+        if (statusTextBuffer) {
+          this.stack.addChild(statusTextBuffer);
+        }
       }
     },
 
@@ -1117,11 +1123,18 @@ const rgbToHex = (color) => {
     },
 
     changeOrth: function (props) {
-      // console.log('Orth: ' + orth);
+      // Ensure we have valid orientation values
+      if (typeof props.orth !== 'number' || props.orth < 0 || props.orth > 2) {
+        console.warn('Invalid orth value:', props.orth, 'resetting to 0');
+        props.orth = 0;
+      }
+      
+      // console.log('Orth: ' + props.orth);
       this.state.orth = props.orth;
       this.state.pit = props.pit;
       this.state.yaw = props.yaw;
       this.state.rol = props.rol;
+      
       // forcing the state change before size calls as setstate take time.
       this.setState({
         pit: props.pit,
@@ -1129,7 +1142,10 @@ const rgbToHex = (color) => {
         rol: props.rol,
         orth: props.orth
       });
+      
       this.clearVisualState('orientation change');
+      
+      // Set appropriate status text based on orientation
       if (props.orth == 0) {
         // console.log('Frontal');
         this.setStatusText('Frontal');
@@ -1143,6 +1159,8 @@ const rgbToHex = (color) => {
         // console.log('Orth:' + props.orth);
         this.setStatusText('...');
       }
+      
+      // Call metadata and size update methods
       this.callDstRange();
       this.callImageSize();
     },
@@ -1152,8 +1170,8 @@ const rgbToHex = (color) => {
       if (!this.state.buffer[-1]) {
         this.createStatusText();
       }
-      this.state.buffer[-1].x = (40);
-      this.state.buffer[-1].y = (8);
+      this.state.buffer[-1].x = (30);
+      this.state.buffer[-1].y = (6);
       this.state.buffer[-1].text = text;
       this.state.text = text;
       this.state.txtUpdated = Date.now();
@@ -1655,12 +1673,13 @@ const StackViewerComponent = () => createClass({
     },
 
     toggleOrth: function () {
-      var orth = this.state.orth += 1;
+      var orth = this.state.orth + 1;
       var pit, yaw, rol;
+      
       if (orth > 2) {
         orth = 0;
-        this.state.orth = orth;
       }
+      
       if (orth == 0) {
         pit = 0;
         yaw = 0;
@@ -1674,8 +1693,19 @@ const StackViewerComponent = () => createClass({
         yaw = 0;
         rol = 0;
       }
-      this.setState({ orth: orth, pit: pit, yaw: yaw, rol: rol, dst: 0, stackX: 0, stackY: 0 });
-      setTimeout(this.onHome, 5000);
+      
+      this.setState({ 
+        orth: orth, 
+        pit: pit, 
+        yaw: yaw, 
+        rol: rol, 
+        dst: 0, 
+        stackX: 0, 
+        stackY: 0 
+      });
+      
+      // Delay the home action to allow the orientation change to complete
+      setTimeout(this.onHome, 1000);
     },
 
     toggleSlice: function () {

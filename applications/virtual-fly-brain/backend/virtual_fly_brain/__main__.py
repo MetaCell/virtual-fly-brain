@@ -4,6 +4,9 @@ import flask
 import werkzeug
 import numpy as np
 import pandas as pd
+import logging
+import time
+from datetime import datetime
 vfb = None
 try:
     import vfbquery as vfb
@@ -40,14 +43,90 @@ class NumpyEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler()  # This ensures logs go to stdout for pod logs
+    ]
+)
+
+# Create logger for API requests
+api_logger = logging.getLogger('vfb_api')
+
+
+def log_request(func):
+    """Decorator to log REST endpoint requests with input data"""
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        request_id = f"{datetime.now().isoformat()}_{int(time.time() * 1000000) % 1000000}"
+        
+        # Log request start
+        request_data = {
+            'request_id': request_id,
+            'endpoint': flask.request.endpoint,
+            'method': flask.request.method,
+            'url': flask.request.url,
+            'path': flask.request.path,
+            'remote_addr': flask.request.remote_addr,
+            'user_agent': flask.request.headers.get('User-Agent', ''),
+            'args': dict(flask.request.args),
+            'form_data': dict(flask.request.form) if flask.request.form else {},
+            'json_data': flask.request.get_json(silent=True) if flask.request.is_json else None,
+            'content_length': flask.request.content_length
+        }
+        
+        api_logger.info(f"REQUEST_START: {json.dumps(request_data, cls=NumpyEncoder)}")
+        
+        try:
+            # Execute the actual endpoint function
+            result = func(*args, **kwargs)
+            
+            # Log successful response
+            end_time = time.time()
+            duration_ms = round((end_time - start_time) * 1000, 2)
+            
+            response_data = {
+                'request_id': request_id,
+                'status': 'SUCCESS',
+                'duration_ms': duration_ms,
+                'response_status': getattr(result, 'status_code', 200) if hasattr(result, 'status_code') else 200
+            }
+            
+            api_logger.info(f"REQUEST_END: {json.dumps(response_data, cls=NumpyEncoder)}")
+            return result
+            
+        except Exception as e:
+            # Log error response
+            end_time = time.time()
+            duration_ms = round((end_time - start_time) * 1000, 2)
+            
+            error_data = {
+                'request_id': request_id,
+                'status': 'ERROR',
+                'duration_ms': duration_ms,
+                'error_type': type(e).__name__,
+                'error_message': str(e)
+            }
+            
+            api_logger.error(f"REQUEST_ERROR: {json.dumps(error_data, cls=NumpyEncoder)}")
+            raise
+    
+    wrapper.__name__ = func.__name__
+    return wrapper
+
+
 def init_webapp_routes(app):
     @app.route('/', methods=['GET'])
+    @log_request
     def index():
         return flask.send_from_directory("www", 'index.html')
 
 
     @app.route('/get_instances', methods=['GET'])
     @cross_origin(supports_credentials=True)
+    @log_request
     def instances():
         short_form = flask.request.args.get('short_form')
         if not short_form:
@@ -66,6 +145,7 @@ def init_webapp_routes(app):
 
     @app.route('/get_term_info', methods=['GET'])
     @cross_origin(supports_credentials=True)
+    @log_request
     def term_info():
         term_id = flask.request.args.get('id')
         if not term_id:
@@ -82,6 +162,7 @@ def init_webapp_routes(app):
 
     @app.route('/run_query', methods=['GET'])
     @cross_origin(supports_credentials=True)
+    @log_request
     def get_query_results():
         term_id = flask.request.args.get('id')
         query_type = flask.request.args.get('query_type')
@@ -124,6 +205,8 @@ init_webapp_routes(app)
 #     app = init_flask(title="Virtual Fly Brain REST API", webapp=True, init_app_fn=init_webapp_routes)
 
 def main():
+    api_logger.info("Starting Virtual Fly Brain REST API server on host='0.0.0.0', port=8080")
+    api_logger.info("Logging is configured for API request tracking")
     app.run(host='0.0.0.0', port=8080)
 
 if __name__ == '__main__':

@@ -10,13 +10,12 @@ harness:
     resources:
       requests:
         memory: 512Mi
-        cpu: 250m
+        cpu: 500m
       limits:
-        memory: 1536Mi
-        cpu: 750m
+        memory: 1024Mi
+        cpu: 1000m
   dependencies:
     build:
       - cloudharness-base-debian
       - cloudharness-flask
     soft:
-    - argo

@@ -7,13 +7,18 @@ harness:
   deployment:
     auto: true
     port: 8080
+    securityContext:
+      capabilities:
+        add:
+        - SYS_ADMIN
+        - SYS_PTRACE
     resources:
       requests:
-        memory: 512Mi
-        cpu: 500m
-      limits:
-        memory: 2048Mi
+        memory: 1512Mi
         cpu: 1000m
+      limits:
+        memory: 3048Mi
+        cpu: 2000m
   dependencies:
     build:
       - cloudharness-base-debian

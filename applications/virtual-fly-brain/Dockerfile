@@ -21,6 +21,8 @@ RUN apt-get update && apt-get install -y \
     freeglut3-dev \
     git \
     cron \
+    util-linux \
+    kmod \
     && rm -rf /var/lib/apt/lists/*
 
 RUN apt-get remove -y nodejs npm || true

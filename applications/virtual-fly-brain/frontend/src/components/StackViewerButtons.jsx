@@ -137,7 +137,7 @@ const StackViewerButtons = ({
           background: 'transparent',
           display: 'flex',
           alignItems: 'center',
-        }} className={orthClass} onClick={toggleOrth} onMouseOver={() => setOrthHover(true)} onMouseOut={() => setOrthHover(false)} title={'Change Slice Plane Through Stack'}>
+        }} className={orthClass} onClick={toggleOrth} onMouseOver={() => setOrthHover(true)} onMouseOut={() => setOrthHover(false)} title={'Toggle the 3D slice display'}>
           <img
             src={orthHover ? ORTHHOVER : ORTH}
             alt={'Toggle Orth'}
@@ -153,7 +153,7 @@ const StackViewerButtons = ({
             alignItems: 'center',
             padding: 0,
             border: 'none',
-          }} className={toggleSliceClass} onClick={toggleSlice} onMouseOver={() => setSliceHover(true)} onMouseOut={() => setSliceHover(false)} title={'Toggle the 3D slice display'}>
+          }} className={toggleSliceClass} onClick={toggleSlice} onMouseOver={() => setSliceHover(true)} onMouseOut={() => setSliceHover(false)} title={'Change Slice Plane Through Stack'}>
           <img
             src={sliceHover ? SLICEHOVER : SLICE}
             alt={'Add Slices'}

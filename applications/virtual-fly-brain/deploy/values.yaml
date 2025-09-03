@@ -12,7 +12,7 @@ harness:
         memory: 512Mi
         cpu: 500m
       limits:
-        memory: 1024Mi
+        memory: 2048Mi
         cpu: 1000m
   dependencies:
     build:

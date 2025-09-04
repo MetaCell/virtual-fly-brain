@@ -288,52 +288,6 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
     );
   };
 
-  // Render Name with ID
-  const renderID = (name, id) => {
-    
-    const handleNameClick = () => {
-      if (id) {
-        getInstanceByID(id, true, true, true);
-      }
-    };
-
-    return (
-      <Box 
-        onClick={handleNameClick} 
-        sx={{ 
-          textAlign: 'right',
-          cursor: id ? 'pointer' : 'default',
-          '&:hover': id ? { 
-            '& .name-text': { 
-              color: tabActiveColor
-            }
-          } : {}
-        }}
-      >
-        <ReactMarkdown 
-          components={{
-            p: ({ children }) => (
-              <Typography 
-                className="name-text"
-                sx={{
-                  ...classes.heading,
-                  color: whiteColor,
-                  textAlign: 'right',
-                  margin: 0,
-                  transition: 'color 0.2s ease-in-out',
-                }}
-              >
-                {children}
-              </Typography>
-            )
-          }}
-        >
-          {`${id}`}
-        </ReactMarkdown>
-      </Box>
-    );
-  };
-
   // Render Licenses with label and icon
   const renderLicensesList = (licenses) => {
     if (!licenses || typeof licenses !== 'object') return null;
@@ -963,8 +917,6 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
       case 'Name':
       case 'Symbol':
         return renderName(value, data?.metadata?.Id);
-      case 'Id':
-        return renderID(value, data?.metadata?.Id);
       case 'Tags':
       case 'Types':
         return renderTags(value);

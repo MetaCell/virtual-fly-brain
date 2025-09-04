@@ -140,7 +140,9 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       return Object.assign({}, state, {
         error: true,
         errorMessage: response.payload.error,
-        finishedLoadedInstances: state.finishedLoadedInstances + 1,
+        loadingInstances: 0,
+        finishedLoadedInstances: 0,
+        isLoading: false,
       });
     }
     case getInstancesTypes.REMOVE_INSTANCES_SUCCESS: {
@@ -436,6 +438,9 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       return Object.assign({}, state, {
         instanceOnFocus: response.payload.error,
         error: true,
+        loadingInstances: 0,
+        finishedLoadedInstances: 0,
+        isLoading: false,
       });
     case getInstancesTypes.ADD_SKELETON: {
       const allLoadedInstances = [...state.allLoadedInstances];

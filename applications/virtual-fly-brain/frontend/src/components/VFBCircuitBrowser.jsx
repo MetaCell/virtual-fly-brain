@@ -2,12 +2,10 @@ import React, { Component } from 'react'
 import axios from 'axios';
 import GeppettoGraphVisualization from '@metacell/geppetto-meta-ui/graph-visualization/Graph';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import { withStyles } from '@material-ui/styles';
 import PropTypes from 'prop-types';
 import Controls from './VFBCircuitBrowser/Controls';
 import { queryParser } from './VFBCircuitBrowser/QueryParser';
 import { connect } from "react-redux";
-import { makeStyles } from '@material-ui/core/styles';
 import { getInstanceByID } from '../reducers/actions/instances';
 import ReactResizeDetector from 'react-resize-detector'
 
@@ -79,7 +77,6 @@ class VFBCircuitBrowser extends Component {
   }
 
   componentDidMount () {
-    let self = this;
     this.__isMounted = true;
     this.updateGraph(this.state.neurons , Math.ceil((configuration.maxPaths - configuration.minPaths) / 2), this.state.weight);
     const { circuitQuerySelected } = this.props;
@@ -184,14 +181,14 @@ class VFBCircuitBrowser extends Component {
   /**
    * Handle Left click on Nodes
    */
-  handleNodeLeftClick (node, event) {
+  handleNodeLeftClick (node) {
     const id = node.title ;
     if (confirm("The image is aligned to another template. Click OK to open in a new tab or Cancel to just view the image metadata")) {
       getInstanceByID(id, true, true);
     }
   }
   
-  handleNodeRightClick (node, event) {
+  handleNodeRightClick (node) {
     this.graphRef.current.ggv.current.centerAt(node.x , node.y, 1000);
     this.graphRef.current.ggv.current.zoom(2, 1000);
   }
@@ -269,12 +266,12 @@ class VFBCircuitBrowser extends Component {
       // Invoke web worker to perform conversion of graph data into format
       worker.postMessage({ message: "refine", params: params });
     })
-      .catch( (error) => {
+      .catch( () => {
         self.setState( { loading : false } );
       })
   }
   
-  getFontSize (context, maxWidth, text, textLength) {
+  getFontSize (context, maxWidth, text) {
     let baseSize = 8;
     let width = context.measureText(text).width;
     while (width > maxWidth) {
@@ -289,7 +286,7 @@ class VFBCircuitBrowser extends Component {
   /**
    * Breaks Description texts into lines to fit within a certain width value.
    */
-  wrapText (context, text, x, y, maxWidth, maxHeight) {
+  wrapText (context, text, x, y, maxWidth) {
     let words = text.split(' ');
     let lines = [];
     let line = '';
@@ -324,11 +321,10 @@ class VFBCircuitBrowser extends Component {
     };
   }
   
-  nodeRendering (node, ctx, globalScale) {
+  nodeRendering (node, ctx) {
     const cardWidth = NODE_WIDTH;
     const cardHeight = NODE_HEIGHT;
     const classnameHeight = cardHeight * .45;
-    const idHeight = cardHeight * .45;
     let borderThickness = this.highlightNodes.has(node) ? NODE_BORDER_THICKNESS : 1;
 
     // Node border color
@@ -467,7 +463,7 @@ class VFBCircuitBrowser extends Component {
               }
               const relLink = { x: end.x - start.x, y: end.y - start.y };
 
-              const maxTextLength = Math.sqrt(Math.pow(relLink.x, 2) + Math.pow(relLink.y, 2)) - LABEL_NODE_MARGIN * 2;
+              // const maxTextLength = Math.sqrt(Math.pow(relLink.x, 2) + Math.pow(relLink.y, 2)) - LABEL_NODE_MARGIN * 2;
 
               let textAngle = Math.atan2(relLink.y, relLink.x);
               // maintain label vertical orientation for legibility
@@ -514,7 +510,7 @@ class VFBCircuitBrowser extends Component {
             }}
             nodeCanvasObject={this.nodeRendering}
             // Overwrite Node Canvas Object
-            nodeCanvasObjectMode={node => 'replace'}
+            nodeCanvasObjectMode={() => 'replace'}
             // bu = Bottom Up, creates Graph with root at bottom
             dagMode="lr"
             nodeVal = { node => {
@@ -522,7 +518,7 @@ class VFBCircuitBrowser extends Component {
               node.fy = -150 * node.level
             }}
             dagLevelDistance = {75}
-            onDagError={loopNodeIds => {}}
+            onDagError={() => {}}
             // Handles clicking event on an individual node
             onNodeClick = { (node,event) => this.handleNodeLeftClick(node,event) }
             // Handles clicking event on an individual node

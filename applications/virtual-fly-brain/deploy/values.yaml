@@ -7,11 +7,6 @@ harness:
   deployment:
     auto: true
     port: 8080
-    securityContext:
-      capabilities:
-        add:
-        - SYS_ADMIN
-        - SYS_PTRACE
     resources:
       requests:
         memory: 1512Mi

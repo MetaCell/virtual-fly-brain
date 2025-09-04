@@ -21,8 +21,6 @@ RUN apt-get update && apt-get install -y \
     freeglut3-dev \
     git \
     cron \
-    util-linux \
-    kmod \
     x11-utils \
     mesa-utils \
     libx11-dev \

@@ -83,6 +83,8 @@ import "@flybase/react-ontology-ribbon/dist/style.css";
 import ReactMarkdown from 'react-markdown';
 import { getUpdatedTags, formatTagText } from "../utils/utils";
 import { facets_annotations_colors as colors_config } from "./configuration/VFBColors";
+import { getInstanceByID } from "../reducers/actions/instances";
+
 const facets_annotations_colors = getUpdatedTags(colors_config);
 
 
@@ -253,6 +255,8 @@ const TermInfo = ({ open, setOpen }) => {
   const queryComponentOpened = useSelector(
     (state) => state.globalInfo.queryComponentOpened
   );
+  const reduxState = useSelector(state => state);
+  const currentTemplate = reduxState.instances.launchTemplate;
 
   const [termInfoData, setTermInfoData] = useState(data);
   const [toggleReadMore, setToggleReadMore] = useState(false);
@@ -506,15 +510,35 @@ const TermInfo = ({ open, setOpen }) => {
 
   const handleLinkClick = (href, event) => {
     event.preventDefault();
+
+    const idsArray = href.split(',');
+    const templateId = idsArray[idsArray.length - 1];
+    const currentTemplateId = currentTemplate?.metadata?.Id;
+
+    let isAlignedTemplate = false;
+    if (data?.metadata?.Examples && typeof data?.metadata?.Examples === 'object' && Object.keys(data?.metadata?.Examples).length > 0) {
+      isAlignedTemplate = !!(data.metadata.Examples[currentTemplateId] && data.metadata.Examples[currentTemplateId].find(e => e.id === templateId));
+    } else if (data?.metadata?.Images && Array.isArray(data?.metadata?.Images) && data?.metadata?.Images.length > 0) {
+      isAlignedTemplate = !!(data.metadata.Images[currentTemplateId] && data.metadata.Images[currentTemplateId].find(e => e.id === templateId));
+    }
+    
     if (href.startsWith("http")) {
       window.open(href, "_blank", "noopener,noreferrer");
     } else {
-      const id = href.split(',').pop().trim();
-      setConfirmationModal({
-        open: true,
-        id: id,
-        message: `The image you requested is aligned to another template. Click Okay to open in a new tab or Cancel to just view the image metadata.`
-      });
+     if (isAlignedTemplate) {
+           getInstanceByID(
+             templateId, 
+             true, 
+             true, 
+             true
+           );
+         } else {
+           setConfirmationModal({
+             open: true,
+             id: templateId,
+             message: "The image you requested is aligned to another template. Click Okay to open in a new tab or Cancel to just view the image metadata."
+           });
+         }
     }
   };
 

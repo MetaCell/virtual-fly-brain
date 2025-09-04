@@ -23,6 +23,10 @@ RUN apt-get update && apt-get install -y \
     cron \
     util-linux \
     kmod \
+    x11-utils \
+    mesa-utils \
+    libx11-dev \
+    libxext-dev \
     && rm -rf /var/lib/apt/lists/*
 
 RUN apt-get remove -y nodejs npm || true
@@ -36,6 +40,8 @@ RUN npm install -g yarn && \
 
 # Set up virtual display for OpenGL
 ENV DISPLAY=:99
+ENV LIBGL_ALWAYS_INDIRECT=1
+ENV MESA_GL_VERSION_OVERRIDE=3.3
 
 COPY frontend ${BUILDDIR}
 WORKDIR ${BUILDDIR}
@@ -68,4 +74,4 @@ RUN mkdir -p /var/log && touch /var/log/vfb_cache_cleanup.log
 WORKDIR /usr/src/app/virtual_fly_brain
 
 EXPOSE 8080
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh", "gunicorn", "--log-level=debug", "--preload", "--bind=0.0.0.0:8080", "--timeout=120", "--graceful-timeout=30", "--keep-alive=5", "virtual_fly_brain.__main__:app"]
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh", "gunicorn", "--log-level=info", "--preload", "--bind=0.0.0.0:8080", "--timeout=120", "--graceful-timeout=30", "--keep-alive=5", "virtual_fly_brain.__main__:app"]

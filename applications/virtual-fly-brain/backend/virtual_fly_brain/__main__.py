@@ -7,6 +7,7 @@ import pandas as pd
 import logging
 import time
 from datetime import datetime
+from virtual_fly_brain.services.numpy_encoder import NumpyEncoder
 vfb = None
 try:
     import vfbquery as vfb
@@ -15,32 +16,6 @@ except ImportError as e:
 from flask_cors import CORS, cross_origin
 from virtual_fly_brain.services.queries import run_query
 from virtual_fly_brain.services.term_info import get_term_info
-
-class NumpyEncoder(json.JSONEncoder):
-    """ Custom encoder for numpy data types """
-    def default(self, obj):
-        if isinstance(obj, (np.int_, np.intc, np.intp, np.int8,
-                            np.int16, np.int32, np.int64, np.uint8,
-                            np.uint16, np.uint32, np.uint64)):
-
-            return int(obj)
-
-        elif isinstance(obj, (np.float_, np.float16, np.float32, np.float64)):
-            return float(obj)
-
-        elif isinstance(obj, (np.complex_, np.complex64, np.complex128)):
-            return {'real': obj.real, 'imag': obj.imag}
-
-        elif isinstance(obj, (np.ndarray,)):
-            return obj.tolist()
-
-        elif isinstance(obj, (np.bool_)):
-            return bool(obj)
-
-        elif isinstance(obj, (np.void)):
-            return None
-
-        return json.JSONEncoder.default(self, obj)
 
 
 # Configure logging
@@ -119,14 +94,14 @@ def log_request(func):
 
 def init_webapp_routes(app):
     @app.route('/', methods=['GET'])
-    @log_request
+    # @log_request
     def index():
         return flask.send_from_directory("www", 'index.html')
 
 
     @app.route('/get_instances', methods=['GET'])
     @cross_origin(supports_credentials=True)
-    @log_request
+    # @log_request
     def instances():
         short_form = flask.request.args.get('short_form')
         if not short_form:
@@ -145,7 +120,7 @@ def init_webapp_routes(app):
 
     @app.route('/get_term_info', methods=['GET'])
     @cross_origin(supports_credentials=True)
-    @log_request
+    # @log_request
     def term_info():
         term_id = flask.request.args.get('id')
         if not term_id:
@@ -162,7 +137,7 @@ def init_webapp_routes(app):
 
     @app.route('/run_query', methods=['GET'])
     @cross_origin(supports_credentials=True)
-    @log_request
+    # @log_request
     def get_query_results():
         term_id = flask.request.args.get('id')
         query_type = flask.request.args.get('query_type')
@@ -201,8 +176,7 @@ app = flask.Flask(
     )
 CORS(app, support_credentials=True)
 init_webapp_routes(app)
-# TODO: fix this to use the init_flask function from cloudharness
-#     app = init_flask(title="Virtual Fly Brain REST API", webapp=True, init_app_fn=init_webapp_routes)
+
 
 def main():
     api_logger.info("Starting Virtual Fly Brain REST API server on host='0.0.0.0', port=8080")

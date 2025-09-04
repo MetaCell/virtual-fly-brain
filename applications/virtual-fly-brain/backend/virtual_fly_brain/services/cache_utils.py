@@ -4,6 +4,7 @@ import time
 import hashlib
 from pathlib import Path
 from typing import Any, Optional
+from virtual_fly_brain.services.numpy_encoder import NumpyEncoder
 
 class DiskCache:
     """
@@ -66,7 +67,7 @@ class DiskCache:
             # Update timestamp on access (refresh TTL)
             cache_data['timestamp'] = time.time()
             with open(cache_path, 'w', encoding='utf-8') as f:
-                json.dump(cache_data, f, ensure_ascii=False)
+                json.dump(cache_data, f, ensure_ascii=False, cls=NumpyEncoder)
             
             return cache_data['data']
             
@@ -93,7 +94,7 @@ class DiskCache:
         
         try:
             with open(cache_path, 'w', encoding='utf-8') as f:
-                json.dump(cache_data, f, ensure_ascii=False)
+                json.dump(cache_data, f, ensure_ascii=False, cls=NumpyEncoder)
         except OSError as e:
             # If we can't write to cache, just continue without caching
             pass

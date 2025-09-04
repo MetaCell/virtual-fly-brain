@@ -14,6 +14,8 @@ import { cypherQuery } from './configuration/VFBGraph/graphConfiguration';
 import { stylingConfiguration } from './configuration/VFBGraph/graphConfiguration';
 import { getInstanceByID } from '../reducers/actions/instances';
 import { getGraphTypes } from '../reducers/actions/types/getGraphTypes'
+import ReactResizeDetector from 'react-resize-detector'
+
 /**
  * If no configuration is given for queries in graphConfiguration.js, we use this configuration.
  */
@@ -482,9 +484,10 @@ class VFBGraph extends Component {
             <p style={{ float : "right", width : "80%", paddingTop : "2vh" }}>No graph available for {this.getErrorLabel()}</p>
           </div>
           : 
+          <ReactResizeDetector handleWidth handleHeight onResize={this.resize} skipOnMount={true}>
             <div ref={this.containerRef}>
               <Box sx={{
-              width: 600,
+              width: '100%',
               height: 800,
               backgroundColor: 'primary.dark',
               '&:hover': {
@@ -663,6 +666,7 @@ class VFBGraph extends Component {
               }
             /></Box>
           </div>
+          </ReactResizeDetector>
     )
   }
 }

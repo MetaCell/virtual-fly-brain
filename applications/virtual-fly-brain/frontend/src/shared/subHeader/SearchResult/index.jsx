@@ -48,6 +48,7 @@ export const SearchResult = ({ getOptionProps, selectedFilters, groupedOptions, 
     <Box sx={{
       py: '1rem',
       px: '0.75rem',
+      zIndex: 100,
     }}>
       <Typography variant="body2" sx={{
         fontSize: '0.75rem',

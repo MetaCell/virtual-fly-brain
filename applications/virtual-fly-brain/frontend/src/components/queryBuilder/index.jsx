@@ -125,7 +125,7 @@ const QueryBuilder = ({ fullWidth, bottomNav, setBottomNav, tabSelected }) => {
         xs: '6.0625rem',
         lg: '0.125rem',
       },
-      zIndex: 99,
+      zIndex: 9,
       right: 0,
       width: {
         xs: '100%',

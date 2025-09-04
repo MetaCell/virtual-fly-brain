@@ -1721,8 +1721,8 @@ const StackViewerComponent = () => createClass({
     },
 
     toggleOrth: function () {
-      var orth = this.state.orth + 1;
-      var pit, yaw, rol;
+      let orth = this.state.orth + 1;
+      let pit, yaw, rol;
       
       if (orth > 2) {
         orth = 0;
@@ -1742,14 +1742,14 @@ const StackViewerComponent = () => createClass({
         rol = 0;
       }
       
-      this.setState({ 
-        orth: orth, 
-        pit: pit, 
-        yaw: yaw, 
-        rol: rol, 
-        dst: 0, 
-        stackX: 0, 
-        stackY: 0 
+      this.setState({
+        orth: orth,
+        pit: pit,
+        yaw: yaw,
+        rol: rol,
+        dst: 0,
+        stackX: 0,
+        stackY: 0
       });
       
       // Delay the home action to allow the orientation change to complete

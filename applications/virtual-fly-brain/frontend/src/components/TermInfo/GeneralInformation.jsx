@@ -145,7 +145,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
 
     if (!Array.isArray(tags)) return null;
     // Global max character count for chips (2 lines worth)
-    const MAX_CHIP_CHAR = 130; // adjust as needed for 2 lines visually
+    const MAX_CHIP_CHAR = 130; // character count limit for all chips combined
     let charCount = 0;
     let visibleTags = [];
     let overflowTags = [];

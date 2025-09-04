@@ -10,6 +10,7 @@ import { getUpdatedTags, formatTagText } from "../../utils/utils";
 import { facets_annotations_colors as colors_config } from "../../components/configuration/VFBColors";
 import { getInstanceByID } from "../../reducers/actions/instances";
 import Modal from "../../shared/modal/Modal";
+import { alignedTemplatesLabels } from "../../utils/alignedTemplates";
 
 const {
   whiteColor,
@@ -455,7 +456,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
           return (
             templateId !== currentTemplateId && <Chip 
               icon={<LinkIcon />} 
-              label={templateId} 
+              label={alignedTemplatesLabels[templateId] || templateId} 
                 sx={{ 
                   cursor: 'pointer',
                   transition: 'background-color 0.2s ease-in-out',
@@ -479,7 +480,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
       <Chip 
         icon={<LinkIcon />} 
         label={currentTemplateName} 
-        onClick={handleTemplateClick}
+        onClick={() =>handleTemplateClick(currentTemplateId)}
         sx={{ 
           cursor: 'pointer',
           transition: 'background-color 0.2s ease-in-out',
@@ -495,7 +496,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
     ) : (
       <>
        <Chip 
-        label={currentTemplateName} 
+        label={alignedTemplatesLabels[currentTemplateId] || currentTemplateId} 
         sx={{ cursor: 'default' }}
       />
       <AllAlignedTo />

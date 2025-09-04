@@ -9,9 +9,22 @@ import { dividerStyle } from "./constants";
 
 const { searchHeadingColor, whiteColor, secondaryBg, primaryBg } = vars
 
-const QueryHeader = ({ title, filters, handleSort, handleCrescentEvent, clearAll }) => {
-  const [sort, setSort] = React.useState('Name');
-  const [crescent , setCrescent] = React.useState(1);
+const QueryHeader = ({ title, filters, handleSort, handleCrescentEvent, clearAll, currentSort, currentDirection }) => {
+  const [sort, setSort] = React.useState(currentSort || 'Name');
+  const [crescent , setCrescent] = React.useState(currentDirection || 1);
+
+  // Sync local state with props when they change
+  React.useEffect(() => {
+    if (currentSort) {
+      setSort(currentSort);
+    }
+  }, [currentSort]);
+
+  React.useEffect(() => {
+    if (currentDirection !== undefined) {
+      setCrescent(currentDirection);
+    }
+  }, [currentDirection]);
 
   const handleChange = (value) => {
     setSort(value);
@@ -19,8 +32,9 @@ const QueryHeader = ({ title, filters, handleSort, handleCrescentEvent, clearAll
   };
 
   const handleCrescentChange = () => {
-    handleCrescentEvent(sort, crescent)
-    setCrescent(crescent * -1 );
+    const newCrescent = crescent * -1;
+    setCrescent(newCrescent);
+    handleCrescentEvent(sort, newCrescent);
   };
 
   return (
@@ -78,7 +92,7 @@ const QueryHeader = ({ title, filters, handleSort, handleCrescentEvent, clearAll
             }
           }}
         >
-          Crescent
+          {crescent === 1 ? 'Ascending' : 'Descending'}
           <ImportExport />
         </Button>
         <Divider sx={dividerStyle} />

@@ -72,7 +72,7 @@ const getInitialFiltersFromHeaders = (queries) => {
       filters[val.title] = key;
     }
     if (val.sort && val.sort["0"] !== undefined) {
-      defaultSort = key;
+      defaultSort = val.title; // Use the title, not the key
     }
   });
   return { filters, tags: "tags", defaultSort };
@@ -89,25 +89,57 @@ const Query = forwardRef(({ fullWidth, queries, searchTerm }, ref) => {
   
   const [chipTags, setChipTags] = useState([]);
   const [count, setCount] = useState(0);
+  const [sortField, setSortField] = useState(() => filters.defaultSort || 'Name'); // Default sort field
+  const [sortDirection, setSortDirection] = useState(1); // 1 for ascending, -1 for descending
   
   // Memoize filtered searches
   const filteredSearches = useMemo(() => getQueries(queries, searchTerm), [queries, searchTerm]);
   
-  // Memoize count calculation based on filtered results
-  const calculatedCount = useMemo(() => {
-    if (!filteredSearches || filteredSearches.length === 0) return 0;
+  // Memoize the final filtered results based on both search term and active chip tags
+  const finalFilteredResults = useMemo(() => {
+    if (!filteredSearches || filteredSearches.length === 0) return [];
     
-    // Count only the items that pass the chip tag filters
     const activeChipLabels = chipTags.filter(f => f.active).map(tag => tag.label);
-    if (activeChipLabels.length === 0) return filteredSearches.length;
     
-    return filteredSearches.filter(row => {
-      const tags = getTags(row.tags);
-      return activeChipLabels.some(label => tags.includes(label));
-    }).length;
-  }, [filteredSearches, chipTags]);
-  
-  // Memoize chip tags calculation
+    // Filter by active chip tags
+    let filtered;
+    if (activeChipLabels.length === 0) {
+      filtered = filteredSearches;
+    } else {
+      filtered = filteredSearches.filter(row => {
+        const tags = getTags(row.tags);
+        return activeChipLabels.some(label => tags.includes(label));
+      });
+    }
+    
+    // Apply sorting
+    if (sortField && filters.filters[sortField]) {
+      const sortKey = filters.filters[sortField];
+      filtered = [...filtered].sort((a, b) => {
+        let aVal = a[sortKey];
+        let bVal = b[sortKey];
+        
+        // Handle null/undefined values
+        if (aVal == null && bVal == null) return 0;
+        if (aVal == null) return sortDirection;
+        if (bVal == null) return -sortDirection;
+        
+        // Convert to strings for comparison if needed
+        if (typeof aVal === 'string' && typeof bVal === 'string') {
+          return sortDirection * aVal.localeCompare(bVal);
+        }
+        
+        // Numeric comparison
+        if (aVal < bVal) return -sortDirection;
+        if (aVal > bVal) return sortDirection;
+        return 0;
+      });
+    }
+    
+    return filtered;
+  }, [filteredSearches, chipTags, sortField, sortDirection, filters.filters]);
+
+  // Memoize chip tags calculation - this should be independent of other state
   const calculatedChipTags = useMemo(() => {
     if (!queries || queries.length === 0) return [];
     
@@ -132,11 +164,6 @@ const Query = forwardRef(({ fullWidth, queries, searchTerm }, ref) => {
     });
     return Array.from(tagMap.values());
   }, [queries]);
-  
-  // Update count when it changes
-  useEffect(() => {
-    setCount(calculatedCount);
-  }, [calculatedCount]);
 
   // Initialize chipTags only when queries change (but preserve user changes)
   useEffect(() => {
@@ -156,6 +183,16 @@ const Query = forwardRef(({ fullWidth, queries, searchTerm }, ref) => {
       });
     }
   }, [calculatedChipTags]);
+
+  // Memoize count calculation based on final filtered results
+  const calculatedCount = useMemo(() => {
+    return finalFilteredResults.length;
+  }, [finalFilteredResults]);
+
+  // Update count when it changes
+  useEffect(() => {
+    setCount(calculatedCount);
+  }, [calculatedCount]);
   
   // Update filters when queries change
   useEffect(() => {
@@ -164,7 +201,11 @@ const Query = forwardRef(({ fullWidth, queries, searchTerm }, ref) => {
       ...prevFilters,
       filters: { ...newFilters.filters, ...prevFilters.filters }
     }));
-  }, [queries]);
+    // Update sort field to default if it's not set or invalid
+    if (newFilters.defaultSort && !sortField) {
+      setSortField(newFilters.defaultSort);
+    }
+  }, [queries, sortField]);
 
   const isLoading = useSelector(state => state.queries.isLoading);
   // eslint-disable-next-line no-unused-vars
@@ -176,11 +217,12 @@ const Query = forwardRef(({ fullWidth, queries, searchTerm }, ref) => {
   }, []);
 
   const handleChipDelete = useCallback((label) => {
-    setChipTags(prevTags =>
-      prevTags.map(tag =>
-        tag.label === label ? { ...tag, active: false } : tag
-      )
-    );
+    setChipTags(prevTags => {
+      const newTags = prevTags.map(tag =>
+        tag.label === label ? { ...tag, active: false } : { ...tag }
+      );
+      return newTags;
+    });
   }, []);
 
   const clearAll = useCallback(() => {
@@ -198,30 +240,31 @@ const Query = forwardRef(({ fullWidth, queries, searchTerm }, ref) => {
     setChipTags(prevTags => prevTags.map(tag => ({ ...tag, active: true })));
   }, []);
 
-  const handleSort = useCallback((value) => {
-    const _identifier = filters.filters[value];
-    // Since we're now using memoized filteredSearches, we need to handle sorting differently
-    // This might need to be moved to a separate state or handled differently
-  }, [filters.filters]);
+  const handleSort = useCallback((value, crescent) => {
+    setSortField(value);
+    if (crescent !== undefined) {
+      setSortDirection(crescent);
+    }
+  }, []);
 
-  const handleCrescentEvent = useCallback((sort) => {
-    const _identifier = filters.filters[sort];
-    // Similar to handleSort, this needs to be reconsidered with memoized data
-  }, [filters.filters]);
+  const handleCrescentEvent = useCallback((sort, crescent) => {
+    setSortField(sort);
+    setSortDirection(crescent);
+  }, []);
 
   // Memoize the CSV download function
   const downloadCSV = useCallback(() => {
-    if (!filteredSearches || filteredSearches.length === 0) return;
+    if (!finalFilteredResults || finalFilteredResults.length === 0) return;
     
     const allKeys = Array.from(
-      filteredSearches.reduce((set, row) => {
+      finalFilteredResults.reduce((set, row) => {
         Object.keys(row).forEach(k => set.add(k));
         return set;
       }, new Set())
     );
     
     const header = allKeys.join(",");
-    const rows = filteredSearches.map(row =>
+    const rows = finalFilteredResults.map(row =>
       allKeys.map(k => {
         let val = row[k];
         if (val === undefined || val === null) return '';
@@ -239,25 +282,25 @@ const Query = forwardRef(({ fullWidth, queries, searchTerm }, ref) => {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-  }, [filteredSearches]);
+  }, [finalFilteredResults]);
 
+  // Don't memoize the QueryCard component as it prevents proper re-rendering
   useImperativeHandle(ref, () => ({
     downloadCSV
   }));
-
-  // Memoize the QueryCard component
-  const MemoizedQueryCard = useMemo(() => React.memo(QueryCard), []);
 
   return (
     <>
       <QueryHeader
         title={isLoading ? "Loading results ..." : `${count} Query results`}
         filters={filters}
-        recentSearches={filteredSearches}
+        recentSearches={finalFilteredResults}
         setFilteredSearches={updateFilters}
         clearAll={clearAll}
         handleCrescentEvent={handleCrescentEvent}
         handleSort={handleSort}
+        currentSort={sortField}
+        currentDirection={sortDirection}
       />
 
       <Box
@@ -375,30 +418,24 @@ const Query = forwardRef(({ fullWidth, queries, searchTerm }, ref) => {
             <CircularProgress />
           </Box>
         ) : (
-          <Grid container spacing={1.5}>
-            {filteredSearches?.map((row, index) => {
+          <Grid container spacing={1.5} key={`grid-${finalFilteredResults.length}-${chipTags.filter(f => f.active).length}-${sortField}-${sortDirection}`}>
+            {finalFilteredResults?.map((row, index) => {
               const tags = getTags(row.tags);
-              const activeChips = chipTags?.filter(f => f.active) || [];
-              
-              // Show all results if no chips are active, otherwise filter by active chips
-              const shouldShow = activeChips.length === 0 || activeChips.some(v => tags.includes(v.label));
-              
-              if (shouldShow) {
-                return (
-                  <Grid
-                    key={row.id || index + row.label}
-                    item
-                    xs={12}
-                    sm={6}
-                    md={4}
-                    lg={fullWidth ? 4 : 3}
-                    xl={3}
-                  >
-                    <MemoizedQueryCard facets_annotation={tags} query={row} fullWidth={fullWidth} />
-                  </Grid>
-                )
-              }
-              return null;
+              // Create a more unique key that includes the current filter state
+              const uniqueKey = `${row.id || row.label || index}-${finalFilteredResults.length}`;
+              return (
+                <Grid
+                  key={uniqueKey}
+                  item
+                  xs={12}
+                  sm={6}
+                  md={4}
+                  lg={fullWidth ? 4 : 3}
+                  xl={3}
+                >
+                  <QueryCard facets_annotation={tags} query={row} fullWidth={fullWidth} />
+                </Grid>
+              )
             })}
           </Grid>
         )}

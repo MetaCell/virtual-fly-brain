@@ -251,6 +251,16 @@ const rgbToHex = (color) => {
         this.stack = null;
       }
 
+      // Cleanup text buffers
+      if (this.state.buffer[-1]) {
+        this.state.buffer[-1].destroy();
+        this.state.buffer[-1] = null;
+      }
+      if (this.state.hoverTextBuffer) {
+        this.state.hoverTextBuffer.destroy();
+        this.state.hoverTextBuffer = null;
+      }
+
       window.addEventListener? document.removeEventListener('keydown', this.setShiftDown, false) : document.attachEvent('keydown', this.setShiftDown);
       window.addEventListener? document.removeEventListener('keyup', this.setShiftUp, false) : document.detachEvent('keyup', this.setShiftUp);
 
@@ -472,6 +482,7 @@ const rgbToHex = (color) => {
         if (this.state.stackViewerPlane) {
           this.state.stackViewerPlane = true;
         }
+        this.checkStack();
       }
       if (this.disp.width > 0 && this.props.slice) {
         this.state.stackViewerPlane = true;
@@ -650,7 +661,7 @@ const rgbToHex = (color) => {
                   if (objects !== '' && i == 0) {
                     that.setHoverText(callX,callY,list[0]);
                   } else {
-                    that.setStatusText('');
+                    that.clearHoverText();
                   }
                 }
                 // update slice view
@@ -962,9 +973,9 @@ const rgbToHex = (color) => {
         const textStyle = new TextStyle(style);
         this.state.buffer[-1] = new Text(this.state.text, textStyle);
         this.app.stage.addChild(this.state.buffer[-1]);
-        // fix position
-        this.state.buffer[-1].x = 0
-        this.state.buffer[-1].y = 8;
+        // fix position to always be at top-left corner
+        this.state.buffer[-1].x = 30;
+        this.state.buffer[-1].y = 6;
         this.state.buffer[-1].anchor.x = 0;
         this.state.buffer[-1].anchor.y = 0;
         this.state.buffer[-1].zOrder = 1000;
@@ -981,8 +992,8 @@ const rgbToHex = (color) => {
       // Properly dispose of existing sprites and textures to prevent memory leaks
       if (this.stack && this.stack.children) {
         this.stack.children.forEach(child => {
-          // Don't destroy the status text buffer
-          if (child !== this.state.buffer[-1]) {
+          // Don't destroy the status text buffer or hover text buffer
+          if (child !== this.state.buffer[-1] && child !== this.state.hoverTextBuffer) {
             if (child.texture) {
               child.texture.destroy(true);
             }
@@ -999,9 +1010,19 @@ const rgbToHex = (color) => {
       this.state.iBuffer = {};
       this.state.imagesUrl = {};
       
-      // Remove all children from stack container (but preserve status text)
+      // Remove all children from stack container (status text should stay on stage)
       if (this.stack) {
         this.stack.removeChildren();
+      }
+      
+      // Ensure status text remains at fixed position on the stage
+      if (this.state.buffer[-1]) {
+        // Make sure it's on the stage, not the stack
+        if (this.state.buffer[-1].parent !== this.app.stage) {
+          this.app.stage.addChild(this.state.buffer[-1]);
+        }
+        this.state.buffer[-1].x = 30;
+        this.state.buffer[-1].y = 6;
       }
     },
 
@@ -1117,11 +1138,18 @@ const rgbToHex = (color) => {
     },
 
     changeOrth: function (props) {
-      // console.log('Orth: ' + orth);
+      // Ensure we have valid orientation values
+      if (typeof props.orth !== 'number' || props.orth < 0 || props.orth > 2) {
+        console.warn('Invalid orth value:', props.orth, 'resetting to 0');
+        props.orth = 0;
+      }
+      
+      // console.log('Orth: ' + props.orth);
       this.state.orth = props.orth;
       this.state.pit = props.pit;
       this.state.yaw = props.yaw;
       this.state.rol = props.rol;
+      
       // forcing the state change before size calls as setstate take time.
       this.setState({
         pit: props.pit,
@@ -1129,7 +1157,10 @@ const rgbToHex = (color) => {
         rol: props.rol,
         orth: props.orth
       });
+      
       this.clearVisualState('orientation change');
+      
+      // Set appropriate status text based on orientation
       if (props.orth == 0) {
         // console.log('Frontal');
         this.setStatusText('Frontal');
@@ -1143,6 +1174,8 @@ const rgbToHex = (color) => {
         // console.log('Orth:' + props.orth);
         this.setStatusText('...');
       }
+      
+      // Call metadata and size update methods
       this.callDstRange();
       this.callImageSize();
     },
@@ -1152,22 +1185,55 @@ const rgbToHex = (color) => {
       if (!this.state.buffer[-1]) {
         this.createStatusText();
       }
-      this.state.buffer[-1].x = (40);
-      this.state.buffer[-1].y = (8);
+      
+      // Make sure the status text is always on the stage (not the stack)
+      if (this.state.buffer[-1].parent !== this.app.stage) {
+        this.app.stage.addChild(this.state.buffer[-1]);
+      }
+      
+      // Always ensure status text is positioned at the fixed location
+      this.state.buffer[-1].x = 30;
+      this.state.buffer[-1].y = 6;
       this.state.buffer[-1].text = text;
       this.state.text = text;
       this.state.txtUpdated = Date.now();
     },
 
     setHoverText: function (x,y,text) {
-      // Ensure status text buffer exists
-      if (!this.state.buffer[-1]) {
-        this.createStatusText();
+      // Create or update a separate hover text element
+      if (!this.state.hoverTextBuffer) {
+        const style = {
+          fontSize: 14,
+          fill: '#ffffff',
+          stroke: '#1a1a1a',
+          strokeThickness: 2,
+          dropShadow: true,
+          dropShadowColor: '#1a1a1a',
+          dropShadowAngle: Math.PI / 6,
+          dropShadowDistance: 2,
+          wordWrap: true,
+          wordWrapWidth: 200,
+          textAlign: 'left'
+        };
+        const textStyle = new TextStyle(style);
+        this.state.hoverTextBuffer = new Text(text, textStyle);
+        this.app.stage.addChild(this.state.hoverTextBuffer);
+        this.state.hoverTextBuffer.anchor.x = 0;
+        this.state.hoverTextBuffer.anchor.y = 0;
+        this.state.hoverTextBuffer.zOrder = 1001; // Higher than status text
       }
-      this.state.buffer[-1].x = this.disp.position.x + (this.stack.position.x * this.disp.scale.x) + (Number(x) * this.disp.scale.x) - 10;
-      this.state.buffer[-1].y = this.disp.position.y + (this.stack.position.y * this.disp.scale.y) + (Number(y) * this.disp.scale.y) + 15;
-      this.state.buffer[-1].text = text;
-      this.state.text = text;
+      
+      // Position the hover text at the specified coordinates
+      this.state.hoverTextBuffer.x = this.disp.position.x + (this.stack.position.x * this.disp.scale.x) + (Number(x) * this.disp.scale.x) - 10;
+      this.state.hoverTextBuffer.y = this.disp.position.y + (this.stack.position.y * this.disp.scale.y) + (Number(y) * this.disp.scale.y) + 15;
+      this.state.hoverTextBuffer.text = text;
+      this.state.hoverTextBuffer.visible = true;
+    },
+
+    clearHoverText: function () {
+      if (this.state.hoverTextBuffer) {
+        this.state.hoverTextBuffer.visible = false;
+      }
     },
 
     /**
@@ -1655,12 +1721,13 @@ const StackViewerComponent = () => createClass({
     },
 
     toggleOrth: function () {
-      var orth = this.state.orth += 1;
-      var pit, yaw, rol;
+      let orth = this.state.orth + 1;
+      let pit, yaw, rol;
+      
       if (orth > 2) {
         orth = 0;
-        this.state.orth = orth;
       }
+      
       if (orth == 0) {
         pit = 0;
         yaw = 0;
@@ -1674,8 +1741,19 @@ const StackViewerComponent = () => createClass({
         yaw = 0;
         rol = 0;
       }
-      this.setState({ orth: orth, pit: pit, yaw: yaw, rol: rol, dst: 0, stackX: 0, stackY: 0 });
-      setTimeout(this.onHome, 5000);
+      
+      this.setState({
+        orth: orth,
+        pit: pit,
+        yaw: yaw,
+        rol: rol,
+        dst: 0,
+        stackX: 0,
+        stackY: 0
+      });
+      
+      // Delay the home action to allow the orientation change to complete
+      setTimeout(this.onHome, 1000);
     },
 
     toggleSlice: function () {

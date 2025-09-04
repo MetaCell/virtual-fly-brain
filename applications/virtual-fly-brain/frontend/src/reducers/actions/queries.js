@@ -1,5 +1,5 @@
 import store from '../../store';
-import { get_queries, get_query_results } from "../../network/query"
+import { get_query_results } from "../../network/query"
 import { getQueriesTypes } from './types/getQueriesTypes';
 
 const getQueriesSuccess = (query, short_form, type) => ({

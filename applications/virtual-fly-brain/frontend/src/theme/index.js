@@ -39,7 +39,7 @@ theme = createTheme({
       styleOverrides: `
         *, body {
           font-family: ${primaryFont};
-          box-sizing: border-box
+          box-sizing: border-box;
         }
 
         .chrome-picker {

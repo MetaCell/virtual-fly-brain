@@ -7,7 +7,7 @@ import { facets_annotations_colors as colors_config } from "../../../components/
 
 const facets_annotations_colors = getUpdatedTags(colors_config)
 
-const { secondaryBg, searchBoxBg, whiteColor, searchHeadingColor, listHover } = vars;
+const { secondaryBg, searchBoxBg, searchHeadingColor } = vars;
 const chips_cutoff = 3;
 export const SearchResult = ({ getOptionProps, selectedFilters, groupedOptions, handleResultSelection }) => {
   const hasTag = (facets_annotations) => {
@@ -48,6 +48,7 @@ export const SearchResult = ({ getOptionProps, selectedFilters, groupedOptions, 
     <Box sx={{
       py: '1rem',
       px: '0.75rem',
+      zIndex: 100,
     }}>
       <Typography variant="body2" sx={{
         fontSize: '0.75rem',

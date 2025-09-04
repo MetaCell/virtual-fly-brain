@@ -99,6 +99,7 @@ const {
 
 const getRibbonData = (query) => {
   let terms = query?.preview_results?.rows?.map((row) => {
+    // eslint-disable-next-line no-unused-vars
     const regExp = /\(([^)]+)\)/g;
     return {
       id: row.Neurotransmitter,
@@ -123,7 +124,7 @@ const CustomBox = styled(Box)(({ theme }) => ({
     content: '""',
     position: "absolute",
     right: 0,
-    zIndex: 999,
+    zIndex: 5,
     width: "100%",
     height: "100%",
     display: "block",
@@ -562,6 +563,7 @@ const TermInfo = ({ open, setOpen }) => {
                   {children}
                 </span>
               ),
+              // eslint-disable-next-line no-unused-vars
               img: ({node, ...props}) => (
                 <img
                   {...props}
@@ -999,7 +1001,7 @@ const TermInfo = ({ open, setOpen }) => {
                                 : "Queries for " +
                                   termInfoData?.metadata?.Name}
                             </Typography>
-                            <Box display="flex" sx={{ zIndex: 1000 }} pl={0.5}>
+                            <Box display="flex" sx={{ zIndex: 6 }} pl={0.5}>
                               <Typography sx={{ pr: 0.5 }}>
                                 {termInfoData?.metadata?.Queries?.reduce(
                                   (n, { count }) => n + count,
@@ -1027,7 +1029,7 @@ const TermInfo = ({ open, setOpen }) => {
                                   <Typography>{query.label}</Typography>
                                   <Box
                                     display="flex"
-                                    sx={{ zIndex: 1000 }}
+                                    sx={{ zIndex: 6 }}
                                     pl={0.5}
                                   >
                                     <Typography sx={{ pr: 0.5 }}>
@@ -1147,7 +1149,7 @@ const TermInfo = ({ open, setOpen }) => {
                                   <Typography>{query.label}</Typography>
                                   <Box
                                     display="flex"
-                                    sx={{ zIndex: 1000 }}
+                                    sx={{ zIndex: 6 }}
                                     pl={0.5}
                                   >
                                     <Typography sx={{ pr: 0.5 }}>
@@ -1206,7 +1208,7 @@ const TermInfo = ({ open, setOpen }) => {
                               </Typography>
                               <Box
                                 display="flex"
-                                sx={{ zIndex: 1000 }}
+                                sx={{ zIndex: 6 }}
                                 pl={0.5}
                               >
                                 <Typography sx={{ pr: 0.5 }}>

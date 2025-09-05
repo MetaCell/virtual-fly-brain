@@ -36,7 +36,7 @@ const CustomTableContainer = styled(TableContainer)(
     content: '';
     position: absolute;
     top: 0;
-    z-index: 999;
+    z-index: 5;
     display: block;
     height: 100%;
     width: 100%;
@@ -53,7 +53,7 @@ const CustomBox = styled(Box)(
     content: '';
     position: absolute;
     right: 0;
-    z-index: 999;
+    z-index: 5;
     width: 100%;
     height: 100%;
     display: block;

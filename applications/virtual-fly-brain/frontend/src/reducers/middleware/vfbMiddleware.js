@@ -43,7 +43,6 @@ const vfbMiddleware = store => next => (action) => {
             break;
         }
         case getGlobalTypes.SHOW_SLICE_DISPLAY : {
-            let matchInstance = store.getState().instances.allLoadedInstances.find( i => i.metadata?.Id === action.payload.id );
             let objectFound = null;
             for (let child of store.getState().instances.threeDObjects) {
                 if ( action.payload.data?.id === child.material?.name ) {
@@ -66,7 +65,6 @@ const vfbMiddleware = store => next => (action) => {
             break;
         }
         case getGlobalTypes.MODIFY_SLICE_DISPLAY : {
-            let matchInstance = store.getState().instances.allLoadedInstances.find( i => i.metadata?.Id === action.payload.id );
             let objectFound = null;
             for (let child of store.getState().instances.threeDObjects) {
                 if ( action.payload.data?.id === child.material?.name ) {

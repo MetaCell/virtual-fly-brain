@@ -3,7 +3,7 @@ import { getQueriesFailure } from '../actions/queries';
 import { getQueriesTypes } from '../actions/types/getQueriesTypes';
 import { getInstancesTypes } from '../actions/types/getInstancesTypes';
 import { setFirstIDLoaded, setAlignTemplates, setTemplateID } from '../actions/globals';
-import { getInstanceByID, get3DMesh, triggerInstanceFailure } from '../actions/instances';
+import { getInstanceByID, get3DMesh, triggerInstanceFailure, setBulkLoadingCount } from '../actions/instances';
 import * as GeppettoActions from '@metacell/geppetto-meta-client/common/actions';
 
 function updateUrlParameterWithCurrentUrl(param, value, reset) {
@@ -43,7 +43,7 @@ function updateUrlWithInstancesAndSelectedId(selectedId) {
 const DEFAULT_ID = "VFB_00101567";
 const APP_LOADED_FLAG_KEY = "CURRENT_LOADED_URL";
 
-const isFirstTimeLoad = (allLoadedInstances) => {
+const isFirstTimeLoad = (allLoadedInstances, store) => {
   const appLoadedUrl = localStorage.getItem(APP_LOADED_FLAG_KEY);
   const currentUrl = window.location.href;
   if (currentUrl != appLoadedUrl) {
@@ -69,6 +69,14 @@ const isFirstTimeLoad = (allLoadedInstances) => {
     } else if (idToUpdate.length === 0) {
       // If no ID is specified in the URL, add the default ID
       idToUpdate.push(DEFAULT_ID);
+    }
+
+    // Filter out instances that are already loaded to get the actual count we need to load
+    const instancesToLoad = idToUpdate.filter(id => !allLoadedInstances?.find(i => i.metadata?.Id === id));
+    
+    // If we have instances to load, set up bulk loading
+    if (instancesToLoad.length > 0) {
+      store.dispatch(setBulkLoadingCount(instancesToLoad.length));
     }
 
     idToUpdate?.forEach( id => {
@@ -101,7 +109,7 @@ export const urlUpdaterMiddleware = store => next => (action) => {
 
   // Only call isFirstTimeLoad if we haven't loaded the first ID yet
   if (!firstIDLoaded) {
-    isFirstTimeLoad(allLoadedInstances);
+    isFirstTimeLoad(allLoadedInstances, store);
   }
 
   switch (action.type) {

@@ -24,6 +24,8 @@ export const initialStateInstancesReducer = {
   selectedInstancesCount: 1,
   loadingInstances: 0,
   finishedLoadedInstances: 0,
+  bulkLoadingCount: 0,
+  isBulkLoading: false,
 };
 
 const getMappedCanvasData = (loadedInstances) => {
@@ -120,6 +122,9 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         });
       }
 
+      const newFinishedCount = state.finishedLoadedInstances + 1;
+      const isAllBulkInstancesLoaded = state.isBulkLoading && newFinishedCount >= state.bulkLoadingCount;
+      
       return Object.assign({}, state, {
         allLoadedInstances: loadedInstances,
         launchTemplate: launchTemplate,
@@ -130,10 +135,13 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
           id: response.payload.Id,
           trigger: Date.now(),
         },
-        isLoading: false,
+        isLoading: state.isBulkLoading ? !isAllBulkInstancesLoaded : false,
         error: false,
         errorMessage: undefined,
-        finishedLoadedInstances: state.finishedLoadedInstances + 1,
+        finishedLoadedInstances: newFinishedCount,
+        // Reset bulk loading state when all instances are loaded
+        isBulkLoading: state.isBulkLoading && !isAllBulkInstancesLoaded,
+        bulkLoadingCount: isAllBulkInstancesLoaded ? 0 : state.bulkLoadingCount,
       });
     }
     case getInstancesTypes.GET_INSTANCES_FAILURE: {
@@ -143,6 +151,9 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         loadingInstances: 0,
         finishedLoadedInstances: 0,
         isLoading: false,
+        // Reset bulk loading state on failure
+        isBulkLoading: false,
+        bulkLoadingCount: 0,
       });
     }
     case getInstancesTypes.REMOVE_INSTANCES_SUCCESS: {
@@ -725,6 +736,23 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         isLoading: false,
         error: false,
         errorMessage: undefined,
+      });
+    }
+    case getInstancesTypes.SET_BULK_LOADING_COUNT: {
+      return Object.assign({}, state, {
+        bulkLoadingCount: response.payload.count,
+        isBulkLoading: true,
+        loadingInstances: 0,
+        finishedLoadedInstances: 0,
+      });
+    }
+    case getInstancesTypes.RESET_BULK_LOADING: {
+      return Object.assign({}, state, {
+        bulkLoadingCount: 0,
+        isBulkLoading: false,
+        loadingInstances: 0,
+        finishedLoadedInstances: 0,
+        isLoading: false,
       });
     }
     default:

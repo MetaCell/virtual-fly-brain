@@ -491,6 +491,12 @@ const rgbToHex = (color) => {
     },
 
     callObjects: function () {
+      // Prevent duplicate calls within 100ms
+      const now = Date.now();
+      if (this._lastCallObjectsTime && (now - this._lastCallObjectsTime) < 100) {
+        return;
+      }
+      this._lastCallObjectsTime = now;
 
       var j, result;
       var that = this;
@@ -1289,13 +1295,20 @@ const rgbToHex = (color) => {
         this.props.setExtent({ stackX: this.stack.position.x, stackY: this.stack.position.y });
         this.createImages();
         this.state.buffer[-1].text = '';
+        
+        // Set flag to prevent duplicate click event
+        this._justFinishedDrag = true;
+        setTimeout(() => {
+          this._justFinishedDrag = false;
+        }, 10);
       }
       this.state.dragging = false;
     },
 
     onStackClick: function (event) {
       // Backup click handler for when drag doesn't register as a click
-      if (!this.state.dragging) {
+      // But prevent duplicate calls if we just finished a drag operation
+      if (!this.state.dragging && !this._justFinishedDrag) {
         var clickPosition;
         if (event.data && typeof event.data.getLocalPosition === "function") {
           clickPosition = event.data.getLocalPosition(this.stack);

@@ -485,16 +485,12 @@ class VFBGraph extends Component {
           </div>
           : 
           <ReactResizeDetector handleWidth handleHeight onResize={this.resize} skipOnMount={true}>
-            <div ref={this.containerRef}>
-              <Box sx={{
-              width: '100%',
-              height: 800,
-              backgroundColor: 'primary.dark',
+            <div ref={this.containerRef} style={ { width: "100%", height: "100%", position: "relative",     backgroundColor: 'primary.dark',
               '&:hover': {
                 backgroundColor: 'primary.main',
                 opacity: [0.9, 0.8, 0.7],
-              },
-            }}><GeppettoGraphVisualization
+              }, } }>
+             <GeppettoGraphVisualization
               id= { COMPONENT_ID }
               // Graph data with Nodes and Links to populate
               data={this.state.graph}
@@ -506,6 +502,9 @@ class VFBGraph extends Component {
               nodeLabel={node => node.path}
               nodeRelSize={20}
               nodeSize={30}
+              height={this.containerRef.current?.offsetHeight}
+              width={this.containerRef.current?.offsetWidth}
+              // Width of individual Node
               // Relationship label, placed in Link
               linkLabel={link => link.name}
               // Assign background color to Canvas
@@ -664,7 +663,7 @@ class VFBGraph extends Component {
                 }
               }
               }
-            /></Box>
+            />
           </div>
           </ReactResizeDetector>
     )

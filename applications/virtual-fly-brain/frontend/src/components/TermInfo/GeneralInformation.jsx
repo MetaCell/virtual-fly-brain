@@ -10,6 +10,7 @@ import { getUpdatedTags, formatTagText } from "../../utils/utils";
 import { facets_annotations_colors as colors_config } from "../../components/configuration/VFBColors";
 import { getInstanceByID } from "../../reducers/actions/instances";
 import Modal from "../../shared/modal/Modal";
+import { alignedTemplatesLabels } from "../../utils/alignedTemplates";
 
 const {
   whiteColor,
@@ -35,7 +36,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const reduxState = useSelector(state => state);
-  const MAX_LENGTH = 35;
+  const MAX_LENGTH = 300;
 
   // Get current template information
   const currentTemplate = reduxState.instances.launchTemplate;
@@ -141,10 +142,28 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
 
   // Render Tags with chips
   const renderTags = (tags) => {
+
     if (!Array.isArray(tags)) return null;
+    // Global max character count for chips (2 lines worth)
+    const MAX_CHIP_CHAR = 130; // character count limit for all chips combined
+    let charCount = 0;
+    let visibleTags = [];
+    let overflowTags = [];
+
+    for (let i = 0; i < tags.length; i++) {
+      const tagText = formatTagText(tags[i]);
+      if (charCount + tagText.length <= MAX_CHIP_CHAR) {
+        visibleTags.push(tags[i]);
+        charCount += tagText.length;
+      } else {
+        overflowTags = tags.slice(i);
+        break;
+      }
+    }
+
     return (
       <Box sx={{ display: 'flex', columnGap: '4px', flexWrap: 'wrap', justifyContent: 'end' }} gap={'0.288rem'}>
-        {tags.slice(0, chips_cutoff).map((tag) => (
+        {visibleTags.map((tag) => (
           <Chip 
             key={tag} 
             sx={{ 
@@ -154,7 +173,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
             label={formatTagText(tag)} 
           />
         ))}
-        {tags.length > chips_cutoff && (
+        {overflowTags.length > 0 && (
           <Tooltip
             title={renderTooltipChips({ metadata: { Tags: tags } })}
             placement="bottom-end"
@@ -166,7 +185,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
                 fontSize: '0.625rem',
                 backgroundColor: searchBoxBg
               }}
-              label={`+${tags.length - chips_cutoff}`}
+              label={`+${overflowTags.length}`}
             />
           </Tooltip>
         )}
@@ -246,7 +265,16 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
                   color: whiteColor,
                   textAlign: 'right',
                   margin: 0,
-                  transition: 'color 0.2s ease-in-out'
+                  transition: 'color 0.2s ease-in-out',
+
+                  '& a': {
+                    textDecoration: 'none',
+                    color: whiteColor,
+
+                    '&:hover': {
+                      textDecoration: 'underline',
+                    }
+                  }
                 }}
               >
                 {children}
@@ -382,7 +410,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
           return (
             templateId !== currentTemplateId && <Chip 
               icon={<LinkIcon />} 
-              label={templateId} 
+              label={alignedTemplatesLabels[templateId] || templateId} 
                 sx={{ 
                   cursor: 'pointer',
                   transition: 'background-color 0.2s ease-in-out',
@@ -406,7 +434,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
       <Chip 
         icon={<LinkIcon />} 
         label={currentTemplateName} 
-        onClick={handleTemplateClick}
+        onClick={() =>handleTemplateClick(currentTemplateId)}
         sx={{ 
           cursor: 'pointer',
           transition: 'background-color 0.2s ease-in-out',
@@ -422,7 +450,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
     ) : (
       <>
        <Chip 
-        label={currentTemplateName} 
+        label={alignedTemplatesLabels[currentTemplateId] || currentTemplateId} 
         sx={{ cursor: 'default' }}
       />
       <AllAlignedTo />
@@ -491,9 +519,9 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
           if (parsedItem.type === 'hierarchy') {
             return (
               <Box key={index} sx={{ 
-                marginBottom: index < rootItems.length - 1 ? '1rem' : 0,
                 borderBottom: index < rootItems.length - 1 ? `1px solid ${headerBorderColor}` : 'none',
-                paddingBottom: index < rootItems.length - 1 ? '0.75rem' : 0
+                display: 'flex',
+                gap: 1
               }}>
                 {/* Relationship property with semicolon */}
                 <Typography 
@@ -506,7 +534,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
                     marginBottom: '0.5rem'
                   }}
                 >
-                  {parsedItem.relationship.text};
+                  {parsedItem.relationship.text}:
                 </Typography>
                 {/* Target (nested on new line) */}
                 <Typography 
@@ -514,7 +542,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
                     ...classes.heading,
                     color: whiteColor,
                     textAlign: 'right',
-                    marginLeft: '1rem',
+                    flex: 1,
                     cursor: parsedItem.target.id ? 'pointer' : 'default',
                     transition: 'color 0.2s ease-in-out',
                     '&:hover': parsedItem.target.id ? {
@@ -887,6 +915,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
     // Handle special cases
     switch (key) {
       case 'Name':
+      case 'Symbol':
         return renderName(value, data?.metadata?.Id);
       case 'Tags':
       case 'Types':
@@ -914,7 +943,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
         } else if (typeof value === 'string') {
           if (containsMarkdown(value)) {
             return (
-              <Box sx={{ textAlign: 'right', '& p': { margin: 0 } }}>
+              <Box sx={{ textAlign: 'right', '& p': { margin: 0, fontSize: '0.875rem', color: 'red !important' } }}>
                 <ReactMarkdown>{value}</ReactMarkdown>
               </Box>
             );
@@ -990,8 +1019,8 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
         }
       });
       // Add all Meta properties (excluding duplicates and already handled ones)
-      if (data.metadata.Meta && typeof data.metadata.Meta === 'object') {
-        Object.entries(data.metadata.Meta).forEach(([key, value]) => {
+      if (data?.metadata?.Meta && typeof data?.metadata?.Meta === 'object') {
+        Object.entries(data.metadata?.Meta).forEach(([key, value]) => {
           if (!seenKeys.has(key) &&
               !isEmpty(value) &&
               typeof value !== 'boolean' &&
@@ -1001,6 +1030,9 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
               return;
             }
             if (key === 'Name') {
+              return;
+            }
+            if (key === 'Symbol') {
               return;
             }
           
@@ -1014,10 +1046,19 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
     } else {
       // When showMetadataOnly is false, show ONLY Name, Synonyms, and Licenses
       
-      // Add Name
-      if (data.metadata.Name && !isEmpty(data.metadata.Name)) {
-        properties.push({ key: 'Name', value: data.metadata.Name });
+      if (data.metadata?.Meta?.Name && !isEmpty(data.metadata?.Meta?.Name)) {
+        properties.push({ key: 'Name', value: data.metadata?.Meta?.Name });
         seenKeys.add('Name');
+      }
+
+      if (data.metadata?.Meta?.Symbol && !isEmpty(data.metadata?.Meta?.Symbol)) {
+        properties.push({ key: 'Symbol', value: data.metadata?.Meta?.Symbol });
+        seenKeys.add('Symbol');
+      }
+
+      if (data.metadata?.Id && !isEmpty(data.metadata?.Id)) {
+        properties.push({ key: 'ID', value: data.metadata?.Id });
+        seenKeys.add('ID');
       }
       
       // Add Synonyms

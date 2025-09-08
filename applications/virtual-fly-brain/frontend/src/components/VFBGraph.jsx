@@ -15,6 +15,7 @@ import { stylingConfiguration } from './configuration/VFBGraph/graphConfiguratio
 import { getInstanceByID } from '../reducers/actions/instances';
 import { getGraphTypes } from '../reducers/actions/types/getGraphTypes'
 import ReactResizeDetector from 'react-resize-detector'
+import { Stack } from '@mui/material';
 
 /**
  * If no configuration is given for queries in graphConfiguration.js, we use this configuration.
@@ -566,15 +567,12 @@ class VFBGraph extends Component {
               // Width of links
               linkWidth={1.25}
               controls = {
-                <div style={ { position: "absolute", width: "5vh", height: "100px",zIndex: "2", color : "white" } }>
+                <Stack gap={1} sx={ { position: "absolute",zIndex: "2"} }>
                   <Tooltip placement="right" title="Reset View">
                     <div
                       style={
                         {
-                          zIndex : "2",
                           cursor : "pointer",
-                          top : "10px",
-                          left : "10px",
                           width: "1.3rem",
                           height: "1.3rem",
                           backgroundPosition: 'center',
@@ -588,10 +586,7 @@ class VFBGraph extends Component {
                     <div
                       style={
                         {
-                          zIndex : "2",
                           cursor : "pointer",
-                          marginTop : "20px",
-                          left : "10px",
                           width: "1.3rem",
                           height: "1.3rem",
                           backgroundPosition: 'center',
@@ -605,10 +600,7 @@ class VFBGraph extends Component {
                     <div
                       style={
                         {
-                          zIndex : "2",
                           cursor : "pointer",
-                          marginTop : "5px",
-                          left : "10px",
                           width: "1.3rem",
                           height: "1.3rem",
                           backgroundPosition: 'center',
@@ -626,7 +618,7 @@ class VFBGraph extends Component {
                     syncColor = { syncColor }
                     stylingConfiguration = { stylingConfiguration }
                   />
-                </div>
+                </Stack>
               }
               click={() => self.graphRef.current.ggv.current.zoomToFit()}
               // Function triggered when hovering over a nodeoptions

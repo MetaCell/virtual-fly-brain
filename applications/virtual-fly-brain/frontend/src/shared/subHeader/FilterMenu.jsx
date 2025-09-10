@@ -13,6 +13,7 @@ export const FilterMenu  = ({ classes , setSelectedFilters, setFilterOpened, des
   const tags = filters[0].values;
   const filterhandleClick = (event, closePanel) => {
     let opened = true;
+    // eslint-disable-next-line no-unused-vars
     filterAnchorEl ? opened = false : opened = true;
 
     setFilterOpened(closePanel)

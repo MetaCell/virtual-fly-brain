@@ -91,6 +91,30 @@ const rgbToHex = (color) => {
       }
     },
 
+    handleBrowserZoomChange: function() {
+      // When browser zoom changes, recalculate dimensions and resize
+      if (this._isMounted && this.app && this.app.renderer && this.props.width && this.props.height) {
+        console.log('Browser zoom detected, resizing stack viewer');
+        this.app.renderer.resize(this.props.width, this.props.height);
+        this.onResize(this.props.width, this.props.height);
+      }
+    },
+
+    handleWindowResize: function() {
+      // Additional check for window resize events that might indicate zoom
+      if (this._isMounted && this.app && this.app.renderer && this.props.width && this.props.height) {
+        // Small delay to ensure proper rendering
+        setTimeout(() => {
+          if (this._isMounted) {
+            this.app.renderer.resize(this.props.width, this.props.height);
+            this.checkStack();
+            this.createImages();
+            this.animate();
+          }
+        }, 100);
+      }
+    },
+
     /**
      * In this case, componentDidMount is used to grab the canvas container ref, and
      * and hook up the PixiJS renderer
@@ -166,6 +190,33 @@ const rgbToHex = (color) => {
 
       window.addEventListener? document.addEventListener('keydown', this.setShiftDown) : document.attachEvent('keydown', this.setShiftDown);
       window.addEventListener? document.addEventListener('keyup', this.setShiftUp) : document.attachEvent('keyup', this.setShiftUp);
+
+      // Add browser zoom detection
+      this.initialZoom = window.devicePixelRatio || 1;
+      this.lastWindowWidth = window.innerWidth;
+      this.lastWindowHeight = window.innerHeight;
+      
+      this.zoomCheckInterval = setInterval(() => {
+        if (!this._isMounted) return; // Exit early if component unmounted
+        
+        const currentZoom = window.devicePixelRatio || 1;
+        const currentWindowWidth = window.innerWidth;
+        const currentWindowHeight = window.innerHeight;
+        
+        // Check for zoom change via devicePixelRatio or window size change
+        if (Math.abs(currentZoom - this.initialZoom) > 0.1 || 
+            this.lastWindowWidth !== currentWindowWidth || 
+            this.lastWindowHeight !== currentWindowHeight) {
+          // Browser zoom or window size changed, trigger resize
+          this.handleBrowserZoomChange();
+          this.initialZoom = currentZoom;
+          this.lastWindowWidth = currentWindowWidth;
+          this.lastWindowHeight = currentWindowHeight;
+        }
+      }, 300); // Check every 300ms for better responsiveness
+
+      // Also listen for resize events that might indicate zoom changes
+      window.addEventListener('resize', this.handleWindowResize.bind(this));
 
     },
 
@@ -263,6 +314,12 @@ const rgbToHex = (color) => {
 
       window.addEventListener? document.removeEventListener('keydown', this.setShiftDown, false) : document.attachEvent('keydown', this.setShiftDown);
       window.addEventListener? document.removeEventListener('keyup', this.setShiftUp, false) : document.detachEvent('keyup', this.setShiftUp);
+      
+      // Clean up zoom detection
+      if (this.zoomCheckInterval) {
+        clearInterval(this.zoomCheckInterval);
+      }
+      window.removeEventListener('resize', this.handleWindowResize);
 
       if (this.props.canvasRef != null && this.props.canvasRef != undefined) {
         this.props.canvasRef.removeObject(this.state.stackViewerPlane);

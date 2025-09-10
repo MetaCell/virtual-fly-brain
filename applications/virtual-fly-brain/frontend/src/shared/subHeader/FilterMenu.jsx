@@ -7,7 +7,7 @@ import { filters } from "./configuration";
 
 const { primaryBg, outlinedBtnTextColor, bottomNavBg, tabActiveColor, whiteColor } = vars;
 
-export const FilterMenu  = ({ classes , setSelectedFilters, setFilterOpened }) => {
+export const FilterMenu  = ({ classes , setSelectedFilters, setFilterOpened, desktop }) => {
   const [filterAnchorEl, setFilterAnchorEl] = React.useState(null);
   const [selection, setSelection] = React.useState({})
   const tags = filters[0].values;
@@ -46,8 +46,9 @@ export const FilterMenu  = ({ classes , setSelectedFilters, setFilterOpened }) =
     <Box
       flexShrink={0}
       display='flex'
-      alignItems='center'
+      alignItems='left'
       columnGap='0.25rem'
+      sx={ !desktop ? { position: "absolute", right: '1rem' } : {}}
     >
       <Button
         aria-describedby={filterId}

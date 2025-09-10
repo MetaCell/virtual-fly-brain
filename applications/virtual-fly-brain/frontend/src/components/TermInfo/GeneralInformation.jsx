@@ -236,7 +236,8 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
 
   // Render Name with ID
   const renderName = (name, id) => {
-    const handleNameClick = () => {
+    const handleNameClick = (e) => {
+      e.preventDefault();
       if (id) {
         getInstanceByID(id, true, true, true);
       }
@@ -244,7 +245,6 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
 
     return (
       <Box 
-        onClick={handleNameClick} 
         sx={{ 
           textAlign: 'right',
           cursor: id ? 'pointer' : 'default',
@@ -260,6 +260,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
             p: ({ children }) => (
               <Typography 
                 className="name-text"
+                onClick={handleNameClick}
                 sx={{
                   ...classes.heading,
                   color: whiteColor,
@@ -273,6 +274,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
 
                     '&:hover': {
                       textDecoration: 'underline',
+                      color: tabActiveColor
                     }
                   }
                 }}
@@ -294,36 +296,18 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
     
     const handleLabelClick = async (shortForm) => {
       if (!shortForm) return;
-      
+      setIsLoading(true);
       try {
-        const alignedTemplates = reduxState.globalInfo.alignedTemplates;
-        const isAligned = alignedTemplates[shortForm];
-        
-        // If template is aligned, load it directly
-        if (isAligned) {
-          setIsLoading(true);
-          try {
-            await getInstanceByID(
-              shortForm, 
-              true, 
-              true, 
-              true
-            );
-          } finally {
-            setIsLoading(false);
-          }
-          return;
-        }
-        
-        // If template is not aligned, show confirmation modal
-        setConfirmationModal({
-          open: true,
+        await getInstanceByID(
           shortForm,
-          message: "The image you requested is aligned to another template. Click Okay to open in a new tab or Cancel to just view the image metadata."
-        });
+          true,
+          true,
+          true
+        );
       } catch (error) {
         console.error('Error loading instance:', error);
-        // TODO: Show user-friendly error message
+      }finally {
+        setIsLoading(false);
       }
     };
 
@@ -339,10 +323,10 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
           if (!license || typeof license !== 'object') return null;
           
           return (
-            <Box key={index} sx={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'flex-end', 
+            <Box key={index} sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
               gap: '0.5rem',
               marginBottom: index < Object.values(licenses).length - 1 ? '0.5rem' : 0
             }}>
@@ -381,7 +365,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
                         }
                       }}
                       onClick={() => handleIconClick(license.iri)}
-                    />} placement="bottom" arrow> 
+                    />} placement="bottom" arrow>
                     {typographyElement}
                   </Tooltip>
                 ) : typographyElement;
@@ -785,30 +769,13 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
       if (!match || !match[2]) return;
       
       const instanceId = match[2];
-      
       try {
-        const alignedTemplates = reduxState.globalInfo.alignedTemplates;
-        const isAligned = alignedTemplates[instanceId];
-        
-        // If template is aligned, load it directly
-        if (isAligned) {
-          setIsLoading(true);
-          try {
-            await getInstanceByID(instanceId, true, true, true);
-          } finally {
-            setIsLoading(false);
-          }
-          return;
-        }
-        
-        // If template is not aligned, show confirmation modal
-        setConfirmationModal({
-          open: true,
-          shortForm: instanceId,
-          message: "The image you requested is aligned to another template. Click Okay to open in a new tab or Cancel to just view the image metadata."
-        });
+        setIsLoading(true);
+        await getInstanceByID(instanceId, true, true, true);
       } catch (error) {
         console.error('Error loading instance:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -816,17 +783,15 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
       <Box sx={{ textAlign: 'right' }}>
         {synonyms.map((synonym, index) => {
           if (!synonym || !synonym.label) return null;
-          
           return (
-            <Box key={index} sx={{ 
-              marginBottom: index < synonyms.length - 1 ? '0.5rem' : 0 ,
+            <Box key={index} sx={{
+              marginBottom: index < synonyms.length - 1 ? '0.5rem' : 0,
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
               columnGap: '0.5rem'
             }}>
-             
-              <Typography 
+              <Typography
                 component="span"
                 sx={{
                   ...classes.heading,
@@ -838,54 +803,26 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
               </Typography>
               {synonym.publication && (
               <Box onClick={() => handlePublicationClick(synonym.publication)} sx={{
-                backgroundColor: '#0164d8',
                 width: 'fit-content',
                 padding: '0.2rem 0.3rem',
-                borderRadius: '0.25rem',
-                cursor: 'pointer'
+                cursor: 'pointer',
               }}>
                 <Tooltip title={`${synonym.publication.replace(/\[([^\]]+)\]\(([^)]+)\)/, '$1')}`} placement="top" arrow>
-                  <Typography sx={{
-                    ...classes.heading,
-                    color: whiteColor,
-                    textAlign: 'right',
-                    fontSize: '0.75rem',
-                    fontWeight: 'bold'
-                  }}>
-                    Pub
-                  </Typography>
+                  <Box
+                    component="i"
+                    className="fa-solid fa-book-bookmark"
+                    sx={{
+                      color: whiteColor,
+                      fontSize: '1rem',
+                      transition: 'color 0.2s ease-in-out',
+                      '&:hover': {
+                        color: tabActiveColor,
+                      }
+                    }}
+                  />
                 </Tooltip>
               </Box>
               )}
-              {/* {synonym.publication && (
-                <>
-                  <Typography 
-                    component="span"
-                    sx={{
-                      ...classes.heading,
-                      color: whiteColor,
-                      margin: '0 0.25rem'
-                    }}
-                  >
-                    ,
-                  </Typography>
-                  <Typography 
-                    component="span"
-                    sx={{
-                      ...classes.heading,
-                      color: tabActiveColor,
-                      cursor: 'pointer',
-                      transition: 'color 0.2s ease-in-out',
-                      '&:hover': {
-                        textDecoration: 'underline'
-                      }
-                    }}
-                    onClick={() => handlePublicationClick(synonym.publication)}
-                  >
-                    {synonym.publication.replace(/\[([^\]]+)\]\(([^)]+)\)/, '$1')}
-                  </Typography>
-                </>
-              )} */}
             </Box>
           );
         })}

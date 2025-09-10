@@ -253,11 +253,11 @@ const rgbToHex = (color) => {
 
       // Cleanup text buffers
       if (this.state.buffer[-1]) {
-        this.state.buffer[-1].destroy();
+        // this.state.buffer[-1].destroy();
         this.state.buffer[-1] = null;
       }
       if (this.state.hoverTextBuffer) {
-        this.state.hoverTextBuffer.destroy();
+        // this.state.hoverTextBuffer.destroy();
         this.state.hoverTextBuffer = null;
       }
 

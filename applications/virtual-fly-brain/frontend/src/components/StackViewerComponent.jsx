@@ -91,6 +91,73 @@ const rgbToHex = (color) => {
       }
     },
 
+    handleBrowserZoomChange: function() {
+      // When browser zoom changes, recalculate dimensions and resize
+      if (this._isMounted && this.app && this.app.renderer && this.props.width && this.props.height) {
+        console.log('Browser zoom detected, resizing stack viewer');
+        this.app.renderer.resize(this.props.width, this.props.height);
+        this.onResize(this.props.width, this.props.height);
+      }
+    },
+
+    handleWindowResize: function() {
+      // Enhanced window resize handler that also detects zoom changes
+      if (this._isMounted && this.app && this.app.renderer && this.props.width && this.props.height) {
+        const currentZoom = window.devicePixelRatio || 1;
+        const currentWindowWidth = window.innerWidth;
+        const currentWindowHeight = window.innerHeight;
+        
+        // Check if this is a zoom-related resize
+        if (Math.abs(currentZoom - this.initialZoom) > 0.1 || 
+            this.lastWindowWidth !== currentWindowWidth || 
+            this.lastWindowHeight !== currentWindowHeight) {
+          
+          this.initialZoom = currentZoom;
+          this.lastWindowWidth = currentWindowWidth;
+          this.lastWindowHeight = currentWindowHeight;
+          
+          // Small delay to ensure proper rendering
+          setTimeout(() => {
+            if (this._isMounted) {
+              this.app.renderer.resize(this.props.width, this.props.height);
+              this.checkStack();
+              this.createImages();
+              this.animate();
+            }
+          }, 100);
+        }
+      }
+    },
+
+    handleVisualViewportChange: function() {
+      // Handle visual viewport changes (modern approach for zoom detection)
+      if (this._isMounted) {
+        const currentZoom = window.devicePixelRatio || 1;
+        if (Math.abs(currentZoom - this.initialZoom) > 0.1) {
+          console.log('Zoom detected via visual viewport change');
+          this.handleBrowserZoomChange();
+          this.initialZoom = currentZoom;
+        }
+      }
+    },
+
+    handleDevicePixelRatioChange: function() {
+      // Handle devicePixelRatio changes via media queries (Webkit fallback)
+      if (this._isMounted) {
+        const currentZoom = window.devicePixelRatio || 1;
+        console.log('Zoom detected via devicePixelRatio change');
+        this.handleBrowserZoomChange();
+        this.initialZoom = currentZoom;
+        
+        // Update media query listener for new ratio
+        if (this.mediaQueryList) {
+          this.mediaQueryList.removeListener(this.boundHandleDevicePixelRatioChange);
+          this.mediaQueryList = window.matchMedia(`(resolution: ${currentZoom}dppx)`);
+          this.mediaQueryList.addListener(this.boundHandleDevicePixelRatioChange);
+        }
+      }
+    },
+
     /**
      * In this case, componentDidMount is used to grab the canvas container ref, and
      * and hook up the PixiJS renderer
@@ -166,6 +233,47 @@ const rgbToHex = (color) => {
 
       window.addEventListener? document.addEventListener('keydown', this.setShiftDown) : document.attachEvent('keydown', this.setShiftDown);
       window.addEventListener? document.addEventListener('keyup', this.setShiftUp) : document.attachEvent('keyup', this.setShiftUp);
+
+      // Add efficient browser zoom detection using event-driven approach
+      this.initialZoom = window.devicePixelRatio || 1;
+      this.lastWindowWidth = window.innerWidth;
+      this.lastWindowHeight = window.innerHeight;
+      
+      // Create bound methods for proper cleanup
+      this.boundHandleWindowResize = this.handleWindowResize.bind(this);
+      this.boundHandleVisualViewportChange = this.handleVisualViewportChange.bind(this);
+      
+      // Listen for window resize events (covers most zoom scenarios)
+      window.addEventListener('resize', this.boundHandleWindowResize);
+      
+      // Listen for visual viewport changes (modern browsers, more accurate for zoom)
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', this.boundHandleVisualViewportChange);
+      }
+      
+      // Setup ResizeObserver for the canvas container if available
+      if (window.ResizeObserver && this.refs.stackCanvas) {
+        this.resizeObserver = new ResizeObserver(() => {
+          if (!this._isMounted) return;
+          
+          // Check if this resize might be due to zoom
+          const currentZoom = window.devicePixelRatio || 1;
+          
+          if (Math.abs(currentZoom - this.initialZoom) > 0.1) {
+            this.handleBrowserZoomChange();
+            this.initialZoom = currentZoom;
+          }
+        });
+        
+        this.resizeObserver.observe(this.refs.stackCanvas);
+      }
+      
+      // Fallback: Listen for devicePixelRatio changes (Webkit-based browsers)
+      if (window.matchMedia) {
+        this.mediaQueryList = window.matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`);
+        this.boundHandleDevicePixelRatioChange = this.handleDevicePixelRatioChange.bind(this);
+        this.mediaQueryList.addListener(this.boundHandleDevicePixelRatioChange);
+      }
 
     },
 
@@ -253,16 +361,33 @@ const rgbToHex = (color) => {
 
       // Cleanup text buffers
       if (this.state.buffer[-1]) {
-        this.state.buffer[-1].destroy();
         this.state.buffer[-1] = null;
       }
       if (this.state.hoverTextBuffer) {
-        this.state.hoverTextBuffer.destroy();
         this.state.hoverTextBuffer = null;
       }
 
       window.addEventListener? document.removeEventListener('keydown', this.setShiftDown, false) : document.attachEvent('keydown', this.setShiftDown);
       window.addEventListener? document.removeEventListener('keyup', this.setShiftUp, false) : document.detachEvent('keyup', this.setShiftUp);
+      
+      // Clean up efficient zoom detection event listeners and observers
+      if (this.boundHandleWindowResize) {
+        window.removeEventListener('resize', this.boundHandleWindowResize);
+      }
+      
+      if (this.boundHandleVisualViewportChange && window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', this.boundHandleVisualViewportChange);
+      }
+      
+      if (this.resizeObserver) {
+        this.resizeObserver.disconnect();
+        this.resizeObserver = null;
+      }
+      
+      if (this.mediaQueryList && this.boundHandleDevicePixelRatioChange) {
+        this.mediaQueryList.removeListener(this.boundHandleDevicePixelRatioChange);
+        this.mediaQueryList = null;
+      }
 
       if (this.props.canvasRef != null && this.props.canvasRef != undefined) {
         this.props.canvasRef.removeObject(this.state.stackViewerPlane);

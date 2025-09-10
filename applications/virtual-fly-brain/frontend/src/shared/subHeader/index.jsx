@@ -72,6 +72,16 @@ const SubHeader = ({ setBottomNav, bottomNav }) => {
   const [focused, setFocused] = useState(false);
   const [filterOpened, setFilterOpened] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState({});
+  const [desktop, setDesktop] = useState(window.innerWidth >= 1200);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setDesktop(window.innerWidth >= 1200);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const isLoading = useSelector((state) => state.instances.isLoading);
   const loadingInstances = useSelector(
@@ -111,10 +121,10 @@ const SubHeader = ({ setBottomNav, bottomNav }) => {
   useEffect(() => {
     // For bulk loading, check if all instances are loaded using bulk count
     // For individual loading, use the original logic
-    const allLoaded = isBulkLoading 
+    const allLoaded = isBulkLoading
       ? finishedLoadedInstances >= bulkLoadingCount
       : loadingInstances > 0 && loadingInstances === finishedLoadedInstances;
-      
+
     if (allLoaded) {
       // Add a small delay to show the final loading state before resetting
       const timer = setTimeout(() => {
@@ -218,7 +228,7 @@ const SubHeader = ({ setBottomNav, bottomNav }) => {
           <Search style={{ margin: 0 }} />
         )}
 
-        <Box flexGrow={1} px={1}>
+        <Box flexGrow={1} px={1} sx={ !desktop ? { width: "95vw" } : {}}>
           <SearchBuilder
             applyFilters={selectedFilters}
             focused={focused}
@@ -230,6 +240,7 @@ const SubHeader = ({ setBottomNav, bottomNav }) => {
           />
         </Box>
         <FilterMenu
+          desktop={desktop}
           classes={classes}
           focused={focused}
           setFilterOpened={setFilterOpened}

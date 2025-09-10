@@ -108,13 +108,19 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
                     backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color,
                     color: facets_annotations_colors[tag]?.textColor || facets_annotations_colors?.default?.textColor,
                     borderRadius: '8px',
-                    fontWeight: 500
+                    fontWeight: 500,
+                    marginLeft: '2px !important',
+                    marginRight: '2px !important',
                   }}
                   label={tag} />
                 ))}
                 {facets_annotation.length > (fullWidth ? 3 : 4) && (
                   <Tooltip
                     arrow
+                    placement="top"
+                    enterDelay={300}
+                    leaveDelay={200}
+                    disableInteractive={false}
                     title={
                       <Box display='flex' py={1} flexWrap='wrap' gap={0.5}>
                         {facets_annotation?.slice(fullWidth ? 3 : 4).map((tag, index) => (
@@ -126,7 +132,9 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
                               backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color,
                               color: facets_annotations_colors[tag]?.textColor || facets_annotations_colors?.default?.textColor,
                               borderRadius: '8px',
-                              fontWeight: 500
+                              fontWeight: 500,
+                              marginLeft: '2px !important',
+                              marginRight: '2px !important',
                             }}
                             label={tag} />
                         ))}
@@ -135,7 +143,16 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
                   >
                     <Chip
                       className="default-chip"
-                      sx={{ background: '#F5F5F5', color: '#333', borderRadius: '8px', fontWeight: 500 }}
+                      sx={{
+                        background: '#F5F5F5',
+                        color: '#333',
+                        borderRadius: '8px',
+                        fontWeight: 500,
+                        cursor: 'default',
+                        '&:hover': {
+                          background: '#E0E0E0'
+                        }
+                      }}
                       label={`+${facets_annotation?.slice(fullWidth ? 3 : 4).length}`}
                     />
                   </Tooltip>

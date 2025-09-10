@@ -91,6 +91,73 @@ const rgbToHex = (color) => {
       }
     },
 
+    handleBrowserZoomChange: function() {
+      // When browser zoom changes, recalculate dimensions and resize
+      if (this._isMounted && this.app && this.app.renderer && this.props.width && this.props.height) {
+        console.log('Browser zoom detected, resizing stack viewer');
+        this.app.renderer.resize(this.props.width, this.props.height);
+        this.onResize(this.props.width, this.props.height);
+      }
+    },
+
+    handleWindowResize: function() {
+      // Enhanced window resize handler that also detects zoom changes
+      if (this._isMounted && this.app && this.app.renderer && this.props.width && this.props.height) {
+        const currentZoom = window.devicePixelRatio || 1;
+        const currentWindowWidth = window.innerWidth;
+        const currentWindowHeight = window.innerHeight;
+        
+        // Check if this is a zoom-related resize
+        if (Math.abs(currentZoom - this.initialZoom) > 0.1 || 
+            this.lastWindowWidth !== currentWindowWidth || 
+            this.lastWindowHeight !== currentWindowHeight) {
+          
+          this.initialZoom = currentZoom;
+          this.lastWindowWidth = currentWindowWidth;
+          this.lastWindowHeight = currentWindowHeight;
+          
+          // Small delay to ensure proper rendering
+          setTimeout(() => {
+            if (this._isMounted) {
+              this.app.renderer.resize(this.props.width, this.props.height);
+              this.checkStack();
+              this.createImages();
+              this.animate();
+            }
+          }, 100);
+        }
+      }
+    },
+
+    handleVisualViewportChange: function() {
+      // Handle visual viewport changes (modern approach for zoom detection)
+      if (this._isMounted) {
+        const currentZoom = window.devicePixelRatio || 1;
+        if (Math.abs(currentZoom - this.initialZoom) > 0.1) {
+          console.log('Zoom detected via visual viewport change');
+          this.handleBrowserZoomChange();
+          this.initialZoom = currentZoom;
+        }
+      }
+    },
+
+    handleDevicePixelRatioChange: function() {
+      // Handle devicePixelRatio changes via media queries (Webkit fallback)
+      if (this._isMounted) {
+        const currentZoom = window.devicePixelRatio || 1;
+        console.log('Zoom detected via devicePixelRatio change');
+        this.handleBrowserZoomChange();
+        this.initialZoom = currentZoom;
+        
+        // Update media query listener for new ratio
+        if (this.mediaQueryList) {
+          this.mediaQueryList.removeListener(this.boundHandleDevicePixelRatioChange);
+          this.mediaQueryList = window.matchMedia(`(resolution: ${currentZoom}dppx)`);
+          this.mediaQueryList.addListener(this.boundHandleDevicePixelRatioChange);
+        }
+      }
+    },
+
     /**
      * In this case, componentDidMount is used to grab the canvas container ref, and
      * and hook up the PixiJS renderer
@@ -166,6 +233,47 @@ const rgbToHex = (color) => {
 
       window.addEventListener? document.addEventListener('keydown', this.setShiftDown) : document.attachEvent('keydown', this.setShiftDown);
       window.addEventListener? document.addEventListener('keyup', this.setShiftUp) : document.attachEvent('keyup', this.setShiftUp);
+
+      // Add efficient browser zoom detection using event-driven approach
+      this.initialZoom = window.devicePixelRatio || 1;
+      this.lastWindowWidth = window.innerWidth;
+      this.lastWindowHeight = window.innerHeight;
+      
+      // Create bound methods for proper cleanup
+      this.boundHandleWindowResize = this.handleWindowResize.bind(this);
+      this.boundHandleVisualViewportChange = this.handleVisualViewportChange.bind(this);
+      
+      // Listen for window resize events (covers most zoom scenarios)
+      window.addEventListener('resize', this.boundHandleWindowResize);
+      
+      // Listen for visual viewport changes (modern browsers, more accurate for zoom)
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', this.boundHandleVisualViewportChange);
+      }
+      
+      // Setup ResizeObserver for the canvas container if available
+      if (window.ResizeObserver && this.refs.stackCanvas) {
+        this.resizeObserver = new ResizeObserver(() => {
+          if (!this._isMounted) return;
+          
+          // Check if this resize might be due to zoom
+          const currentZoom = window.devicePixelRatio || 1;
+          
+          if (Math.abs(currentZoom - this.initialZoom) > 0.1) {
+            this.handleBrowserZoomChange();
+            this.initialZoom = currentZoom;
+          }
+        });
+        
+        this.resizeObserver.observe(this.refs.stackCanvas);
+      }
+      
+      // Fallback: Listen for devicePixelRatio changes (Webkit-based browsers)
+      if (window.matchMedia) {
+        this.mediaQueryList = window.matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`);
+        this.boundHandleDevicePixelRatioChange = this.handleDevicePixelRatioChange.bind(this);
+        this.mediaQueryList.addListener(this.boundHandleDevicePixelRatioChange);
+      }
 
     },
 
@@ -251,8 +359,35 @@ const rgbToHex = (color) => {
         this.stack = null;
       }
 
+      // Cleanup text buffers
+      if (this.state.buffer[-1]) {
+        this.state.buffer[-1] = null;
+      }
+      if (this.state.hoverTextBuffer) {
+        this.state.hoverTextBuffer = null;
+      }
+
       window.addEventListener? document.removeEventListener('keydown', this.setShiftDown, false) : document.attachEvent('keydown', this.setShiftDown);
       window.addEventListener? document.removeEventListener('keyup', this.setShiftUp, false) : document.detachEvent('keyup', this.setShiftUp);
+      
+      // Clean up efficient zoom detection event listeners and observers
+      if (this.boundHandleWindowResize) {
+        window.removeEventListener('resize', this.boundHandleWindowResize);
+      }
+      
+      if (this.boundHandleVisualViewportChange && window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', this.boundHandleVisualViewportChange);
+      }
+      
+      if (this.resizeObserver) {
+        this.resizeObserver.disconnect();
+        this.resizeObserver = null;
+      }
+      
+      if (this.mediaQueryList && this.boundHandleDevicePixelRatioChange) {
+        this.mediaQueryList.removeListener(this.boundHandleDevicePixelRatioChange);
+        this.mediaQueryList = null;
+      }
 
       if (this.props.canvasRef != null && this.props.canvasRef != undefined) {
         this.props.canvasRef.removeObject(this.state.stackViewerPlane);
@@ -472,6 +607,7 @@ const rgbToHex = (color) => {
         if (this.state.stackViewerPlane) {
           this.state.stackViewerPlane = true;
         }
+        this.checkStack();
       }
       if (this.disp.width > 0 && this.props.slice) {
         this.state.stackViewerPlane = true;
@@ -480,6 +616,12 @@ const rgbToHex = (color) => {
     },
 
     callObjects: function () {
+      // Prevent duplicate calls within 100ms
+      const now = Date.now();
+      if (this._lastCallObjectsTime && (now - this._lastCallObjectsTime) < 100) {
+        return;
+      }
+      this._lastCallObjectsTime = now;
 
       var j, result;
       var that = this;
@@ -650,7 +792,7 @@ const rgbToHex = (color) => {
                   if (objects !== '' && i == 0) {
                     that.setHoverText(callX,callY,list[0]);
                   } else {
-                    that.setStatusText('');
+                    that.clearHoverText();
                   }
                 }
                 // update slice view
@@ -962,9 +1104,9 @@ const rgbToHex = (color) => {
         const textStyle = new TextStyle(style);
         this.state.buffer[-1] = new Text(this.state.text, textStyle);
         this.app.stage.addChild(this.state.buffer[-1]);
-        // fix position
-        this.state.buffer[-1].x = 0
-        this.state.buffer[-1].y = 8;
+        // fix position to always be at top-left corner
+        this.state.buffer[-1].x = 30;
+        this.state.buffer[-1].y = 6;
         this.state.buffer[-1].anchor.x = 0;
         this.state.buffer[-1].anchor.y = 0;
         this.state.buffer[-1].zOrder = 1000;
@@ -981,8 +1123,8 @@ const rgbToHex = (color) => {
       // Properly dispose of existing sprites and textures to prevent memory leaks
       if (this.stack && this.stack.children) {
         this.stack.children.forEach(child => {
-          // Don't destroy the status text buffer
-          if (child !== this.state.buffer[-1]) {
+          // Don't destroy the status text buffer or hover text buffer
+          if (child !== this.state.buffer[-1] && child !== this.state.hoverTextBuffer) {
             if (child.texture) {
               child.texture.destroy(true);
             }
@@ -999,9 +1141,19 @@ const rgbToHex = (color) => {
       this.state.iBuffer = {};
       this.state.imagesUrl = {};
       
-      // Remove all children from stack container (but preserve status text)
+      // Remove all children from stack container (status text should stay on stage)
       if (this.stack) {
         this.stack.removeChildren();
+      }
+      
+      // Ensure status text remains at fixed position on the stage
+      if (this.state.buffer[-1]) {
+        // Make sure it's on the stage, not the stack
+        if (this.state.buffer[-1].parent !== this.app.stage) {
+          this.app.stage.addChild(this.state.buffer[-1]);
+        }
+        this.state.buffer[-1].x = 30;
+        this.state.buffer[-1].y = 6;
       }
     },
 
@@ -1117,11 +1269,18 @@ const rgbToHex = (color) => {
     },
 
     changeOrth: function (props) {
-      // console.log('Orth: ' + orth);
+      // Ensure we have valid orientation values
+      if (typeof props.orth !== 'number' || props.orth < 0 || props.orth > 2) {
+        console.warn('Invalid orth value:', props.orth, 'resetting to 0');
+        props.orth = 0;
+      }
+      
+      // console.log('Orth: ' + props.orth);
       this.state.orth = props.orth;
       this.state.pit = props.pit;
       this.state.yaw = props.yaw;
       this.state.rol = props.rol;
+      
       // forcing the state change before size calls as setstate take time.
       this.setState({
         pit: props.pit,
@@ -1129,7 +1288,10 @@ const rgbToHex = (color) => {
         rol: props.rol,
         orth: props.orth
       });
+      
       this.clearVisualState('orientation change');
+      
+      // Set appropriate status text based on orientation
       if (props.orth == 0) {
         // console.log('Frontal');
         this.setStatusText('Frontal');
@@ -1143,6 +1305,8 @@ const rgbToHex = (color) => {
         // console.log('Orth:' + props.orth);
         this.setStatusText('...');
       }
+      
+      // Call metadata and size update methods
       this.callDstRange();
       this.callImageSize();
     },
@@ -1152,22 +1316,55 @@ const rgbToHex = (color) => {
       if (!this.state.buffer[-1]) {
         this.createStatusText();
       }
-      this.state.buffer[-1].x = (40);
-      this.state.buffer[-1].y = (8);
+      
+      // Make sure the status text is always on the stage (not the stack)
+      if (this.state.buffer[-1].parent !== this.app.stage) {
+        this.app.stage.addChild(this.state.buffer[-1]);
+      }
+      
+      // Always ensure status text is positioned at the fixed location
+      this.state.buffer[-1].x = 30;
+      this.state.buffer[-1].y = 6;
       this.state.buffer[-1].text = text;
       this.state.text = text;
       this.state.txtUpdated = Date.now();
     },
 
     setHoverText: function (x,y,text) {
-      // Ensure status text buffer exists
-      if (!this.state.buffer[-1]) {
-        this.createStatusText();
+      // Create or update a separate hover text element
+      if (!this.state.hoverTextBuffer) {
+        const style = {
+          fontSize: 14,
+          fill: '#ffffff',
+          stroke: '#1a1a1a',
+          strokeThickness: 2,
+          dropShadow: true,
+          dropShadowColor: '#1a1a1a',
+          dropShadowAngle: Math.PI / 6,
+          dropShadowDistance: 2,
+          wordWrap: true,
+          wordWrapWidth: 200,
+          textAlign: 'left'
+        };
+        const textStyle = new TextStyle(style);
+        this.state.hoverTextBuffer = new Text(text, textStyle);
+        this.app.stage.addChild(this.state.hoverTextBuffer);
+        this.state.hoverTextBuffer.anchor.x = 0;
+        this.state.hoverTextBuffer.anchor.y = 0;
+        this.state.hoverTextBuffer.zOrder = 1001; // Higher than status text
       }
-      this.state.buffer[-1].x = this.disp.position.x + (this.stack.position.x * this.disp.scale.x) + (Number(x) * this.disp.scale.x) - 10;
-      this.state.buffer[-1].y = this.disp.position.y + (this.stack.position.y * this.disp.scale.y) + (Number(y) * this.disp.scale.y) + 15;
-      this.state.buffer[-1].text = text;
-      this.state.text = text;
+      
+      // Position the hover text at the specified coordinates
+      this.state.hoverTextBuffer.x = this.disp.position.x + (this.stack.position.x * this.disp.scale.x) + (Number(x) * this.disp.scale.x) - 10;
+      this.state.hoverTextBuffer.y = this.disp.position.y + (this.stack.position.y * this.disp.scale.y) + (Number(y) * this.disp.scale.y) + 15;
+      this.state.hoverTextBuffer.text = text;
+      this.state.hoverTextBuffer.visible = true;
+    },
+
+    clearHoverText: function () {
+      if (this.state.hoverTextBuffer) {
+        this.state.hoverTextBuffer.visible = false;
+      }
     },
 
     /**
@@ -1223,13 +1420,20 @@ const rgbToHex = (color) => {
         this.props.setExtent({ stackX: this.stack.position.x, stackY: this.stack.position.y });
         this.createImages();
         this.state.buffer[-1].text = '';
+        
+        // Set flag to prevent duplicate click event
+        this._justFinishedDrag = true;
+        setTimeout(() => {
+          this._justFinishedDrag = false;
+        }, 10);
       }
       this.state.dragging = false;
     },
 
     onStackClick: function (event) {
       // Backup click handler for when drag doesn't register as a click
-      if (!this.state.dragging) {
+      // But prevent duplicate calls if we just finished a drag operation
+      if (!this.state.dragging && !this._justFinishedDrag) {
         var clickPosition;
         if (event.data && typeof event.data.getLocalPosition === "function") {
           clickPosition = event.data.getLocalPosition(this.stack);
@@ -1655,12 +1859,13 @@ const StackViewerComponent = () => createClass({
     },
 
     toggleOrth: function () {
-      var orth = this.state.orth += 1;
-      var pit, yaw, rol;
+      let orth = this.state.orth + 1;
+      let pit, yaw, rol;
+      
       if (orth > 2) {
         orth = 0;
-        this.state.orth = orth;
       }
+      
       if (orth == 0) {
         pit = 0;
         yaw = 0;
@@ -1674,8 +1879,19 @@ const StackViewerComponent = () => createClass({
         yaw = 0;
         rol = 0;
       }
-      this.setState({ orth: orth, pit: pit, yaw: yaw, rol: rol, dst: 0, stackX: 0, stackY: 0 });
-      setTimeout(this.onHome, 5000);
+      
+      this.setState({
+        orth: orth,
+        pit: pit,
+        yaw: yaw,
+        rol: rol,
+        dst: 0,
+        stackX: 0,
+        stackY: 0
+      });
+      
+      // Delay the home action to allow the orientation change to complete
+      setTimeout(this.onHome, 1000);
     },
 
     toggleSlice: function () {

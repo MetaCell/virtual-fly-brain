@@ -12,13 +12,12 @@ import { RecentSearch } from './RecentSearch';
 import { QueriesSelection } from './QueriesSelection';
 import { ResultSelectionOptions } from './ResultSelectionOptions';
 import  { getResultsSOLR } from '../../components/configuration/SOLRclient'
-import { DatasourceTypes } from '@metacell/geppetto-meta-ui/search/datasources/datasources';
 import { facets_annotations_colors as colors_config } from "../../components/configuration/VFBColors";
 import { searchConfiguration, datasourceConfiguration } from '../../components/configuration/VFBSearchBuilder/searchConfiguration';
 import { getInstanceByID } from './../../reducers/actions/instances';
 import { addRecentSearch } from '../../reducers/actions/globals';
 import { useSelector, useDispatch } from 'react-redux'
-import { getQueries, deleteQuery, updateQueries, getQueriesFinished, getQueriesStarted} from '../../reducers/actions/queries';
+import { getQueries, deleteQuery, updateQueries } from '../../reducers/actions/queries';
 import { getUpdatedTags } from '../../utils/utils';
 import { debounce } from '@mui/material';
 
@@ -83,6 +82,7 @@ Tag.propTypes = {
 };
 
 const Listbox = styled('div')(
+  // eslint-disable-next-line no-unused-vars
   ({ theme }) => `
   width: 100%;
   margin: 0.125rem 0 0;
@@ -148,8 +148,6 @@ export default function SearchBuilder(props) {
   const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances);
   const queries = useSelector(state => state.queries.queries);
   const globalRecentSearches = useSelector( state => state.globalInfo.recentSearches)
-  const queriesError = useSelector(state => state.queries.error);
-  const queriesErrorMessage = useSelector(state => state.queries.errorMessage);
   const queriesErrorID = useSelector(state => state.queries.errorID);
 
   const dispatch = useDispatch();
@@ -233,11 +231,6 @@ export default function SearchBuilder(props) {
     let option = value.find((chip) => chip.id === id);
     deleteQuery(option?.short_form);
   }
-
-  const getDatasource = {
-    [DatasourceTypes.CUSTOM]: props.customDatasourceHandler,
-    [DatasourceTypes.SOLRClient]: getResultsSOLR,
-  };
 
   const handleResults = (status, data, v) => {
     switch(status) {

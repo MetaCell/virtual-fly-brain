@@ -14,6 +14,9 @@ import { cypherQuery } from './configuration/VFBGraph/graphConfiguration';
 import { stylingConfiguration } from './configuration/VFBGraph/graphConfiguration';
 import { getInstanceByID } from '../reducers/actions/instances';
 import { getGraphTypes } from '../reducers/actions/types/getGraphTypes'
+import ReactResizeDetector from 'react-resize-detector'
+import { Stack } from '@mui/material';
+
 /**
  * If no configuration is given for queries in graphConfiguration.js, we use this configuration.
  */
@@ -482,16 +485,14 @@ class VFBGraph extends Component {
             <p style={{ float : "right", width : "80%", paddingTop : "2vh" }}>No graph available for {this.getErrorLabel()}</p>
           </div>
           : 
-            <div ref={this.containerRef}>
-              <Box sx={{
-              width: 600,
-              height: 800,
-              backgroundColor: 'primary.dark',
+          <ReactResizeDetector handleWidth handleHeight onResize={this.resize} skipOnMount={true}>
+            <div ref={this.containerRef} style={ { width: "100%", height: "100%", position: "relative", backgroundColor: 'primary.dark',
               '&:hover': {
                 backgroundColor: 'primary.main',
                 opacity: [0.9, 0.8, 0.7],
               },
-            }}><GeppettoGraphVisualization
+            }}>
+              <GeppettoGraphVisualization
               id= { COMPONENT_ID }
               // Graph data with Nodes and Links to populate
               data={this.state.graph}
@@ -503,6 +504,8 @@ class VFBGraph extends Component {
               nodeLabel={node => node.path}
               nodeRelSize={20}
               nodeSize={30}
+              height={this.containerRef.current?.offsetHeight}
+              width={this.containerRef.current?.offsetWidth}
               // Relationship label, placed in Link
               linkLabel={link => link.name}
               // Assign background color to Canvas
@@ -564,15 +567,12 @@ class VFBGraph extends Component {
               // Width of links
               linkWidth={1.25}
               controls = {
-                <div style={ { position: "absolute", width: "5vh", height: "100px",zIndex: "2", color : "white" } }>
+                <Stack gap={1} sx={ { position: "absolute",zIndex: "2"} }>
                   <Tooltip placement="right" title="Reset View">
                     <div
                       style={
                         {
-                          zIndex : "2",
                           cursor : "pointer",
-                          top : "10px",
-                          left : "10px",
                           width: "1.3rem",
                           height: "1.3rem",
                           backgroundPosition: 'center',
@@ -586,10 +586,7 @@ class VFBGraph extends Component {
                     <div
                       style={
                         {
-                          zIndex : "2",
                           cursor : "pointer",
-                          marginTop : "20px",
-                          left : "10px",
                           width: "1.3rem",
                           height: "1.3rem",
                           backgroundPosition: 'center',
@@ -603,10 +600,7 @@ class VFBGraph extends Component {
                     <div
                       style={
                         {
-                          zIndex : "2",
                           cursor : "pointer",
-                          marginTop : "5px",
-                          left : "10px",
                           width: "1.3rem",
                           height: "1.3rem",
                           backgroundPosition: 'center',
@@ -624,7 +618,7 @@ class VFBGraph extends Component {
                     syncColor = { syncColor }
                     stylingConfiguration = { stylingConfiguration }
                   />
-                </div>
+                </Stack>
               }
               click={() => self.graphRef.current.ggv.current.zoomToFit()}
               // Function triggered when hovering over a nodeoptions
@@ -661,8 +655,9 @@ class VFBGraph extends Component {
                 }
               }
               }
-            /></Box>
+            />
           </div>
+          </ReactResizeDetector>
     )
   }
 }

@@ -4,6 +4,7 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import PropTypes from "prop-types";
 import LoopIcon from '@material-ui/icons/Loop';
+import { Stack } from '@mui/material';
 
 /**
  * Shows the data value as a link
@@ -24,23 +25,28 @@ class DropDownQueries extends Component {
     let self = this;
 
     return (
-      <div>
+      <Stack gap={1}>
         <Tooltip placement="right" title={`Refresh for ${self.props.stateInstanceOnFocus?.metadata?.Name}`}>
-          <LoopIcon key="tooltip-icon"
-            onClick={ self.props.sync } style={{fontSize: '1.3rem', zIndex : "1000",
-              cursor : "pointer",
-              marginTop : "20px",
-              left : "10px",
-              color : self.props.syncColor,}} />
+          <div
+           onClick={ self.props.sync }
+           style={
+              {
+                cursor : "pointer",
+                width: "1.3rem",
+                height: "1.3rem",
+                backgroundPosition: "center",
+                backgroundImage: `url(${self.props.stylingConfiguration.icons.sync})`,
+                color : self.props.syncColor
+              }
+            }>
+
+          </div>
         </Tooltip>
         <Tooltip placement="right" title="Options">
           <div
             style={
               {
-                zIndex : "1000" ,
                 cursor : "pointer",
-                marginTop : "5px",
-                left : "10px",
                 width: "1.3rem",
                 height: "1.3rem",
                 backgroundPosition: "center",
@@ -93,7 +99,7 @@ class DropDownQueries extends Component {
             </MenuItem>
           ))}
         </Menu>
-      </div>
+      </Stack>
     )
   }
 }

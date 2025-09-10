@@ -59,11 +59,11 @@ export const stylingConfiguration = {
   // Description area (in node) background color
   nodeDescriptionBackgroundColor : "white",
   icons : {
-    home : "../../../assets/viewer/home.svg",
-    zoomIn : "../../../assets/viewer/zoom_in.svg",
-    zoomOut : "../../../assets/viewer/zoom_out.svg",
-    sync : "../../../assets/viewer/refresh_icon.svg",
-    dropdown : "../../../assets/viewer/layers.svg",
+    home : "home.svg",
+    zoomIn : "zoom_in.svg",
+    zoomOut : "zoom_out.svg",
+    sync : "refresh_icon.svg",
+    dropdown : "layers.svg",
   },
   defaultRefreshIconColor : "white",
   outOfSyncIconColor : "red",

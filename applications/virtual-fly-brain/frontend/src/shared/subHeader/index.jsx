@@ -72,6 +72,16 @@ const SubHeader = ({ setBottomNav, bottomNav }) => {
   const [focused, setFocused] = useState(false);
   const [filterOpened, setFilterOpened] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState({});
+  const [desktop, setDesktop] = useState(window.innerWidth >= 1200);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setDesktop(window.innerWidth >= 1200);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const isLoading = useSelector((state) => state.instances.isLoading);
   const loadingInstances = useSelector(
@@ -79,6 +89,12 @@ const SubHeader = ({ setBottomNav, bottomNav }) => {
   );
   const finishedLoadedInstances = useSelector(
     (state) => state.instances.finishedLoadedInstances
+  );
+  const isBulkLoading = useSelector(
+    (state) => state.instances.isBulkLoading
+  );
+  const bulkLoadingCount = useSelector(
+    (state) => state.instances.bulkLoadingCount
   );
   const dispatch = useDispatch();
   const classes = {
@@ -103,7 +119,13 @@ const SubHeader = ({ setBottomNav, bottomNav }) => {
   };
 
   useEffect(() => {
-    if (loadingInstances > 0 && loadingInstances === finishedLoadedInstances) {
+    // For bulk loading, check if all instances are loaded using bulk count
+    // For individual loading, use the original logic
+    const allLoaded = isBulkLoading
+      ? finishedLoadedInstances >= bulkLoadingCount
+      : loadingInstances > 0 && loadingInstances === finishedLoadedInstances;
+
+    if (allLoaded) {
       // Add a small delay to show the final loading state before resetting
       const timer = setTimeout(() => {
         dispatch(resetLoadingState());
@@ -111,7 +133,7 @@ const SubHeader = ({ setBottomNav, bottomNav }) => {
 
       return () => clearTimeout(timer);
     }
-  }, [loadingInstances, finishedLoadedInstances]);
+  }, [loadingInstances, finishedLoadedInstances, isBulkLoading, bulkLoadingCount, dispatch]);
 
   return (
     <Box
@@ -153,7 +175,9 @@ const SubHeader = ({ setBottomNav, bottomNav }) => {
           <CircularProgress size={20} />
           <Typography variant="body1" color={lightWhiteColor}>
             Loading{" "}
-            {loadingInstances > 0 && finishedLoadedInstances > 0
+            {isBulkLoading && bulkLoadingCount > 0
+              ? `instance ${finishedLoadedInstances} of ${bulkLoadingCount}`
+              : loadingInstances > 0 && finishedLoadedInstances > 0
               ? `instance ${finishedLoadedInstances} of ${loadingInstances}`
               : " ..."}
           </Typography>
@@ -204,7 +228,7 @@ const SubHeader = ({ setBottomNav, bottomNav }) => {
           <Search style={{ margin: 0 }} />
         )}
 
-        <Box flexGrow={1} px={1}>
+        <Box flexGrow={1} px={1} sx={ !desktop ? { width: "95vw" } : {}}>
           <SearchBuilder
             applyFilters={selectedFilters}
             focused={focused}
@@ -216,6 +240,7 @@ const SubHeader = ({ setBottomNav, bottomNav }) => {
           />
         </Box>
         <FilterMenu
+          desktop={desktop}
           classes={classes}
           focused={focused}
           setFilterOpened={setFilterOpened}

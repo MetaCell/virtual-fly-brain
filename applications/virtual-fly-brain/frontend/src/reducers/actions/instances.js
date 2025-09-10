@@ -170,6 +170,15 @@ export const resetLoadingState = () => ({
   type: getInstancesTypes.RESET_LOADING_STATE
 });
 
+export const setBulkLoadingCount = (count) => ({
+  type: getInstancesTypes.SET_BULK_LOADING_COUNT,
+  payload: { count }
+});
+
+export const resetBulkLoading = () => ({
+  type: getInstancesTypes.RESET_BULK_LOADING
+});
+
 export const triggerInstanceFailure = (error) => {
   store.dispatch(getInstancesFailure(error));
   return;

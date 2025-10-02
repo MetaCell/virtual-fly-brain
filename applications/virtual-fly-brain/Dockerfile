@@ -14,6 +14,9 @@ ENV BUILDDIR=/app
 # CVE-2025-57807, CVE-2025-55298, CVE-2025-55154, CVE-2025-55212, CVE-2025-57803
 RUN apt-get update && apt-get upgrade -y imagemagick
 
+# Remove bluez if present (CVE-2023-44431 - no fix available, not needed for this app)
+RUN apt-get remove -y bluez bluez-obexd libbluetooth3 || true
+
 RUN apt-get update && apt-get install -y \
     git \
     build-essential \
@@ -50,7 +53,10 @@ COPY frontend ${BUILDDIR}
 WORKDIR ${BUILDDIR}
 ENV VFB_DOMAIN=https://${BE_DOMAIN}
 RUN yarn install
-RUN yarn run build
+# Debug: Print the VFB_DOMAIN value
+RUN echo "Building with VFB_DOMAIN: https://${BE_DOMAIN}"
+# Pass VFB_DOMAIN to Vite build process explicitly
+RUN VFB_DOMAIN=https://${BE_DOMAIN} yarn run build
 
 WORKDIR /usr/src/app
 COPY backend/requirements.txt /usr/src/app/

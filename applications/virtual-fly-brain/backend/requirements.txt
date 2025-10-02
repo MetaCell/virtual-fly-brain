@@ -11,7 +11,7 @@ setuptools >= 21.0.0
 Flask >= 2.3.2
 psycopg2-binary
 gunicorn >= 22.0.0
-flask_cors==3.0.10
+flask_cors >= 4.0.1
 dataclasses_json >= 0.5.7
 dacite >= 1.6.0
 pandas >= 1.0.0

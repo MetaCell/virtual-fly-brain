@@ -87,6 +87,7 @@
     "vite": "^7.0.4"
   },
   "resolutions": {
-    "node-fetch": "^2.6.7"
+    "node-fetch": "^2.6.7",
+    "cross-spawn": "^7.0.6"
   }
 }

@@ -51,12 +51,16 @@ ENV MESA_GL_VERSION_OVERRIDE=3.3
 
 COPY frontend ${BUILDDIR}
 WORKDIR ${BUILDDIR}
-ENV VFB_DOMAIN=https://${BE_DOMAIN}
 RUN yarn install
-# Debug: Print the VFB_DOMAIN value
-RUN echo "Building with VFB_DOMAIN: https://${BE_DOMAIN}"
+# Debug: Print all environment variables and the VFB_DOMAIN value
+RUN echo "=== Environment Check ===" && \
+    echo "BE_DOMAIN ARG: ${BE_DOMAIN}" && \
+    echo "Full VFB_DOMAIN value: https://${BE_DOMAIN}" && \
+    export VFB_DOMAIN="https://${BE_DOMAIN}" && \
+    echo "Exported VFB_DOMAIN: $VFB_DOMAIN" && \
+    echo "========================"
 # Pass VFB_DOMAIN to Vite build process explicitly
-RUN VFB_DOMAIN=https://${BE_DOMAIN} yarn run build
+RUN export VFB_DOMAIN="https://${BE_DOMAIN}" && yarn run build
 
 WORKDIR /usr/src/app
 COPY backend/requirements.txt /usr/src/app/

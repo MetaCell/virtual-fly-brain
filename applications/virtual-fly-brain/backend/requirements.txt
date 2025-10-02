@@ -10,7 +10,7 @@ python_dateutil >= 2.6.0
 setuptools >= 21.0.0
 Flask >= 2.3.2
 psycopg2-binary
-gunicorn==20.1.0
+gunicorn >= 22.0.0
 flask_cors==3.0.10
 dataclasses_json >= 0.5.7
 dacite >= 1.6.0

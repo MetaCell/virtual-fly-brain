@@ -12,7 +12,7 @@ ENV BUILDDIR=/app
 
 # Update ImageMagick to fix critical security vulnerabilities
 # CVE-2025-57807, CVE-2025-55298, CVE-2025-55154, CVE-2025-55212, CVE-2025-57803
-RUN apt-get update && apt-get upgrade -y imagemagick imagemagick-6-common libmagickcore-6.q16-6 libmagickwand-6.q16-6
+RUN apt-get update && apt-get upgrade -y imagemagick
 
 RUN apt-get update && apt-get install -y \
     git \

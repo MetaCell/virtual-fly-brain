@@ -295,13 +295,13 @@ const Header = ({setBottomNav}) => {
       </Box>
 
       <MediaQuery minWidth={1200}>
-        <Button
+        {/* <Button
           onClick={() => setBottomNav((prev) => prev === 2 ? null : 2)}
           variant="outlined"
         >
           <QueryStats size={16} />
           Queries for V_ilpn (FlyEM-HB:2064165421)
-        </Button>
+        </Button> */}
       </MediaQuery>
     </Box>
   )

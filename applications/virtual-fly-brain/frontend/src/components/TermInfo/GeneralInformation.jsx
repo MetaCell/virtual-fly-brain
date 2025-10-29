@@ -38,6 +38,17 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
   const reduxState = useSelector(state => state);
   const MAX_LENGTH = 300;
 
+  // Utility function to decode URL-encoded strings
+  const decodeText = (text) => {
+    if (typeof text !== 'string') return text;
+    try {
+      return decodeURIComponent(text);
+    } catch {
+      // If decoding fails, return original text
+      return text;
+    }
+  };
+
   // Get current template information
   const currentTemplate = reduxState.instances.launchTemplate;
   const currentTemplateName = currentTemplate?.metadata?.Name || 'Unknown Template';
@@ -196,6 +207,8 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
   // Render Description with read more functionality
   const renderDescription = (description, fieldKey) => {
     if (!description) return null;
+    
+    const decodedDescription = decodeText(description);
     const isExpanded = toggleReadMore[fieldKey] || false;
     
     return (
@@ -212,9 +225,9 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
           }
         }}
         className='scrollbar'>
-          {isExpanded ? description : (description.length > MAX_LENGTH ? `${description.substr(0, MAX_LENGTH)}...` : description)}
+          {isExpanded ? decodedDescription : (decodedDescription.length > MAX_LENGTH ? `${decodedDescription.substr(0, MAX_LENGTH)}...` : decodedDescription)}
         </Typography>
-        {description.length > MAX_LENGTH && (
+        {decodedDescription.length > MAX_LENGTH && (
           <Button
             onClick={() => setToggleReadMore((prev) => ({ ...prev, [fieldKey]: !prev[fieldKey] }))} 
             disableRipple
@@ -242,6 +255,8 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
         getInstanceByID(id, true, true, true);
       }
     };
+
+    const decodedName = decodeText(name);
 
     return (
       <Box 
@@ -284,7 +299,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
             )
           }}
         >
-          {`${name}`}
+          {`${decodedName}`}
         </ReactMarkdown>
       </Box>
     );
@@ -322,6 +337,8 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
         {Object.values(licenses).map((license, index) => {
           if (!license || typeof license !== 'object') return null;
           
+          const decodedLabel = decodeText(license.label);
+          
           return (
             <Box key={index} sx={{
               display: 'flex',
@@ -346,7 +363,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
                     }}
                     onClick={() => handleLabelClick(license.short_form)}
                   >
-                    {license.label}
+                    {decodedLabel}
                   </Typography>
                 );
 
@@ -354,7 +371,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
                   <Tooltip title={ <Box
                       component="img"
                       src={license.icon}
-                      alt={license.label}
+                      alt={decodedLabel}
                       sx={{
                         height: 'auto',
                         width: '100px',
@@ -447,6 +464,8 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
   const renderRelationships = (relationships) => {
     if (!relationships || typeof relationships !== 'string') return null;
     
+    const decodedRelationships = decodeText(relationships);
+    
     // Parse relationship structure like "[develops from](RO_0002202): [medulla anlage](FBbt_00001935)"
     const parseRelationshipItem = (item) => {
       const trimmedItem = item.trim();
@@ -492,7 +511,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
     };
 
     // Split by semicolon to get root level items
-    const rootItems = relationships.split(';').filter(item => item.trim());
+    const rootItems = decodedRelationships.split(';').filter(item => item.trim());
     
     return (
       <Box sx={{ textAlign: 'right' }}>
@@ -783,6 +802,10 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
       <Box sx={{ textAlign: 'right' }}>
         {synonyms.map((synonym, index) => {
           if (!synonym || !synonym.label) return null;
+          
+          const decodedLabel = decodeText(synonym.label);
+          const decodedPublication = synonym.publication ? decodeText(synonym.publication) : null;
+          
           return (
             <Box key={index} sx={{
               marginBottom: index < synonyms.length - 1 ? '0.5rem' : 0,
@@ -799,15 +822,15 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
                   textAlign: 'right'
                 }}
               >
-                {synonym.label}
+                {decodedLabel}
               </Typography>
-              {synonym.publication && (
+              {decodedPublication && (
               <Box onClick={() => handlePublicationClick(synonym.publication)} sx={{
                 width: 'fit-content',
                 padding: '0.2rem 0.3rem',
                 cursor: 'pointer',
               }}>
-                <Tooltip title={`${synonym.publication.replace(/\[([^\]]+)\]\(([^)]+)\)/, '$1')}`} placement="top" arrow>
+                <Tooltip title={`${decodedPublication.replace(/\[([^\]]+)\]\(([^)]+)\)/, '$1')}`} placement="top" arrow>
                   <Box
                     component="i"
                     className="fa-solid fa-book-bookmark"
@@ -868,20 +891,22 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
       default:
         // Handle different value types
         if (Array.isArray(value)) {
+          const decodedValues = value.map(v => decodeText(v));
           return (
             <Typography sx={{
               ...classes.heading,
               color: whiteColor,
               textAlign: 'right'
             }}>
-              {value.join(', ')}
+              {decodedValues.join(', ')}
             </Typography>
           );
         } else if (typeof value === 'string') {
-          if (containsMarkdown(value)) {
+          const decodedValue = decodeText(value);
+          if (containsMarkdown(decodedValue)) {
             return (
               <Box sx={{ textAlign: 'right', '& p': { margin: 0, fontSize: '0.875rem', color: 'red !important' } }}>
-                <ReactMarkdown>{value}</ReactMarkdown>
+                <ReactMarkdown>{decodedValue}</ReactMarkdown>
               </Box>
             );
           } else {
@@ -891,7 +916,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
                 color: whiteColor,
                 textAlign: 'right'
               }}>
-                {value}
+                {decodedValue}
               </Typography>
             );
           }

@@ -75,7 +75,8 @@ const rgbToHex = (color) => {
         bufferRunning: false,
         iBuffer: {},
         imagesUrl: {},
-        isMenuOpen: false
+        isMenuOpen: false,
+        currentTemplateId: this.props.templateId
       };
     },
 
@@ -98,6 +99,49 @@ const rgbToHex = (color) => {
         this.app.renderer.resize(this.props.width, this.props.height);
         this.onResize(this.props.width, this.props.height);
       }
+    },
+
+    ensureCanvasAttachment: function() {
+      if (!this.refs.stackCanvas || !this.app || !this.app.view) {
+        return;
+      }
+
+      // Remove any stale canvases left behind by Pixi re-initialisation
+      const canvases = this.refs.stackCanvas.getElementsByTagName('canvas');
+      for (let i = canvases.length - 1; i >= 0; i--) {
+        const canvasElement = canvases[i];
+        if (canvasElement !== this.app.view && canvasElement.parentNode) {
+          canvasElement.parentNode.removeChild(canvasElement);
+        }
+      }
+
+      if (!this.app.view.parentNode) {
+        this.refs.stackCanvas.appendChild(this.app.view);
+      }
+
+      // Ensure the canvas reflects the latest dimensions provided by flex layout
+      const computedWidth = Math.max(0, Math.floor(this.props.width || this.state.width || this.app.renderer.width || 0));
+      const computedHeight = Math.max(0, Math.floor(this.props.height || this.state.height || this.app.renderer.height || 0));
+      this.app.view.style.width = `${computedWidth}px`;
+      this.app.view.style.height = `${computedHeight}px`;
+    },
+
+    handleTemplateChange: function(nextProps) {
+      this.state.currentTemplateId = nextProps.templateId;
+      this.clearHoverText();
+      this.clearVisualState('template changed');
+      this.state.images = {};
+      this.state.imagesUrl = {};
+      this.state.iBuffer = {};
+      this.state.visibleTiles = [];
+      this.state.objects = [];
+      this.state.loadingLabels = false;
+      this.state.lastLabelCall = 0;
+      this.state.hoverTime = Date.now();
+      this.state.posX = 0;
+      this.state.posY = 0;
+      this.state.stackViewerPlane = false;
+      this.state.bufferRunning = false;
     },
 
     handleWindowResize: function() {
@@ -173,7 +217,7 @@ const rgbToHex = (color) => {
       this.app = new Application({ width : this.props.width, height : this.props.height});
       // this.app.renderer.backgroundColor = '#1a1a1a';
       // maintain full window size
-      this.refs.stackCanvas?.getElementsByTagName("canvas")?.length == 0 && this.refs.stackCanvas?.appendChild(this.app.view);
+      this.ensureCanvasAttachment();
 
       this.disp = new Container({ width : this.props.width, height : this.props.height});
       this.disp.pivot.x = 0;
@@ -281,7 +325,10 @@ const rgbToHex = (color) => {
       // console.log('Canvas update');
       if (this.app.renderer.width !== Math.floor(this.props.width) || this.app.renderer.height !== Math.floor(this.props.height)) {
         this.app.renderer.resize(this.props.width, this.props.height);
+        this.ensureCanvasAttachment();
         this.props.onHome();
+      } else {
+        this.ensureCanvasAttachment();
       }
       this.checkStack();
       this.createImages();
@@ -981,16 +1028,17 @@ const rgbToHex = (color) => {
     createImages: async function () {
       if (this.state.stack.length > 0) {
         var i, x, y, w, h, d, offX, offY, t, image, Xpos, Ypos, XboundMax, YboundMax, XboundMin, YboundMin;
-        /*
-         * move through tiles
-         * console.log('Creating slice view...');
-         */
+    
+        // Reset visible tiles each time
         this.state.visibleTiles = [];
-        w = Math.ceil(((this.state.imageX / 10.0) * this.state.scl) / this.state.tileX);
-        h = Math.ceil(((this.state.imageY / 10.0) * this.state.scl) / this.state.tileY);
-        // console.log('Tile grid is ' + w.toString() + ' wide by ' + h.toString() + ' high');
+    
+        // --- FIX: tile grid is a property of the image, not the zoom (scl) ---
+        // Do NOT multiply by scl when computing how many tiles exist.
+        w = Math.ceil(this.state.imageX / this.state.tileX);
+        h = Math.ceil(this.state.imageY / this.state.tileY);
         this.state.numTiles = w * h;
-
+        // console.log('Tile grid is ' + w.toString() + ' wide by ' + h.toString() + ' high');
+    
         for (t = 0; t < w * h; t++) {
           x = 0;
           y = 0;
@@ -1162,6 +1210,9 @@ const rgbToHex = (color) => {
      *
      */
     UNSAFE_componentWillReceiveProps: function (nextProps) {
+      if (nextProps.templateId && nextProps.templateId !== this.state.currentTemplateId) {
+        this.handleTemplateChange(nextProps);
+      }
       var updDst = false;
       if (nextProps.dst !== this.state.dst) {
         this.state.dst = nextProps.dst;
@@ -1691,7 +1742,10 @@ const StackViewerComponent = () => createClass({
       });
 
       if (this.props.data && this.props.data != null && this.props.data.instances && this.props.data.instances != null) {
-        this.setState(this.handleInstances(this.props.data.instances));
+        const derivedState = this.handleInstances(this.props.data.instances);
+        if (derivedState) {
+          this.setState(derivedState);
+        }
       }
 
       const container = document.getElementById('slice-viewer');
@@ -1705,89 +1759,155 @@ const StackViewerComponent = () => createClass({
     },
 
     componentDidUpdate: function (prevProps) {
-      if (prevProps.data != undefined && prevProps.data != null && prevProps.data.instances != undefined) {
-        this.setState(this.handleInstances(this.props.data.instances));
+      if (!this.props.data || !this.props.data.instances) {
+        return;
+      }
+
+      if (prevProps.data && prevProps.data.instances === this.props.data.instances) {
+        return;
+      }
+
+      const derivedState = this.handleInstances(this.props.data.instances);
+      if (derivedState) {
+        this.setState(derivedState);
       }
     },
 
     handleInstances: function (instances) {
-      var newState = {...this.state};
-      if (instances && instances != null && instances.length > 0) {
-        var instance;
-        var data;
-        var files = [];
-        var colors = [];
-        var labels = [];
-        var ids = [];
-        var server = this.props.config.serverUrl.replace('http:', window.location.protocol).replace('https:', window.location.protocol);
-        if (!this.state.height && this.props.data.height != null) {
-          newState.height = this.props.data.height;
-        }
-        if (!this.state.width && this.props.data.width != null) {
-          newState.width = this.props.data.width;
-        }
+      if (!instances || instances == null || instances.length === 0) {
+        return null;
+      }
 
-        if (this.props.config && this.props.config != null && this.props.config.subDomains && this.props.config.subDomains != null && this.props.config.subDomains.length && this.props.config.subDomains.length > 0 && this.props.config.subDomains[0] && this.props.config.subDomains[0].length && this.props.config.subDomains[0].length > 2) {
-          newState.voxelX = Number(this.props.config.subDomains[0][0] || 0.622088);
-          newState.voxelY = Number(this.props.config.subDomains[0][1] || 0.622088);
-          newState.voxelZ = Number(this.props.config.subDomains[0][2] || 0.622088);
+      var updates = {};
+      var changed = false;
+      var instance;
+      var data;
+      var files = [];
+      var colors = [];
+      var labels = [];
+      var ids = [];
+      var config = this.props.config || {};
+      var subDomains = Array.isArray(config.subDomains) ? config.subDomains : [];
+      var server = config.serverUrl ? config.serverUrl.replace('http:', window.location.protocol).replace('https:', window.location.protocol) : null;
+
+      function arraysEqual (a, b) {
+        if (!Array.isArray(a) || !Array.isArray(b)) {
+          return false;
         }
-        if (this.props.config && this.props.config != null) {
-          if (this.props.config.subDomains && this.props.config.subDomains != null && this.props.config.subDomains.length) {
-            if (this.props.config.subDomains.length > 0 && this.props.config.subDomains[0] && this.props.config.subDomains[0].length && this.props.config.subDomains[0].length > 2) {
-              newState.voxelX = Number(this.props.config.subDomains[0][0] || 0.622088);
-              newState.voxelY = Number(this.props.config.subDomains[0][1] || 0.622088);
-              newState.voxelZ = Number(this.props.config.subDomains[0][2] || 0.622088);
+        if (a.length !== b.length) {
+          return false;
+        }
+        for (var i = 0; i < a.length; i++) {
+          if (Array.isArray(a[i]) && Array.isArray(b[i])) {
+            if (!arraysEqual(a[i], b[i])) {
+              return false;
             }
-            if (this.props.config.subDomains.length > 3 && this.props.config.subDomains[1] != null) {
-              newState.tempName = this.props.config.subDomains[2];
-              newState.tempId = this.props.config.subDomains[1];
-              newState.tempType = this.props.config.subDomains[3];
-              // FIXME : Add extra subdomain to match previous configuration
-              // if (this.props.config.subDomains[4] && this.props.config.subDomains[4].length && this.props.config.subDomains[4].length > 0) {
-              //   newState.fxp = JSON.parse(this.props.config.subDomains[4][0]);
-              // }
-            }
+          } else if (a[i] !== b[i]) {
+            return false;
           }
         }
-        for (instance in instances) {
-          try {
-            if ((instances[instance].wrappedObj.id != undefined) && (instances[instance].parent != null) ){
-              data = instances[instance].wrappedObj.visualValue.data;
-              files.push(data);
-              // Take multiple ID's for template
-              if (typeof this.props.config.templateId !== 'undefined' && typeof this.props.config.templateDomainIds !== 'undefined' && instances[instance].parent.getId() == this.props.config.templateId) {
-                ids.push(this.props.config.templateDomainIds);
-              } else {
-                ids.push([instances[instance].getId()]);
-              }
-              labels.push(instances[instance].getName());
-              colors.push(rgbToHex(instances[instance].wrappedObj.color))
-            }
-          } catch (err) {
-            console.log('Error handling ' + instance);
-            console.log(err.message);
-            console.log(err.stack);
-          }
-        }
+        return true;
+      }
 
-        if (server != this.props.config.serverUrl.replace('http:', window.location.protocol).replace('https:', window.location.protocol) && server != null) {
-          newState.serverURL = server;
+      if (!this.state.height && this.props.data && this.props.data.height != null) {
+        updates.height = this.props.data.height;
+        changed = true;
+      }
+
+      if (!this.state.width && this.props.data && this.props.data.width != null) {
+        updates.width = this.props.data.width;
+        changed = true;
+      }
+
+      if (subDomains.length > 0 && subDomains[0] && subDomains[0].length > 2) {
+        var voxelX = Number(subDomains[0][0] || 0.622088);
+        var voxelY = Number(subDomains[0][1] || 0.622088);
+        var voxelZ = Number(subDomains[0][2] || 0.622088);
+
+        if (this.state.voxelX !== voxelX) {
+          updates.voxelX = voxelX;
+          changed = true;
         }
-        if (files && files != null && files.length > 0 && files.toString() != this.state.stack.toString()) {
-          newState.stack = files;
+        if (this.state.voxelY !== voxelY) {
+          updates.voxelY = voxelY;
+          changed = true;
         }
-        if (labels && labels != null && labels.length > 0 && labels.toString() != this.state.label.toString()) {
-          newState.label = labels;
-        }
-        if (ids && ids != null && ids.length > 0 && ids.toString() != this.state.id.toString()) {
-          newState.id = ids;
-        }
-        if (colors && colors != null && colors.length > 0 && colors.toString() != this.state.color.toString()) {
-          newState.color = colors;
+        if (this.state.voxelZ !== voxelZ) {
+          updates.voxelZ = voxelZ;
+          changed = true;
         }
       }
-      return newState;
+
+      if (subDomains.length > 3 && subDomains[1] != null) {
+        var nextTempName = subDomains[2] ? [].concat(subDomains[2]) : [];
+        var nextTempId = subDomains[1] ? [].concat(subDomains[1]) : [];
+        var nextTempType = subDomains[3] ? [].concat(subDomains[3]) : [];
+
+        if (!arraysEqual(nextTempName, this.state.tempName || [])) {
+          updates.tempName = nextTempName;
+          changed = true;
+        }
+        if (!arraysEqual(nextTempId, this.state.tempId || [])) {
+          updates.tempId = nextTempId;
+          changed = true;
+        }
+        if (!arraysEqual(nextTempType, this.state.tempType || [])) {
+          updates.tempType = nextTempType;
+          changed = true;
+        }
+      } else {
+        if ((this.state.tempName && this.state.tempName.length) || (this.state.tempId && this.state.tempId.length) || (this.state.tempType && this.state.tempType.length)) {
+          updates.tempName = [];
+          updates.tempId = [];
+          updates.tempType = [];
+          changed = true;
+        }
+      }
+
+      for (instance in instances) {
+        try {
+          if ((instances[instance].wrappedObj.id != undefined) && (instances[instance].parent != null) ){
+            data = instances[instance].wrappedObj.visualValue.data;
+            files.push(data);
+            // Take multiple ID's for template
+            if (typeof config.templateId !== 'undefined' && typeof config.templateDomainIds !== 'undefined' && instances[instance].parent.getId() == config.templateId) {
+              ids.push(config.templateDomainIds);
+            } else {
+              ids.push([instances[instance].getId()]);
+            }
+            labels.push(instances[instance].getName());
+            colors.push(rgbToHex(instances[instance].wrappedObj.color))
+          }
+        } catch (err) {
+          console.log('Error handling ' + instance);
+          console.log(err.message);
+          console.log(err.stack);
+        }
+      }
+
+      if (server && this.state.serverURL !== server) {
+        updates.serverURL = server;
+        changed = true;
+      }
+
+      if (files && files.length > 0 && files.toString() != this.state.stack.toString()) {
+        updates.stack = files;
+        changed = true;
+      }
+      if (labels && labels.length > 0 && labels.toString() != this.state.label.toString()) {
+        updates.label = labels;
+        changed = true;
+      }
+      if (ids && ids.length > 0 && ids.toString() != this.state.id.toString()) {
+        updates.id = ids;
+        changed = true;
+      }
+      if (colors && colors.length > 0 && colors.toString() != this.state.color.toString()) {
+        updates.color = colors;
+        changed = true;
+      }
+
+      return changed ? updates : null;
     },
 
     componentWillUnmount: function () {

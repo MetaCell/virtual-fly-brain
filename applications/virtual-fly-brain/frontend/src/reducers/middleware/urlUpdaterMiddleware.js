@@ -49,44 +49,38 @@ const isFirstTimeLoad = (allLoadedInstances, store) => {
   if (currentUrl != appLoadedUrl) {
     localStorage.setItem(APP_LOADED_FLAG_KEY, currentUrl);
     // Load id parameter from URL and dispatch action
-    let idToUpdate = [];
     const idsFromUrl = getUrlParameter("i");
-    // let idToUpdate = [DEFAULT_ID];
-
-    if (idsFromUrl) {
-      idToUpdate = [...new Set(idsFromUrl?.split(','))];
-    }
-
     const idSelected = getUrlParameter("id");
 
+    const queuedInstances = idsFromUrl
+      ? idsFromUrl
+        .split(',')
+        .map(id => id?.trim())
+        .filter(Boolean)
+      : [];
+
+    let loadOrder = [...queuedInstances];
     if (idSelected) {
-      // If an ID is specified in the URL, check if present and if yes move it as last in the list, otherwise add it at the end
-      idToUpdate = idToUpdate.filter(id => id !== idSelected);
-      // If the selected ID is not already in the list, add it
-      if (!idToUpdate.includes(idSelected)) {
-        idToUpdate.push(idSelected);
-      }
-    } else if (idToUpdate.length === 0) {
-      // If no ID is specified in the URL, add the default ID
-      idToUpdate.push(DEFAULT_ID);
+      loadOrder = loadOrder.filter(id => id !== idSelected);
+      loadOrder.unshift(idSelected);
     }
 
-    // Filter out instances that are already loaded to get the actual count we need to load
-    const instancesToLoad = idToUpdate.filter(id => !allLoadedInstances?.find(i => i.metadata?.Id === id));
-    
     // If we have instances to load, set up bulk loading
-    if (instancesToLoad.length > 0) {
-      store.dispatch(setBulkLoadingCount(instancesToLoad.length));
+    if (loadOrder.length === 0) {
+      loadOrder.push(DEFAULT_ID);
     }
 
-    idToUpdate?.forEach( id => {
-      // if it's the last ID in the list, we need to focus it
-      if (id === idToUpdate[idToUpdate.length - 1]) {
-        getInstance(allLoadedInstances, id, true);
-      }
-      else {
-        getInstance(allLoadedInstances, id, false);
-      }
+    const uniqueLoadOrder = [...new Set(loadOrder)];
+
+    const instancesToLoad = uniqueLoadOrder.filter(id => !allLoadedInstances?.find(i => i.metadata?.Id === id));
+
+    const focusTarget = queuedInstances.length > 0
+      ? queuedInstances[queuedInstances.length - 1]
+      : (idSelected || uniqueLoadOrder[uniqueLoadOrder.length - 1]);
+
+    uniqueLoadOrder.forEach(id => {
+      const shouldFocus = id === focusTarget;
+      getInstance(allLoadedInstances, id, shouldFocus);
     });
   }
 };

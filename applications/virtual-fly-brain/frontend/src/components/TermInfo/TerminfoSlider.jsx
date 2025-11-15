@@ -121,10 +121,13 @@ const TerminfoSlider = (props) => {
     
     setIsLoading(true);
     try {
-      window.open(
-        window.location.origin + '/?id=' + confirmationModal.example.template + '&i=' + confirmationModal.example.id,
-        '_blank'
-      );
+      const templateId = confirmationModal.example.template;
+      const instanceId = confirmationModal.example.id;
+      const url = new URL(window.location.origin);
+      url.searchParams.set('id', templateId);
+      url.searchParams.set('i', instanceId);
+
+      window.open(url.toString(), '_blank', 'noopener,noreferrer');
     } catch (error) {
       console.error('Error loading instance:', error);
     } finally {

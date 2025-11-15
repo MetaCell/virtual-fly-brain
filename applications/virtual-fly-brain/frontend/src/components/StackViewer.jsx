@@ -161,7 +161,6 @@ const VFBStackViewer = (props) => {
 
     data?.forEach(stackViewerData => {
       if (stackViewerData?.metadata?.IsTemplate) {
-        // base image metadata for the template
         const imageKeys = Object.keys(stackViewerData.metadata?.Images || {});
         if (!imageKeys.length) {
           return;
@@ -173,7 +172,6 @@ const VFBStackViewer = (props) => {
           return;
         }
 
-        // domains → index-aligned arrays
         const domains = stackViewerData.metadata?.Domains || {};
         const domainKeys = Object.keys(domains);
         const maxIndex = domainKeys.reduce(
@@ -193,7 +191,6 @@ const VFBStackViewer = (props) => {
           classIDs[idx] = d?.type_id;
         });
 
-        // voxel sizes
         const voxels = [];
         if (imageMeta?.voxel) {
           voxelSizeRef.current.x = Number(imageMeta.voxel.X || 0.622088);

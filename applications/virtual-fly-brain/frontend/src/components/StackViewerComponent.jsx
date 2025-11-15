@@ -1749,14 +1749,12 @@ const StackViewerComponent = () => createClass({
             templateDomainTypeIds
           } = this.props.config;
         
-          // voxel size
           if (subDomains.length > 0 && subDomains[0] && subDomains[0].length > 2) {
             newState.voxelX = Number(subDomains[0][0] || 0.622088);
             newState.voxelY = Number(subDomains[0][1] || 0.622088);
             newState.voxelZ = Number(subDomains[0][2] || 0.622088);
           }
         
-          // template domain arrays used by Canvas hover / click
           const ids = templateDomainIds || subDomains[1];
           const names = templateDomainNames || subDomains[2];
           const types = templateDomainTypeIds || subDomains[3];

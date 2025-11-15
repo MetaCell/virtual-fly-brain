@@ -982,11 +982,8 @@ const rgbToHex = (color) => {
       if (this.state.stack.length > 0) {
         var i, x, y, w, h, d, offX, offY, t, image, Xpos, Ypos, XboundMax, YboundMax, XboundMin, YboundMin;
     
-        // Reset visible tiles each time
         this.state.visibleTiles = [];
     
-        // --- FIX: tile grid is a property of the image, not the zoom (scl) ---
-        // Do NOT multiply by scl when computing how many tiles exist.
         w = Math.ceil(this.state.imageX / this.state.tileX);
         h = Math.ceil(this.state.imageY / this.state.tileY);
         this.state.numTiles = w * h;
@@ -1690,7 +1687,6 @@ const StackViewerComponent = () => createClass({
         ? "mousewheel"                     // Webkit / IE
         : "DOMMouseScroll";                // Older Firefox
 
-      // Find a DOM element to attach the wheel listener to
       const displayElem =
       document.getElementById((this.props.data && this.props.data.id) + 'displayArea') ||
       document.getElementById('slice-viewer');

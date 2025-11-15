@@ -150,7 +150,6 @@ const VFBStackViewer = (props) => {
 
   // Update config and voxel size before re-rendering
   const config = useMemo(() => {
-    // sensible defaults
     let result = {
       serverUrl: 'http://www.virtualflybrain.org/fcgi/wlziipsrv.fcgi',
       templateId: 'NOTSET',
@@ -207,7 +206,6 @@ const VFBStackViewer = (props) => {
           );
         }
 
-        // final config object used by StackViewerComponent
         result = {
           ...imageMeta,
           serverUrl: 'http://www.virtualflybrain.org/fcgi/wlziipsrv.fcgi',

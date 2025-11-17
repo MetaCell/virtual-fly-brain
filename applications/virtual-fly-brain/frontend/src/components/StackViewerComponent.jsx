@@ -1806,8 +1806,11 @@ const StackViewerComponent = () => createClass({
     },
 
     componentWillUnmount: function () {
+      if (this._wheelListenerElem && this._wheelListenerCallback) {
+        this._wheelListenerElem.removeEventListener(support, this._wheelListenerCallback);
+      }
       this._isMounted = false;
-      return true;
+      return true;      
     },
     /**
      * Event handler for clicking zoom in. Increments the zoom level

@@ -77,9 +77,7 @@ const isFirstTimeLoad = (allLoadedInstances, store) => {
       store.dispatch(setBulkLoadingCount(instancesToLoad.length));
     }
 
-    const focusTarget = queuedInstances.length > 0
-    ? queuedInstances[queuedInstances.length - 1]
-    : (idSelected || uniqueLoadOrder[uniqueLoadOrder.length - 1]);
+    const focusTarget = idSelected || uniqueLoadOrder[uniqueLoadOrder.length - 1];
 
     uniqueLoadOrder.forEach(id => {
       const shouldFocus = id === focusTarget;

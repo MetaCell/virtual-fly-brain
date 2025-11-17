@@ -1254,8 +1254,8 @@ const rgbToHex = (color) => {
       // update slice view
       this.checkStack();
       // recenter display for new image size keeping any stack offset.
-      this.disp.position.x = Math.ceil((props.width / 2) - (((this.state.imageX) * props.zoomLevel) / 2));
-      this.disp.position.y = Math.ceil((props.height / 2) - (((this.state.imageY) * props.zoomLevel) / 2));
+      this.disp.position.x = Math.ceil((props.width / 2) - (((this.state.imageX / 10.0) * props.zoomLevel) / 2));
+      this.disp.position.y = Math.ceil((props.height / 2) - (((this.state.imageY / 10.0) * props.zoomLevel) / 2));
     },
 
     /**
@@ -1688,7 +1688,7 @@ const StackViewerComponent = () => createClass({
         : "DOMMouseScroll";                // Older Firefox
 
       const displayElem =
-      document.getElementById((this.props.data?.id || '') + 'displayArea') ||
+      document.getElementById((this.props.data && this.props.data.id) + 'displayArea') ||
       document.getElementById('slice-viewer');
 
       if (displayElem) {
@@ -1815,8 +1815,8 @@ const StackViewerComponent = () => createClass({
      */
     onResize: function (width, height) {
       const autoScale = Number(Math.min(
-        height / (this.state.imageY),
-        width / (this.state.imageX)
+        height / (this.state.imageY / 10.0),
+        width / (this.state.imageX / 10.0)
       ).toFixed(1));
 
       const scale = Math.ceil(autoScale);

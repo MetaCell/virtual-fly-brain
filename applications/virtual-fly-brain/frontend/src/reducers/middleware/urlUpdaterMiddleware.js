@@ -64,17 +64,18 @@ const isFirstTimeLoad = (allLoadedInstances, store) => {
       loadOrder = loadOrder.filter(id => id !== idSelected);
       loadOrder.unshift(idSelected);
     }
-    const uniqueLoadOrder = [...new Set(loadOrder)];
-
-    const instancesToLoad = uniqueLoadOrder.filter(id => !allLoadedInstances?.find(i => i.metadata?.Id === id));
 
     // If we have instances to load, set up bulk loading
     if (loadOrder.length === 0) {
       loadOrder.push(DEFAULT_ID);
-    } else if (instancesToLoad.length > 0) {
-      store.dispatch(setBulkLoadingCount(instancesToLoad.length));
     }
 
+    const uniqueLoadOrder = [...new Set(loadOrder)];
+    const instancesToLoad = uniqueLoadOrder.filter(id => !allLoadedInstances?.find(i => i.metadata?.Id === id));
+
+    if (instancesToLoad.length > 0) {
+      store.dispatch(setBulkLoadingCount(instancesToLoad.length));
+    }
 
     const focusTarget = queuedInstances.length > 0
     ? queuedInstances[queuedInstances.length - 1]

@@ -1254,8 +1254,8 @@ const rgbToHex = (color) => {
       // update slice view
       this.checkStack();
       // recenter display for new image size keeping any stack offset.
-      this.disp.position.x = Math.ceil((props.width / 2) - (((this.state.imageX / 10.0) * props.zoomLevel) / 2));
-      this.disp.position.y = Math.ceil((props.height / 2) - (((this.state.imageY / 10.0) * props.zoomLevel) / 2));
+      this.disp.position.x = Math.ceil((props.width / 2) - (((this.state.imageX) * props.zoomLevel) / 2));
+      this.disp.position.y = Math.ceil((props.height / 2) - (((this.state.imageY) * props.zoomLevel) / 2));
     },
 
     /**
@@ -1688,7 +1688,7 @@ const StackViewerComponent = () => createClass({
         : "DOMMouseScroll";                // Older Firefox
 
       const displayElem =
-      document.getElementById((this.props.data && this.props.data.id) + 'displayArea') ||
+      document.getElementById((this.props.data?.id || '') + 'displayArea') ||
       document.getElementById('slice-viewer');
 
       if (displayElem) {
@@ -1755,14 +1755,14 @@ const StackViewerComponent = () => createClass({
             newState.voxelZ = Number(subDomains[0][2] || 0.622088);
           }
         
-          const ids = templateDomainIds || subDomains[1];
-          const names = templateDomainNames || subDomains[2];
-          const types = templateDomainTypeIds || subDomains[3];
+          const templateIds = templateDomainIds || subDomains[1];
+          const templateNames = templateDomainNames || subDomains[2];
+          const templateTypes = templateDomainTypeIds || subDomains[3];
         
-          if (ids && names && types) {
-            newState.tempId = ids;
-            newState.tempName = names;
-            newState.tempType = types;
+          if (templateIds && templateNames && templateTypes) {
+            newState.tempId = templateIds;
+            newState.tempName = templateNames;
+            newState.tempType = templateTypes;
           }
         }                
         for (instance in instances) {
@@ -1815,8 +1815,8 @@ const StackViewerComponent = () => createClass({
      */
     onResize: function (width, height) {
       const autoScale = Number(Math.min(
-        height / (this.state.imageY / 10.0),
-        width / (this.state.imageX / 10.0)
+        height / (this.state.imageY),
+        width / (this.state.imageX)
       ).toFixed(1));
 
       const scale = Math.ceil(autoScale);

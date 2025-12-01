@@ -22,6 +22,7 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
   const [showFullScreen, setShowFullScreen] = useState(false);
 
   const getThumbnail = (thumbnail) => {
+    if (!thumbnail) return null;
     const matches = thumbnail.match(/\bhttps?::\/\/\S+/gi) || thumbnail.match(/\bhttps?:\/\/\S+/gi);
 
     return matches;

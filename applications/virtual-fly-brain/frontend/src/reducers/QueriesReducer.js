@@ -52,10 +52,8 @@ const QueriesReducer = (state = initialStateQueriesReducer, response) => {
           };
           updatedQueries.push(newQuery);
         } else {
-          if (findQuery.queries?.[response.payload.type]) {
-            findQuery.type = response.payload.type;
-            findQuery.queries[response.payload.type] = response.payload.query;
-          }
+          findQuery.type = response.payload.type;
+          findQuery.queries[response.payload.type] = response.payload.query;
         }
       }
 

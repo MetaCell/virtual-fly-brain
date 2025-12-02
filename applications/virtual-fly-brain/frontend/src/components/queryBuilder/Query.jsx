@@ -208,8 +208,22 @@ const Query = forwardRef(({ fullWidth, queries, searchTerm }, ref) => {
   }, [queries, sortField]);
 
   const isLoading = useSelector(state => state.queries.isLoading);
+  const [isRendering, setIsRendering] = useState(false);
   // eslint-disable-next-line no-unused-vars
   const dispatch = useDispatch();
+
+  // Track when data is being processed/rendered
+  useEffect(() => {
+    if (isLoading) {
+      setIsRendering(true);
+    } else if (finalFilteredResults.length > 0 || queries.length === 0) {
+      // Small delay to ensure DOM has rendered
+      const timer = setTimeout(() => {
+        setIsRendering(false);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading, finalFilteredResults.length, queries.length]);
 
   // Memoize callbacks to prevent unnecessary re-renders
   const updateFilters = useCallback(() => {
@@ -413,7 +427,7 @@ const Query = forwardRef(({ fullWidth, queries, searchTerm }, ref) => {
       </Box>
 
       <Box overflow='auto' height='calc(100% - 5.375rem)' p={1.5}>
-        {isLoading ? (
+        {(isLoading || isRendering) ? (
           <Box display="flex" justifyContent="center" alignItems="center" height="40vh">
             <CircularProgress />
           </Box>

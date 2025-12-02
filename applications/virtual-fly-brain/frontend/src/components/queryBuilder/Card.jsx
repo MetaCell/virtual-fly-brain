@@ -28,6 +28,8 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
     return matches;
   }
 
+  const hasThumbnail = getThumbnail(query.thumbnail);
+
   const handleLinkClick = (href, event) => {
     event.preventDefault();
     if (href.startsWith("http")) {
@@ -41,7 +43,7 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
   return (
     <>
       <Card sx={{
-        height: '20rem',
+        height: hasThumbnail ? '20rem' : '10rem',
         width: '20rem',
         display: 'flex',
         flexDirection: 'column',
@@ -58,35 +60,37 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
           background: secondaryBg
         }
       }}>
-        <CardMedia
-          sx={{
-            height: '7.5rem',
-            backgroundSize: 'cover',
-            backgroundRepeat: 'no-repeat',
-            backgroundPosition: 'center',
-            borderTopLeftRadius: '8px',
-            borderTopRightRadius: '8px',
-            borderBottom: '1px solid',
-            borderColor: secondaryBg,
-            position: 'relative',
-          }}
-          image={getThumbnail(query.thumbnail)}
-        >
-          <IconButton onClick={(e) => {
-            e.stopPropagation();
-            setShowFullScreen(true)
-          }}
-          sx={{
-            position: 'absolute',
-            top: 8,
-            right: 8,
-            background: 'rgba(255,255,255,0.7)',
-            '&:hover': { background: 'rgba(255,255,255,0.9)' },
-            boxShadow: '0 2px 8px 0 rgba(0,0,0,0.10)'
-          }}>
-            <FullscreenIcon sx={{fill: '#333', fontSize: '1.2rem'}} />
-          </IconButton>
-        </CardMedia>
+        {hasThumbnail && (
+          <CardMedia
+            sx={{
+              height: '7.5rem',
+              backgroundSize: 'cover',
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'center',
+              borderTopLeftRadius: '8px',
+              borderTopRightRadius: '8px',
+              borderBottom: '1px solid',
+              borderColor: secondaryBg,
+              position: 'relative',
+            }}
+            image={getThumbnail(query.thumbnail)}
+          >
+            <IconButton onClick={(e) => {
+              e.stopPropagation();
+              setShowFullScreen(true)
+            }}
+            sx={{
+              position: 'absolute',
+              top: 8,
+              right: 8,
+              background: 'rgba(255,255,255,0.7)',
+              '&:hover': { background: 'rgba(255,255,255,0.9)' },
+              boxShadow: '0 2px 8px 0 rgba(0,0,0,0.10)'
+            }}>
+              <FullscreenIcon sx={{fill: '#333', fontSize: '1.2rem'}} />
+            </IconButton>
+          </CardMedia>
+        )}
         <CardContent sx={{overflowY: 'auto', flex: 1, padding: "8px", paddingBottom: "6px !important", paddingTop: "4px !important"}}>
           <Box
             display='flex'

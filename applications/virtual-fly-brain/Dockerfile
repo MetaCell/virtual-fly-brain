@@ -65,7 +65,6 @@ RUN export VFB_DOMAIN="https://${BE_DOMAIN}" && yarn run build
 WORKDIR /usr/src/app
 COPY backend/requirements.txt /usr/src/app/
 RUN pip3 install --no-cache-dir -r requirements.txt
-RUN echo 'test s'
 COPY backend/ /usr/src/app
 RUN pip3 install -e .
 

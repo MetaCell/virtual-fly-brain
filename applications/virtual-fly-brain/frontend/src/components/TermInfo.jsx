@@ -550,6 +550,20 @@ const TermInfo = ({ open, setOpen }) => {
     }
   };
 
+  // Helper to check if query is a "Neurons with" query with results
+  const isNeuronsWithQuery = (q) => {
+    return q.label?.startsWith("Neurons with") && 
+           q.output_format === "table" && 
+           q?.preview_results?.rows?.length > 0;
+  };
+
+  // Comparator function to sort queries, moving zero-count queries to the bottom
+  const sortByCountDescending = (a, b) => {
+    if ((a.count || 0) === 0 && (b.count || 0) !== 0) return 1;
+    if ((a.count || 0) !== 0 && (b.count || 0) === 0) return -1;
+    return 0;
+  };
+
   // Renderers for each type
   const renderCellContent = (type, value) => {
     switch (type) {
@@ -1068,11 +1082,7 @@ const TermInfo = ({ open, setOpen }) => {
                     defaultParentIcon={<ArrowRight />}
                   >
                     {/* Group queries that start with "Neurons with" */}
-                    {termInfoData?.metadata?.Queries?.filter(q => 
-                      q.label?.startsWith("Neurons with") && 
-                      q.output_format === "table" && 
-                      q?.preview_results?.rows?.length > 0
-                    ).length > 0 && (
+                    {termInfoData?.metadata?.Queries?.filter(isNeuronsWithQuery).length > 0 && (
                       <TreeItem
                         itemId="terminfo-neurons-with-queries"
                         sx={{ "&:before": { display: "none" } }}
@@ -1081,11 +1091,7 @@ const TermInfo = ({ open, setOpen }) => {
                             <Typography>Types of neurons with</Typography>
                             <Box display="flex" sx={{ zIndex: 6 }} pl={0.5}>
                               <Typography sx={{ pr: 0.5 }}>
-                                {termInfoData?.metadata?.Queries?.filter(q => 
-                                  q.label?.startsWith("Neurons with") && 
-                                  q.output_format === "table" && 
-                                  q?.preview_results?.rows?.length > 0
-                                ).reduce((n, { count }) => n + count, 0)}
+                                {termInfoData?.metadata?.Queries?.filter(isNeuronsWithQuery).reduce((n, { count }) => n + (count || 0), 0)}
                               </Typography>
                               <ListAltIcon
                                 sx={{ fontSize: "1.25rem", color: "#A0A0A0" }}
@@ -1096,12 +1102,7 @@ const TermInfo = ({ open, setOpen }) => {
                       >
                         {termInfoData?.metadata?.Queries
                           ?.filter(q => q.label?.startsWith("Neurons with"))
-                          .sort((a, b) => {
-                            // Move queries with count === 0 to the bottom
-                            if ((a.count || 0) === 0 && (b.count || 0) !== 0) return 1;
-                            if ((a.count || 0) !== 0 && (b.count || 0) === 0) return -1;
-                            return 0;
-                          })
+                          .sort(sortByCountDescending)
                           .map((query, index) => {
                           const headers = getOrderedHeaders(query?.preview_results?.headers);
                           return (query.output_format === "table" &&
@@ -1336,12 +1337,7 @@ const TermInfo = ({ open, setOpen }) => {
                       >
                         {termInfoData?.metadata?.Queries
                           ?.filter(q => !q.label?.startsWith("Neurons with"))
-                          .sort((a, b) => {
-                            // Move queries with count === 0 to the bottom
-                            if ((a.count || 0) === 0 && (b.count || 0) !== 0) return 1;
-                            if ((a.count || 0) !== 0 && (b.count || 0) === 0) return -1;
-                            return 0;
-                          })
+                          .sort(sortByCountDescending)
                           .map((query, index) => {
                       const headers = getOrderedHeaders(query?.preview_results?.headers);
                       return (query.output_format === "table" &&
@@ -1479,7 +1475,7 @@ const TermInfo = ({ open, setOpen }) => {
                                 pl={0.5}
                               >
                                 <Typography sx={{ pr: 0.5 }}>
-                                  {query?.preview_results?.rows?.length}
+                                  {query?.count}
                                 </Typography>
                                 <ListAltIcon
                                   sx={{

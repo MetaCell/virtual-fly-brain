@@ -218,7 +218,7 @@ def generate_neuroglancer_state(datasets_info, base_url="http://localhost:8080/p
         selected_segments = [str(s) for s in segments[:10]]
         
         layer = {
-            "type": "image",
+            "type": "segmentation",
             "source": {
                 "url": f"precomputed://{base_url}/{dataset_name}",
                 "subsources":  {

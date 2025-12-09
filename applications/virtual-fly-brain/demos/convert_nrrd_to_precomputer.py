@@ -119,7 +119,7 @@ def main():
         
         # Determine layer type
         is_segmentation = np.issubdtype(arr_xyz.dtype, np. integer)
-        layer_type = 'image'
+        layer_type = 'segmentation' if is_segmentation else 'image'
         
         # For uint8/uint16, use raw encoding
         encoding = 'raw'

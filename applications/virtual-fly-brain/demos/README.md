@@ -97,12 +97,14 @@ python3 convert_nrrd_to_precomputed.py \
   --input-url "http://v2.virtualflybrain.org/data/VFB/i/0010/12vj/VFB_00101567/volume.nrrd" \
   --input-url "http://v2.virtualflybrain.org/data/VFB/i/0010/101b/VFB_00101567/volume.nrrd" \
   --output-path "file://~/precomputed" \
+  --no-compress
   --verbose
 
-python3 generate_and_setup_meshes.py \
+python3 generate_meshes.py \
   --input-path "file://~/precomputed/VFB_00101567_1567" \
   --input-path "file://~/precomputed/VFB_00101567_12vj" \
   --input-path "file://~/precomputed/VFB_00101567_101b" \
+  -- no-compress
   --verbose
 
 cd ~

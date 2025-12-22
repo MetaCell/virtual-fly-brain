@@ -155,8 +155,9 @@ def generate_meshes_with_skimage(dataset_path, dust_threshold=100, verbose=True)
                 continue
             
             try:
+                field = gaussian(mask.astype(np.float32), sigma=0.6, preserve_range=True)
                 vertices, faces, normals, values = measure.marching_cubes(
-                    mask,
+                    field,
                     level=0.5,
                     spacing=spacing,
                     allow_degenerate=False

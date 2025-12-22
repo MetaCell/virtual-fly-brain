@@ -75,16 +75,17 @@ def detect_spacing(header: dict):
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--input-url", action='append', required=True, help="NRRD URL or local path (repeatable)")
-    p.add_argument("--output-path", default=None, help="precomputed root: file:///full/path or gs:// / s3:// ; default file://~/precomputed")
+    p.add_argument("--output-path", default=None, help="precomputed root: file:///full/path or gs:// / s3:// ; default ./precomputed")
     p.add_argument("--verbose", action='store_true')
     p. add_argument("--no-compress", action='store_true', help="Disable gzip compression (store raw uncompressed chunks)")
     args = p.parse_args()
 
-    compress = not args.no_compress
+    compress = args.no_compress
 
     if args.output_path is None:
-        home = str(Path.home())
-        args. output_path = f"file://{home}/precomputed"
+        # Default to a "precomputed" folder next to this script
+        script_dir = Path(__file__).resolve().parent
+        args.output_path = f"file://{script_dir / 'precomputed'}"
 
     if args.output_path. startswith('file://'):
         pth = args.output_path.replace('file://','')

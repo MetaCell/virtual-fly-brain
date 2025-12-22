@@ -14,7 +14,7 @@ conda create -n vfb python=3.12
 conda activate vfb
 
 # Install dependencies
-pip install cloud-volume nrrd numpy requests scikit-image
+pip install cloud-volume pynrrd numpy requests scikit-image
 
 # Install Node.js/npm if not already installed (for local HTTP server)
 # macOS: brew install node
@@ -25,31 +25,33 @@ pip install cloud-volume nrrd numpy requests scikit-image
 
 ```bash
 # 1. Convert all 3 NRRD files to precomputed format
-python3 convert_nrrd_to_precomputed. py \
+#    (Default output: ./precomputed next to convert_nrrd_to_precomputed.py)
+#    (Default: no compression; add --compress to gzip chunk files)
+python convert_nrrd_to_precomputed.py \
   --input-url "http://v2.virtualflybrain.org/data/VFB/i/0010/1567/VFB_00101567/volume.nrrd" \
   --input-url "http://v2.virtualflybrain.org/data/VFB/i/0010/12vj/VFB_00101567/volume.nrrd" \
   --input-url "http://v2.virtualflybrain.org/data/VFB/i/0010/101b/VFB_00101567/volume.nrrd" \
-  --output-path "file://~/precomputed" \
   --verbose
 
-# 2. Generate meshes and segment properties for all 3 datasets
-python3 generate_and_setup_meshes.py \
-  --input-path "file://~/precomputed/VFB_00101567_1567" \
-  --input-path "file://~/precomputed/VFB_00101567_12vj" \
-  --input-path "file://~/precomputed/VFB_00101567_101b" \
+# 2. Generate meshes and segment properties
+#    (Default input datasets: next to generate_meshes.py)
+python generate_meshes.py \
+  --input-path "file://./precomputed/VFB_00101567_1567" \
+  --input-path "file://./precomputed/VFB_00101567_12vj" \
+  --input-path "file://./precomputed/VFB_00101567_101b" \
   --verbose
 
-# 3. Start HTTP server (keep running in a terminal)
-cd ~
+# 3. Start HTTP server (serve the folder containing ./precomputed)
+cd /path/to/this/repo_or_script_folder
 npx http-server . -p 8080 --cors
 ```
 
 This creates:
 ```
-~/precomputed/VFB_00101567_1567/     # Dataset 1
-~/precomputed/VFB_00101567_12vj/     # Dataset 2
-~/precomputed/VFB_00101567_101b/     # Dataset 3
-~/precomputed/neuroglancer_state.json # Pre-configured state with all 3 layers
+./precomputed/VFB_00101567_1567/
+./precomputed/VFB_00101567_12vj/
+./precomputed/VFB_00101567_101b/
+./neuroglancer_state.json
 ```
 
 ## Visualization Options
@@ -82,7 +84,7 @@ The mesh generation script creates a pre-configured Neuroglancer state with all 
 2. Click the **`< >`** button (JSON state) in the top-right
 3. Copy and paste the contents: 
    ```bash
-   cat ~/precomputed/neuroglancer_state.json
+   cat ./neuroglancer_state.json
    ```
 4. Click **Apply** or close the editor
 
@@ -92,43 +94,39 @@ The mesh generation script creates a pre-configured Neuroglancer state with all 
 
 ```bash
 # One-shot test with all 3 datasets
-python3 convert_nrrd_to_precomputed.py \
+python convert_nrrd_to_precomputed.py \
   --input-url "http://v2.virtualflybrain.org/data/VFB/i/0010/1567/VFB_00101567/volume.nrrd" \
   --input-url "http://v2.virtualflybrain.org/data/VFB/i/0010/12vj/VFB_00101567/volume.nrrd" \
   --input-url "http://v2.virtualflybrain.org/data/VFB/i/0010/101b/VFB_00101567/volume.nrrd" \
-  --output-path "file://~/precomputed" \
-  --no-compress
   --verbose
 
-python3 generate_meshes.py \
-  --input-path "file://~/precomputed/VFB_00101567_1567" \
-  --input-path "file://~/precomputed/VFB_00101567_12vj" \
-  --input-path "file://~/precomputed/VFB_00101567_101b" \
-  -- no-compress
+python generate_meshes.py \
+  --input-path "file://./precomputed/VFB_00101567_1567" \
+  --input-path "file://./precomputed/VFB_00101567_12vj" \
+  --input-path "file://./precomputed/VFB_00101567_101b" \
   --verbose
 
-cd ~
+cd /path/to/this/repo_or_script_folder
 npx http-server . -p 8080 --cors
 
 # Then load the generated state: 
-cat ~/precomputed/neuroglancer_state.json
+cat ./neuroglancer_state.json
 # Copy and paste into neuroglass.io
 ```
 
 ## What Gets Created
 
 ```
-~/precomputed/
+./precomputed/
 ├── VFB_00101567_1567/
-│   ├── info                         # Main metadata
-│   ├── 0/                          # Volume data chunks
-│   ├── mesh/                       # 3D surface meshes
-│   │   ├── info
-│   │   ├── 1:0, 1:0:1.gz          # Segment meshes
-│   │   └── ... 
-│   └── segment_properties/         # Segment IDs list
+│   ├── info
+│   ├── 0/
+│   ├── mesh/
+│   │   └── info
+│   └── segment_properties/
 │       └── info
-├── VFB_00101567_12vj/              # Dataset 2 (same structure)
-├── VFB_00101567_101b/              # Dataset 3 (same structure)
-└── neuroglancer_state.json         # Pre-configured state with all 3 layers
+├── VFB_00101567_12vj/
+├── VFB_00101567_101b/
+└── ...
+./neuroglancer_state.json
 ```

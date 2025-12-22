@@ -1,0 +1,128 @@
+{
+  "dimensions": {
+    "x": [
+      1e-09,
+      "m"
+    ],
+    "y": [
+      5.189161e-10,
+      "m"
+    ],
+    "z": [
+      5.189161e-10,
+      "m"
+    ]
+  },
+  "position": [
+    87,
+    283,
+    605
+  ],
+  "crossSectionScale": 5,
+  "projectionScale": 2048,
+  "layers": [
+    {
+      "type": "segmentation",
+      "source": {
+        "url": "precomputed://http://localhost:8080/precomputed/VFB_00101567_1567",
+        "subsources": {
+          "default": true,
+          "mesh": true,
+          "properties": true
+        },
+        "enableDefaultSubsources": false
+      },
+      "tab": "segments",
+      "segments": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10"
+      ],
+      "hideSegmentZero": true,
+      "selectedAlpha": 0.35,
+      "notSelectedAlpha": 0.05,
+      "objectAlpha": 0.25,
+      "meshRenderScale": 1,
+      "meshSilhouetteRendering": 1,
+      "colorSeed": 1,
+      "name": "VFB_00101567_1567",
+      "visible": true
+    },
+    {
+      "type": "segmentation",
+      "source": {
+        "url": "precomputed://http://localhost:8080/precomputed/VFB_00101567_12vj",
+        "subsources": {
+          "default": true,
+          "mesh": true,
+          "properties": true
+        },
+        "enableDefaultSubsources": false
+      },
+      "tab": "segments",
+      "segments": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10"
+      ],
+      "hideSegmentZero": true,
+      "selectedAlpha": 0.35,
+      "notSelectedAlpha": 0.05,
+      "objectAlpha": 0.25,
+      "meshRenderScale": 1,
+      "meshSilhouetteRendering": 1,
+      "colorSeed": 1,
+      "name": "VFB_00101567_12vj",
+      "visible": true
+    },
+    {
+      "type": "segmentation",
+      "source": {
+        "url": "precomputed://http://localhost:8080/precomputed/VFB_00101567_101b",
+        "subsources": {
+          "default": true,
+          "mesh": true,
+          "properties": true
+        },
+        "enableDefaultSubsources": false
+      },
+      "tab": "segments",
+      "segments": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10"
+      ],
+      "hideSegmentZero": true,
+      "selectedAlpha": 0.35,
+      "notSelectedAlpha": 0.05,
+      "objectAlpha": 0.25,
+      "meshRenderScale": 1,
+      "meshSilhouetteRendering": 1,
+      "colorSeed": 1,
+      "name": "VFB_00101567_101b",
+      "visible": true
+    }
+  ],
+  "layout": "4panel"
+}

@@ -17,6 +17,7 @@ except ImportError:
     print("ERROR: scikit-image not installed. Install with: pip install scikit-image")
     sys. exit(1)
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 def create_segment_properties(local_path, segment_ids, verbose=True):
     """Create segment_properties directory with info file listing all segments."""
@@ -81,7 +82,7 @@ def setup_mesh_metadata(dataset_path, local_path, verbose=True):
         "@type": "neuroglancer_legacy_mesh",
         "mip": 0,
         "vertex_quantization_bits": 10,
-        "lod_scale_multiplier": 1.0
+        "lod_scale_multiplier": 1.5
     }
     
     with open(mesh_info_path, 'w') as f:
@@ -231,11 +232,12 @@ def generate_neuroglancer_state(datasets_info, base_url="http://localhost:8080/p
             "tab": "segments",
             "segments": selected_segments,
             "hideSegmentZero": True,
-            "selectedAlpha": 1.0,
-            "notSelectedAlpha":  0.15,
-            "objectAlpha": 0.8,
+            "selectedAlpha": 0.35,
+            "notSelectedAlpha": 0.05,
+            "objectAlpha": 0.25,
             "meshRenderScale": 1,
-            "meshSilhouetteRendering":  3,
+            "meshSilhouetteRendering": 1,
+            "colorSeed": 1,
             "name":  dataset_name,
             "visible": True
         }
@@ -267,9 +269,9 @@ def main():
     
     # Default dataset paths - can be overridden with --input-path
     DEFAULT_DATASETS = [
-        "file://~/precomputed/VFB_00101567_1567",
-        "file://~/precomputed/VFB_00101567_12vj",
-        "file://~/precomputed/VFB_00101567_101b",
+        f"file://{os.path.join(SCRIPT_DIR, 'VFB_00101567_1567')}",
+        f"file://{os.path.join(SCRIPT_DIR, 'VFB_00101567_12vj')}",
+        f"file://{os.path.join(SCRIPT_DIR, 'VFB_00101567_101b')}",
     ]
     
     # Default base URL for HTTP server
@@ -357,11 +359,14 @@ def main():
     
     # Generate Neuroglancer state
     if datasets_info:
-        output_state_path = args.output_state or os.path.expanduser("~/precomputed/neuroglancer_state.json")
+        output_state_path = args.output_state or os.path.join(
+            SCRIPT_DIR, "neuroglancer_state.json"
+        )
         generate_neuroglancer_state(datasets_info, base_url=args.base_url, output_path=output_state_path)
     
     print(f"\nNext steps:")
-    print(f"  1. Start HTTP server: cd ~ && npx http-server . -p 8080 --cors")
+    print(f"  1. Start HTTP server:")
+    print(f"     cd {SCRIPT_DIR} && npx http-server . -p 8080 --cors")
     print(f"  2. Load in Neuroglancer:")
     print(f"     - Click the {{}} button")
     print(f"     - Paste contents from: {output_state_path}")

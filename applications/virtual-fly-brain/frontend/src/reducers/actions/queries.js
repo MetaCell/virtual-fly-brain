@@ -1,5 +1,5 @@
 import store from '../../store';
-import { get_query_results } from "../../network/query"
+import { get_query_results, get_queries } from "../../network/query"
 import { getQueriesTypes } from './types/getQueriesTypes';
 
 const getQueriesSuccess = (query, short_form, type) => ({
@@ -42,14 +42,40 @@ export const getQueriesFailure = ( error, id) => ({
 export const getQueries = async (short_form, type) => {
 
   store.dispatch(_getQueriesStarted())
+  
+  const state = store.getState();
+  const allLoadedInstances = state.instances.allLoadedInstances;
+  
   let response;
   try {
-    response = await get_query_results(short_form, type);
+    // When type is provided - EXECUTE the specific query
+    if (type) {
+      response = await get_query_results(short_form, type);
+      store.dispatch(getQueriesSuccess(response, short_form, type))
+    } 
+    // When type is NOT provided - LOAD available queries list
+    else {
+      // Check if instance already loaded (CACHE CHECK)
+      const existingInstance = allLoadedInstances?.find(
+        i => i.metadata?.Id === short_form
+      );
+      
+      if (existingInstance?.metadata?.Queries) {
+        // Use cached instance data - no network call needed!
+        response = {
+          queries: existingInstance.metadata.Queries,
+          name: existingInstance.metadata.Name
+        };
+      } else {
+        // Instance not loaded, fetch queries from backend using get_queries
+        response = await get_queries(short_form);
+      }
+      
+      store.dispatch(getQueriesSuccess(response, short_form, undefined))
+    }
   } catch (error) {
     store.dispatch(getQueriesFailure(error.message, short_form))
   }
-
-  store.dispatch(getQueriesSuccess(response, short_form, type))
 }
 
 export const deleteQuery = async (instance) => {

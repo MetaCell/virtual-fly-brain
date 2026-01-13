@@ -60,16 +60,23 @@ export const getQueries = async (short_form, type) => {
         i => i.metadata?.Id === short_form
       );
       
+      let queriesData;
       if (existingInstance?.metadata?.Queries) {
         // Use cached instance data - no network call needed!
-        response = {
+        queriesData = {
           queries: existingInstance.metadata.Queries,
           name: existingInstance.metadata.Name
         };
       } else {
         // Instance not loaded, fetch queries from backend using get_queries
-        response = await get_queries(short_form);
+        queriesData = await get_queries(short_form);
       }
+      
+      // Format response to match what reducer expects
+      response = {
+        queries: queriesData.queries, // Array of all available queries
+        name: queriesData.name
+      };
       
       store.dispatch(getQueriesSuccess(response, short_form, undefined))
     }

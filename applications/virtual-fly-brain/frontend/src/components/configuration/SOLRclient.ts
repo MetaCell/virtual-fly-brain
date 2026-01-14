@@ -23,11 +23,7 @@ const globalConfiguration:any = {
 };
 
 let solrConfiguration:any = {
-    params: {
-        json: {
-          params: globalConfiguration.query_settings
-        }
-    }
+    params: globalConfiguration.query_settings
 }
 
 export function getResultsSOLR ( searchString: string, returnResults: Function, sorter: Function, configuration?: any) {
@@ -37,12 +33,12 @@ export function getResultsSOLR ( searchString: string, returnResults: Function, 
         url = globalConfiguration.url;
     }
     if (configuration.query_settings !== undefined) {
-        solrConfiguration.params.json.params = configuration.query_settings;
+        solrConfiguration.params = configuration.query_settings;
     }
 
     // hack to clone the object
     let tempConfig:any = JSON.parse(JSON.stringify(solrConfiguration));
-    tempConfig.params.json.params.q = solrConfiguration.params.json.params.q.replace(/\$SEARCH_TERM\$/g, searchString);
+    tempConfig.params.q = solrConfiguration.params.q.replace(/\$SEARCH_TERM\$/g, searchString);
 
     axios.get(`${url}`, tempConfig)
     .then(function(response) {

@@ -981,16 +981,14 @@ const rgbToHex = (color) => {
     createImages: async function () {
       if (this.state.stack.length > 0) {
         var i, x, y, w, h, d, offX, offY, t, image, Xpos, Ypos, XboundMax, YboundMax, XboundMin, YboundMin;
-        /*
-         * move through tiles
-         * console.log('Creating slice view...');
-         */
+    
         this.state.visibleTiles = [];
-        w = Math.ceil(((this.state.imageX / 10.0) * this.state.scl) / this.state.tileX);
-        h = Math.ceil(((this.state.imageY / 10.0) * this.state.scl) / this.state.tileY);
-        // console.log('Tile grid is ' + w.toString() + ' wide by ' + h.toString() + ' high');
+    
+        w = Math.ceil(this.state.imageX / this.state.tileX);
+        h = Math.ceil(this.state.imageY / this.state.tileY);
         this.state.numTiles = w * h;
-
+        // console.log('Tile grid is ' + w.toString() + ' wide by ' + h.toString() + ' high');
+    
         for (t = 0; t < w * h; t++) {
           x = 0;
           y = 0;
@@ -1683,12 +1681,23 @@ const StackViewerComponent = () => createClass({
       }
 
       // detect available wheel event
-      support = "onwheel" in document.createElement("div") ? "wheel" // Modern browsers support "wheel"
-        : document.onmousewheel !== undefined ? "mousewheel" // Webkit and IE support at least "mousewheel"
-          : "DOMMouseScroll"; // let's assume that remaining browsers are older Firefox
-      this?.addWheelListener(document.getElementById(this.props.data.id + 'displayArea'), (e) => {
+      support = "onwheel" in document.createElement("div")
+      ? "wheel"                            // Modern browsers
+      : document.onmousewheel !== undefined
+        ? "mousewheel"                     // Webkit / IE
+        : "DOMMouseScroll";                // Older Firefox
+
+      const displayElem =
+      document.getElementById((this.props.data && this.props.data.id) + 'displayArea') ||
+      document.getElementById('slice-viewer');
+
+      if (displayElem) {
+      this.addWheelListener(displayElem, (e) => {
         this.onWheelEvent(e);
       });
+      } else {
+      console.warn('StackViewer: wheel listener target not found for slice viewer');
+      }
 
       if (this.props.data && this.props.data != null && this.props.data.instances && this.props.data.instances != null) {
         this.setState(this.handleInstances(this.props.data.instances));
@@ -1732,24 +1741,30 @@ const StackViewerComponent = () => createClass({
           newState.voxelY = Number(this.props.config.subDomains[0][1] || 0.622088);
           newState.voxelZ = Number(this.props.config.subDomains[0][2] || 0.622088);
         }
-        if (this.props.config && this.props.config != null) {
-          if (this.props.config.subDomains && this.props.config.subDomains != null && this.props.config.subDomains.length) {
-            if (this.props.config.subDomains.length > 0 && this.props.config.subDomains[0] && this.props.config.subDomains[0].length && this.props.config.subDomains[0].length > 2) {
-              newState.voxelX = Number(this.props.config.subDomains[0][0] || 0.622088);
-              newState.voxelY = Number(this.props.config.subDomains[0][1] || 0.622088);
-              newState.voxelZ = Number(this.props.config.subDomains[0][2] || 0.622088);
-            }
-            if (this.props.config.subDomains.length > 3 && this.props.config.subDomains[1] != null) {
-              newState.tempName = this.props.config.subDomains[2];
-              newState.tempId = this.props.config.subDomains[1];
-              newState.tempType = this.props.config.subDomains[3];
-              // FIXME : Add extra subdomain to match previous configuration
-              // if (this.props.config.subDomains[4] && this.props.config.subDomains[4].length && this.props.config.subDomains[4].length > 0) {
-              //   newState.fxp = JSON.parse(this.props.config.subDomains[4][0]);
-              // }
-            }
+        if (this.props.config) {
+          const {
+            subDomains = [],
+            templateDomainIds,
+            templateDomainNames,
+            templateDomainTypeIds
+          } = this.props.config;
+        
+          if (subDomains.length > 0 && subDomains[0] && subDomains[0].length > 2) {
+            newState.voxelX = Number(subDomains[0][0] || 0.622088);
+            newState.voxelY = Number(subDomains[0][1] || 0.622088);
+            newState.voxelZ = Number(subDomains[0][2] || 0.622088);
           }
-        }
+        
+          const templateIds = templateDomainIds || subDomains[1];
+          const templateNames = templateDomainNames || subDomains[2];
+          const templateTypes = templateDomainTypeIds || subDomains[3];
+        
+          if (templateIds && templateNames && templateTypes) {
+            newState.tempId = templateIds;
+            newState.tempName = templateNames;
+            newState.tempType = templateTypes;
+          }
+        }                
         for (instance in instances) {
           try {
             if ((instances[instance].wrappedObj.id != undefined) && (instances[instance].parent != null) ){
@@ -1792,7 +1807,7 @@ const StackViewerComponent = () => createClass({
 
     componentWillUnmount: function () {
       this._isMounted = false;
-      return true;
+      return true;      
     },
     /**
      * Event handler for clicking zoom in. Increments the zoom level

@@ -61,7 +61,11 @@ export const RecentSearch = ({ getOptionProps, selectedFilters, recentSearches, 
       </Typography>
 
       <Box mt={1.5}>
-      {recentSearches?.filter(search => search.type === undefined).map((option, index) => ( hasTag(option.facets_annotation)  &&
+      {recentSearches
+        ?.filter(search => search.type === undefined)
+        .slice(-5) // Get last 5 items
+        .reverse() // Reverse to show most recent first
+        .map((option, index) => ( hasTag(option.facets_annotation)  &&
           <Box key={`recentSearches-${index}`} {...getOptionProps({ option, index })}>
             <Box onClick={() => handleResultSelection(option)} sx={{
               position: 'relative',

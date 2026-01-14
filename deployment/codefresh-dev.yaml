@@ -98,6 +98,7 @@ steps:
         build_arguments:
         - TAG=${{CF_BUILD_ID}}
         - DOMAIN=${{DOMAIN}}
+        - BE_DOMAIN=${{BE_DOMAIN}}
         - NOCACHE=${{CF_BUILD_ID}}
         - REGISTRY=${{REGISTRY}}/virtual-fly-brain
         - CLOUDHARNESS_FLASK=${{REGISTRY}}/virtual-fly-brain/cloudharness-flask:${{CF_BUILD_ID}}

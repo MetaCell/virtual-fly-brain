@@ -152,36 +152,69 @@ const VFBStackViewer = (props) => {
   const config = useMemo(() => {
     let result = {
       serverUrl: 'http://www.virtualflybrain.org/fcgi/wlziipsrv.fcgi',
-      templateId: 'NOTSET'
+      templateId: 'NOTSET',
+      templateDomainIds: [],
+      templateDomainNames: [],
+      templateDomainTypeIds: [],
+      subDomains: []
     };
-    
-    data?.forEach( stackViewerData => {
+
+    data?.forEach(stackViewerData => {
       if (stackViewerData?.metadata?.IsTemplate) {
-        let keys = Object.keys(stackViewerData.metadata?.Images);
-        result = stackViewerData.metadata?.Images[keys[0]]?.[0];
-        result.serverUrl = 'http://www.virtualflybrain.org/fcgi/wlziipsrv.fcgi';
-        if ( stackViewerData?.metadata?.Domains ){
-          keys = Object.keys(stackViewerData?.metadata?.Domains);
-        }
-        let ids = [parseInt(keys[keys?.length - 1]) + 1], labels = [parseInt(keys[keys?.length - 1]) + 1], classID = [parseInt(keys[keys?.length - 1]) + 1]; 
-        keys?.forEach( key => {
-          ids[parseInt(key)] = (stackViewerData?.metadata?.Domains?.[key]?.id);
-          labels[parseInt(key)] = (stackViewerData?.metadata?.Domains?.[key]?.type_label);
-          classID[parseInt(key)] = (stackViewerData?.metadata?.Domains?.[key]?.type_id);
-        })
-        let voxels = [];
-        if (result?.voxel != undefined) {
-          voxelSizeRef.current.x = Number(result.voxel.X || 0.622088);
-          voxelSizeRef.current.y = Number(result.voxel.Y || 0.622088);
-          voxelSizeRef.current.z = Number(result.voxel.Z || 0.622088);
-          voxels = [voxelSizeRef.current.x, voxelSizeRef.current.y, voxelSizeRef.current.z];
+        const imageKeys = Object.keys(stackViewerData.metadata?.Images || {});
+        if (!imageKeys.length) {
+          return;
         }
 
-        let subDomains = [voxels, ids, labels, classID]
-        result.subDomains = subDomains;
+        const imageMeta =
+          stackViewerData.metadata?.Images[imageKeys[0]]?.[0];
+        if (!imageMeta) {
+          return;
+        }
+
+        const domains = stackViewerData.metadata?.Domains || {};
+        const domainKeys = Object.keys(domains);
+        const maxIndex = domainKeys.reduce(
+          (acc, k) => Math.max(acc, Number(k) || 0),
+          0
+        );
+
+        const ids = new Array(maxIndex + 1);
+        const labels = new Array(maxIndex + 1);
+        const classIDs = new Array(maxIndex + 1);
+
+        domainKeys.forEach(key => {
+          const idx = Number(key);
+          const d = domains[key];
+          ids[idx] = d?.id;
+          labels[idx] = d?.type_label;
+          classIDs[idx] = d?.type_id;
+        });
+
+        const voxels = [];
+        if (imageMeta?.voxel) {
+          voxelSizeRef.current.x = Number(imageMeta.voxel.X || 0.622088);
+          voxelSizeRef.current.y = Number(imageMeta.voxel.Y || 0.622088);
+          voxelSizeRef.current.z = Number(imageMeta.voxel.Z || 0.622088);
+          voxels.push(
+            voxelSizeRef.current.x,
+            voxelSizeRef.current.y,
+            voxelSizeRef.current.z
+          );
+        }
+
+        result = {
+          ...imageMeta,
+          serverUrl: 'http://www.virtualflybrain.org/fcgi/wlziipsrv.fcgi',
+          templateId: stackViewerData.metadata?.Id,
+          templateDomainIds: ids,
+          templateDomainNames: labels,
+          templateDomainTypeIds: classIDs,
+          subDomains: [voxels, ids, labels, classIDs]
+        };
       }
     });
-    
+
     return result;
   }, [data]);
 

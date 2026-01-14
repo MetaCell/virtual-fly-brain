@@ -3,11 +3,19 @@ ARG CLOUDHARNESS_FLASK
 FROM ${CLOUDHARNESS_FLASK}
 
 ARG DOMAIN
+ARG BE_DOMAIN
 
 ENV MODULE_NAME=virtual_fly_brain
 ENV WORKERS=2
 ENV PORT=8080
 ENV BUILDDIR=/app
+
+# Update ImageMagick to fix critical security vulnerabilities
+# CVE-2025-57807, CVE-2025-55298, CVE-2025-55154, CVE-2025-55212, CVE-2025-57803
+RUN apt-get update && apt-get upgrade -y imagemagick
+
+# Remove bluez if present (CVE-2023-44431 - no fix available, not needed for this app)
+RUN apt-get remove -y bluez bluez-obexd libbluetooth3 || true
 
 RUN apt-get update && apt-get install -y \
     git \
@@ -43,14 +51,20 @@ ENV MESA_GL_VERSION_OVERRIDE=3.3
 
 COPY frontend ${BUILDDIR}
 WORKDIR ${BUILDDIR}
-ENV VFB_DOMAIN=https://${DOMAIN}
 RUN yarn install
-RUN yarn run build
+# Debug: Print all environment variables and the VFB_DOMAIN value
+RUN echo "=== Environment Check ===" && \
+    echo "BE_DOMAIN ARG: ${BE_DOMAIN}" && \
+    echo "Full VFB_DOMAIN value: https://${BE_DOMAIN}" && \
+    export VFB_DOMAIN="https://${BE_DOMAIN}" && \
+    echo "Exported VFB_DOMAIN: $VFB_DOMAIN" && \
+    echo "========================"
+# Pass VFB_DOMAIN to Vite build process explicitly
+RUN export VFB_DOMAIN="https://${BE_DOMAIN}" && yarn run build
 
 WORKDIR /usr/src/app
 COPY backend/requirements.txt /usr/src/app/
 RUN pip3 install --no-cache-dir -r requirements.txt
-RUN echo 'test s'
 COPY backend/ /usr/src/app
 RUN pip3 install -e .
 

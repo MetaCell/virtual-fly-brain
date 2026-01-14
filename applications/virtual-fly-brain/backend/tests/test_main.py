@@ -21,7 +21,11 @@ class TestMainModule(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         # # Parse the JSON response
         data = json.loads(response.data)
-        self.assertIsInstance(data, list)
+        self.assertIsInstance(data, dict)
+        self.assertIn('count', data)
+        self.assertIn('headers', data)
+        self.assertIn('rows', data)
+        self.assertIsInstance(data['rows'], list)
 
     def test_get_term_info(self):
         """Test the /get_term_info route."""

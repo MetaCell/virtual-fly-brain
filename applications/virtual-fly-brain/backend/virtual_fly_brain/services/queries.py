@@ -4,6 +4,10 @@ from .cache_utils import queries_cache, term_info_cache
 def run_query(id, query_type):
     # TODO: this will have to be extended to handle a list of ids as params
     try:
+        # Validate query_type - it must be provided and not None or 'undefined'
+        if query_type is None or query_type == 'undefined' or query_type == '':
+            raise ValueError("query_type parameter is required and must be a valid query type. Use get_term_info endpoint to retrieve available queries.")
+        
         # Create a unique cache key for the query
         cache_key = f"query_{id}_{query_type}"
         cached_data = queries_cache.get(cache_key)
@@ -35,10 +39,7 @@ def run_query(id, query_type):
             
             return data_queries
         else:
-            # For queries list, we can also cache this
-            result = dict({'queries': queries, 'name': data['Name']})
-            queries_cache.set(cache_key, result)
-            return result
+            raise ValueError(f"Query type '{query_type}' not found for instance '{id}'")
             
     except Exception as e:
         return str(e)

@@ -21,7 +21,11 @@ export const get_queries = async (queryId) => {
     return response.json()
   })
   .then((data) => {
-    return data;
+    // Extract only the queries array and name to minimize response
+    return {
+      queries: data.query?.Queries || data.Queries || [],
+      name: data.Name || data.query?.Name
+    };
   });
   return response;
 }

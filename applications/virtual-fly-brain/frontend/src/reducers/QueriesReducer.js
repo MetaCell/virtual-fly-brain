@@ -19,27 +19,27 @@ const QueriesReducer = (state = initialStateQueriesReducer, response) => {
       let updatedQueries = [...state.queries];
       response.payload.query.active = true;
       if (Array.isArray(response.payload.query.queries)) {
-        response.payload?.query.queries.forEach((query) => {
-          query.active = true;
-          let findQuery = updatedQueries?.find(
-            (i) => i.short_form === response.payload.short_form
-          );
-          if (findQuery === undefined) {
-            const newQuery = {
-              short_form: response.payload.short_form,
-              name: response.payload.query.name,
-              queries: { [query["query"]]: query },
-            };
-            updatedQueries.push(newQuery);
-          } else {
-            if (findQuery.queries?.[response.payload.type]) {
-              findQuery.queries[response.payload.type] = Object.assign(
-                findQuery.queries[response.payload.type],
-                response.payload.query
-              );
-            }
-          }
-        });
+        let findQuery = updatedQueries?.find(
+          (i) => i.short_form === response.payload.short_form
+        );
+        if (findQuery === undefined) {
+          const queriesObject = {};
+          response.payload.query.queries.forEach((query) => {
+            query.active = true;
+            queriesObject[query["query"]] = query;
+          });
+          const newQuery = {
+            short_form: response.payload.short_form,
+            name: response.payload.query.name,
+            queries: queriesObject,
+          };
+          updatedQueries.push(newQuery);
+        } else {
+          response.payload.query.queries.forEach((query) => {
+            query.active = true;
+            findQuery.queries[query["query"]] = query;
+          });
+        }
       } else {
         let findQuery = updatedQueries?.find(
           (i) => i.short_form === response.payload.short_form
@@ -56,7 +56,6 @@ const QueriesReducer = (state = initialStateQueriesReducer, response) => {
           findQuery.queries[response.payload.type] = response.payload.query;
         }
       }
-
       return Object.assign({}, state, {
         queries: updatedQueries,
         isLoading: false,

@@ -64,6 +64,7 @@ const QueriesReducer = (state = initialStateQueriesReducer, response) => {
     case getQueriesTypes.UPDATE_QUERIES:
       return Object.assign({}, state, {
         queries: response.payload,
+        isLoading: false
       });
     case getQueriesTypes.DELETE_QUERY:
       return Object.assign({}, state, {
@@ -79,6 +80,7 @@ const QueriesReducer = (state = initialStateQueriesReducer, response) => {
         error: true,
         errorMessage: response.payload.error,
         errorID: response.payload.id,
+        isLoading: false
       });
     case getGlobalTypes.RESET_ERRORS: {
       return Object.assign({}, state, {

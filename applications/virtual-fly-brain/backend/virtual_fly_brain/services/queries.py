@@ -42,4 +42,4 @@ def run_query(id, query_type):
             raise ValueError(f"Query type '{query_type}' not found for instance '{id}'")
             
     except Exception as e:
-        return str(e)
+        return {"error": str(e)}

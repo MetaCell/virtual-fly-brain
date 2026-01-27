@@ -46,6 +46,7 @@ import {
   EyeOff,
   ArViewOff,
 } from "../icons";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import vars from "../theme/variables";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
@@ -239,9 +240,9 @@ const TermInfo = ({ open, setOpen }) => {
   const openMenu = Boolean(anchorEl);
   const [displayColorPicker, setDisplayColorPicker] = useState(false);
   const [expanded, setExpanded] = useState({
-    "General Information": configuration.sectionsExpanded,
-    Queries: configuration.sectionsExpanded,
-    Graphs: configuration.sectionsExpanded,
+    "General Information": true,
+    "Queries": true,
+    "Graphs": true,
   });
   const [sections,] = useState([
     "General Information",
@@ -254,12 +255,13 @@ const TermInfo = ({ open, setOpen }) => {
   );
   const queries = useSelector((state) => state.queries.queries);
   const queryComponentOpened = useSelector(
-    (state) => state.globalInfo.queryComponentOpened
+    (state) => state.queries.queryComponentOpened
   );
-  const reduxState = useSelector(state => state);
-  const currentTemplate = reduxState.instances.launchTemplate;
-
+  const currentTemplate = useSelector(
+    (state) => state.instances.currentTemplate
+  );
   const [termInfoData, setTermInfoData] = useState(data);
+  const [queriesData, setQueriesData] = useState(data?.metadata?.Queries);
   const [toggleReadMore, setToggleReadMore] = useState(false);
   const [currentOpenQuery, setCurrentOpenQuery] = useState(null);
   const [confirmationModal, setConfirmationModal] = useState({
@@ -267,7 +269,7 @@ const TermInfo = ({ open, setOpen }) => {
     id: null,
     message: ''
   });
-  
+
   const dispatch = useDispatch();
 
   const popover = React.useRef();
@@ -383,7 +385,7 @@ const TermInfo = ({ open, setOpen }) => {
   const handleTermClick = (term) => {
     const regExp = /\(([^)]+)\)/g;
     const matches = [...term.id.matchAll(regExp)].flat();
-    
+
     setConfirmationModal({
       open: true,
       id: matches[1],
@@ -432,7 +434,7 @@ const TermInfo = ({ open, setOpen }) => {
 
   const setToggleMore = (prev, id, type) => {
     const queryKey = `${id}-${type}`;
-    
+
     if (currentOpenQuery === queryKey && toggleReadMore) {
       // Clicking "Show Less" on the currently open query
       setToggleReadMore(false);
@@ -481,6 +483,7 @@ const TermInfo = ({ open, setOpen }) => {
       )
     ) {
       setTermInfoData(data);
+      setQueriesData(data?.metadata?.Queries);
     }
   }, [data]);
 
@@ -529,33 +532,44 @@ const TermInfo = ({ open, setOpen }) => {
     } else if (data?.metadata?.Images && Array.isArray(data?.metadata?.Images) && data?.metadata?.Images.length > 0) {
       isAlignedTemplate = !!(data.metadata.Images[currentTemplateId] && data.metadata.Images[currentTemplateId].find(e => e.id === templateId));
     }
-    
+
     if (href.startsWith("http")) {
       window.open(href, "_blank", "noopener,noreferrer");
     } else {
-     if (isAlignedTemplate) {
-           getInstanceByID(
-             templateId, 
-             true, 
-             true, 
-             true
-           );
-         } else {
-           setConfirmationModal({
-             open: true,
-             id: templateId,
-             message: "The image you requested is aligned to another template. Click Okay to open in a new tab or Cancel to just view the image metadata."
-           });
-         }
+      if (isAlignedTemplate) {
+        getInstanceByID(
+          templateId,
+          true,
+          true,
+          true
+        );
+      } else {
+        setConfirmationModal({
+          open: true,
+          id: templateId,
+          message: "The image you requested is aligned to another template. Click Okay to open in a new tab or Cancel to just view the image metadata."
+        });
+      }
     }
   };
 
-  // Helper to check if query is a "Neurons with" query with results
-  const isNeuronsWithQuery = (q) => {
-    return q.label?.startsWith("Neurons with") && 
-           q.output_format === "table" && 
-           q?.preview_results?.rows?.length > 0;
-  };
+  const queryGroups = [
+    { label: "Types of neurons with...", keys: ["Find neurons", "Find all", "Neurons with"] },
+    { label: "Individual neurons with ", keys: ["Images of neurons with"] },
+    { label: "Tract/Nerves innervating here ", keys: ["Tracts/nerves innervating"] },
+    { label: "Lineage clones with ", keys: ["Lineage clones found"] },
+    { label: "Expression/Phenotypes found here", keys: ["Transgene expression in", "Expression patterns"] }
+  ];
+
+  // Group queries based on the configuration
+  const groupedQueries = queryGroups.map(group => ({
+    ...group,
+    queries: queriesData?.filter(q => group.keys.some(key => q.label.startsWith(key))) || []
+  }));
+
+  const otherQueries = queriesData?.filter(q =>
+    !queryGroups.some(group => group.keys.some(key => q.label.startsWith(key)))
+  ) || [];
 
   // Comparator function to sort queries, moving zero-count queries to the bottom
   const sortByCountDescending = (a, b) => {
@@ -581,8 +595,8 @@ const TermInfo = ({ open, setOpen }) => {
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
-              width : 'auto',
-              height : '1.25rem',
+              width: 'auto',
+              height: '1.25rem',
               padding: '0.1875rem 0.5rem',
               backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color,
               color: '#ffffff',
@@ -602,7 +616,8 @@ const TermInfo = ({ open, setOpen }) => {
                     ":hover": {
                       color: tabActiveColor,
                       cursor: 'pointer',
-                    }}}
+                    }
+                  }}
                   onClick={e => handleLinkClick(href, e)}
                   {...props}
                 >
@@ -610,7 +625,7 @@ const TermInfo = ({ open, setOpen }) => {
                 </span>
               ),
               // eslint-disable-next-line no-unused-vars
-              img: ({node, ...props}) => (
+              img: ({ node, ...props }) => (
                 <img
                   {...props}
                   style={{ maxWidth: 180, maxHeight: 90, width: 'auto', height: 'auto' }}
@@ -1053,505 +1068,128 @@ const TermInfo = ({ open, setOpen }) => {
               >
                 <AccordionSummary
                   expandIcon={<ChevronDown />}
-                  aria-controls="panel1a-content"
-                  id="panel1a-header"
-                >
-                  <Typography>Metadata</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <GeneralInformation data={termInfoData} classes={classes} showMetadataOnly={true} />
-                </AccordionDetails>
-              </Accordion>
-
-              <Accordion
-                expanded={expanded[sections[2]]}
-                onChange={() => handleSection(sections[2])}
-              >
-                <AccordionSummary
-                  expandIcon={<ChevronDown />}
                   aria-controls="panel2a-content"
                   id="panel2a-header"
                 >
-                  <Typography>
-                    Queries ({termInfoData?.metadata?.Queries?.length}){" "}
-                  </Typography>
+                  <Typography>Queries</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                   <SimpleTreeView
                     aria-label="customized"
                     defaultParentIcon={<ArrowRight />}
                   >
-                    {/* Group queries that start with "Neurons with" */}
-                    {termInfoData?.metadata?.Queries?.filter(isNeuronsWithQuery).length > 0 && (
-                      <TreeItem
-                        itemId="terminfo-neurons-with-queries"
-                        sx={{ "&:before": { display: "none" } }}
-                        label={
-                          <CustomBox display="flex" flexWrap="wrap">
-                            <Typography>Types of neurons with</Typography>
-                            <Box display="flex" sx={{ zIndex: 6 }} pl={0.5}>
-                              <Typography sx={{ pr: 0.5 }}>
-                                {termInfoData?.metadata?.Queries?.filter(isNeuronsWithQuery).reduce((n, { count }) => n + (count || 0), 0)}
-                              </Typography>
-                              <ListAltIcon
-                                sx={{ fontSize: "1.25rem", color: "#A0A0A0" }}
-                              />
-                            </Box>
-                          </CustomBox>
-                        }
-                      >
-                        {termInfoData?.metadata?.Queries
-                          ?.filter(q => q.label?.startsWith("Neurons with"))
-                          .sort(sortByCountDescending)
-                          .map((query, index) => {
-                          const headers = getOrderedHeaders(query?.preview_results?.headers);
-                          return (query.output_format === "table" &&
-                          query?.preview_results?.rows?.length > 0 ? (
-                            <TreeItem
-                              sx={{ "paddingLeft": "1.25rem" }}
-                              key={query.label + index}
-                              itemId={`query-${index}`}
-                              label={
-                                <CustomBox display="flex" flexWrap="wrap">
-                                  <Typography>{query.label}</Typography>
-                                  <Box
-                                    display="flex"
-                                    sx={{ zIndex: 6 }}
-                                    pl={0.5}
-                                  >
-                                    <Typography sx={{ pr: 0.5 }}>
-                                      {query?.count}
-                                    </Typography>
-                                    <ListAltIcon
-                                      sx={{
-                                        fontSize: "1.25rem",
-                                        color: "#A0A0A0",
-                                      }}
-                                    />
-                                  </Box>
-                                </CustomBox>
-                              }
-                            >
-                              <TreeItem
-                                itemId={`terminfo-queries-table-${index}`}
-                                label={
-                                  <>
-                                    <TableContainerBoxWrapper>
-                                      <TableContainer component={Paper}>
-                                        <Table>
-                                          <TableHead>
-                                            <TableRow>
-                                              {headers.slice(0, -1).map(h => (
-                                                <TableCell key={h.key}>{h.title}</TableCell>
-                                              ))}
-                                              <TableCell /> {/* Last header is always empty for Add button */}
-                                            </TableRow>
-                                          </TableHead>
-                                          <TableBody>
-                                            {query?.preview_results?.rows.map((row, rowIdx) => {
-                                              const isLoaded = allLoadedInstances?.find(
-                                                (instance) => instance.metadata?.Id === row.id
-                                              );
-                                              return ( <TableRow key={row.id + '-' + rowIdx}>
-                                                {headers.slice(0, -1).map((h) =>
-                                                  (
-                                                    <TableCell key={h.key}>
-                                                      {renderCellContent(h.type, row[h.key])}
-                                                    </TableCell>
-                                                  )
-                                                )}
-                                                <TableCell>
-                                                  {isLoaded ? (
-                                                    <Button
-                                                      variant="text"
-                                                      color="error"
-                                                      onClick={() => deleteId(row.id)}
-                                                    >
-                                                      Delete
-                                                    </Button>
-                                                  ) : (
-                                                    <Button
-                                                      variant="outlined"
-                                                      onClick={() =>
-                                                        addId(row.id)
-                                                      }
-                                                      color="success"
-                                                      sx={{
-                                                        borderRadius:
-                                                          "0.25rem",
-                                                        border:
-                                                          "1px solid #0AB7FE",
-                                                        color: "#0AB7FE",
-                                                        "&:hover": {
-                                                          border:
-                                                            "1px solid #0AB7FE",
-                                                        },
-                                                      }}
-                                                    >
-                                                      Add
-                                                    </Button>
-                                                  )}
-                                                </TableCell>
-                                              </TableRow>
-                                            )})}
-                                          </TableBody>
-                                        </Table>
-                                      </TableContainer>
-                                    </TableContainerBoxWrapper>
-                                  </>
-                                }
-                              />
-                              <TreeItem
-                                itemId={`toggle-${index}`}
-                                label={
-                                  <Button
-                                    onClick={() =>
-                                      setToggleMore(
-                                        (prev) => !prev,
-                                        termInfoData.metadata?.Id,
-                                        query.query
-                                      )
-                                    }
-                                    disableRipple
-                                    sx={{
-                                      padding: 0,
-                                      marginTop: "0.25rem",
-                                      height: "auto",
-                                      color: tabActiveColor,
-                                      "&:hover": { background: "transparent" },
-                                    }}
-                                  >
-                                    {currentOpenQuery === `${termInfoData.metadata?.Id}-${query.query}` && toggleReadMore ? "Show Less" : "See More"}
-                                  </Button>
-                                }
-                              />
-                            </TreeItem>
-                          ) : query?.preview_results?.rows?.length > 0 ? (
-                            <TreeItem
-                              sx={{ "paddingLeft": "1.25rem" }}
-                              key={query.label}
-                              itemId={`query-${index}`}
-                              label={
-                                <CustomBox display="flex" flexWrap="wrap">
-                                  <Typography>{query.label}</Typography>
-                                  <Box
-                                    display="flex"
-                                    sx={{ zIndex: 6 }}
-                                    pl={0.5}
-                                  >
-                                    <Typography sx={{ pr: 0.5 }}>
-                                      {query?.preview_results?.rows?.length}
-                                    </Typography>
-                                    <ListAltIcon
-                                      sx={{
-                                        fontSize: "1.25rem",
-                                        color: "#A0A0A0",
-                                      }}
-                                    />
-                                  </Box>
-                                </CustomBox>
-                              }
-                            >
-                              <TreeItem
-                                itemId={`ribbon-${index}`}
-                                label={
-                                  <Box display="flex" justifyContent="start">
-                                    <Ribbon
-                                      onTermClick={handleTermClick}
-                                      data={getRibbonData(query)}
-                                      itemTitle={ribbonTitle}
-                                      calcHeatColor={customColorCalculation}
-                                      baseRGB={ribbonConfiguration.rgbColor}
-                                      heatLevels={
-                                        ribbonConfiguration.heatLevels
-                                      }
-                                    />
-                                  </Box>
-                                }
-                              />
-                            </TreeItem>
-                          ) : (
-                            <Box
-                              display="flex"
-                              alignItems="center"
-                              key={index}
-                              onClick={() =>
-                                openQuery(data.metadata?.Id, query.query)
-                              }
-                            >
-                              <Typography
-                                sx={{
-                                  paddingLeft: "1.25rem",
-                                  flexGrow: 1,
-                                  color: outlinedBtnTextColor,
-                                  fontSize: {
-                                    xs: "0.875rem",
-                                    lg: "1rem",
-                                  },
-                                  "&:hover": { cursor: "pointer" },
-                                }}
-                              >
-                                {query.label}
-                              </Typography>
-                              <Box
-                                display="flex"
-                                sx={{ zIndex: 6 }}
-                                pl={0.5}
-                              >
+                    {groupedQueries.map((group, groupIndex) => (
+                      group.queries.length > 0 && (
+                        <TreeItem
+                          key={`group-${groupIndex}`}
+                          itemId={`group-${groupIndex}`}
+                          label={
+                            <CustomBox display="flex" flexWrap="wrap">
+                              <Typography>{group.label}</Typography>
+                              <Box display="flex" sx={{ zIndex: 6 }} pl={0.5}>
                                 <Typography sx={{ pr: 0.5 }}>
-                                  {termInfoData?.metadata?.Queries?.reduce(
-                                    (n, { count }) => n + count,
-                                    0
-                                  )}
+                                  {group.queries.length}
                                 </Typography>
                                 <ListAltIcon
                                   sx={{ fontSize: "1.25rem", color: "#A0A0A0" }}
                                 />
                               </Box>
-                            </Box>
-                          ))
-                        })}
-                      </TreeItem>
-                    )}
-
-                    {/* All other queries under "Other queries" section */}
-                    {termInfoData?.metadata?.Queries?.filter(q => !q.label?.startsWith("Neurons with")).length > 0 && (
-                      <TreeItem
-                        itemId="terminfo-other-queries"
-                        sx={{ "&:before": { display: "none" } }}
-                        label={
-                          <CustomBox display="flex" flexWrap="wrap">
-                            <Typography>Other queries</Typography>
-                            <Box display="flex" sx={{ zIndex: 6 }} pl={0.5}>
-                              <Typography sx={{ pr: 0.5 }}>
-                                {termInfoData?.metadata?.Queries?.filter(q => 
-                                  !q.label?.startsWith("Neurons with")
-                                ).reduce((n, { count }) => n + (count || 0), 0)}
-                              </Typography>
-                              <ListAltIcon
-                                sx={{ fontSize: "1.25rem", color: "#A0A0A0" }}
-                              />
-                            </Box>
-                          </CustomBox>
-                        }
-                      >
-                        {termInfoData?.metadata?.Queries
-                          ?.filter(q => !q.label?.startsWith("Neurons with"))
-                          .sort(sortByCountDescending)
-                          .map((query, index) => {
-                      const headers = getOrderedHeaders(query?.preview_results?.headers);
-                      return (query.output_format === "table" &&
-                      query?.preview_results?.rows?.length > 0 ? (
-                        <TreeItem
-                          sx={{ "paddingLeft": "1.25rem" }}
-                          key={query.label + index}
-                          itemId={`query-root-${index}`}
-                          label={
-                            <CustomBox display="flex" flexWrap="wrap">
-                              <Typography>{query.label}</Typography>
-                              <Box
-                                display="flex"
-                                sx={{ zIndex: 6 }}
-                                pl={0.5}
-                              >
-                                <Typography sx={{ pr: 0.5 }}>
-                                  {query?.count}
-                                </Typography>
-                                <ListAltIcon
-                                  sx={{
-                                    fontSize: "1.25rem",
-                                    color: "#A0A0A0",
-                                  }}
-                                />
-                              </Box>
                             </CustomBox>
                           }
                         >
-                          <TreeItem
-                            itemId={`terminfo-queries-table-root-${index}`}
-                            label={
-                              <>
-                                <TableContainerBoxWrapper>
-                                  <TableContainer component={Paper}>
-                                    <Table>
-                                      <TableHead>
-                                        <TableRow>
-                                          {headers.slice(0, -1).map(h => (
-                                            <TableCell key={h.key}>{h.title}</TableCell>
-                                          ))}
-                                          <TableCell /> {/* Last header is always empty for Add button */}
-                                        </TableRow>
-                                      </TableHead>
-                                      <TableBody>
-                                        {query?.preview_results?.rows.map((row, rowIdx) => {
-                                          const isLoaded = allLoadedInstances?.find(
-                                            (instance) => instance.metadata?.Id === row.id
-                                          );
-                                          return ( <TableRow key={row.id + '-' + rowIdx}>
-                                            {headers.slice(0, -1).map((h) =>
-                                              (
-                                                <TableCell key={h.key}>
-                                                  {renderCellContent(h.type, row[h.key])}
-                                                </TableCell>
-                                              )
-                                            )}
-                                            <TableCell>
-                                              {isLoaded ? (
-                                                <Button
-                                                  variant="text"
-                                                  color="error"
-                                                  onClick={() => deleteId(row.id)}
-                                                >
-                                                  Delete
-                                                </Button>
-                                              ) : (
-                                                <Button
-                                                  variant="outlined"
-                                                  onClick={() =>
-                                                    addId(row.id)
-                                                  }
-                                                  color="success"
-                                                  sx={{
-                                                    borderRadius:
-                                                      "0.25rem",
-                                                    border:
-                                                      "1px solid #0AB7FE",
-                                                    color: "#0AB7FE",
-                                                    "&:hover": {
-                                                      border:
-                                                        "1px solid #0AB7FE",
-                                                    },
-                                                  }}
-                                                >
-                                                  Add
-                                                </Button>
-                                              )}
-                                            </TableCell>
-                                          </TableRow>
-                                        )})}
-                                      </TableBody>
-                                    </Table>
-                                  </TableContainer>
-                                </TableContainerBoxWrapper>
-                              </>
-                            }
-                          />
-                          <TreeItem
-                            itemId={`toggle-root-${index}`}
-                            label={
-                              <Button
-                                onClick={() =>
-                                  setToggleMore(
-                                    (prev) => !prev,
-                                    termInfoData.metadata?.Id,
-                                    query.query
-                                  )
-                                }
-                                disableRipple
-                                sx={{
-                                  padding: 0,
-                                  marginTop: "0.25rem",
-                                  height: "auto",
-                                  color: tabActiveColor,
-                                  "&:hover": { background: "transparent" },
-                                }}
-                              >
-                                {currentOpenQuery === `${termInfoData.metadata?.Id}-${query.query}` && toggleReadMore ? "Show Less" : "See More"}
-                              </Button>
-                            }
-                          />
-                        </TreeItem>
-                      ) : query?.preview_results?.rows?.length > 0 ? (
-                        <TreeItem
-                          sx={{ "paddingLeft": "1.25rem" }}
-                          key={query.label}
-                          itemId={`query-root-${index}`}
-                          label={
-                            <CustomBox display="flex" flexWrap="wrap">
-                              <Typography>{query.label}</Typography>
-                              <Box
-                                display="flex"
-                                sx={{ zIndex: 6 }}
-                                pl={0.5}
-                              >
-                                <Typography sx={{ pr: 0.5 }}>
-                                  {query?.count}
-                                </Typography>
-                                <ListAltIcon
-                                  sx={{
-                                    fontSize: "1.25rem",
-                                    color: "#A0A0A0",
-                                  }}
-                                />
-                              </Box>
-                            </CustomBox>
-                          }
-                        >
-                          <TreeItem
-                            itemId={`ribbon-root-${index}`}
-                            label={
-                              <Box display="flex" justifyContent="start">
-                                <Ribbon
-                                  onTermClick={handleTermClick}
-                                  data={getRibbonData(query)}
-                                  itemTitle={ribbonTitle}
-                                  calcHeatColor={customColorCalculation}
-                                  baseRGB={ribbonConfiguration.rgbColor}
-                                  heatLevels={
-                                    ribbonConfiguration.heatLevels
+                          {group.queries.map((query, queryIndex) => (
+                            <TreeItem
+                              key={`query-${groupIndex}-${queryIndex}`}
+                              itemId={`query-${groupIndex}-${queryIndex}`}
+                              sx={{
+                                '& .MuiTreeItem-content': {
+                                  paddingLeft: '1.5rem',
+                                },
+                              }}
+                              label={
+                                <Box
+                                  display="flex"
+                                  alignItems="center"
+                                  onClick={() =>
+                                    openQuery(data.metadata?.Id, query.query)
                                   }
-                                />
-                              </Box>
-                            }
-                          />
+                                >
+                                  <Typography
+                                    sx={{
+                                      flexGrow: 1,
+                                      color: outlinedBtnTextColor,
+                                      fontSize: { xs: "0.875rem", lg: "1rem" },
+                                      "&:hover": {
+                                        cursor: "pointer",
+                                      },
+                                    }}
+                                  >
+                                    - {query.label}
+                                  </Typography>
+                                  <Box display="flex" sx={{ zIndex: 6 }} pl={0.5}>
+                                    <Typography sx={{ pr: 0.5 }}>
+                                      {query.count}
+                                    </Typography>
+                                    <ListAltIcon
+                                      sx={{
+                                        fontSize: "1.25rem",
+                                        color: "#A0A0A0",
+                                      }}
+                                    />
+                                  </Box>
+                                </Box>
+                              }
+                            />
+                          ))}
                         </TreeItem>
-                      ) : (
-                        <Box
-                          display="flex"
-                          alignItems="center"
-                          key={index}
-                          onClick={() =>
-                            openQuery(data.metadata?.Id, query.query)
-                          }
-                        >
-                          <Typography
-                            sx={{
-                              paddingLeft: "1.25rem",
-                              flexGrow: 1,
-                              color: outlinedBtnTextColor,
-                              fontSize: {
-                                xs: "0.875rem",
-                                lg: "1rem",
-                              },
-                              "&:hover": { cursor: "pointer" },
-                            }}
-                          >
-                            {query.label}
-                          </Typography>
+                      )
+                    ))}
+                    {otherQueries.map((query, index) => (
+                      <TreeItem
+                        key={`other-query-${index}`}
+                        itemId={`other-query-${index}`}
+                        label={
                           <Box
                             display="flex"
-                            sx={{ zIndex: 6 }}
-                            pl={0.5}
+                            alignItems="center"
+                            onClick={() =>
+                              openQuery(data.metadata?.Id, query.query)
+                            }
                           >
-                            <Typography sx={{ pr: 0.5 }}>
-                              {query.count || 0}
+                            <Typography
+                              sx={{
+                                flexGrow: 1,
+                                color: outlinedBtnTextColor,
+                                fontSize: { xs: "0.875rem", lg: "1rem" },
+                                "&:hover": {
+                                  cursor: "pointer",
+                                },
+                              }}
+                            >
+                              {query.label}
                             </Typography>
-                            <ListAltIcon
-                              sx={{ fontSize: "1.25rem", color: "#A0A0A0" }}
-                            />
+                            <Box display="flex" sx={{ zIndex: 6 }} pl={0.5}>
+                              <Typography sx={{ pr: 0.5 }}>
+                                {query.count}
+                              </Typography>
+                              <ListAltIcon
+                                sx={{
+                                  fontSize: "1.25rem",
+                                  color: "#A0A0A0",
+                                }}
+                              />
+                            </Box>
                           </Box>
-                        </Box>
-                      ))
-                    })}
-                      </TreeItem>
-                    )}
+                        }
+                      />
+                    ))}
                   </SimpleTreeView>
                 </AccordionDetails>
               </Accordion>
 
               <Accordion
-                expanded={expanded[sections[3]]}
-                onChange={() => handleSection(sections[3])}
+                expanded={expanded[sections[2]]}
+                onChange={() => handleSection(sections[2])}
               >
                 <AccordionSummary
                   expandIcon={<ChevronDown />}

@@ -878,7 +878,6 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
       case 'Symbol':
         return renderName(value, data?.metadata?.Id);
       case 'Tags':
-      case 'Types':
         return renderTags(value);
       case 'Licenses':
         return renderLicensesList(value);

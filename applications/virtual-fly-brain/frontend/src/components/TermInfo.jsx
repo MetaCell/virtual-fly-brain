@@ -240,9 +240,9 @@ const TermInfo = ({ open, setOpen }) => {
   const openMenu = Boolean(anchorEl);
   const [displayColorPicker, setDisplayColorPicker] = useState(false);
   const [expanded, setExpanded] = useState({
-    "General Information": true,
-    "Queries": true,
-    "Graphs": true,
+    "General Information": configuration.sectionsExpanded,
+    "Queries": configuration.sectionsExpanded,
+    "Graphs": configuration.sectionsExpanded,
   });
   const [sections,] = useState([
     "General Information",

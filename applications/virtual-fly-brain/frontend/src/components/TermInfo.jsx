@@ -258,7 +258,7 @@ const TermInfo = ({ open, setOpen }) => {
     (state) => state.queries.queryComponentOpened
   );
   const currentTemplate = useSelector(
-    (state) => state.instances.currentTemplate
+    (state) => state.instances.launchTemplate
   );
   const [termInfoData, setTermInfoData] = useState(data);
   const [queriesData, setQueriesData] = useState(data?.metadata?.Queries);
@@ -568,7 +568,7 @@ const TermInfo = ({ open, setOpen }) => {
   }));
 
   const otherQueries = queriesData?.filter(q =>
-    !queryGroups.some(group => group.keys.some(key => q.label.startsWith(key)))
+    !queryGroups.some(group => group.keys.some(key => q?.label?.startsWith(key)))
   ) || [];
 
   // Comparator function to sort queries, moving zero-count queries to the bottom

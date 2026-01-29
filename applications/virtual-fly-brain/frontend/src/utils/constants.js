@@ -49,7 +49,7 @@ export const getNextColor = (colorIndex = 0, opacity = 0.3) => {
   const g = parseInt(hexColor.substring(4, 6), 16) / 255;
   const b = parseInt(hexColor.substring(6, 8), 16) / 255;
   
-  return { r, g, b, a: 0.3 };
+  return { r, g, b, a: opacity };
 }
 
 // Convert hex to RGBA for existing functions

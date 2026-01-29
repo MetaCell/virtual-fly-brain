@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { CheckBoxDefault, CheckBoxGreen, CheckBoxRed, CleaningServices, FilterIcon, Tick, Undo } from "../../icons";
+import React, { useState } from "react";
+import { CleaningServices, FilterIcon, Tick, Undo } from "../../icons";
 import { Box, Button, Checkbox, FormControlLabel, FormGroup, IconButton, Popper, Typography } from "@mui/material";
 import vars from "../../theme/variables";
 
@@ -91,7 +91,7 @@ const Filter = (props) => {
             alignItems: 'flex-start',
             rowGap: 1.5
           }}>
-            {props.tags?.map((tag, index) => (
+            {props.tags?.map((tag) => (
               <FormControlLabel sx={{
                 height: '20px',
                 borderRadius: '50px',

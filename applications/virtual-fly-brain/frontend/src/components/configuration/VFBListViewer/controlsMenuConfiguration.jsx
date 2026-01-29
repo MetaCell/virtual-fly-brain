@@ -116,7 +116,7 @@ const controlsMenuConf = {
           list : [
               { toggle : {
                 condition : entity => { return entity.visible ? true : false},
-                isVisible : entity => { return true },
+                isVisible :  () => { return true },
                 options : {
                   false : {
                     label: "Show",

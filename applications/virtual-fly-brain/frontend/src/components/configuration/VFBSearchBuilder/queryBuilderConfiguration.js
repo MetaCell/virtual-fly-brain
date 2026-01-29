@@ -59,6 +59,7 @@ export const queryBuilderDatasourceConfig = {
         return Bloodhound.tokenizers.nonword(q.replace('_', ' '));
       },
       sorter: function (a, b) {
+        // eslint-disable-next-line no-undef
         var InputString = $("#query-typeahead").val();
         // move exact matches to top
         if (InputString == a.label) {

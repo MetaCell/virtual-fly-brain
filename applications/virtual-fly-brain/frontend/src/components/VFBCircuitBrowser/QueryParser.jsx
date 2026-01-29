@@ -5,7 +5,6 @@ export function queryParser (e) {
   // The nodes and links arrays used for the graph
   let nodes = [], links = [];
   let graphData = e.data.params.results;
-  let weight = e.data.params.weight;
   // Reads graph data
   let data = graphData?.results[0]?.data;
   
@@ -45,7 +44,7 @@ export function queryParser (e) {
   })
   
   // Creates map from Relationships for easy access. 
-  data.forEach(({ graph, row }) => {
+  data.forEach(({ graph }) => {
     graph.relationships.forEach(({ startNode, endNode, properties, id }) => {
       // Keep track of the level where the node will be placed
       linksMaxHops[id] ? nodesInLevel[endNode] ? nodesInLevel[endNode] = linksMaxHops[id] : nodesInLevel[endNode] = linksMaxHops[id] : null;
@@ -63,7 +62,6 @@ export function queryParser (e) {
     graph.nodes.forEach(({ id, properties }) => {
       let label = properties[e.data.params.configuration.resultsMapping.node.label];
       let title = properties[e.data.params.configuration.resultsMapping.node.title];
-      let color = e.data.params.styling.defaultNodeDescriptionBackgroundColor;
       let nodeColorLabels = [];
       const labels = properties.uniqueFacets.sort();
       
@@ -141,7 +139,6 @@ export function queryParser (e) {
     if ( typeof id === "number" ) {
       id = sourceNode.id.toString();
     }
-    let n = linksMap.get(id);
     
     // Set the X position of each node, this will place them on their corresponding column depending on hops
     let positionX = 0;
@@ -171,8 +168,6 @@ export function queryParser (e) {
   // Creates links map from Relationships, avoid duplicates
   data.forEach(({ graph, row }) => {
     graph.relationships.forEach(({ startNode, endNode, properties, id }) => {
-      let matchingStartNode = nodes.find(node => node.id === parseInt(startNode));
-      let matchingEndNode = nodes.find(node => node.id === parseInt(endNode));
       
       if ( row[3].includes(parseInt(id)) ) {
         if (linksMap.get(startNode) === undefined) {
@@ -217,7 +212,6 @@ export function queryParser (e) {
           let reverse = reverseMap.get(targetNode.id.toString())?.find( node => node.target === sourceNode.id.toString());
           if ( !match ) {
             // Create tooltip label for link and weight
-            const labelWeight = n[i].weight >= weight ? n[i].weight : 0; 
             const tooltip = "Label  : " + n[i].label + '<br/>'
               + "Weight : " + (reverse ? n[i].weight + " [" + reverse.weight + "]" : n[i].weight + "[0]");
             const weightLabel = reverse ? n[i].weight + " [" + reverse.weight + "]" : n[i].weight + "[0]";

@@ -107,12 +107,12 @@ class VFBGraph extends Component {
     }
   }
 
-  componentDidUpdate (prevProps, prevState) {
+  componentDidUpdate () {
     const graphInstance = this.props.graphInstanceOnFocus ;
     const stateInstance = this.props.stateInstanceOnFocus
     const graphInstanceSelection = this.props.graphInstanceSelection
 
-    // Find FlexLayout div for VFBGraph. 
+    // Find FlexLayout div for VFBGraph.
     let componentFocused = document.getElementById("VFBGraph")
     while( componentFocused?.className != "flexlayout__tab" && componentFocused != undefined) {
       componentFocused = componentFocused?.parentNode;
@@ -136,7 +136,7 @@ class VFBGraph extends Component {
       if (!this.resizeObserver && this.containerRef.current)
       {
         let self = this;
-        this.resizeObserver = new ResizeObserver(entries => {
+        this.resizeObserver = new ResizeObserver(() => {
           self.graphRef?.current?.ggv?.current.zoomToFit();
         });
         if (this.containerRef.current) {
@@ -203,7 +203,7 @@ class VFBGraph extends Component {
     this.graphRef.current.ggv.current.zoom(zoom - out , 100);
   }
 
-  handleNodeLeftClick(node, event) {
+  handleNodeLeftClick(node) {
     const currentTime = Date.now();
     const doubleClickThreshold = 300; // Time in milliseconds to consider it a double-click
     const isDoubleClick = this.state.lastClick.nodeId === node.id &&
@@ -224,7 +224,7 @@ class VFBGraph extends Component {
   /**
    * Handle Right click on Nodes
    */
-  handleNodeRightClick (node, event) {
+  handleNodeRightClick (node) {
     this.graphRef.current.ggv.current.centerAt(node.x , node.y, 1000);
     this.graphRef.current.ggv.current.zoom(2, 1000);
   }
@@ -392,7 +392,7 @@ class VFBGraph extends Component {
       // Invoke web worker to perform conversion of graph data into format
       worker.postMessage({ message: "refine", params: params });
     })
-      .catch( (error)=> {
+      .catch( ()=> {
         self.loading = false;
       })
   }
@@ -436,8 +436,6 @@ class VFBGraph extends Component {
 
   render () {
     let self = this;
-    const { graphQueryIndex } = this.props;
-
     this.focused = true;
     // Color to use for synchronization button
     let syncColor = this.state.optionsIconColor;
@@ -519,7 +517,7 @@ class VFBGraph extends Component {
 
                 return color;
               }}
-              nodeCanvasObject={(node, ctx, globalScale) => {
+              nodeCanvasObject={(node, ctx) => {
                 let cardWidth = NODE_WIDTH;
                 let cardHeight = NODE_HEIGHT;
                 let borderThickness = self.highlightNodes.has(node) ? NODE_BORDER_THICKNESS : 1;
@@ -551,7 +549,7 @@ class VFBGraph extends Component {
                 this.wrapText(ctx, node.path, node.x, node.y, cardWidth - (borderThickness * 2) , 5);
               }}
               // Overwrite Node Canvas Object
-              nodeCanvasObjectMode={node => 'replace'}
+              nodeCanvasObjectMode={ () => 'replace'}
               // bu = Bottom Up, creates Graph with root at bottom
               dagMode="bu"
               dagLevelDistance = {100}
@@ -666,7 +664,6 @@ function mapStateToProps (state) {
   const graphInstanceOnFocus = state.graph.instanceOnFocus;
   const graphInstanceSelection = state.graph.selection;
   const stateInstanceOnFocus = state.instances.focusedInstance;
-  const firstIDLoaded = state.globalInfo.firstIDLoaded;
   const newProps = {
     graphQueryIndex : graphInstanceOnFocus && stateInstanceOnFocus ? 0 : -1,
     sync : state.graph.sync,

@@ -1,12 +1,11 @@
-/* eslint-disable no-undef */
-import React, { useState } from 'react';
+import React from 'react';
 import Wrapper from '../shared/wrapper';
 import MainLayout from './Layout';
 import '../css/base.less';
 import '../css/VFBMain.less';
 
 const Main = () => {
-  const [bottomNav, setBottomNav] = useState();
+  const [bottomNav, setBottomNav] = React.useState();
 
   return (
     <Wrapper bottomNav={bottomNav} setBottomNav={setBottomNav}>

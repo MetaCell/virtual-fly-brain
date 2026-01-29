@@ -217,10 +217,8 @@ export const searchConfiguration = {
       lcInputStingFac = InputString.toLowerCase().split(/\W+/);
       compare = (a1, a2) => a1.filter(v => a2.includes(v)).length;
       var aLabel = a.label.split(' (');
-      var aEnd = aLabel.pop(aLabel.length);
       aLabel = aLabel.join(' (');
       var bLabel = b.label.split(' (');
-      var bEnd = bLabel.pop(bLabel.length);
       bLabel = bLabel.join(' (');
       cA = compare(lcInputStingFac, aLabel.toLowerCase().split(/\W+/));
       cB = compare(lcInputStingFac, bLabel.toLowerCase().split(/\W+/));

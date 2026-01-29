@@ -46,7 +46,6 @@ import {
   EyeOff,
   ArViewOff,
 } from "../icons";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import vars from "../theme/variables";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
@@ -241,8 +240,8 @@ const TermInfo = ({ open, setOpen }) => {
   const [displayColorPicker, setDisplayColorPicker] = useState(false);
   const [expanded, setExpanded] = useState({
     "General Information": configuration.sectionsExpanded,
-    "Queries": configuration.sectionsExpanded,
-    "Graphs": configuration.sectionsExpanded,
+    Queries: configuration.sectionsExpanded,
+    Graphs: configuration.sectionsExpanded,
   });
   const [sections,] = useState([
     "General Information",
@@ -257,11 +256,12 @@ const TermInfo = ({ open, setOpen }) => {
   const queryComponentOpened = useSelector(
     (state) => state.queries.queryComponentOpened
   );
+  const [queriesData, setQueriesData] = useState(data?.metadata?.Queries || []);
   const currentTemplate = useSelector(
     (state) => state.instances.launchTemplate
   );
+
   const [termInfoData, setTermInfoData] = useState(data);
-  const [queriesData, setQueriesData] = useState(data?.metadata?.Queries);
   const [toggleReadMore, setToggleReadMore] = useState(false);
   const [currentOpenQuery, setCurrentOpenQuery] = useState(null);
   const [confirmationModal, setConfirmationModal] = useState({
@@ -483,7 +483,7 @@ const TermInfo = ({ open, setOpen }) => {
       )
     ) {
       setTermInfoData(data);
-      setQueriesData(data?.metadata?.Queries);
+      setQueriesData(data?.metadata?.Queries || []);
     }
   }, [data]);
 
@@ -595,8 +595,8 @@ const TermInfo = ({ open, setOpen }) => {
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
-              width: 'auto',
-              height: '1.25rem',
+              width : 'auto',
+              height : '1.25rem',
               padding: '0.1875rem 0.5rem',
               backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color,
               color: '#ffffff',
@@ -616,8 +616,7 @@ const TermInfo = ({ open, setOpen }) => {
                     ":hover": {
                       color: tabActiveColor,
                       cursor: 'pointer',
-                    }
-                  }}
+                    }}}
                   onClick={e => handleLinkClick(href, e)}
                   {...props}
                 >
@@ -625,7 +624,7 @@ const TermInfo = ({ open, setOpen }) => {
                 </span>
               ),
               // eslint-disable-next-line no-unused-vars
-              img: ({ node, ...props }) => (
+              img: ({node, ...props}) => (
                 <img
                   {...props}
                   style={{ maxWidth: 180, maxHeight: 90, width: 'auto', height: 'auto' }}
@@ -1068,24 +1067,45 @@ const TermInfo = ({ open, setOpen }) => {
               >
                 <AccordionSummary
                   expandIcon={<ChevronDown />}
+                  aria-controls="panel1a-content"
+                  id="panel1a-header"
+                >
+                  <Typography>Metadata</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <GeneralInformation data={termInfoData} classes={classes} showMetadataOnly={true} />
+                </AccordionDetails>
+              </Accordion>
+
+              <Accordion
+                expanded={expanded[sections[2]]}
+                onChange={() => handleSection(sections[2])}
+              >
+                <AccordionSummary
+                  expandIcon={<ChevronDown />}
                   aria-controls="panel2a-content"
                   id="panel2a-header"
                 >
-                  <Typography>Queries</Typography>
+                  <Typography>
+                    Queries ({termInfoData?.metadata?.Queries?.length}){" "}
+                  </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                   <SimpleTreeView
                     aria-label="customized"
-                    defaultParentIcon={<ArrowRight />}
+                    defaultExpandIcon={<ArrowDown />}
+                    defaultCollapseIcon={<ArrowRight />}
                   >
+                    {/* Group queries that start with "Neurons with" */}
                     {groupedQueries.map((group, groupIndex) => (
                       group.queries.length > 0 && (
                         <TreeItem
-                          key={`group-${groupIndex}`}
-                          itemId={`group-${groupIndex}`}
+                          key={`group-${group.label}-${groupIndex}`}
+                          itemId={`group-${group.label}-${groupIndex}`}
+                          sx={{ "&:before": { display: "none" } }}
                           label={
                             <CustomBox display="flex" flexWrap="wrap">
-                              <Typography>{group.label}</Typography>
+                              <Typography>{group?.label}</Typography>
                               <Box display="flex" sx={{ zIndex: 6 }} pl={0.5}>
                                 <Typography sx={{ pr: 0.5 }}>
                                   {group.queries.length}
@@ -1097,99 +1117,452 @@ const TermInfo = ({ open, setOpen }) => {
                             </CustomBox>
                           }
                         >
-                          {group.queries.map((query, queryIndex) => (
-                            <TreeItem
-                              key={`query-${groupIndex}-${queryIndex}`}
-                              itemId={`query-${groupIndex}-${queryIndex}`}
-                              sx={{
-                                '& .MuiTreeItem-content': {
-                                  paddingLeft: '1.5rem',
-                                },
-                              }}
-                              label={
+                          {group.queries.map((query, index) => {
+                              const headers = getOrderedHeaders(query?.preview_results?.headers);
+                              return (query.output_format === "table" &&
+                                query?.preview_results?.rows?.length > 0 ? (
+                                <TreeItem
+                                  sx={{ "paddingLeft": "1.25rem" }}
+                                  key={`table-query-${groupIndex}-${index}`}
+                                  itemId={`table-query-${groupIndex}-${index}`}
+                                  label={
+                                    <CustomBox display="flex" flexWrap="wrap">
+                                      <Typography>{query.label}</Typography>
+                                      <Box
+                                        display="flex"
+                                        sx={{ zIndex: 6 }}
+                                        pl={0.5}
+                                      >
+                                        <Typography sx={{ pr: 0.5 }}>
+                                          {query?.count}
+                                        </Typography>
+                                        <ListAltIcon
+                                          sx={{
+                                            fontSize: "1.25rem",
+                                            color: "#A0A0A0",
+                                          }}
+                                        />
+                                      </Box>
+                                    </CustomBox>
+                                  }
+                                >
+                                  <TreeItem
+                                    itemId={`terminfo-queries-table-${groupIndex}-${index}`}
+                                    label={
+                                      <>
+                                        <TableContainerBoxWrapper>
+                                          <TableContainer component={Paper}>
+                                            <Table>
+                                              <TableHead>
+                                                <TableRow>
+                                                  {headers.slice(0, -1).map(h => (
+                                                    <TableCell key={h.key}>{h.title}</TableCell>
+                                                  ))}
+                                                  <TableCell /> {/* Last header is always empty for Add button */}
+                                                </TableRow>
+                                              </TableHead>
+                                              <TableBody>
+                                                {query?.preview_results?.rows.map((row, rowIdx) => {
+                                                  const isLoaded = allLoadedInstances?.find(
+                                                    (instance) => instance.metadata?.Id === row.id
+                                                  );
+                                              return ( <TableRow key={row.id + '-' + rowIdx}>
+                                                    {headers.slice(0, -1).map((h) =>
+                                                    (
+                                                      <TableCell key={h.key}>
+                                                        {renderCellContent(h.type, row[h.key])}
+                                                      </TableCell>
+                                                    )
+                                                    )}
+                                                    <TableCell>
+                                                      {isLoaded ? (
+                                                        <Button
+                                                          variant="text"
+                                                          color="error"
+                                                          onClick={() => deleteId(row.id)}
+                                                        >
+                                                          Delete
+                                                        </Button>
+                                                      ) : (
+                                                        <Button
+                                                          variant="outlined"
+                                                          onClick={() =>
+                                                            addId(row.id)
+                                                          }
+                                                          color="success"
+                                                          sx={{
+                                                            borderRadius:
+                                                              "0.25rem",
+                                                            border:
+                                                              "1px solid #0AB7FE",
+                                                            color: "#0AB7FE",
+                                                            "&:hover": {
+                                                              border:
+                                                                "1px solid #0AB7FE",
+                                                            },
+                                                          }}
+                                                        >
+                                                          Add
+                                                        </Button>
+                                                      )}
+                                                    </TableCell>
+                                                  </TableRow>
+                                            )})}
+                                              </TableBody>
+                                            </Table>
+                                          </TableContainer>
+                                        </TableContainerBoxWrapper>
+                                      </>
+                                    }
+                                  />
+                                  <TreeItem
+                                    itemId={`toggle-${groupIndex}-${index}`}
+                                    label={
+                                      <Button
+                                        onClick={() =>
+                                          setToggleMore(
+                                            (prev) => !prev,
+                                            termInfoData.metadata?.Id,
+                                            query.query
+                                          )
+                                        }
+                                        disableRipple
+                                        sx={{
+                                          padding: 0,
+                                          marginTop: "0.25rem",
+                                          height: "auto",
+                                          color: tabActiveColor,
+                                          "&:hover": { background: "transparent" },
+                                        }}
+                                      >
+                                        {currentOpenQuery === `${termInfoData.metadata?.Id}-${query.query}` && toggleReadMore ? "Show Less" : "See More"}
+                                      </Button>
+                                    }
+                                  />
+                                </TreeItem>
+                              ) : query?.preview_results?.rows?.length > 0 ? (
+                                <TreeItem
+                                  sx={{ "paddingLeft": "1.25rem" }}
+                                  key={query.label}
+                                  itemId={`query-${index}`}
+                                  label={
+                                    <CustomBox display="flex" flexWrap="wrap">
+                                      <Typography>{query.label}</Typography>
+                                      <Box
+                                        display="flex"
+                                        sx={{ zIndex: 6 }}
+                                        pl={0.5}
+                                      >
+                                        <Typography sx={{ pr: 0.5 }}>
+                                          {query?.preview_results?.rows?.length}
+                                        </Typography>
+                                        <ListAltIcon
+                                          sx={{
+                                            fontSize: "1.25rem",
+                                            color: "#A0A0A0",
+                                          }}
+                                        />
+                                      </Box>
+                                    </CustomBox>
+                                  }
+                                >
+                                  <TreeItem
+                                    itemId={`ribbon-${index}`}
+                                    label={
+                                      <Box display="flex" justifyContent="start">
+                                        <Ribbon
+                                          onTermClick={handleTermClick}
+                                          data={getRibbonData(query)}
+                                          itemTitle={ribbonTitle}
+                                          calcHeatColor={customColorCalculation}
+                                          baseRGB={ribbonConfiguration.rgbColor}
+                                          heatLevels={
+                                            ribbonConfiguration.heatLevels
+                                          }
+                                        />
+                                      </Box>
+                                    }
+                                  />
+                                </TreeItem>
+                              ) : (
                                 <Box
                                   display="flex"
                                   alignItems="center"
+                                  key={index}
                                   onClick={() =>
                                     openQuery(data.metadata?.Id, query.query)
                                   }
                                 >
                                   <Typography
                                     sx={{
+                                      paddingLeft: "1.25rem",
                                       flexGrow: 1,
                                       color: outlinedBtnTextColor,
-                                      fontSize: { xs: "0.875rem", lg: "1rem" },
-                                      "&:hover": {
-                                        cursor: "pointer",
+                                      fontSize: {
+                                        xs: "0.875rem",
+                                        lg: "1rem",
                                       },
+                                      "&:hover": { cursor: "pointer" },
                                     }}
                                   >
-                                    - {query.label}
+                                    {query.label}
                                   </Typography>
-                                  <Box display="flex" sx={{ zIndex: 6 }} pl={0.5}>
+                                  <Box
+                                    display="flex"
+                                    sx={{ zIndex: 6 }}
+                                    pl={0.5}
+                                  >
                                     <Typography sx={{ pr: 0.5 }}>
-                                      {query.count}
+                                      {termInfoData?.metadata?.Queries?.reduce(
+                                        (n, { count }) => n + count,
+                                        0
+                                      )}
                                     </Typography>
                                     <ListAltIcon
-                                      sx={{
-                                        fontSize: "1.25rem",
-                                        color: "#A0A0A0",
-                                      }}
+                                      sx={{ fontSize: "1.25rem", color: "#A0A0A0" }}
                                     />
                                   </Box>
                                 </Box>
-                              }
-                            />
-                          ))}
+                              ))
+                            })}
                         </TreeItem>
-                      )
-                    ))}
-                    {otherQueries.map((query, index) => (
+                    )))}
+
+                    {/* All other queries under "Other queries" section */}
+                    {otherQueries.length > 0 && (
                       <TreeItem
-                        key={`other-query-${index}`}
-                        itemId={`other-query-${index}`}
+                        itemId="terminfo-other-queries"
+                        sx={{ "&:before": { display: "none" } }}
                         label={
-                          <Box
-                            display="flex"
-                            alignItems="center"
-                            onClick={() =>
-                              openQuery(data.metadata?.Id, query.query)
-                            }
-                          >
-                            <Typography
-                              sx={{
-                                flexGrow: 1,
-                                color: outlinedBtnTextColor,
-                                fontSize: { xs: "0.875rem", lg: "1rem" },
-                                "&:hover": {
-                                  cursor: "pointer",
-                                },
-                              }}
-                            >
-                              {query.label}
-                            </Typography>
+                          <CustomBox display="flex" flexWrap="wrap">
+                            <Typography>Other queries</Typography>
                             <Box display="flex" sx={{ zIndex: 6 }} pl={0.5}>
                               <Typography sx={{ pr: 0.5 }}>
-                                {query.count}
+                                {otherQueries.reduce((n, { count }) => n + (count || 0), 0)}
                               </Typography>
                               <ListAltIcon
-                                sx={{
-                                  fontSize: "1.25rem",
-                                  color: "#A0A0A0",
-                                }}
+                                sx={{ fontSize: "1.25rem", color: "#A0A0A0" }}
                               />
                             </Box>
-                          </Box>
+                          </CustomBox>
                         }
-                      />
-                    ))}
+                      >
+                        {otherQueries
+                          .sort(sortByCountDescending)
+                          .map((query, index) => {
+                            const headers = getOrderedHeaders(query?.preview_results?.headers);
+                            return (query.output_format === "table" &&
+                              query?.preview_results?.rows?.length > 0 ? (
+                              <TreeItem
+                                sx={{ "paddingLeft": "1.25rem" }}
+                                key={query.label + index}
+                                itemId={`query-root-${index}`}
+                                label={
+                                  <CustomBox display="flex" flexWrap="wrap">
+                                    <Typography>{query.label}</Typography>
+                                    <Box
+                                      display="flex"
+                                      sx={{ zIndex: 6 }}
+                                      pl={0.5}
+                                    >
+                                      <Typography sx={{ pr: 0.5 }}>
+                                        {query?.count}
+                                      </Typography>
+                                      <ListAltIcon
+                                        sx={{
+                                          fontSize: "1.25rem",
+                                          color: "#A0A0A0",
+                                        }}
+                                      />
+                                    </Box>
+                                  </CustomBox>
+                                }
+                              >
+                                <TreeItem
+                                  itemId={`terminfo-queries-table-root-${index}`}
+                                  label={
+                                    <>
+                                      <TableContainerBoxWrapper>
+                                        <TableContainer component={Paper}>
+                                          <Table>
+                                            <TableHead>
+                                              <TableRow>
+                                                {headers.slice(0, -1).map(h => (
+                                                  <TableCell key={h.key}>{h.title}</TableCell>
+                                                ))}
+                                                <TableCell /> {/* Last header is always empty for Add button */}
+                                              </TableRow>
+                                            </TableHead>
+                                            <TableBody>
+                                              {query?.preview_results?.rows.map((row, rowIdx) => {
+                                                const isLoaded = allLoadedInstances?.find(
+                                                  (instance) => instance.metadata?.Id === row.id
+                                                );
+                                          return ( <TableRow key={row.id + '-' + rowIdx}>
+                                                  {headers.slice(0, -1).map((h) =>
+                                                  (
+                                                    <TableCell key={h.key}>
+                                                      {renderCellContent(h.type, row[h.key])}
+                                                    </TableCell>
+                                                  )
+                                                  )}
+                                                  <TableCell>
+                                                    {isLoaded ? (
+                                                      <Button
+                                                        variant="text"
+                                                        color="error"
+                                                        onClick={() => deleteId(row.id)}
+                                                      >
+                                                        Delete
+                                                      </Button>
+                                                    ) : (
+                                                      <Button
+                                                        variant="outlined"
+                                                        onClick={() =>
+                                                          addId(row.id)
+                                                        }
+                                                        color="success"
+                                                        sx={{
+                                                          borderRadius:
+                                                            "0.25rem",
+                                                          border:
+                                                            "1px solid #0AB7FE",
+                                                          color: "#0AB7FE",
+                                                          "&:hover": {
+                                                            border:
+                                                              "1px solid #0AB7FE",
+                                                          },
+                                                        }}
+                                                      >
+                                                        Add
+                                                      </Button>
+                                                    )}
+                                                  </TableCell>
+                                                </TableRow>
+                                        )})}
+                                            </TableBody>
+                                          </Table>
+                                        </TableContainer>
+                                      </TableContainerBoxWrapper>
+                                    </>
+                                  }
+                                />
+                                <TreeItem
+                                  itemId={`toggle-root-${index}`}
+                                  label={
+                                    <Button
+                                      onClick={() =>
+                                        setToggleMore(
+                                          (prev) => !prev,
+                                          termInfoData.metadata?.Id,
+                                          query.query
+                                        )
+                                      }
+                                      disableRipple
+                                      sx={{
+                                        padding: 0,
+                                        marginTop: "0.25rem",
+                                        height: "auto",
+                                        color: tabActiveColor,
+                                        "&:hover": { background: "transparent" },
+                                      }}
+                                    >
+                                      {currentOpenQuery === `${termInfoData.metadata?.Id}-${query.query}` && toggleReadMore ? "Show Less" : "See More"}
+                                    </Button>
+                                  }
+                                />
+                              </TreeItem>
+                            ) : query?.preview_results?.rows?.length > 0 ? (
+                              <TreeItem
+                                sx={{ "paddingLeft": "1.25rem" }}
+                                key={query.label}
+                                itemId={`query-root-${index}`}
+                                label={
+                                  <CustomBox display="flex" flexWrap="wrap">
+                                    <Typography>{query.label}</Typography>
+                                    <Box
+                                      display="flex"
+                                      sx={{ zIndex: 6 }}
+                                      pl={0.5}
+                                    >
+                                      <Typography sx={{ pr: 0.5 }}>
+                                        {query?.count}
+                                      </Typography>
+                                      <ListAltIcon
+                                        sx={{
+                                          fontSize: "1.25rem",
+                                          color: "#A0A0A0",
+                                        }}
+                                      />
+                                    </Box>
+                                  </CustomBox>
+                                }
+                              >
+                                <TreeItem
+                                  itemId={`ribbon-root-${index}`}
+                                  label={
+                                    <Box display="flex" justifyContent="start">
+                                      <Ribbon
+                                        onTermClick={handleTermClick}
+                                        data={getRibbonData(query)}
+                                        itemTitle={ribbonTitle}
+                                        calcHeatColor={customColorCalculation}
+                                        baseRGB={ribbonConfiguration.rgbColor}
+                                        heatLevels={
+                                          ribbonConfiguration.heatLevels
+                                        }
+                                      />
+                                    </Box>
+                                  }
+                                />
+                              </TreeItem>
+                            ) : (
+                              <Box
+                                display="flex"
+                                alignItems="center"
+                                key={index}
+                                onClick={() =>
+                                  openQuery(data.metadata?.Id, query.query)
+                                }
+                              >
+                                <Typography
+                                  sx={{
+                                    paddingLeft: "1.25rem",
+                                    flexGrow: 1,
+                                    color: outlinedBtnTextColor,
+                                    fontSize: {
+                                      xs: "0.875rem",
+                                      lg: "1rem",
+                                    },
+                                    "&:hover": { cursor: "pointer" },
+                                  }}
+                                >
+                                  {query.label}
+                                </Typography>
+                                <Box
+                                  display="flex"
+                                  sx={{ zIndex: 6 }}
+                                  pl={0.5}
+                                >
+                                  <Typography sx={{ pr: 0.5 }}>
+                                    {query.count || 0}
+                                  </Typography>
+                                  <ListAltIcon
+                                    sx={{ fontSize: "1.25rem", color: "#A0A0A0" }}
+                                  />
+                                </Box>
+                              </Box>
+                            ))
+                          })}
+                      </TreeItem>
+                    )}
                   </SimpleTreeView>
                 </AccordionDetails>
               </Accordion>
 
               <Accordion
-                expanded={expanded[sections[2]]}
-                onChange={() => handleSection(sections[2])}
+                expanded={expanded[sections[3]]}
+                onChange={() => handleSection(sections[3])}
               >
                 <AccordionSummary
                   expandIcon={<ChevronDown />}

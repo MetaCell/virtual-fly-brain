@@ -566,12 +566,23 @@ const TermInfo = ({ open, setOpen }) => {
     }
   };
 
-  // Helper to check if query is a "Neurons with" query with results
-  const isNeuronsWithQuery = (q) => {
-    return q.label?.startsWith("Neurons with") && 
-           q.output_format === "table" && 
-           q?.preview_results?.rows?.length > 0;
-  };
+  const queryGroups = [
+    { label: "Types of neurons with...", keys: ["Find neurons", "Find all", "Neurons with"] },
+    { label: "Individual neurons with ", keys: ["Images of neurons with"] },
+    { label: "Tract/Nerves innervating here ", keys: ["Tracts/nerves innervating"] },
+    { label: "Lineage clones with ", keys: ["Lineage clones found"] },
+    { label: "Expression/Phenotypes found here", keys: ["Transgene expression in", "Expression patterns"] }
+  ];
+
+  // Group queries based on the configuration
+  const groupedQueries = queryGroups.map(group => ({
+    ...group,
+    queries: queriesData?.filter(q => group.keys.some(key => q.label.startsWith(key))) || []
+  }));
+
+  const otherQueries = queriesData?.filter(q =>
+    !queryGroups.some(group => group.keys.some(key => q?.label?.startsWith(key)))
+  ) || [];
 
   // Comparator function to sort queries, moving zero-count queries to the bottom
   const sortByCountDescending = (a, b) => {

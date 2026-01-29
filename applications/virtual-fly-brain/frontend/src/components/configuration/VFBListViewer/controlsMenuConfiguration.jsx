@@ -77,7 +77,7 @@ const controlsMenuConf = {
   buttons: [
     {
       label: "",
-      icon: <i className="fa fa-eye" style={{'marginRight': '5px'}}/>,
+      icon: <i className="fa fa-sliders" style={{'marginRight': '5px'}}/>,
       activeColor : "red",
       action: "",
       position: "bottom-start",
@@ -116,7 +116,7 @@ const controlsMenuConf = {
           list : [
               { toggle : {
                 condition : entity => { return entity.visible ? true : false},
-                isVisible : entity => { return true },
+                isVisible :  () => { return true },
                 options : {
                   false : {
                     label: "Show",

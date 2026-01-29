@@ -20,7 +20,7 @@ import { getLayoutManagerInstance } from "@metacell/geppetto-meta-client/common/
 
 const { primaryBg, headerBoxShadow } = vars;
 
-const Header = ({setBottomNav}) => {
+const Header = ({ setBottomNav }) => {
   const classes = {
     root: {
       background: primaryBg,
@@ -38,6 +38,7 @@ const Header = ({setBottomNav}) => {
   const recentSearches = useSelector(state => state.globalInfo.recentSearches)
   const queries = useSelector(state => state.queries.queries)
   const allLoadedInstances = useSelector(state => state.instances.allLoadedInstances)
+  const focusedInstance = useSelector(state => state.instances.focusedInstance)
   const widgets = useSelector(state => state.widgets);
   const firstIdLoaded = useSelector(state => state.globalInfo.firstIDLoaded);
   let autoSaveLayout = useSelector(state => state.globalInfo.autoSaveLayout);
@@ -55,8 +56,20 @@ const Header = ({setBottomNav}) => {
   }
 
   const handleQueryStatsClick = () => {
-    // TODO: what to do here?
-    console.log('QueryStats Clicked!')
+    // Open queries for the focused instance
+    if (focusedInstance?.metadata?.Id) {
+      // Ensure queries are loaded if not already
+      const queriesForInstance = queries?.find(
+        q => q.short_form === focusedInstance.metadata.Id
+      );
+
+      if (!queriesForInstance) {
+        getQueries(focusedInstance.metadata.Id);
+      }
+
+      // Open the query component panel
+      setBottomNav(2);
+    }
   }
 
   const handleMenuClick = () => {
@@ -67,7 +80,7 @@ const Header = ({setBottomNav}) => {
    * Handler function triggered when a Menu item is clicked.
    */
   const menuHandler = (action, _component) => {
-    switch (action.handlerAction){
+    switch (action.handlerAction) {
       case ACTIONS.SHOW_WIDGET: {
         const newWidget = { ...widgets[action.parameters[0]] }
         const layoutManager = getLayoutManagerInstance();
@@ -100,7 +113,7 @@ const Header = ({setBottomNav}) => {
       case ACTIONS.SHOW_COMPONENT:
         setBottomNav(action.parameters[0])
         break;
-      case ACTIONS.SHOW_TERM_INFO:{
+      case ACTIONS.SHOW_TERM_INFO: {
         dispatch(setTermInfoOpened(true))
         break;
       }
@@ -109,9 +122,9 @@ const Header = ({setBottomNav}) => {
           window.open(item, '_blank');
         })
         break;
-      case ACTIONS.SELECT_INSTANCE:{
-        let matchInstance = allLoadedInstances?.find( q => q.metadata?.Id === action.parameters[0] );
-        if (matchInstance ) {
+      case ACTIONS.SELECT_INSTANCE: {
+        let matchInstance = allLoadedInstances?.find(q => q.metadata?.Id === action.parameters[0]);
+        if (matchInstance) {
           focusInstance(action.parameters[0])
           selectInstance(action.parameters[0])
         } else {
@@ -119,28 +132,28 @@ const Header = ({setBottomNav}) => {
         }
         break;
       }
-      case ACTIONS.RUN_QUERY:{
+      case ACTIONS.RUN_QUERY: {
         let updatedQueries = [...queries];
-        let matchQuery = updatedQueries?.find( q => q.short_form === action.parameters[0] );
-        updatedQueries?.forEach( query => {
-          if( query.queries ){
-            Object.keys(query.queries)?.forEach( q => query.queries[q].active = false );
+        let matchQuery = updatedQueries?.find(q => q.short_form === action.parameters[0]);
+        updatedQueries?.forEach(query => {
+          if (query.queries) {
+            Object.keys(query.queries)?.forEach(q => query.queries[q].active = false);
           }
         });
-        if ( matchQuery?.queries?.[action?.parameters[1]] ) {
+        if (matchQuery?.queries?.[action?.parameters[1]]) {
           matchQuery.queries[action.parameters[1]].active = true;
           updateQueries(updatedQueries);
           setBottomNav(2)
         } else {
-          getQueries(action.parameters[0],action.parameters[1])
+          getQueries(action.parameters[0], action.parameters[1])
           setBottomNav(2)
         }
         break;
       }
-      case ACTIONS.HISTORY_MENU_INJECTOR:{
+      case ACTIONS.HISTORY_MENU_INJECTOR: {
         var historyList = [];
         // Add instances to history menu
-        recentSearches?.reverse()?.forEach( i => {
+        recentSearches?.reverse()?.forEach(i => {
           historyList.push(
             {
               label: i?.label,
@@ -154,12 +167,12 @@ const Header = ({setBottomNav}) => {
         })
         return historyList;
       }
-      case ACTIONS.LOAD_LAYOUT:{
+      case ACTIONS.LOAD_LAYOUT: {
         if (!firstIdLoaded) {
           dispatch(triggerInstanceFailure('No instance loaded, wait please ...'));
           break;
         }
-        switch (action.parameters[0]){
+        switch (action.parameters[0]) {
           case 'layout1':
             dispatch(loadCustomLayout(layout1));
             break;
@@ -263,7 +276,7 @@ const Header = ({setBottomNav}) => {
         </Box>
 
         <Box
-          sx={ {
+          sx={{
             '& span': {
               display: {
                 xs: 'block',
@@ -295,13 +308,15 @@ const Header = ({setBottomNav}) => {
       </Box>
 
       <MediaQuery minWidth={1200}>
-        {/* <Button
-          onClick={() => setBottomNav((prev) => prev === 2 ? null : 2)}
-          variant="outlined"
-        >
-          <QueryStats size={16} />
-          Queries for V_ilpn (FlyEM-HB:2064165421)
-        </Button> */}
+        {focusedInstance?.metadata?.Id && (focusedInstance?.metadata?.Queries?.length > 0 || queries?.find(q => q.short_form === focusedInstance.metadata.Id)) && (
+          <Button
+            onClick={() => setBottomNav((prev) => prev === 2 ? null : 2)}
+            variant="outlined"
+          >
+            <QueryStats size={16} />
+            Queries for {focusedInstance.metadata?.Name || ''} ({focusedInstance.metadata?.Id || ''})
+          </Button>
+        )}
       </MediaQuery>
     </Box>
   )

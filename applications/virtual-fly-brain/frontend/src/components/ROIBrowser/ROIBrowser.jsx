@@ -1,5 +1,4 @@
-/* eslint-disable no-prototype-builtins */
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { ChromePicker } from "react-color";
 import { MuiThemeProvider } from "@material-ui/core/styles";
 import Tree from "./Tree";
@@ -10,26 +9,24 @@ import Box from "@mui/material/Box";
 import Tooltip from "@mui/material/Tooltip";
 import axios from 'axios';
 import vars from "../../theme/variables";
-import { useSelector, connect } from "react-redux";
+import { useSelector } from "react-redux";
 import { getInstanceByID, changeColor, hide3DMesh, show3DMesh } from '../../reducers/actions/instances';
 import theme from "../../theme/index";
-import useClickOutside from "./../useClickOutside";
 import { VisibilityOff, Eye } from "../../icons";
 import { restPostConfig, treeCypherQuery } from "../../components/configuration/ROIBrowser/ROIBrowserConfiguration";
-import { 
-    isNumber, 
-    sortData, 
-    findRoot, 
-    convertEdges, 
-    convertNodes, 
-    searchChildren, 
-    defaultComparator, 
-    parseGraphResultData, 
-    buildDictClassToIndividual 
+import {
+    isNumber,
+    sortData,
+    findRoot,
+    convertEdges,
+    convertNodes,
+    searchChildren,
+    defaultComparator,
+    parseGraphResultData,
+    buildDictClassToIndividual
 } from "./helper";
 
 const {
-    secondaryBg,
     whiteColor,
     blackColor
   } = vars;
@@ -57,7 +54,6 @@ const ROIBrowser = (props) => {
         width: props.size.width,
     };
     const [displayColorPicker, setDisplayColorPicker] = React.useState({});
-    const [pickerAnchor, setPickerAnchor] = React.useState(undefined);
     const [state, setState] = React.useState({
         errors : undefined,
         dataTree : undefined,
@@ -68,20 +64,14 @@ const ROIBrowser = (props) => {
         root : undefined
     });
 
-    const popover = React.useRef();
-
-    const close = React.useCallback(() => setDisplayColorPicker({}), []);
-    // useClickOutside(popover, close);
-
-
     const treeRef = React.useRef();
 
     const AUTHORIZATION = "Basic " + btoa("neo4j:vfb")
 
     const colorPickerContainer = React.useRef();
-    let nodeWithColorPicker = undefined;
+    const nodeWithColorPicker = React.useRef(undefined);
     //axios.defaults.headers.common["Authorization"] = this.AUTHORIZATION
-    const restPost = (data) => {
+    const restPost = useCallback((data) => {
         return new Promise((resolve, reject) => {
             axios.post(restPostConfig.url, data,  {
                 headers: {
@@ -96,7 +86,7 @@ const ROIBrowser = (props) => {
                 reject(error);
             });
         });
-    };
+    }, [AUTHORIZATION]);
 
     const findChildren = (parent, key, familyList, labels) => {
         let childrenList = [];
@@ -120,7 +110,7 @@ const ROIBrowser = (props) => {
         return childrenList;
     };
 
-    const insertChildren = (nodes, edges, child, imagesMap) => {
+    const insertChildren = useCallback((nodes, edges, child, imagesMap) => {
         // Extend the array of relationships from here
         let childrenList = findChildren({ from: child.id }, "from", edges, [
             "part of",
@@ -135,7 +125,6 @@ const ROIBrowser = (props) => {
 
         for (let j = 0; j < uniqNodes.length; j++) {
             let node = nodes[findChildren({ id: uniqNodes[j] }, "id", nodes)[0]];
-            let imageId = node.instanceId;
             child.children.push({
                 title: node.title,
                 subtitle: node.classId,
@@ -148,9 +137,9 @@ const ROIBrowser = (props) => {
             });
             insertChildren(nodes, edges, child.children[j], imagesMap);
         }
-    };
+    }, []);
 
-    const convertDataForTree = (nodes, edges, vertix, imagesMap) => {
+    const convertDataForTree = useCallback((nodes, edges, vertix, imagesMap) => {
         // This will create the data structure for the react-sortable-tree library, starting from the vertix node.
         let refinedDataTree = [];
         for (let i = 0; i < nodes.length; i++) {
@@ -172,24 +161,24 @@ const ROIBrowser = (props) => {
         // Once the vertix has been established we call insertChildren recursively on each child.
         insertChildren(nodes, edges, child, imagesMap);
         return refinedDataTree;
-    };
+    }, [insertChildren]);
 
-    const updateSubtitle = (tree, idSelected) => {
-        let node = undefined;
-        if (tree.length !== undefined) {
-            node = tree[0];
-        } else {
-            node = tree;
-        }
-        if (node.instanceId === idSelected || node.classId === idSelected) {
-            node.subtitle = idSelected;
-        }
-        for (let i = 0; i < node.children.length; i++) {
-            updateSubtitle(node.children[i], idSelected);
-        }
-    };
+    // const updateSubtitle = (tree, idSelected) => {
+    //     let node = undefined;
+    //     if (tree.length !== undefined) {
+    //         node = tree[0];
+    //     } else {
+    //         node = tree;
+    //     }
+    //     if (node.instanceId === idSelected || node.classId === idSelected) {
+    //         node.subtitle = idSelected;
+    //     }
+    //     for (let i = 0; i < node.children.length; i++) {
+    //         updateSubtitle(node.children[i], idSelected);
+    //     }
+    // };
 
-    const selectNode = (instance) => {
+    const selectNode = useCallback((instance) => {
         if (
             state?.nodeSelected !== undefined &&
             state?.nodeSelected.instanceId !== instance.instanceId
@@ -200,9 +189,9 @@ const ROIBrowser = (props) => {
              */
             setState({ ...state, nodeSelected : instance });
         }
-    };
+    }, [state]);
 
-    const updateTree = (instance) => {
+    const updateTree = useCallback((instance) => {
         /*
          * function handler called by the VFBMain whenever there is an update of the instance on focus,
          * this will reflect and move to the node (if it exists) that we have on focus.
@@ -239,11 +228,10 @@ const ROIBrowser = (props) => {
                 //selectNode(state?.dataTree[0])
             }
         }
-    };
+    }, [selectNode, state?.dataTree, state?.nodeSelected, state?.nodes, templateID]);
 
-    const initTree = (instance) => {
+    const initTree = useCallback((instance) => {
         // This function is the core and starting point of the component itself
-        let that = this;
         setState({ ...state, loading : true, errors : undefined });
         if ( instance === undefined ) return
         let queryCypher = treeCypherQuery(instance.metadata?.Id);
@@ -272,7 +260,7 @@ const ROIBrowser = (props) => {
                 );
                 let treeData = convertDataForTree(nodes, edges, vertix, imagesMap);
                 treeData ? treeData : []
-                setState({ 
+                setState({
                     ...state,
                     loading : false,
                     errors : undefined,
@@ -287,7 +275,7 @@ const ROIBrowser = (props) => {
                 setState({...state, loading : false })
             }
         });
-    };
+    }, [convertDataForTree, restPost, state]);
 
     const nodeClick = (event, rowInfo) => {
         if (
@@ -299,7 +287,7 @@ const ROIBrowser = (props) => {
         }
     };
 
-    const monitorMouseClick = (e) => {
+    const monitorMouseClick = useCallback((e) => {
         const clickCoord = {
             INSIDE: "inside",
             OUTSIDE: "outside",
@@ -317,14 +305,14 @@ const ROIBrowser = (props) => {
 
         switch (clickCondition) {
             case clickCoord.OUTSIDE:
-                if (nodeWithColorPicker !== undefined) {
-                    nodeWithColorPicker.showColorPicker = false;
-                    nodeWithColorPicker = undefined;
+                if (nodeWithColorPicker.current !== undefined) {
+                    nodeWithColorPicker.current.showColorPicker = false;
+                    nodeWithColorPicker.current = undefined;
                 }
                 setDisplayColorPicker({});
                 break;
         }
-    };
+    }, []);
 
     const getButtons = (rowInfo) => {
         // As per name, provided by the react-sortable-tree api, we use this to attach to each node custom buttons
@@ -405,7 +393,7 @@ const ROIBrowser = (props) => {
                         <IconButton style={{ color: 'white' }} aria-label="color" size="small" onClick={(e) => {
                             e.stopPropagation();
                             if ( displayColorPicker[rowInfo.node.instanceId] != true ){
-                                nodeWithColorPicker = rowInfo.node;
+                                nodeWithColorPicker.current = rowInfo.node;
                                 setDisplayColorPicker({[rowInfo.node.instanceId] : true});
                             }
                         }}>
@@ -479,10 +467,11 @@ const ROIBrowser = (props) => {
                             onClick={(e) => {
                                 e.stopPropagation();
                                 let instanceFound = false;
+                                let Instances = window.Instances;
                                 if ( Instances[rowInfo.node.instanceId] ) {
                                     instanceFound = true;
                                 }
-                                
+
                                 if ( instanceFound ) {
                                     getInstanceByID(rowInfo.node.instanceId, false, true, false);
                                 } else {
@@ -508,7 +497,8 @@ const ROIBrowser = (props) => {
         } else {
             setState({ ...state, errors : "Template not loaded yet." });
         }
-    }, [templateID]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [allLoadedInstances, templateID]);
 
     useEffect( () => {
         if ( state.dataTree === undefined ) {
@@ -516,11 +506,12 @@ const ROIBrowser = (props) => {
         } else {
             updateTree(data)
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     },[data]);
 
     useEffect(() => {
         document.addEventListener('mousedown', monitorMouseClick, false);
-    }, [])
+    }, [monitorMouseClick])
 
     return(
         <Box

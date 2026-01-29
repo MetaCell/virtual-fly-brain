@@ -82,7 +82,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
       setConfirmationModal({
         open: true,
         shortForm: templateId,
-        message: "The template you requested is aligned to another template. Click Okay to open in a new tab or Cancel to just view the template metadata."
+        message: "The ID you requested is aligned to another template. Click Load Template to open the new ID in a new tab or Cancel to just view the ID metadata."
       });
     }
   };
@@ -282,7 +282,8 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
                   textAlign: 'right',
                   margin: 0,
                   transition: 'color 0.2s ease-in-out',
-
+                  wordWrap: "break-word",
+                  maxWidth: "23ch",
                   '& a': {
                     textDecoration: 'none',
                     color: whiteColor,
@@ -562,9 +563,9 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
             // Single item
             return (
               <Box key={index} sx={{ 
-                marginBottom: index < rootItems.length - 1 ? '1rem' : 0,
+                marginBottom: index < rootItems.length - 1 ? '0.2rem' : 0,
                 borderBottom: index < rootItems.length - 1 ? `1px solid ${headerBorderColor}` : 'none',
-                paddingBottom: index < rootItems.length - 1 ? '0.75rem' : 0
+                paddingBottom: index < rootItems.length - 1 ? '0.2rem' : 0
               }}>
                 <Typography 
                   sx={{
@@ -878,10 +879,10 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
       case 'Symbol':
         return renderName(value, data?.metadata?.Id);
       case 'Tags':
-      case 'Types':
         return renderTags(value);
       case 'Licenses':
         return renderLicensesList(value);
+      case 'Types':
       case 'Relationships':
         return renderRelationships(value);
       case 'Cross References':

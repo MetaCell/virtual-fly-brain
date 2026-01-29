@@ -45,7 +45,7 @@ class ListViewerControlsMenu extends Component {
   /**
    * Handles menu option selection
    */
-  menuHandler (action, component) {
+  menuHandler (action) {
     switch (action.handlerAction){
     case ACTIONS.SHOW:
       show3D(this.props.instance)
@@ -87,7 +87,7 @@ class ListViewerControlsMenu extends Component {
   }
   
   /**
-   * Pick button in configuration to display, some buttons have multiple options to display based on a 
+   * Pick button in configuration to display, some buttons have multiple options to display based on a
    * condition.
    * E.g.: 
    * { toggle : {
@@ -98,7 +98,7 @@ class ListViewerControlsMenu extends Component {
    */
   visibleButton (list,item) {
     let instance = this.props.allLoadedInstances?.find( i => i.metadata?.Id == this.props.instance);
-    // Button configuration has two options, perform condition to determine which button to use 
+    // Button configuration has two options, perform condition to determine which button to use
     if ( item.toggle ){
       let condition = item.toggle.condition(instance);
       if ( item.toggle.isVisible !== undefined) {
@@ -150,7 +150,7 @@ class ListViewerControlsMenu extends Component {
 
     let buttons = [...configuration.buttons];
  
-    let updatedButtons = buttons.map((button, index) => {
+    let updatedButtons = buttons.map((button) => {
       const updatedButton = {...button}
       if ( self.props.allLoadedInstances?.find( i => i.metadata?.Id == self.props.instance) !== undefined ) {
         updatedButton.activeColor = RGBAToHexA(self.props.allLoadedInstances?.find( i => i.metadata?.Id == self.props.instance)?.color);
@@ -172,7 +172,6 @@ class ListViewerControlsMenu extends Component {
     // Update Menu Configuration
     let configuration = this.updateControlsConfiguration();
     let matchInstance = this.props.allLoadedInstances.find( instance => instance.metadata?.Id === this.props.instance);
-    let self = this;
     return (
       <div id="LayersControls_Menu">
         <Menu
@@ -187,7 +186,7 @@ class ListViewerControlsMenu extends Component {
             <ChromePicker
               color={{ r:matchInstance.color.r*255, g:matchInstance.color.g*255, b:matchInstance.color.b*255, a:matchInstance.color.a }}
               disableAlpha={false}
-              onChangeComplete={ (color, event) => {
+              onChangeComplete={ (color) => {
                 let rgb;
                 rgb = { r:color.rgb.r/255, g:color.rgb.g/255, b:color.rgb.b/255, a:color.rgb.a }
                 changeColor(this.props.instance, rgb)
@@ -207,8 +206,8 @@ function mapStateToProps (state) {
   }
 }
 
-function mapDispatchToProps (dispatch) {
-  return { setTermInfo: (instance, visible) => dispatch(setTermInfo(instance, visible )) }
-}
+// function mapDispatchToProps (dispatch) {
+//   return { setTermInfo: (instance, visible) => dispatch(setTermInfo(instance, visible )) }
+// }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ListViewerControlsMenu);
+export default connect(mapStateToProps, null)(ListViewerControlsMenu);

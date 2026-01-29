@@ -1,6 +1,7 @@
-import React, { useRef } from "react"
+import React from "react"
 import { Box, Button, Chip, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Menu, MenuItem, Popper, Tooltip, Typography } from "@mui/material"
 import { AddChart, Delete, More, OpenInNew, Search, SplitScreen } from "../../../icons";
+import { facets_annotations_colors } from "../../../components/configuration/VFBColors";
 import vars from "../../../theme/variables";
 
 const {

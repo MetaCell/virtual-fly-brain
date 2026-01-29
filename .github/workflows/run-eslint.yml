@@ -30,7 +30,12 @@ jobs:
       working-directory: applications/virtual-fly-brain/frontend
       run: yarn install
 
-    # Step 4: Run ESLint
+    # Step 4: Run ESLint (fails only on errors, allows warnings)
     - name: Run ESLint
+      working-directory: applications/virtual-fly-brain/frontend
+      run: yarn lint
+
+    # Step 5: Build (optional - only run if lint passes)
+    - name: Build application
       working-directory: applications/virtual-fly-brain/frontend
       run: yarn build

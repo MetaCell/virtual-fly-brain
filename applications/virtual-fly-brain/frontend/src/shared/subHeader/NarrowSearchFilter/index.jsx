@@ -7,7 +7,7 @@ const { searchHeadingColor, primaryBg, outlinedBtnTextColor } = vars;
 
 export const NarrowSearchFilter = ({groupedOptions, facets_annotations_colors}) => {
   let tags = [];
-  groupedOptions?.forEach((option, index) => (
+  groupedOptions?.forEach((option) => (
     option?.facets_annotation?.forEach( fa => { if ( !tags.find(t => t == fa )) tags.push(fa)})
   ));
   

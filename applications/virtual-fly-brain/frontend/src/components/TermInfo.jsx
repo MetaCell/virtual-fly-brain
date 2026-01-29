@@ -269,7 +269,7 @@ const TermInfo = ({ open, setOpen }) => {
     id: null,
     message: ''
   });
-
+  
   const dispatch = useDispatch();
 
   const popover = React.useRef();
@@ -305,11 +305,12 @@ const TermInfo = ({ open, setOpen }) => {
   };
 
   const addId = (id) => {
-    setConfirmationModal({
-      open: true,
-      id: id,
-      message: `The image you requested is aligned to another template. Click Okay to open in a new tab or Cancel to just view the image metadata.?`
-    });
+    getInstanceByID(
+      id,
+      true,
+      true,
+      true
+    );
   };
 
   const handleConfirmAdd = () => {
@@ -385,11 +386,11 @@ const TermInfo = ({ open, setOpen }) => {
   const handleTermClick = (term) => {
     const regExp = /\(([^)]+)\)/g;
     const matches = [...term.id.matchAll(regExp)].flat();
-
+    
     setConfirmationModal({
       open: true,
       id: matches[1],
-      message: `The image you requested is aligned to another template. Click Okay to open in a new tab or Cancel to just view the image metadata.`
+      message: `The image you requested is aligned to another template. Click Load Template to open it in a new tab or Cancel to just view the image metadata.`
     });
   };
 
@@ -434,7 +435,7 @@ const TermInfo = ({ open, setOpen }) => {
 
   const setToggleMore = (prev, id, type) => {
     const queryKey = `${id}-${type}`;
-
+    
     if (currentOpenQuery === queryKey && toggleReadMore) {
       // Clicking "Show Less" on the currently open query
       setToggleReadMore(false);
@@ -458,21 +459,31 @@ const TermInfo = ({ open, setOpen }) => {
   };
 
   const termInfoHeading = (
-    <>
+    <Box display="flex" flexDirection="column">
       <Typography
-        component="span"
         sx={{
           fontWeight: 500,
-          lineHeight: 1,
+          lineHeight: 1.2,
           fontSize: "1.25rem",
-          mr: 1,
-          color: outlinedBtnTextColor,
+          color: whiteColor,
+          wordWrap: "break-word",
+          maxWidth: "23ch",
         }}
       >
-        Term info:
+        {termInfoData?.metadata?.Name}
       </Typography>
-      {termInfoData?.metadata?.Name} [{termInfoData?.metadata?.Id}]
-    </>
+      <Typography
+        sx={{
+          fontWeight: 400,
+          lineHeight: 1.2,
+          fontSize: "1rem",
+          color: outlinedBtnTextColor,
+          mt: 0.5,
+        }}
+      >
+        ID: {termInfoData?.metadata?.Id}
+      </Typography>
+    </Box>
   );
 
   // FIXME
@@ -485,6 +496,7 @@ const TermInfo = ({ open, setOpen }) => {
       setTermInfoData(data);
       setQueriesData(data?.metadata?.Queries || []);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
   useEffect(() => {
@@ -495,6 +507,7 @@ const TermInfo = ({ open, setOpen }) => {
     ) {
       setTermInfoData(data);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allLoadedInstances]);
 
   const getInstance = () => {
@@ -532,44 +545,33 @@ const TermInfo = ({ open, setOpen }) => {
     } else if (data?.metadata?.Images && Array.isArray(data?.metadata?.Images) && data?.metadata?.Images.length > 0) {
       isAlignedTemplate = !!(data.metadata.Images[currentTemplateId] && data.metadata.Images[currentTemplateId].find(e => e.id === templateId));
     }
-
+    
     if (href.startsWith("http")) {
       window.open(href, "_blank", "noopener,noreferrer");
     } else {
-      if (isAlignedTemplate) {
-        getInstanceByID(
-          templateId,
-          true,
-          true,
-          true
-        );
-      } else {
-        setConfirmationModal({
-          open: true,
-          id: templateId,
-          message: "The image you requested is aligned to another template. Click Okay to open in a new tab or Cancel to just view the image metadata."
-        });
-      }
+     if (isAlignedTemplate) {
+           getInstanceByID(
+             templateId, 
+             true, 
+             true, 
+             true
+           );
+         } else {
+           setConfirmationModal({
+             open: true,
+             id: templateId,
+             message: "The image you requested is aligned to another template. Click Load Template to open it in a new tab or Cancel to just view the image metadata."
+           });
+         }
     }
   };
 
-  const queryGroups = [
-    { label: "Types of neurons with...", keys: ["Find neurons", "Find all", "Neurons with"] },
-    { label: "Individual neurons with ", keys: ["Images of neurons with"] },
-    { label: "Tract/Nerves innervating here ", keys: ["Tracts/nerves innervating"] },
-    { label: "Lineage clones with ", keys: ["Lineage clones found"] },
-    { label: "Expression/Phenotypes found here", keys: ["Transgene expression in", "Expression patterns"] }
-  ];
-
-  // Group queries based on the configuration
-  const groupedQueries = queryGroups.map(group => ({
-    ...group,
-    queries: queriesData?.filter(q => group.keys.some(key => q.label.startsWith(key))) || []
-  }));
-
-  const otherQueries = queriesData?.filter(q =>
-    !queryGroups.some(group => group.keys.some(key => q?.label?.startsWith(key)))
-  ) || [];
+  // Helper to check if query is a "Neurons with" query with results
+  const isNeuronsWithQuery = (q) => {
+    return q.label?.startsWith("Neurons with") && 
+           q.output_format === "table" && 
+           q?.preview_results?.rows?.length > 0;
+  };
 
   // Comparator function to sort queries, moving zero-count queries to the bottom
   const sortByCountDescending = (a, b) => {
@@ -686,6 +688,10 @@ const TermInfo = ({ open, setOpen }) => {
         );
       }
       default:
+        // Handle arrays of strings
+        if (Array.isArray(value)) {
+          return <span>{value.join(', ')}</span>;
+        }
         // Handle objects by converting to JSON string
         if (value && typeof value === 'object') {
           return <span>{JSON.stringify(value)}</span>;

@@ -1,8 +1,8 @@
 import React from "react";
 import { Box, Typography, Button, Popper, List, ListItem, ListItemButton, ListItemText } from "@mui/material";
 import { ChevronDown, Delete, ChevronUp } from "../../../icons";
-import { useSelector, useDispatch } from 'react-redux'
-import { getQueries, updateQueries } from "../../../reducers/actions/queries"
+import { useSelector } from 'react-redux'
+import { updateQueries } from "../../../reducers/actions/queries"
 import vars from "../../../theme/variables";
 
 const { searchBoxBg, whiteColor, queryBorderColor } = vars;
@@ -10,7 +10,6 @@ const { searchBoxBg, whiteColor, queryBorderColor } = vars;
 export const QueriesSelectionDropdown = ({option, selectedOption, goBackToInitialState,  setSelectedOption, setSelectedQueryIndex, deleteQuery}) => {
   const [popoverAnchorEl, setPopoverAnchorEl] = React.useState(null);
   const queries = useSelector(state => state.queries.queries);
-  const dispatch = useDispatch();
 
   const popoverHandleClick = (event) => {
     setSelectedQueryIndex(event.target.parentElement.id || event.target.id)

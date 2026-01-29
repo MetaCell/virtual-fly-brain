@@ -1,37 +1,10 @@
-import React from 'react';
-import Tooltip from '@material-ui/core/Tooltip';
-import Chip from '@material-ui/core/Chip';
-import ListViewerControlsMenu from '../../VFBListViewer/ListViewerControlsMenu';
-import { getUpdatedTags, formatTagText } from '../../../utils/utils';
-import Link from '@mui/material/Link';
-import { focusInstance, selectInstance } from '../../../reducers/actions/instances';
-import { facets_annotations_colors as colors_config } from "../VFBColors";
-
-const facets_annotations_colors = getUpdatedTags(colors_config)
-
-/**
- * Create component to display controls
- */
-const ControlsMenu = component => {
-  const path = component.value._root.nodes.find( e=> e.entry?.[0] == "path").entry[1] ;
-  //let instance = Instances.getInstance(path); anti pattern fix: we don't pass the full instance anymore as we have an indirection level through the reducer
-  //actions should be executed through the reducer, given an instance path
-  return <ListViewerControlsMenu instance={ path }/>;
-}
-
-const Thumbnail = component => (
-  <Tooltip
-    leaveDelay={100000000000}
-    placement="top-end"
-    title={
-      <div style={{ backgroundColor: "transparent !important" }}>
-        <img src={component.value} className="thumbnail-listviewer" />
-      </div>
-    }
-  >
-    <img src={component.value} className="thumbnail-img" />
-  </Tooltip>
-)
+import { 
+  ControlsMenu, 
+  Thumbnail, 
+  NameComponent, 
+  TypeComponent, 
+  TagsComponent 
+} from './listViewerComponents';
 
 const conf = [
   {
@@ -43,89 +16,19 @@ const conf = [
   {
     id: "name",
     title: "Name",
-    customComponent: component => {
-      const entityName = component.value._root.nodes.find( e=> e.entry?.[0] == "name").entry[1];
-      const entityPath = component.value._root.nodes.find( e=> e.entry?.[0] == "path").entry[1];
-      const entitySelected = component.value._root.nodes.find( e=> e.entry?.[0] == "selected").entry[1];
-
-      return <div style={{ width: "100%", textAlign: "left", float: "left" }}>
-          <Link 
-            component="button"
-            underline='none'
-            variant="subtitle1"
-            color={entitySelected ? "yellow" : "white"}
-            sx={{
-              textAlign : "left",
-              float : "left"
-            }}
-            onClick={() => {
-              selectInstance(entityPath);
-              focusInstance(entityPath)
-            }}>
-            {entityName}
-          </Link>
-        </div>
-    },
+    customComponent: NameComponent,
     source : entity => entity
   },
   {
     id: "type",
     title: "Type",
-    customComponent: component => {
-
-      //const entityType = component.value._root.nodes.find( e=> e.entry?.[0] == "types").entry[1]?.match(/\[(.*?)\]/)[1];
-      let entityType = null;
-      let entityPath = null;
-      component.value._root.nodes.forEach( e=> e.nodes?.forEach( n=> { if ( n.entry?.[0] == "types" ) { entityType = n.entry?.[1] } }))
-      entityPath = entityType.match(/\(([^)]+)\)/)[1];
-      entityType = entityType.match(/\[(.*?)\]/)[1];
-
-      return <div style={{ width: "100%", textAlign: "left", float: "left" }}>
-        <Link
-          component="button"
-          underline='none'
-          variant="subtitle1"
-          onClick={() => {
-            selectInstance(entityPath);
-            focusInstance(entityPath);
-          }}>
-          {entityType}
-        </Link>
-      </div>
-    },
+    customComponent: TypeComponent,
     source : entity => entity
   },
   {
     id: "tags",
     title: "Tags",
-    customComponent: component => {
-      let tags = null;
-      component.value._root.nodes.forEach( e=> e.nodes?.forEach( n=> { if ( n.entry?.[0] == "tags" ) { tags = n.entry?.[1] } }))
-
-      const chips_cutoff = 3;
-      
-      return <div style={{ width: "100%", textAlign: "left", float: "left", display: 'flex', gap: '.5rem' }}>
-        {tags?.slice(0,chips_cutoff).map((tag, index) => {
-          return (<Chip
-            key={tag + index}
-            style={{
-              fontSize: '0.625rem',
-              alignSelf: 'center',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              width : 'auto',
-              height : '1.25rem',
-              padding: '0.1875rem 0.5rem',
-              backgroundColor: facets_annotations_colors[tag]?.color || facets_annotations_colors?.default?.color,
-              color: '#ffffff',
-            }}
-            label={formatTagText(tag)}
-          />)
-        }
-        )}
-      </div>
-    },
+    customComponent: TagsComponent,
     source : entity => entity
   },
   {

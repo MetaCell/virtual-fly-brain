@@ -1,5 +1,5 @@
 import React from "react";
-import { 
+import {
   Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel,
   FormGroup, InputLabel, Select, Typography, IconButton, Divider, Box, TextField,
   ListItemIcon, ListItemText, Checkbox, MenuItem, Button, LinearProgress, CircularProgress, Grid
@@ -21,7 +21,8 @@ import FileIcon from "../../components/configuration/VFBUploader/file-icon.png";
 import { CustomStyle, CustomTheme } from "./styles";
 
 const UNIQUE_ID = "UNIQUE_ID";
-const VFBUploader = (props) => {
+
+function VFBUploader(props) {
     const [state, setState] = React.useState({
       open: props.open,
       fileNBLASTURL: "",
@@ -55,9 +56,9 @@ const VFBUploader = (props) => {
     setState({...state, templateSelected: event.target.value });
   }
 
-  const openDialog = () =>{
-    setState({...state, open: true });
-  }
+  // const openDialog = () =>{
+  //   setState({...state, open: true });
+  // }
 
   const handleNBLASTAction = () => {
     let newId = "VFBu_" + nanoid(8);
@@ -81,10 +82,10 @@ const VFBUploader = (props) => {
 
     axios.put(url,
       formData, { headers: { 'Content-Type': configuration.contentType } }
-    ).then((response) => {
+    ).then(() => {
       setState({...state, uploading : false, fileNBLASTURL : newURL, nblastEnabled: true });
     })
-      .catch((error) => {
+      .catch(() => {
         setState({...state, error : true, uploading : false });
       });
   }
@@ -229,8 +230,6 @@ const VFBUploader = (props) => {
   }
   
   const getErrorDialog = () => {
-    const { classes } = props;
-  
     return (
       <Grid container>
         <Grid container justify="center" spacing={1}>
@@ -332,4 +331,6 @@ const VFBUploader = (props) => {
     );
 }
 
-export default withStyles(CustomStyle)(VFBUploader);
+const StyledVFBUploader = withStyles(CustomStyle)(VFBUploader);
+
+export default StyledVFBUploader;

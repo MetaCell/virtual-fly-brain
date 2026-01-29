@@ -64,7 +64,7 @@ class DropDownQueries extends Component {
           anchorEl={self.state.dropDownAnchorEl}
           keepMounted
           open={Boolean(self.state.dropDownAnchorEl)}
-          onClose={ event => self.setState( { dropDownAnchorEl : null } )}
+          onClose={ () => self.setState( { dropDownAnchorEl : null } )}
           PaperProps={{
             style: {
               marginTop: '32px',

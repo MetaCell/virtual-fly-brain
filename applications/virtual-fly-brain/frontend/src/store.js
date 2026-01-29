@@ -1,4 +1,3 @@
-import { combineReducers } from 'redux';
 import { urlUpdaterMiddleware } from './reducers/middleware/urlUpdaterMiddleware';
 import { createStore } from '@metacell/geppetto-meta-client/common';
 import './index.css';

@@ -24,7 +24,7 @@ import OBJIcon from "../../components/configuration/VFBDownloadContents/obj.png"
 import SWCIcon from "../../components/configuration/VFBDownloadContents/swc.png";
 import ReferenceIcon from "../../components/configuration/VFBDownloadContents/reference.png";
 import CloseIcon from "@material-ui/icons/Close";
-import { useSelector, connect } from "react-redux";
+import { useSelector } from "react-redux";
 import { createTheme } from "@material-ui/core/styles";
 
 const iconsMap = {
@@ -36,7 +36,7 @@ const iconsMap = {
 
 const ALL_INSTANCES = { id: "ALL_INSTANCES", name: "All Instances" };
 
-const styles = theme => ({
+const styles = () => ({
   downloadButton: { backgroundColor: "#0AB7FE", color: "white !important" },
   downloadErrorButton: { backgroundColor: "#FCE7E7", color: "#E53935", border : "1px solid #E53935" },
   error: { color: "#E53935" },
@@ -123,7 +123,7 @@ const theme = createTheme({
 /**
  * Component to download files contents
  */
-const VFBDownloadContents = (props) => {
+function VFBDownloadContents(props) {
 
   const [state,setState] = React.useState({
     open: props.open,
@@ -240,7 +240,7 @@ const VFBDownloadContents = (props) => {
           500
         );
       })
-      .catch((error) => {
+      .catch(() => {
         setState({
           ...state,
           downloadError: true,
@@ -545,4 +545,6 @@ const VFBDownloadContents = (props) => {
     );
 }
 
-export default withStyles(styles)(VFBDownloadContents);
+const StyledVFBDownloadContents = withStyles(styles)(VFBDownloadContents);
+
+export default StyledVFBDownloadContents;

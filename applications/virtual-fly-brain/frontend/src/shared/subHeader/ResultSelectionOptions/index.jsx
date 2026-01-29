@@ -5,7 +5,7 @@ import vars from "../../../theme/variables";
 
 const { searchHeadingColor, outlinedBtnBorderColor, primaryBg } = vars;
 
-export const ResultSelectionOptions = ({ addQueryTag, loadResults, loadQueries }) => {
+export const ResultSelectionOptions = ({ addQueryTag, loadResults }) => {
   return (
     <Box sx={{
       py: '1rem',

@@ -120,7 +120,6 @@ import SortableTree, { toggleExpandedForAll, changeNodeAtPath, walk } from '@nos
       }
   
       render () {
-        var onlyExpandSearchedNodes = (this.props.searchQuery !== undefined && this.props.searchQuery !== null);
         return (
           <div key={this.props.id + "_component"} id={this.props.id + "_component"} className="treeViewer" style={this.props.style}>
             { this.props.controls ? this.props.controls : null } 

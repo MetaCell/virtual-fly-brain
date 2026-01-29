@@ -1,6 +1,6 @@
 import { createTheme } from "@material-ui/core/styles";
 
-export const CustomStyle = theme => ({
+export const CustomStyle = () => ({
   dropzoneArea: { minHeight: "20vh !important" },
   marginTop: { marginTop: "2vh !important" },
   checked: { "&$checked": { color: "#0AB7FE" } },

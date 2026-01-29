@@ -95,7 +95,7 @@ export const add3DPlane = (params) => {
       },
       // Function called when download errors
       (xhr) => {
-        console.log('An error happened');
+        console.log((xhr.loaded / xhr.total * 100) + '% loaded - An error happened');
       }
     );
 

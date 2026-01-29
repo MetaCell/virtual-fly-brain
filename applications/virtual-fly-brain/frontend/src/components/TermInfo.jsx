@@ -303,11 +303,12 @@ const TermInfo = ({ open, setOpen }) => {
   };
 
   const addId = (id) => {
-    setConfirmationModal({
-      open: true,
-      id: id,
-      message: `The image you requested is aligned to another template. Click Okay to open in a new tab or Cancel to just view the image metadata.?`
-    });
+    getInstanceByID(
+      id,
+      true,
+      true,
+      true
+    );
   };
 
   const handleConfirmAdd = () => {
@@ -387,7 +388,7 @@ const TermInfo = ({ open, setOpen }) => {
     setConfirmationModal({
       open: true,
       id: matches[1],
-      message: `The image you requested is aligned to another template. Click Okay to open in a new tab or Cancel to just view the image metadata.`
+      message: `The image you requested is aligned to another template. Click Load Template to open it in a new tab or Cancel to just view the image metadata.`
     });
   };
 
@@ -456,21 +457,31 @@ const TermInfo = ({ open, setOpen }) => {
   };
 
   const termInfoHeading = (
-    <>
+    <Box display="flex" flexDirection="column">
       <Typography
-        component="span"
         sx={{
           fontWeight: 500,
-          lineHeight: 1,
+          lineHeight: 1.2,
           fontSize: "1.25rem",
-          mr: 1,
-          color: outlinedBtnTextColor,
+          color: whiteColor,
+          wordWrap: "break-word",
+          maxWidth: "23ch",
         }}
       >
-        Term info:
+        {termInfoData?.metadata?.Name}
       </Typography>
-      {termInfoData?.metadata?.Name} [{termInfoData?.metadata?.Id}]
-    </>
+      <Typography
+        sx={{
+          fontWeight: 400,
+          lineHeight: 1.2,
+          fontSize: "1rem",
+          color: outlinedBtnTextColor,
+          mt: 0.5,
+        }}
+      >
+        ID: {termInfoData?.metadata?.Id}
+      </Typography>
+    </Box>
   );
 
   // FIXME
@@ -482,6 +493,7 @@ const TermInfo = ({ open, setOpen }) => {
     ) {
       setTermInfoData(data);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
   useEffect(() => {
@@ -492,6 +504,7 @@ const TermInfo = ({ open, setOpen }) => {
     ) {
       setTermInfoData(data);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allLoadedInstances]);
 
   const getInstance = () => {
@@ -544,7 +557,7 @@ const TermInfo = ({ open, setOpen }) => {
            setConfirmationModal({
              open: true,
              id: templateId,
-             message: "The image you requested is aligned to another template. Click Okay to open in a new tab or Cancel to just view the image metadata."
+             message: "The image you requested is aligned to another template. Click Load Template to open it in a new tab or Cancel to just view the image metadata."
            });
          }
     }
@@ -672,6 +685,10 @@ const TermInfo = ({ open, setOpen }) => {
         );
       }
       default:
+        // Handle arrays of strings
+        if (Array.isArray(value)) {
+          return <span>{value.join(', ')}</span>;
+        }
         // Handle objects by converting to JSON string
         if (value && typeof value === 'object') {
           return <span>{JSON.stringify(value)}</span>;

@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import TermInfo from "./TermInfo"
 import vars from "../theme/variables";
 import ErrorDialog from "./ErrorDialog";
@@ -34,7 +34,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
   const theme = useTheme();
   const sidebarOpen = useSelector(state => state.globalInfo.termInfoOpened)
   const desktopScreen = useMediaQuery(theme.breakpoints.up('lg'));
-  const defaultActiveTab = desktopScreen ? [0, 1, 2, 3, 4] : [0];
+  const defaultActiveTab = useMemo(() => desktopScreen ? [0, 1, 2, 3, 4] : [0], [desktopScreen]);
   const [tab, setTab] = useState([]);
   const [LayoutComponent, setLayoutComponent] = useState(undefined);
   const [isLayoutMobile, setIsLayoutMobile] = useState(window.innerWidth < 1200);
@@ -64,7 +64,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
 
   useEffect(() => {
     setTab(defaultActiveTab)
-  }, [desktopScreen])
+  }, [defaultActiveTab, desktopScreen])
 
   useEffect(() => {
     if (LayoutComponent === undefined) {
@@ -74,7 +74,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
         setLayoutComponent(myManager.getComponent());
       }
     }
-  }, [store])
+  }, [LayoutComponent, store])
 
   const queryComponentOpened = useSelector( state => state.globalInfo?.queryComponentOpened );
 
@@ -84,7 +84,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
     } else if ( !queryComponentOpened ) {
       setBottomNav(undefined)
     }
-  }, [queryComponentOpened]);
+  }, [bottomNav, queryComponentOpened, setBottomNav]);
 
   // Handle Clear All functionality
   useEffect(() => {
@@ -107,11 +107,11 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
       }
       setBottomNav(undefined)
     }
-  }, [bottomNav]);
+  }, [bottomNav, dispatch, setBottomNav]);
 
   useEffect(() => {
     dispatch(setWidgets(widgets));
-  }, [])
+  }, [dispatch])
 
   const classes = {
     tabs: {

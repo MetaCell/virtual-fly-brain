@@ -2,9 +2,8 @@ import React, {useState} from "react";
 import { Box, Typography, Button, LinearProgress, Stack } from "@mui/material";
 import { AngleRight, CleaningServices } from "../../../icons";
 import { QueriesSelectionDropdown } from "./QueriesSelectionDropdown";
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
 import vars from "../../../theme/variables";
-import { queryBuilderDatasourceConfig } from '../../../components/configuration/VFBSearchBuilder/queryBuilderConfiguration';
 
 const { searchHeadingColor, primaryBg, btnDisabledColor } = vars;
 

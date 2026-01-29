@@ -26,7 +26,7 @@ const {
 } = vars;
 
 const CustomTableContainer = styled(TableContainer)(
-  ({ theme }) => `
+  () => `
   position: relative;
   min-width: 35rem;
   max-width: 43rem;
@@ -47,7 +47,7 @@ const CustomTableContainer = styled(TableContainer)(
 );
 
 const CustomBox = styled(Box)(
-  ({ theme }) => `
+  () => `
   position: relative;
   &:after {
     content: '';

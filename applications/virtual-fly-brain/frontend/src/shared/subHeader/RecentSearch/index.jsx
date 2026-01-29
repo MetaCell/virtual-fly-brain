@@ -1,10 +1,9 @@
-import { Box, Typography, Chip, Tooltip } from "@mui/material";
 import React from "react";
+import { Box, Typography, Chip, Tooltip } from "@mui/material";
 import vars from "../../../theme/variables";
 import { Search } from "../../../icons";
-import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
 
-const { secondaryBg, searchBoxBg, whiteColor, searchHeadingColor, listHover } = vars;
+const { secondaryBg, searchBoxBg, searchHeadingColor } = vars;
 const chips_cutoff = 3;
 
 export const RecentSearch = ({ getOptionProps, selectedFilters, recentSearches, facets_annotations_colors, handleResultSelection }) => {

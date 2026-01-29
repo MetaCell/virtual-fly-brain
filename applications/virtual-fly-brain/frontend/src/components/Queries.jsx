@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import React from "react";
 import "@metacell/geppetto-meta-ui/flex-layout/style/dark.scss";
 import { get_instance } from "../network/query";

@@ -216,14 +216,14 @@ const Query = forwardRef(({ fullWidth, queries, searchTerm }, ref) => {
   useEffect(() => {
     if (isLoading) {
       setIsRendering(true);
-    } else if (finalFilteredResults.length > 0 || queries.length === 0) {
+    } else {
       // Small delay to ensure DOM has rendered
       const timer = setTimeout(() => {
         setIsRendering(false);
       }, 100);
       return () => clearTimeout(timer);
     }
-  }, [isLoading, finalFilteredResults.length, queries.length]);
+  }, [isLoading]);
 
   // Memoize callbacks to prevent unnecessary re-renders
   const updateFilters = useCallback(() => {

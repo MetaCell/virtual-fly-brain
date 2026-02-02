@@ -254,7 +254,7 @@ const TermInfo = ({ open, setOpen }) => {
   );
   const queries = useSelector((state) => state.queries.queries);
   const queryComponentOpened = useSelector(
-    (state) => state.queries.queryComponentOpened
+    (state) => state.globalInfo.queryComponentOpened
   );
   const [queriesData, setQueriesData] = useState(data?.metadata?.Queries || []);
   const currentTemplate = useSelector(
@@ -577,7 +577,7 @@ const TermInfo = ({ open, setOpen }) => {
   // Group queries based on the configuration
   const groupedQueries = queryGroups.map(group => ({
     ...group,
-    queries: queriesData?.filter(q => group.keys.some(key => q.label.startsWith(key))) || []
+    queries: queriesData?.filter(q => group.keys.some(key => q?.label?.startsWith(key))) || []
   }));
 
   const otherQueries = queriesData?.filter(q =>
@@ -1110,8 +1110,8 @@ const TermInfo = ({ open, setOpen }) => {
                 <AccordionDetails>
                   <SimpleTreeView
                     aria-label="customized"
-                    defaultExpandIcon={<ArrowDown />}
-                    defaultCollapseIcon={<ArrowRight />}
+                    defaultExpandIcon={<ArrowRight />}
+                    defaultCollapseIcon={<ArrowDown />}
                   >
                     {/* Group queries that start with "Neurons with" */}
                     {groupedQueries.map((group, groupIndex) => (
@@ -1134,7 +1134,7 @@ const TermInfo = ({ open, setOpen }) => {
                             </CustomBox>
                           }
                         >
-                          {group.queries.map((query, index) => {
+                          {group.queries.slice().sort(sortByCountDescending).map((query, index) => {
                               const headers = getOrderedHeaders(query?.preview_results?.headers);
                               return (query.output_format === "table" &&
                                 query?.preview_results?.rows?.length > 0 ? (
@@ -1196,7 +1196,7 @@ const TermInfo = ({ open, setOpen }) => {
                                                         <Button
                                                           variant="text"
                                                           color="error"
-                                                          onClick={() => deleteId(row.id)}
+                                                          onClick={() => deleteId()}
                                                         >
                                                           Delete
                                                         </Button>
@@ -1261,7 +1261,7 @@ const TermInfo = ({ open, setOpen }) => {
                                 <TreeItem
                                   sx={{ "paddingLeft": "1.25rem" }}
                                   key={query.label}
-                                  itemId={`query-${index}`}
+                                  itemId={`ribbon-query-${groupIndex}-${index}`}
                                   label={
                                     <CustomBox display="flex" flexWrap="wrap">
                                       <Typography>{query.label}</Typography>
@@ -1330,10 +1330,7 @@ const TermInfo = ({ open, setOpen }) => {
                                     pl={0.5}
                                   >
                                     <Typography sx={{ pr: 0.5 }}>
-                                      {termInfoData?.metadata?.Queries?.reduce(
-                                        (n, { count }) => n + count,
-                                        0
-                                      )}
+                                      {query?.count ?? query?.preview_results?.rows?.length ?? 0}
                                     </Typography>
                                     <ListAltIcon
                                       sx={{ fontSize: "1.25rem", color: "#A0A0A0" }}
@@ -1373,7 +1370,7 @@ const TermInfo = ({ open, setOpen }) => {
                               <TreeItem
                                 sx={{ "paddingLeft": "1.25rem" }}
                                 key={query.label + index}
-                                itemId={`query-root-${index}`}
+                                itemId={`table-query-root-${index}`}
                                 label={
                                   <CustomBox display="flex" flexWrap="wrap">
                                     <Typography>{query.label}</Typography>
@@ -1428,7 +1425,7 @@ const TermInfo = ({ open, setOpen }) => {
                                                       <Button
                                                         variant="text"
                                                         color="error"
-                                                        onClick={() => deleteId(row.id)}
+                                                        onClick={() => deleteId()}
                                                       >
                                                         Delete
                                                       </Button>
@@ -1493,7 +1490,7 @@ const TermInfo = ({ open, setOpen }) => {
                               <TreeItem
                                 sx={{ "paddingLeft": "1.25rem" }}
                                 key={query.label}
-                                itemId={`query-root-${index}`}
+                                itemId={`ribbon-query-root-${index}`}
                                 label={
                                   <CustomBox display="flex" flexWrap="wrap">
                                     <Typography>{query.label}</Typography>

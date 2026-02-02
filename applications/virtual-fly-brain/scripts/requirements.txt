@@ -1,0 +1,16 @@
+# Python dependencies for VFB scripts
+# Install with: pip install -r requirements.txt
+
+# Core dependencies
+numpy>=1.20.0
+requests>=2.25.0
+
+# NRRD file handling
+pynrrd>=1.0.0
+
+# Neuroglancer precomputed format
+cloud-volume>=8.0.0
+
+# Mesh generation and image processing
+scikit-image>=0.18.0
+scipy>=1.7.0

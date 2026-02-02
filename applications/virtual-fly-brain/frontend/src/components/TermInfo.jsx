@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { styled } from "@mui/material/styles";
 import { ribbonConfiguration } from "../components/configuration/TermInfo/TermInfo";
@@ -256,7 +256,6 @@ const TermInfo = ({ open, setOpen }) => {
   const queryComponentOpened = useSelector(
     (state) => state.globalInfo.queryComponentOpened
   );
-  const [queriesData, setQueriesData] = useState(data?.metadata?.Queries || []);
   const currentTemplate = useSelector(
     (state) => state.instances.launchTemplate
   );
@@ -494,7 +493,6 @@ const TermInfo = ({ open, setOpen }) => {
       )
     ) {
       setTermInfoData(data);
-      setQueriesData(data?.metadata?.Queries || []);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
@@ -566,23 +564,29 @@ const TermInfo = ({ open, setOpen }) => {
     }
   };
 
-  const queryGroups = [
+  const queryGroups = useMemo(() => [
     { label: "Types of neurons with...", keys: ["Find neurons", "Find all", "Neurons with"] },
     { label: "Individual neurons with ", keys: ["Images of neurons with"] },
     { label: "Tract/Nerves innervating here ", keys: ["Tracts/nerves innervating"] },
     { label: "Lineage clones with ", keys: ["Lineage clones found"] },
     { label: "Expression/Phenotypes found here", keys: ["Transgene expression in", "Expression patterns"] }
-  ];
+  ], []);
 
   // Group queries based on the configuration
-  const groupedQueries = queryGroups.map(group => ({
-    ...group,
-    queries: queriesData?.filter(q => group.keys.some(key => q?.label?.startsWith(key))) || []
-  }));
+  const groupedQueries = useMemo(() => {
+    const queriesData = data?.metadata?.Queries || [];
+    return queryGroups.map(group => ({
+      ...group,
+      queries: queriesData?.filter(q => group.keys.some(key => q?.label?.startsWith(key))) || []
+    }));
+  }, [data?.metadata?.Queries, queryGroups]);
 
-  const otherQueries = queriesData?.filter(q =>
-    !queryGroups.some(group => group.keys.some(key => q?.label?.startsWith(key)))
-  ) || [];
+  const otherQueries = useMemo(() => {
+    const queriesData = data?.metadata?.Queries || [];
+    return queriesData?.filter(q =>
+      !queryGroups.some(group => group.keys.some(key => q?.label?.startsWith(key)))
+    ) || [];
+  }, [data?.metadata?.Queries, queryGroups]);
 
   // Comparator function to sort queries, moving zero-count queries to the bottom
   const sortByCountDescending = (a, b) => {
@@ -1284,7 +1288,7 @@ const TermInfo = ({ open, setOpen }) => {
                                   }
                                 >
                                   <TreeItem
-                                    itemId={`ribbon-${index}`}
+                                    itemId={`ribbon-${groupIndex}-${index}`}
                                     label={
                                       <Box display="flex" justifyContent="start">
                                         <Ribbon

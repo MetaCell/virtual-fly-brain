@@ -1243,7 +1243,7 @@ const TermInfo = ({ open, setOpen }) => {
                                         onClick={() =>
                                           setToggleMore(
                                             (prev) => !prev,
-                                            termInfoData.metadata?.Id,
+                                            termInfoData?.metadata?.Id,
                                             query.query
                                           )
                                         }
@@ -1256,7 +1256,7 @@ const TermInfo = ({ open, setOpen }) => {
                                           "&:hover": { background: "transparent" },
                                         }}
                                       >
-                                        {currentOpenQuery === `${termInfoData.metadata?.Id}-${query.query}` && toggleReadMore ? "Show Less" : "See More"}
+                                        {currentOpenQuery === `${termInfoData?.metadata?.Id}-${query.query}` && toggleReadMore ? "Show Less" : "See More"}
                                       </Button>
                                     }
                                   />
@@ -1472,7 +1472,7 @@ const TermInfo = ({ open, setOpen }) => {
                                       onClick={() =>
                                         setToggleMore(
                                           (prev) => !prev,
-                                          termInfoData.metadata?.Id,
+                                          termInfoData?.metadata?.Id,
                                           query.query
                                         )
                                       }
@@ -1485,7 +1485,7 @@ const TermInfo = ({ open, setOpen }) => {
                                         "&:hover": { background: "transparent" },
                                       }}
                                     >
-                                      {currentOpenQuery === `${termInfoData.metadata?.Id}-${query.query}` && toggleReadMore ? "Show Less" : "See More"}
+                                      {currentOpenQuery === `${termInfoData?.metadata?.Id}-${query.query}` && toggleReadMore ? "Show Less" : "See More"}
                                     </Button>
                                   }
                                 />

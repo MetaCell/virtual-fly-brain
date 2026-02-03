@@ -134,6 +134,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
           action: getInstancesTypes.ADD_INSTANCE,
           id: response.payload.Id,
           trigger: Date.now(),
+          bulkLoadComplete: isAllBulkInstancesLoaded,
         },
         isLoading: state.isBulkLoading ? !isAllBulkInstancesLoaded : false,
         error: false,

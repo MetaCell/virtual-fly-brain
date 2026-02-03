@@ -80,6 +80,20 @@ class ThreeDCanvas extends Component {
           }
           break;
         }
+        case getInstancesTypes.ADD_INSTANCE: {
+          // Auto-zoom when all instances from URL have finished loading
+          if (this.props.event.bulkLoadComplete) {
+            const visibleInstances = this.props.mappedCanvasData
+              ?.filter(d => d?.visibility && window.Instances[d.instancePath]?.wrappedObj?.visible)
+              .map(d => window.Instances[d.instancePath])
+              .filter(Boolean);
+            
+            if (visibleInstances.length > 0) {
+              this.canvasRef.current?.threeDEngine?.cameraManager?.zoomTo(visibleInstances);
+            }
+          }
+          break;
+        }
         // TOOD : Geppetto-meta bug opened to handle this. Once it's close, this can be removed.
         case getGlobalTypes.CAMERA_EVENT: {
           // Force Canvas re-render after a camera event

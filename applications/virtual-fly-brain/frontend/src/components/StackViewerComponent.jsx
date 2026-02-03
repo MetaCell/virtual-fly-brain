@@ -486,6 +486,7 @@ const rgbToHex = (color) => {
             let extent = { imageX: imageX, imageY: imageY };
             that.setState(extent);
             that.props.setExtent(extent);
+            that.onResize(that.props.width, that.props.height);
             that.checkStack();
             that.callPlaneEdges();
             that.state.iBuffer = {};

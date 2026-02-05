@@ -90,6 +90,11 @@ const isFirstTimeLoad = (allLoadedInstances, store) => {
         ? queuedInstances[queuedInstances.length - 1]
         : uniqueLoadOrder[uniqueLoadOrder.length - 1]);
 
+    // Update URL with default template if no parameters were provided
+    if (!idsFromUrl && !idSelected) {
+      updateUrlParameterWithCurrentUrl('id', DEFAULT_ID, true);
+    }
+
     uniqueLoadOrder.forEach(id => {
       const isFocusTarget = id === focusTarget;
       getInstance(allLoadedInstances, id, !isFocusTarget, !isFocusTarget);

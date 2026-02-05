@@ -1728,7 +1728,10 @@ const StackViewerComponent = () => createClass({
     },
 
     componentDidUpdate: function (prevProps) {
-      if (prevProps.data != undefined && prevProps.data != null && prevProps.data.instances != undefined) {
+      // Only process if instances actually changed
+      const instancesChanged = prevProps.data?.instances !== this.props.data?.instances;
+      
+      if (instancesChanged && this.props.data?.instances) {
         // Debounce instance processing to prevent parallel rendering issues
         clearTimeout(this._instanceUpdateTimeout);
         this._instanceUpdateTimeout = setTimeout(() => {
@@ -1852,6 +1855,10 @@ const StackViewerComponent = () => createClass({
 
     componentWillUnmount: function () {
       this._isMounted = false;
+      // Clear any pending timeout
+      if (this._instanceUpdateTimeout) {
+        clearTimeout(this._instanceUpdateTimeout);
+      }
       return true;      
     },
     /**

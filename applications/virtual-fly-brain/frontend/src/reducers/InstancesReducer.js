@@ -144,7 +144,6 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         // Reset bulk loading state when all instances are loaded
         isBulkLoading: state.isBulkLoading && !isAllBulkInstancesLoaded,
         bulkLoadingCount: isAllBulkInstancesLoaded ? 0 : state.bulkLoadingCount,
-        // Don't auto-clear isLoadingFromUrl here - middleware will clear it with delay
       });
     }
     case getInstancesTypes.GET_INSTANCES_FAILURE: {

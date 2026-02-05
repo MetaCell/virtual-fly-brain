@@ -458,9 +458,9 @@ const rgbToHex = (color) => {
           )
         .then( data => {
             if (data.indexOf('html') < 0) {
-              let result = data.trim().split(':')[1].split(' ');
-              let tileX = Number(result[0]);
-              let tileY = Number(result[1]);
+            let result = data.trim().split(':')[1].split(' ');
+            let tileX = Number(result[0]);
+            let tileY = Number(result[1]);
             that.setState({ tileX: tileX, tileY: tileY });
             that.checkStack();
             that.callPlaneEdges();
@@ -468,11 +468,11 @@ const rgbToHex = (color) => {
             that.state.lastUpdate = 0;
             that.bufferStack();
             that.animate();
-            }
-          })
-          .catch(error => {
-            console.error("Calling Tile size error : ", error);
-          });
+          }
+        })
+        .catch(error => {
+          console.error("Calling Tile size error : ", error);
+        });
     },
 
     callImageSize: function () {
@@ -485,10 +485,10 @@ const rgbToHex = (color) => {
           )
         .then( data => {
             if (data.indexOf('html') < 0) {
-              let result = data.trim().split(':')[1].split(' ');
-              let imageX = Math.ceil( Number(result[0] ));
-              let imageY = Math.ceil( Number(result[1] ));
-              let extent = { imageX: imageX, imageY: imageY };
+            let result = data.trim().split(':')[1].split(' ');
+            let imageX = Math.ceil( Number(result[0] ));
+            let imageY = Math.ceil( Number(result[1] ));
+            let extent = { imageX: imageX, imageY: imageY };
             that.setState(extent);
             that.props.setExtent(extent);
             that.onResize(that.props.width, that.props.height);
@@ -498,11 +498,11 @@ const rgbToHex = (color) => {
             that.state.lastUpdate = 0;
             that.bufferStack();
             that.animate();
-            }
-          })
-          .catch(error => {
+          }
+        })
+        .catch(error => {
           console.error("Calling Tile size error : ", error);
-          });
+        });
     },
 
     callPlaneEdges: function () {
@@ -637,14 +637,14 @@ const rgbToHex = (color) => {
       [this.state.stack[0]]?.forEach( (item,i) => {
         (function (i, that) {
           var image = that.state.serverUrl.toString() + '?wlz=' + item + '&sel=0,255,255,255&mod=zeta&fxp=' + that.props.fxp.join(',') + '&scl=' + Number(that.state.scl).toFixed(1) + '&dst=' + Number(that.state.dst).toFixed(1) + '&pit=' + Number(that.state.pit).toFixed(0) + '&yaw=' + Number(that.state.yaw).toFixed(0) + '&rol=' + Number(that.state.rol).toFixed(0);
-        // get image size;
+          // get image size;
           let file = image + '&prl=-1,' + that.state.posX.toFixed(0) + ',' + that.state.posY.toFixed(0) + '&obj=Wlz-foreground-objects';
-        fetch(file,{ method : "POST", url : file})
+          fetch(file,{ method : "POST", url : file})
               .then(response =>
                 response.text()
               )
-        .then( data => {
-          result = data.trim().split(':')[1].trim().split(' ');
+          .then( data => {
+            result = data.trim().split(':')[1].trim().split(' ');
                 if (result !== '') {
                   for (j in result) {
                     if (result[j].trim() !== '') {
@@ -748,32 +748,32 @@ const rgbToHex = (color) => {
 
         [this.state.stack[0]]?.forEach( (item, i) => {
           (function (i, that) {
-          if (i == 0) {
+            if (i == 0) {
               that.state.loadingLabels = true;
-          }
+            }
             var image = that.state.serverUrl.toString() + '?wlz=' + item + '&sel=0,255,255,255&mod=zeta&fxp=' + that.props.fxp.join(',') + '&scl=' + Number(that.state.scl).toFixed(1) + '&dst=' + Number(that.state.dst).toFixed(1) + '&pit=' + Number(that.state.pit).toFixed(0) + '&yaw=' + Number(that.state.yaw).toFixed(0) + '&rol=' + Number(that.state.rol).toFixed(0);
             let file = image + '&prl=-1,' + callX + ',' + callY + '&obj=Wlz-foreground-objects';
-          fetch(file,{ method : "POST", url : file})
-            .then(response =>
-              response.text()
-            )
-          .then( data => {
-            result = data.trim().split(':')[1].trim().split(' ');
-              if (result !== '') {
-                for (j in result) {
-                  if (result[j].trim() !== '') {
-                    var index = Number(result[j]);
-                    if (i !== 0 || index !== 0) { // don't select template
-                      if (index == 0) {
-                        if (!window.shiftDown || window.shiftDown === undefined ) {
+            fetch(file,{ method : "POST", url : file})
+              .then(response =>
+                response.text()
+              )
+            .then( data => {
+              result = data.trim().split(':')[1].trim().split(' ');
+                if (result !== '') {
+                  for (j in result) {
+                    if (result[j].trim() !== '') {
+                      var index = Number(result[j]);
+                      if (i !== 0 || index !== 0) { // don't select template
+                        if (index == 0) {
+                          if (!window.shiftDown || window.shiftDown === undefined ) {
                             let updatedObjects = [...that.state.objects];
                             if ( !updatedObjects?.find( o => o === that.state.label[i] ) ){
                               updatedObjects.push(that.props.templateDomainNames[index]);
                           }
                             that.setState({ objects : updatedObjects})
                             that.state.objects = updatedObjects
-                        }
-                      } else {
+                          }
+                        } else {
                           if (typeof that.props.templateDomainIds !== 'undefined' && typeof that.props.templateDomainNames !== 'undefined' && typeof that.props.templateDomainIds[index] !== 'undefined' && typeof that.props.templateDomainNames[index] !== 'undefined' && that.props.templateDomainNames[index] !== null) {
                             let updatedObjects = [...that.state.objects];
                             if ( !updatedObjects?.find( o => o === that.props.templateDomainNames[index] ) ){
@@ -781,37 +781,37 @@ const rgbToHex = (color) => {
                           }
                             that.setState({ objects : updatedObjects})
                             that.state.objects = updatedObjects
-                          break;
-                        }
+                            break;
+                          }
                       }
                     }
                   }
                 }
                   var list = that.state.objects?.filter((el, index, arr) => {
-                  return index === arr.indexOf(el);
-                }).sort();
-                var objects = '';
-                if (window.shiftDown) {
-                  objects = 'Click to add: ';
-                }
-                for (j in list) {
-                  objects = objects + list[j] + '\n';
-                }
-                if (objects !== '' && i == 0) {
+                    return index === arr.indexOf(el);
+                  }).sort();
+                  var objects = '';
+                  if (window.shiftDown) {
+                    objects = 'Click to add: ';
+                  }
+                  for (j in list) {
+                    objects = objects + list[j] + '\n';
+                  }
+                  if (objects !== '' && i == 0) {
                     that.setHoverText(callX,callY,list[0]);
-                } else {
-                    that.clearHoverText();
+                  } else {
+                      that.clearHoverText();
+                  }
                 }
-              }
-              // update slice view
-              if (i == 0) {
-                  that.state.loadingLabels = false;
-              }
-          })
-          .catch(error => {
+                // update slice view
+                if (i == 0) {
+                    that.state.loadingLabels = false;
+                }
+            })
+            .catch(error => {
               that.state.loadingLabels = false;
-            console.error("Listing Objects", error);
-          });
+              console.error("Listing Objects", error);
+            });
           })(i, that);
         });
       }

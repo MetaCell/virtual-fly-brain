@@ -3,7 +3,7 @@ import { getQueriesFailure } from '../actions/queries';
 import { getQueriesTypes } from '../actions/types/getQueriesTypes';
 import { getInstancesTypes } from '../actions/types/getInstancesTypes';
 import { setFirstIDLoaded, setAlignTemplates, setTemplateID } from '../actions/globals';
-import { getInstanceByID, get3DMesh, triggerInstanceFailure, setBulkLoadingCount, clearUrlLoadingState } from '../actions/instances';
+import { getInstanceByID, get3DMesh, triggerInstanceFailure, setBulkLoadingCount, clearUrlLoadingState, focusInstance, selectInstance } from '../actions/instances';
 import * as GeppettoActions from '@metacell/geppetto-meta-client/common/actions';
 
 function updateUrlParameterWithCurrentUrl(param, value, reset) {
@@ -97,7 +97,7 @@ const isFirstTimeLoad = (allLoadedInstances, store) => {
 
     uniqueLoadOrder.forEach(id => {
       const isFocusTarget = id === focusTarget;
-      getInstance(allLoadedInstances, id, !isFocusTarget, !isFocusTarget);
+      getInstance(allLoadedInstances, id, isFocusTarget, false);
     });
   }
 };
@@ -108,7 +108,8 @@ const getUrlParameter = (param) => {
 };
 
 const getInstance = (allLoadedInstances, id, focus, select) => {
-  if ( !allLoadedInstances?.find( i => i.metadata?.Id === id ) ){
+  const isAlreadyLoaded = allLoadedInstances?.find( i => i.metadata?.Id === id );
+  if (!isAlreadyLoaded) {
     getInstanceByID(id, true, focus, select, true);
   }
 }
@@ -140,8 +141,18 @@ export const urlUpdaterMiddleware = store => next => (action) => {
       const newFinishedCount = state.finishedLoadedInstances + 1;
       const isAllBulkInstancesLoaded = state.isBulkLoading && newFinishedCount >= state.bulkLoadingCount;
       
-      // If bulk loading completed from URL, clear the flag after delay to allow templates to load
+      // If bulk loading completed from URL, apply focus/select and clear the flag
       if (isAllBulkInstancesLoaded && isLoadingFromUrl) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const pendingFocusId = urlParams.get('id');
+
+        // Apply focus and select to the id= parameter from URL
+        if (pendingFocusId) {
+          focusInstance(pendingFocusId);
+          selectInstance(pendingFocusId);
+        }
+        
+        // Clear URL loading state after templates have time to load
         setTimeout(() => {
           store.dispatch(clearUrlLoadingState());
         }, 1000);

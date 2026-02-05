@@ -798,7 +798,7 @@ const rgbToHex = (color) => {
                     objects = objects + list[j] + '\n';
                   }
                   if (objects !== '' && i == 0) {
-                    that.setHoverText(callX,callY,list[0]);
+                    that.setHoverText(that.state.posX,that.state.posY,list[0]);
                   } else {
                     that.clearHoverText();
                   }
@@ -1471,6 +1471,13 @@ const rgbToHex = (color) => {
         // update new position:
         this.state.posX = Number(currentPosition?.x?.toFixed(0));
         this.state.posY = Number(currentPosition?.y?.toFixed(0));
+        
+        // Update hover text position if it's visible
+        if (this.state.hoverTextBuffer && this.state.hoverTextBuffer.visible) {
+          this.state.hoverTextBuffer.x = this.disp.position.x + (this.stack.position.x * this.disp.scale.x) + (Number(this.state.posX) * this.disp.scale.x) - 10;
+          this.state.hoverTextBuffer.y = this.disp.position.y + (this.stack.position.y * this.disp.scale.y) + (Number(this.state.posY) * this.disp.scale.y) + 15;
+        }
+        
         if (!(this.state.posX == this.state.oldX && this.state.posY == this.state.oldY)) {
           this.listObjects();
           this.state.hoverTime = Date.now();
@@ -1757,9 +1764,9 @@ const StackViewerComponent = () => createClass({
       if (instances && instances != null && instances.length > 0) {
         // Show loading indicator if app is initialized
         if (this.app && this.state.buffer[-1]) {
-          newState.state.buffer[-1].text = 'Loading instances...';
-          newState.state.text = 'Loading instances...';
-          newState.state.txtUpdated = Date.now();
+          newState.buffer[-1].text = 'Loading instances...';
+          newState.text = 'Loading instances...';
+          newState.txtUpdated = Date.now();
         }
         
         var instance;

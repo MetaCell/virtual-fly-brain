@@ -20,6 +20,9 @@ import {
 const API_URL = import.meta.env.VITE_API_URL;
 const { whiteColor, blackBG } = vars;
 
+const MESH_POLL_MAX_ATTEMPTS = 150;
+const CAMERA_RESET_DELAY_MS = 100;
+
 const styles = () => ({
   container: {
     height: "100%",
@@ -81,21 +84,53 @@ class ThreeDCanvas extends Component {
           break;
         }
         case getInstancesTypes.ADD_INSTANCE: {
-          // Auto-zoom when all instances from URL have finished loading
           if (this.props.event.bulkLoadComplete) {
-            const urlParams = new URLSearchParams(window.location.search);
-            const pendingFocusId = urlParams.get('id');
+            let pollCount = 0;
             
-            // Apply pending focus from URL
-            if (pendingFocusId) {
-              focusInstance(pendingFocusId);
-              selectInstance(pendingFocusId);
-            }
-
-            // Reset camera to fit all loaded instances
-            setTimeout(() => {
-              this.canvasRef.current?.threeDEngine?.cameraManager?.resetCamera();
-            }, 300);
+            const checkCanvasAndReset = () => {
+              pollCount++;
+              
+              if (pollCount > MESH_POLL_MAX_ATTEMPTS) {
+                this.canvasRef.current?.threeDEngine?.cameraManager?.resetCamera();
+                return;
+              }
+              
+              const threeDEngine = this.canvasRef.current?.threeDEngine;
+              if (!threeDEngine) {
+                requestAnimationFrame(checkCanvasAndReset);
+                return;
+              }
+              
+              const visibleInstances = this.props.mappedCanvasData?.filter(d => d?.visibility);
+              const loadedMeshes = visibleInstances?.filter(d => {
+                const instance = window.Instances?.[d.instancePath];
+                const wrappedObj = instance?.wrappedObj;
+                
+                if (wrappedObj?.geometry?.attributes?.position?.count > 0) {
+                  return true;
+                }
+                
+                if (wrappedObj?.children?.length > 0) {
+                  return wrappedObj.children.some(child => 
+                    child?.geometry?.attributes?.position?.count > 0
+                  );
+                }
+                
+                return false;
+              });
+              
+              const allMeshesLoaded = loadedMeshes?.length > 0 && 
+                                      loadedMeshes.length === visibleInstances?.length;
+              
+              if (allMeshesLoaded) {
+                threeDEngine.updateVisibleChildren();
+                this.canvasRef.current?.threeDEngine?.cameraManager?.resetCamera();
+              } else {
+                requestAnimationFrame(checkCanvasAndReset);
+              }
+            };
+            
+            requestAnimationFrame(checkCanvasAndReset);
           }
           break;
         }
@@ -105,7 +140,7 @@ class ThreeDCanvas extends Component {
           setTimeout(() => {
             this.canvasRef.current?.threeDEngine?.updateVisibleChildren();
             this.forceUpdate();
-          }, 100);
+          }, CAMERA_RESET_DELAY_MS);
           break;
         }
         case getInstancesTypes.UPDATE_SKELETON:

@@ -457,7 +457,7 @@ const rgbToHex = (color) => {
             response.text()
           )
         .then( data => {
-            if (data.indexOf('html') < 0) {
+          if (data.indexOf('html') < 0) {
             let result = data.trim().split(':')[1].split(' ');
             let tileX = Number(result[0]);
             let tileY = Number(result[1]);
@@ -484,7 +484,7 @@ const rgbToHex = (color) => {
             response.text()
           )
         .then( data => {
-            if (data.indexOf('html') < 0) {
+          if (data.indexOf('html') < 0) {
             let result = data.trim().split(':')[1].split(' ');
             let imageX = Math.ceil( Number(result[0] ));
             let imageY = Math.ceil( Number(result[1] ));
@@ -639,12 +639,12 @@ const rgbToHex = (color) => {
           var image = that.state.serverUrl.toString() + '?wlz=' + item + '&sel=0,255,255,255&mod=zeta&fxp=' + that.props.fxp.join(',') + '&scl=' + Number(that.state.scl).toFixed(1) + '&dst=' + Number(that.state.dst).toFixed(1) + '&pit=' + Number(that.state.pit).toFixed(0) + '&yaw=' + Number(that.state.yaw).toFixed(0) + '&rol=' + Number(that.state.rol).toFixed(0);
           // get image size;
           let file = image + '&prl=-1,' + that.state.posX.toFixed(0) + ',' + that.state.posY.toFixed(0) + '&obj=Wlz-foreground-objects';
-          fetch(file,{ method : "POST", url : file})
+            fetch(file,{ method : "POST", url : file})
               .then(response =>
                 response.text()
               )
-          .then( data => {
-            result = data.trim().split(':')[1].trim().split(' ');
+            .then( data => {
+              result = data.trim().split(':')[1].trim().split(' ');
                 if (result !== '') {
                   for (j in result) {
                     if (result[j].trim() !== '') {
@@ -769,7 +769,7 @@ const rgbToHex = (color) => {
                             let updatedObjects = [...that.state.objects];
                             if ( !updatedObjects?.find( o => o === that.state.label[i] ) ){
                               updatedObjects.push(that.props.templateDomainNames[index]);
-                          }
+                            }
                             that.setState({ objects : updatedObjects})
                             that.state.objects = updatedObjects
                           }
@@ -778,7 +778,7 @@ const rgbToHex = (color) => {
                             let updatedObjects = [...that.state.objects];
                             if ( !updatedObjects?.find( o => o === that.props.templateDomainNames[index] ) ){
                               updatedObjects.push(that.props.templateDomainNames[index]);
-                          }
+                            }
                             that.setState({ objects : updatedObjects})
                             that.state.objects = updatedObjects
                             break;
@@ -800,12 +800,12 @@ const rgbToHex = (color) => {
                   if (objects !== '' && i == 0) {
                     that.setHoverText(callX,callY,list[0]);
                   } else {
-                      that.clearHoverText();
+                    that.clearHoverText();
                   }
                 }
                 // update slice view
                 if (i == 0) {
-                    that.state.loadingLabels = false;
+                  that.state.loadingLabels = false;
                 }
             })
             .catch(error => {

@@ -150,6 +150,8 @@ export const urlUpdaterMiddleware = store => next => (action) => {
         if (pendingFocusId) {
           focusInstance(pendingFocusId);
           selectInstance(pendingFocusId);
+        } else {
+          store.dispatch(clearUrlLoadingState());
         }
         
         // Clear URL loading state after templates have time to load

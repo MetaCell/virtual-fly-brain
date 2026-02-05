@@ -64,6 +64,109 @@ class ThreeDCanvas extends Component {
     this.canvasRef = React.createRef();
   }
 
+  isMeshLoaded(instanceData) {
+    try {
+      const instance = window.Instances?.[instanceData.instancePath];
+      if (!instance?.wrappedObj) return false;
+      
+      const wrappedObj = instance.wrappedObj;
+      
+      // Check if geometry has valid vertex data
+      if (wrappedObj.geometry?.attributes?.position?.count > 0) {
+        return true;
+      }
+      
+      // Check children meshes
+      if (Array.isArray(wrappedObj.children) && wrappedObj.children.length > 0) {
+        return wrappedObj.children.some(child => 
+          child?.geometry?.attributes?.position?.count > 0
+        );
+      }
+      
+      return false;
+    } catch (err) {
+      console.warn(`[ThreeDCanvas] Error checking mesh for ${instanceData.instancePath}:`, err);
+      return false;
+    }
+  }
+
+  resetCameraWithUpdate() {
+    try {
+      const threeDEngine = this.canvasRef.current?.threeDEngine;
+      if (threeDEngine) {
+        threeDEngine.updateVisibleChildren();
+        threeDEngine.cameraManager?.resetCamera();
+      }
+    } catch (error) {
+      console.error('[ThreeDCanvas] Failed to reset camera:', error);
+    }
+  }
+
+  stopMeshPolling() {
+    this._meshPolling = false;
+    this._meshPollHandle = null;
+  }
+
+  startMeshPollingForBulkLoad() {
+    // Cancel any existing mesh polling loop
+    if (this._meshPolling && this._meshPollHandle) {
+      cancelAnimationFrame(this._meshPollHandle);
+    }
+    
+    this._meshPolling = true;
+    let pollCount = 0;
+    
+    const checkAndReset = () => {
+      pollCount++;
+      
+      if (!this._meshPolling) {
+        this._meshPollHandle = null;
+        return;
+      }
+      
+      if (pollCount > MESH_POLL_MAX_ATTEMPTS) {
+        console.warn(`[ThreeDCanvas] Mesh polling timeout after ${MESH_POLL_MAX_ATTEMPTS} attempts. Resetting camera anyway.`);
+        this.stopMeshPolling();
+        this.resetCameraWithUpdate();
+        return;
+      }
+      
+      const threeDEngine = this.canvasRef.current?.threeDEngine;
+      if (!threeDEngine) {
+        this._meshPollHandle = requestAnimationFrame(checkAndReset);
+        return;
+      }
+      
+      try {
+        const visibleInstances = this.props.mappedCanvasData?.filter(d => d?.visibility) || [];
+        
+        if (visibleInstances.length === 0) {
+          this.stopMeshPolling();
+          this.resetCameraWithUpdate();
+          return;
+        }
+        
+        const loadedMeshes = visibleInstances.filter(d => this.isMeshLoaded(d));
+        const allMeshesLoaded = loadedMeshes.length > 0 && 
+                                loadedMeshes.length === visibleInstances.length;
+        
+        if (allMeshesLoaded) {
+          console.log(`[ThreeDCanvas] All ${loadedMeshes.length} meshes loaded. Resetting camera.`);
+          this.stopMeshPolling();
+          this.resetCameraWithUpdate();
+        } else {
+          this._meshPollHandle = requestAnimationFrame(checkAndReset);
+        }
+      } catch (error) {
+        console.error('[ThreeDCanvas] Error during mesh polling:', error);
+        this.stopMeshPolling();
+        this.resetCameraWithUpdate();
+      }
+    };
+    
+    this._meshPollHandle = requestAnimationFrame(checkAndReset);
+  }
+
   componentDidUpdate(prevProps) {
     this.canvasRef.current?.threeDEngine?.updateVisibleChildren();
     if (this.props.event.trigger !== prevProps.event.trigger) {
@@ -85,52 +188,7 @@ class ThreeDCanvas extends Component {
         }
         case getInstancesTypes.ADD_INSTANCE: {
           if (this.props.event.bulkLoadComplete) {
-            let pollCount = 0;
-            
-            const checkCanvasAndReset = () => {
-              pollCount++;
-              
-              if (pollCount > MESH_POLL_MAX_ATTEMPTS) {
-                this.canvasRef.current?.threeDEngine?.cameraManager?.resetCamera();
-                return;
-              }
-              
-              const threeDEngine = this.canvasRef.current?.threeDEngine;
-              if (!threeDEngine) {
-                requestAnimationFrame(checkCanvasAndReset);
-                return;
-              }
-              
-              const visibleInstances = this.props.mappedCanvasData?.filter(d => d?.visibility);
-              const loadedMeshes = visibleInstances?.filter(d => {
-                const instance = window.Instances?.[d.instancePath];
-                const wrappedObj = instance?.wrappedObj;
-                
-                if (wrappedObj?.geometry?.attributes?.position?.count > 0) {
-                  return true;
-                }
-                
-                if (wrappedObj?.children?.length > 0) {
-                  return wrappedObj.children.some(child => 
-                    child?.geometry?.attributes?.position?.count > 0
-                  );
-                }
-                
-                return false;
-              });
-              
-              const allMeshesLoaded = loadedMeshes?.length > 0 && 
-                                      loadedMeshes.length === visibleInstances?.length;
-              
-              if (allMeshesLoaded) {
-                threeDEngine.updateVisibleChildren();
-                this.canvasRef.current?.threeDEngine?.cameraManager?.resetCamera();
-              } else {
-                requestAnimationFrame(checkCanvasAndReset);
-              }
-            };
-            
-            requestAnimationFrame(checkCanvasAndReset);
+            this.startMeshPollingForBulkLoad();
           }
           break;
         }
@@ -246,6 +304,12 @@ class ThreeDCanvas extends Component {
 
   componentWillUnmount() {
     document.removeEventListener("mousedown", this.handleClickOutside);
+    
+    // Cancel any ongoing mesh polling to prevent operations on unmounted component
+    if (this._meshPolling && this._meshPollHandle) {
+      cancelAnimationFrame(this._meshPollHandle);
+      this.stopMeshPolling();
+    }
   }
 
   componentDidMount() {

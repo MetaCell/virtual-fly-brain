@@ -671,6 +671,7 @@ const rgbToHex = (color) => {
                                 // selectInstance(that.props.templateDomainIds[index]);
                                 //console.log(that.props.templateDomainNames[index] + ' clicked');
                                 that.setStatusText(that.props.templateDomainNames[index] + ' selected');
+                                that.state.loadingLabels = false;
                                 break;
                               // eslint-disable-next-line no-unused-vars
                               } catch (_ignore) {
@@ -1752,7 +1753,9 @@ const StackViewerComponent = () => createClass({
             } catch (error) {
               // Ensure the processing flag is always cleared, even on error
               console.error('Error while handling instances in StackViewerComponent:', error);
-              this._processingInstances = false;
+              if (this._isMounted) {
+                this._processingInstances = false;
+              }
             }
           }
         }, 50);

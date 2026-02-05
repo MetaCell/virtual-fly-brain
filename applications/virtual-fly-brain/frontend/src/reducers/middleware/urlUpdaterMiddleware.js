@@ -30,13 +30,20 @@ function updateUrlParameterWithCurrentUrl(param, value, reset) {
 
 // This function updates the URL with the instances and the selected ID
 function updateUrlWithInstancesAndSelectedId(selectedId, store) {
-  const { isLoadingFromUrl } = store.getState().instances;
+  const { isLoadingFromUrl, launchTemplate } = store.getState().instances;
+  
   
   // During URL load, don't update the URL at all - let the initial URL parameters stay unchanged
   if (isLoadingFromUrl) {
     return;
   }
   
+  // Block template from overwriting the focused instance during initial load
+  const isTemplate = launchTemplate?.metadata?.Id === selectedId;
+  if (initialUrlFocusId && initialUrlFocusId !== selectedId && isTemplate) {
+    return;
+  }
+
   const urlObj = new URL(window.location.href);
   if (urlObj.searchParams.has('id')) {
     const currentId = urlObj.searchParams.get('id');
@@ -49,6 +56,9 @@ function updateUrlWithInstancesAndSelectedId(selectedId, store) {
 
 const DEFAULT_ID = "VFB_00101567";
 const APP_LOADED_FLAG_KEY = "CURRENT_LOADED_URL";
+
+// Track the initial focus ID from URL to prevent templates from overwriting it
+let initialUrlFocusId = null;
 
 const isFirstTimeLoad = (allLoadedInstances, store) => {
   const appLoadedUrl = localStorage.getItem(APP_LOADED_FLAG_KEY);
@@ -146,10 +156,22 @@ export const urlUpdaterMiddleware = store => next => (action) => {
         const urlParams = new URLSearchParams(window.location.search);
         const pendingFocusId = urlParams.get('id');
 
+        // Store the initial focus ID to prevent templates from overwriting it
+        initialUrlFocusId = pendingFocusId;
+
         // Apply focus and select to the id= parameter from URL
         if (pendingFocusId) {
-          focusInstance(pendingFocusId);
-          selectInstance(pendingFocusId);
+          // Use async IIFE to wait for focus/select to complete before clearing URL loading state
+          (async () => {
+            await focusInstance(pendingFocusId);
+            await selectInstance(pendingFocusId);
+            // Clear URL loading state after async operations complete
+            store.dispatch(clearUrlLoadingState());            
+            // Clear the initial focus ID after a longer delay to allow all pending template operations to complete
+            setTimeout(() => {
+              initialUrlFocusId = null;
+            }, 1000);
+          })();
         } else {
           store.dispatch(clearUrlLoadingState());
         }
@@ -180,7 +202,10 @@ export const urlUpdaterMiddleware = store => next => (action) => {
         }
         get3DMesh(action.payload);
         store.dispatch(setTemplateID(action.payload.Id));
-        updateUrlWithInstancesAndSelectedId(action.payload.Id, store);
+        
+        if (!(initialUrlFocusId && initialUrlFocusId !== action.payload.Id)) {
+          updateUrlWithInstancesAndSelectedId(action.payload.Id, store);
+        }
         next(action);
         return;
       } else if (IsTemplate && launchTemplate?.metadata?.Id !== action.payload.Id) {
@@ -214,7 +239,14 @@ export const urlUpdaterMiddleware = store => next => (action) => {
           // Load template WITHOUT focus/select to avoid overriding user's intended focus
           getInstanceByID(template, true, false, false);
           store.dispatch(setTemplateID(template));
-          updateUrlWithInstancesAndSelectedId(template, store);
+          
+          // Don't update URL with template ID if we're loading from URL with a specific id= parameter
+          const urlParams = new URLSearchParams(window.location.search);
+          const pendingFocusId = urlParams.get('id');
+          if (!isLoadingFromUrl || !pendingFocusId) {
+            updateUrlWithInstancesAndSelectedId(template, store);
+          }
+          
           // Continue with the action and get the 3D mesh
           updateUrlWithInstancesAndSelectedId(action.payload.Id, store);
           next(action);

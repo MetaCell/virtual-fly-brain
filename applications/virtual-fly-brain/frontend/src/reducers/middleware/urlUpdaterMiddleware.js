@@ -91,7 +91,8 @@ const isFirstTimeLoad = (allLoadedInstances, store) => {
         : uniqueLoadOrder[uniqueLoadOrder.length - 1]);
 
     uniqueLoadOrder.forEach(id => {
-      getInstance(allLoadedInstances, id, false, false);
+      const isFocusTarget = id === focusTarget;
+      getInstance(allLoadedInstances, id, !isFocusTarget, !isFocusTarget);
     });
   }
 };

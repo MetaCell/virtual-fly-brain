@@ -83,7 +83,6 @@ class ThreeDCanvas extends Component {
         case getInstancesTypes.ADD_INSTANCE: {
           // Auto-zoom when all instances from URL have finished loading
           if (this.props.event.bulkLoadComplete) {
-            // Read pending focus from URL
             const urlParams = new URLSearchParams(window.location.search);
             const pendingFocusId = urlParams.get('id');
             
@@ -91,25 +90,12 @@ class ThreeDCanvas extends Component {
             if (pendingFocusId) {
               focusInstance(pendingFocusId);
               selectInstance(pendingFocusId);
-
-              // Auto-zoom to all visible instances
-              const attemptAutoZoom = (attempt = 0) => {
-                const visibleInstances = this.props.mappedCanvasData
-                  ?.filter(d => d?.visibility && window.Instances[d.instancePath]?.wrappedObj?.visible)
-                  .map(d => window.Instances[d.instancePath])
-                  .filter(Boolean);
-                              
-                if (visibleInstances.length > 0) {
-                  this.canvasRef.current?.threeDEngine?.cameraManager?.zoomTo(visibleInstances);
-                } else if (attempt < 10) {
-                  setTimeout(() => attemptAutoZoom(attempt + 1), 200);
-                } else {
-                  this.canvasRef.current?.threeDEngine?.cameraManager?.resetCamera();
-                }
-              };
-              
-              setTimeout(() => attemptAutoZoom(), 300);
             }
+
+            // Reset camera to fit all loaded instances
+            setTimeout(() => {
+              this.canvasRef.current?.threeDEngine?.cameraManager?.resetCamera();
+            }, 300);
           }
           break;
         }

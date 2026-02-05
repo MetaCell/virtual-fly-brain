@@ -923,16 +923,16 @@ const rgbToHex = (color) => {
           extensions.add(imageDelivery);
 
           let list = Array.from(loadList);
-          let completedCount = 0;
           const totalCount = list.length;
           
-          let images = list.map( async (value) => {
-            let im = await Assets.load({ src : value, loadParser : 'customParser' })
-            completedCount++;
-            // Update progress
-            this.loadProgressHandler({ progress: (completedCount / totalCount) * 100 });
+          let images = list.map(async (value, index) => {
+            let im = await Assets.load({ src : value, loadParser : 'customParser' });
+            // Update progress deterministically using index
+            const progress = ((index + 1) / totalCount) * 100;
+            this.loadProgressHandler({ progress });
             return im;
-          })
+          });
+          
           let results = await Promise.allSettled(images);
           results = results.map( result => result.value );
 

@@ -153,11 +153,6 @@ export const urlUpdaterMiddleware = store => next => (action) => {
         } else {
           store.dispatch(clearUrlLoadingState());
         }
-        
-        // Clear URL loading state after templates have time to load
-        setTimeout(() => {
-          store.dispatch(clearUrlLoadingState());
-        }, 1000);
       }
       
       const IsTemplate = action.payload?.IsTemplate || false;

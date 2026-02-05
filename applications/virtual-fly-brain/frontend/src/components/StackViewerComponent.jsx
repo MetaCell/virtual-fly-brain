@@ -189,6 +189,10 @@ const rgbToHex = (color) => {
       this.stack.position.y = 0;
       this.state.recenter = true;
 
+      // Initialize component lifecycle flags
+      this._isMounted = true;
+      this._processingInstances = false;
+
       this.createStatusText();
 
       this.stack.interactive = true;
@@ -1829,22 +1833,22 @@ const StackViewerComponent = () => createClass({
           return 0;
         });
         
-        for (instance in sortedInstances) {
+        for (const instance of sortedInstances) {
           try {
-            if ((sortedInstances[instance].wrappedObj.id != undefined) && (sortedInstances[instance].parent != null) ){
-              data = sortedInstances[instance].wrappedObj.visualValue.data;
+            if ((instance.wrappedObj.id !== undefined) && (instance.parent !== null) ){
+              data = instance.wrappedObj.visualValue.data;
               files.push(data);
               // Take multiple ID's for template
-              if (typeof this.props.config.templateId !== 'undefined' && typeof this.props.config.templateDomainIds !== 'undefined' && sortedInstances[instance].parent.getId() === this.props.config.templateId) {
+              if (typeof this.props.config.templateId !== 'undefined' && typeof this.props.config.templateDomainIds !== 'undefined' && instance.parent.getId() === this.props.config.templateId) {
                 ids.push(this.props.config.templateDomainIds);
               } else {
-                ids.push([sortedInstances[instance].getId()]);
+                ids.push([instance.getId()]);
               }
-              labels.push(sortedInstances[instance].getName());
-              colors.push(rgbToHex(sortedInstances[instance].wrappedObj.color));
+              labels.push(instance.getName());
+              colors.push(rgbToHex(instance.wrappedObj.color));
             }
           } catch (err) {
-            console.log('Error handling ' + instance);
+            console.log('Error handling instance: ' + (instance?.getId?.() || 'unknown'));
             console.log(err.message);
             console.log(err.stack);
           }

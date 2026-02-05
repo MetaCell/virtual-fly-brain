@@ -170,9 +170,13 @@ export const resetLoadingState = () => ({
   type: getInstancesTypes.RESET_LOADING_STATE
 });
 
-export const setBulkLoadingCount = (count) => ({
+export const setBulkLoadingCount = (count, isFromUrl = false) => ({
   type: getInstancesTypes.SET_BULK_LOADING_COUNT,
-  payload: { count }
+  payload: { count, isFromUrl }
+});
+
+export const clearUrlLoadingState = () => ({
+  type: getInstancesTypes.CLEAR_URL_LOADING_STATE
 });
 
 export const resetBulkLoading = () => ({

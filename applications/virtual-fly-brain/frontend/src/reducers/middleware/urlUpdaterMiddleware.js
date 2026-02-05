@@ -3,7 +3,7 @@ import { getQueriesFailure } from '../actions/queries';
 import { getQueriesTypes } from '../actions/types/getQueriesTypes';
 import { getInstancesTypes } from '../actions/types/getInstancesTypes';
 import { setFirstIDLoaded, setAlignTemplates, setTemplateID } from '../actions/globals';
-import { getInstanceByID, get3DMesh, triggerInstanceFailure, setBulkLoadingCount } from '../actions/instances';
+import { getInstanceByID, get3DMesh, triggerInstanceFailure, setBulkLoadingCount, clearUrlLoadingState } from '../actions/instances';
 import * as GeppettoActions from '@metacell/geppetto-meta-client/common/actions';
 
 function updateUrlParameterWithCurrentUrl(param, value, reset) {
@@ -29,7 +29,14 @@ function updateUrlParameterWithCurrentUrl(param, value, reset) {
 }
 
 // This function updates the URL with the instances and the selected ID
-function updateUrlWithInstancesAndSelectedId(selectedId) {
+function updateUrlWithInstancesAndSelectedId(selectedId, store) {
+  const { isLoadingFromUrl } = store.getState().instances;
+  
+  // During URL load, don't update the URL at all - let the initial URL parameters stay unchanged
+  if (isLoadingFromUrl) {
+    return;
+  }
+  
   const urlObj = new URL(window.location.href);
   if (urlObj.searchParams.has('id')) {
     const currentId = urlObj.searchParams.get('id');
@@ -74,7 +81,7 @@ const isFirstTimeLoad = (allLoadedInstances, store) => {
     const instancesToLoad = uniqueLoadOrder.filter(id => !allLoadedInstances?.find(i => i.metadata?.Id === id));
 
     if (instancesToLoad.length > 0) {
-      store.dispatch(setBulkLoadingCount(instancesToLoad.length));
+      store.dispatch(setBulkLoadingCount(instancesToLoad.length, true));
     }
 
     // id= parameter should always take priority for focus
@@ -84,8 +91,7 @@ const isFirstTimeLoad = (allLoadedInstances, store) => {
         : uniqueLoadOrder[uniqueLoadOrder.length - 1]);
 
     uniqueLoadOrder.forEach(id => {
-      const shouldFocus = id === focusTarget;
-      getInstance(allLoadedInstances, id, shouldFocus);
+      getInstance(allLoadedInstances, id, false, false);
     });
   }
 };
@@ -95,9 +101,9 @@ const getUrlParameter = (param) => {
   return urlParams.get(param);
 };
 
-const getInstance = (allLoadedInstances, id, focus) => {
+const getInstance = (allLoadedInstances, id, focus, select) => {
   if ( !allLoadedInstances?.find( i => i.metadata?.Id === id ) ){
-    getInstanceByID(id, true, focus, focus, true);
+    getInstanceByID(id, true, focus, select, true);
   }
 }
 
@@ -105,6 +111,8 @@ export const urlUpdaterMiddleware = store => next => (action) => {
   const launchTemplate = store.getState().instances.launchTemplate;
   const allLoadedInstances = store.getState().instances.allLoadedInstances;
   const firstIDLoaded = store.getState().globalInfo.firstIDLoaded;
+  const isBulkLoading = store.getState().instances.isBulkLoading;
+  const isLoadingFromUrl = store.getState().instances.isLoadingFromUrl;
 
   // Only call isFirstTimeLoad if we haven't loaded the first ID yet
   if (!firstIDLoaded) {
@@ -122,6 +130,18 @@ export const urlUpdaterMiddleware = store => next => (action) => {
       break;
     }
     case getInstancesTypes.GET_INSTANCES_SUCCESS : {
+      // Check if bulk loading just completed
+      const state = store.getState().instances;
+      const newFinishedCount = state.finishedLoadedInstances + 1;
+      const isAllBulkInstancesLoaded = state.isBulkLoading && newFinishedCount >= state.bulkLoadingCount;
+      
+      // If bulk loading completed from URL, clear the flag after delay to allow templates to load
+      if (isAllBulkInstancesLoaded && isLoadingFromUrl) {
+        setTimeout(() => {
+          store.dispatch(clearUrlLoadingState());
+        }, 1000);
+      }
+      
       const IsTemplate = action.payload?.IsTemplate || false;
       const isClass = action.payload?.IsClass || false;
       const isIndividual = action.payload?.IsIndividual || false;
@@ -147,7 +167,7 @@ export const urlUpdaterMiddleware = store => next => (action) => {
         }
         get3DMesh(action.payload);
         store.dispatch(setTemplateID(action.payload.Id));
-        updateUrlWithInstancesAndSelectedId(action.payload.Id);
+        updateUrlWithInstancesAndSelectedId(action.payload.Id, store);
         next(action);
         return;
       } else if (IsTemplate && launchTemplate?.metadata?.Id !== action.payload.Id) {
@@ -159,7 +179,7 @@ export const urlUpdaterMiddleware = store => next => (action) => {
       // if it's a class just load it, since classes are not aligned with templates
       if (isClass) {
         next(action);
-        updateUrlWithInstancesAndSelectedId(action.payload.Id);
+        updateUrlWithInstancesAndSelectedId(action.payload.Id, store);
         return;
       }
 
@@ -171,18 +191,19 @@ export const urlUpdaterMiddleware = store => next => (action) => {
         const loadedTemplate = launchTemplate?.metadata?.Id;
         if (loadedTemplate && templates.includes(loadedTemplate)) {
           // If the individual is aligned with the current template, continue with the action
-          updateUrlWithInstancesAndSelectedId(action.payload.Id);
+          updateUrlWithInstancesAndSelectedId(action.payload.Id, store);
           next(action);
           get3DMesh(action.payload);
           return;
         } else if (loadedTemplate === null || loadedTemplate === undefined) {
           // if the template is not defined, we need to set the template ID
           const template = Object.keys(templateLookup)?.[0];
-          getInstanceByID(template, true, true, true);
+          // Load template WITHOUT focus/select to avoid overriding user's intended focus
+          getInstanceByID(template, true, false, false);
           store.dispatch(setTemplateID(template));
-          updateUrlWithInstancesAndSelectedId(template);
+          updateUrlWithInstancesAndSelectedId(template, store);
           // Continue with the action and get the 3D mesh
-          updateUrlWithInstancesAndSelectedId(action.payload.Id);
+          updateUrlWithInstancesAndSelectedId(action.payload.Id, store);
           next(action);
           get3DMesh(action.payload);
           return;
@@ -205,9 +226,9 @@ export const urlUpdaterMiddleware = store => next => (action) => {
     case getInstancesTypes.SELECT_INSTANCE:
     case getInstancesTypes.FOCUS_INSTANCE: {
       const instance = action.payload.id;
+      
       if (instance) {
-        // Update the URL with the selected instance ID
-        updateUrlWithInstancesAndSelectedId(instance);
+        updateUrlWithInstancesAndSelectedId(instance, store);
       }
       next(action);
       break;

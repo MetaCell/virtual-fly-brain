@@ -133,6 +133,17 @@ const VFBStackViewer = (props) => {
       width: props.size.width,
       instances: instances,
     }));
+
+    // Trigger resize when bulk loading completes
+    if (instanceEvent?.bulkLoadComplete) {
+      // Trigger a small delay to ensure all DOM updates are complete
+      setTimeout(() => {
+        const resizeEvent = new CustomEvent('vfb-bulk-load-complete', {
+          detail: { timestamp: Date.now() }
+        });
+        window.dispatchEvent(resizeEvent);
+      }, 100);
+    }
   }, [data, instanceEvent, props.size.height, props.size.width]);
 
   // Update height and width of the stackwidget, happens when flex layout resizes tabs

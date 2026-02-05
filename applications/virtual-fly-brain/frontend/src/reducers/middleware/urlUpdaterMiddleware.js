@@ -111,7 +111,6 @@ export const urlUpdaterMiddleware = store => next => (action) => {
   const launchTemplate = store.getState().instances.launchTemplate;
   const allLoadedInstances = store.getState().instances.allLoadedInstances;
   const firstIDLoaded = store.getState().globalInfo.firstIDLoaded;
-  const isBulkLoading = store.getState().instances.isBulkLoading;
   const isLoadingFromUrl = store.getState().instances.isLoadingFromUrl;
 
   // Only call isFirstTimeLoad if we haven't loaded the first ID yet

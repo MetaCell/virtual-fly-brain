@@ -1737,10 +1737,16 @@ const StackViewerComponent = () => createClass({
         this._instanceUpdateTimeout = setTimeout(() => {
           if (this._isMounted && !this._processingInstances) {
             this._processingInstances = true;
-            this.setState(this.handleInstances(this.props.data.instances));
-            setTimeout(() => {
+            try {
+              const newState = this.handleInstances(this.props.data.instances);
+              this.setState(newState, () => {
+                this._processingInstances = false;
+              });
+            } catch (error) {
+              // Ensure the processing flag is always cleared, even on error
+              console.error('Error while handling instances in StackViewerComponent:', error);
               this._processingInstances = false;
-            }, 100);
+            }
           }
         }, 50);
       }
@@ -1751,9 +1757,9 @@ const StackViewerComponent = () => createClass({
       if (instances && instances != null && instances.length > 0) {
         // Show loading indicator if app is initialized
         if (this.app && this.state.buffer[-1]) {
-          this.state.buffer[-1].text = 'Loading instances...';
-          this.state.text = 'Loading instances...';
-          this.state.txtUpdated = Date.now();
+          newState.state.buffer[-1].text = 'Loading instances...';
+          newState.state.text = 'Loading instances...';
+          newState.state.txtUpdated = Date.now();
         }
         
         var instance;
@@ -1802,7 +1808,7 @@ const StackViewerComponent = () => createClass({
         
         // Sort instances to ensure template is always first
         // This is critical for click selection to work correctly
-        const sortedInstances = instances ? [...instances] : [];
+        const sortedInstances = Array.isArray(instances) ? [...instances] : [];
         sortedInstances.sort((a, b) => {
           const aIsTemplate = a?.parent?.getId && this.props.config?.templateId && 
                              a.parent.getId() === this.props.config.templateId;
@@ -1819,13 +1825,13 @@ const StackViewerComponent = () => createClass({
               data = sortedInstances[instance].wrappedObj.visualValue.data;
               files.push(data);
               // Take multiple ID's for template
-              if (typeof this.props.config.templateId !== 'undefined' && typeof this.props.config.templateDomainIds !== 'undefined' && sortedInstances[instance].parent.getId() == this.props.config.templateId) {
+              if (typeof this.props.config.templateId !== 'undefined' && typeof this.props.config.templateDomainIds !== 'undefined' && sortedInstances[instance].parent.getId() === this.props.config.templateId) {
                 ids.push(this.props.config.templateDomainIds);
               } else {
                 ids.push([sortedInstances[instance].getId()]);
               }
               labels.push(sortedInstances[instance].getName());
-              colors.push(rgbToHex(sortedInstances[instance].wrappedObj.color))
+              colors.push(rgbToHex(sortedInstances[instance].wrappedObj.color));
             }
           } catch (err) {
             console.log('Error handling ' + instance);

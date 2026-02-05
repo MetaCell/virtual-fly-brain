@@ -191,7 +191,6 @@ const rgbToHex = (color) => {
 
       // Initialize component lifecycle flags
       this._isMounted = true;
-      this._processingInstances = false;
 
       this.createStatusText();
 
@@ -1535,6 +1534,7 @@ const rgbToHex = (color) => {
 
 const StackViewerComponent = () => createClass({
     _isMounted: false,
+    _processingInstances: false,
 
     getInitialState: function () {
       return {
@@ -1776,7 +1776,6 @@ const StackViewerComponent = () => createClass({
           newState.txtUpdated = Date.now();
         }
         
-        var instance;
         var data;
         var files = [];
         var colors = [];

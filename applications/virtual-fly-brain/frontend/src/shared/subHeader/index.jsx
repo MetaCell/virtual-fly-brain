@@ -167,9 +167,17 @@ const SubHeader = ({ setBottomNav, bottomNav }) => {
       {isLoading && (
         <Box
           sx={{
+            position: "absolute",
+            left: {
+              xs: "1rem",
+              lg: "1.5rem",
+            },
+            top: "50%",
+            transform: "translateY(-50%)",
             display: "flex",
             alignItems: "center",
             gap: 1,
+            zIndex: 1,
           }}
         >
           <CircularProgress size={20} />

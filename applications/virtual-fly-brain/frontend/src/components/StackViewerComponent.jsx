@@ -189,6 +189,9 @@ const rgbToHex = (color) => {
       this.stack.position.y = 0;
       this.state.recenter = true;
 
+      // Initialize component lifecycle flags
+      this._isMounted = true;
+
       this.createStatusText();
 
       this.stack.interactive = true;
@@ -404,6 +407,11 @@ const rgbToHex = (color) => {
 
       // signal component is now unmounted
       this._isMounted = false;
+      
+      // Clear any pending instance updates
+      if (this._instanceUpdateTimeout) {
+        clearTimeout(this._instanceUpdateTimeout);
+      }
 
       return true;
     },
@@ -486,6 +494,7 @@ const rgbToHex = (color) => {
             let extent = { imageX: imageX, imageY: imageY };
             that.setState(extent);
             that.props.setExtent(extent);
+            that.onResize(that.props.width, that.props.height);
             that.checkStack();
             that.callPlaneEdges();
             that.state.iBuffer = {};
@@ -623,6 +632,8 @@ const rgbToHex = (color) => {
       }
       this._lastCallObjectsTime = now;
 
+      this.state.loadingLabels = true;
+
       var j, result;
       var that = this;
       var isSelected = false;
@@ -663,6 +674,7 @@ const rgbToHex = (color) => {
                                 // selectInstance(that.props.templateDomainIds[index]);
                                 //console.log(that.props.templateDomainNames[index] + ' clicked');
                                 that.setStatusText(that.props.templateDomainNames[index] + ' selected');
+                                that.state.loadingLabels = false;
                                 break;
                               // eslint-disable-next-line no-unused-vars
                               } catch (_ignore) {
@@ -775,10 +787,10 @@ const rgbToHex = (color) => {
                             that.state.objects = updatedObjects
                             break;
                           }
-                        }
                       }
                     }
                   }
+                }
                   var list = that.state.objects?.filter((el, index, arr) => {
                     return index === arr.indexOf(el);
                   }).sort();
@@ -790,7 +802,7 @@ const rgbToHex = (color) => {
                     objects = objects + list[j] + '\n';
                   }
                   if (objects !== '' && i == 0) {
-                    that.setHoverText(callX,callY,list[0]);
+                    that.setHoverText(that.state.posX,that.state.posY,list[0]);
                   } else {
                     that.clearHoverText();
                   }
@@ -915,10 +927,16 @@ const rgbToHex = (color) => {
           extensions.add(imageDelivery);
 
           let list = Array.from(loadList);
-          let images = list.map( async (value) => {
-            let im = await Assets.load({ src : value, loadParser : 'customParser' })
+          const totalCount = list.length;
+          
+          let images = list.map(async (value, index) => {
+            let im = await Assets.load({ src : value, loadParser : 'customParser' });
+            // Update progress deterministically using index
+            const progress = ((index + 1) / totalCount) * 100;
+            this.loadProgressHandler({ progress });
             return im;
-          })
+          });
+          
           let results = await Promise.allSettled(images);
           results = results.map( result => result.value );
 
@@ -941,7 +959,7 @@ const rgbToHex = (color) => {
         this.clearVisualState('empty stack');
       }
 
-      if (this.state.txtUpdated < Date.now() - this.state.txtStay) {
+      if (this.state.buffer[-1] && this.state.txtUpdated < Date.now() - this.state.txtStay) {
         this.state.buffer[-1].text = '';
       }
 
@@ -1457,6 +1475,13 @@ const rgbToHex = (color) => {
         // update new position:
         this.state.posX = Number(currentPosition?.x?.toFixed(0));
         this.state.posY = Number(currentPosition?.y?.toFixed(0));
+        
+        // Update hover text position if it's visible
+        if (this.state.hoverTextBuffer && this.state.hoverTextBuffer.visible) {
+          this.state.hoverTextBuffer.x = this.disp.position.x + (this.stack.position.x * this.disp.scale.x) + (Number(this.state.posX) * this.disp.scale.x) - 10;
+          this.state.hoverTextBuffer.y = this.disp.position.y + (this.stack.position.y * this.disp.scale.y) + (Number(this.state.posY) * this.disp.scale.y) + 15;
+        }
+        
         if (!(this.state.posX == this.state.oldX && this.state.posY == this.state.oldY)) {
           this.listObjects();
           this.state.hoverTime = Date.now();
@@ -1509,6 +1534,7 @@ const rgbToHex = (color) => {
 
 const StackViewerComponent = () => createClass({
     _isMounted: false,
+    _processingInstances: false,
 
     getInitialState: function () {
       return {
@@ -1714,15 +1740,42 @@ const StackViewerComponent = () => createClass({
     },
 
     componentDidUpdate: function (prevProps) {
-      if (prevProps.data != undefined && prevProps.data != null && prevProps.data.instances != undefined) {
-        this.setState(this.handleInstances(this.props.data.instances));
+      // Only process if instances actually changed
+      const instancesChanged = prevProps.data?.instances !== this.props.data?.instances;
+      
+      if (instancesChanged && this.props.data?.instances) {
+        // Debounce instance processing to prevent parallel rendering issues
+        clearTimeout(this._instanceUpdateTimeout);
+        this._instanceUpdateTimeout = setTimeout(() => {
+          if (this._isMounted && !this._processingInstances) {
+            this._processingInstances = true;
+            try {
+              const newState = this.handleInstances(this.props.data.instances);
+              this.setState(newState, () => {
+                this._processingInstances = false;
+              });
+            } catch (error) {
+              // Ensure the processing flag is always cleared, even on error
+              console.error('Error while handling instances in StackViewerComponent:', error);
+              if (this._isMounted) {
+                this._processingInstances = false;
+              }
+            }
+          }
+        }, 50);
       }
     },
 
     handleInstances: function (instances) {
       var newState = {...this.state};
       if (instances && instances != null && instances.length > 0) {
-        var instance;
+        // Show loading indicator if app is initialized
+        if (this.app && this.state.buffer[-1]) {
+          newState.buffer[-1].text = 'Loading instances...';
+          newState.text = 'Loading instances...';
+          newState.txtUpdated = Date.now();
+        }
+        
         var data;
         var files = [];
         var colors = [];
@@ -1764,23 +1817,37 @@ const StackViewerComponent = () => createClass({
             newState.tempName = templateNames;
             newState.tempType = templateTypes;
           }
-        }                
-        for (instance in instances) {
+        }
+        
+        // Sort instances to ensure template is always first
+        // This is critical for click selection to work correctly
+        const sortedInstances = Array.isArray(instances) ? [...instances] : [];
+        sortedInstances.sort((a, b) => {
+          const aIsTemplate = a?.parent?.getId && this.props.config?.templateId && 
+                             a.parent.getId() === this.props.config.templateId;
+          const bIsTemplate = b?.parent?.getId && this.props.config?.templateId && 
+                             b.parent.getId() === this.props.config.templateId;
+          if (aIsTemplate && !bIsTemplate) return -1;
+          if (!aIsTemplate && bIsTemplate) return 1;
+          return 0;
+        });
+        
+        for (const instance of sortedInstances) {
           try {
-            if ((instances[instance].wrappedObj.id != undefined) && (instances[instance].parent != null) ){
-              data = instances[instance].wrappedObj.visualValue.data;
+            if ((instance.wrappedObj.id !== undefined) && (instance.parent !== null) ){
+              data = instance.wrappedObj.visualValue.data;
               files.push(data);
               // Take multiple ID's for template
-              if (typeof this.props.config.templateId !== 'undefined' && typeof this.props.config.templateDomainIds !== 'undefined' && instances[instance].parent.getId() == this.props.config.templateId) {
+              if (typeof this.props.config.templateId !== 'undefined' && typeof this.props.config.templateDomainIds !== 'undefined' && instance.parent.getId() === this.props.config.templateId) {
                 ids.push(this.props.config.templateDomainIds);
               } else {
-                ids.push([instances[instance].getId()]);
+                ids.push([instance.getId()]);
               }
-              labels.push(instances[instance].getName());
-              colors.push(rgbToHex(instances[instance].wrappedObj.color))
+              labels.push(instance.getName());
+              colors.push(rgbToHex(instance.wrappedObj.color));
             }
           } catch (err) {
-            console.log('Error handling ' + instance);
+            console.log('Error handling instance: ' + (instance?.getId?.() || 'unknown'));
             console.log(err.message);
             console.log(err.stack);
           }
@@ -1807,6 +1874,10 @@ const StackViewerComponent = () => createClass({
 
     componentWillUnmount: function () {
       this._isMounted = false;
+      // Clear any pending timeout
+      if (this._instanceUpdateTimeout) {
+        clearTimeout(this._instanceUpdateTimeout);
+      }
       return true;      
     },
     /**

@@ -3,7 +3,7 @@ import { getQueriesFailure } from '../actions/queries';
 import { getQueriesTypes } from '../actions/types/getQueriesTypes';
 import { getInstancesTypes } from '../actions/types/getInstancesTypes';
 import { setFirstIDLoaded, setAlignTemplates, setTemplateID } from '../actions/globals';
-import { getInstanceByID, get3DMesh, triggerInstanceFailure, setBulkLoadingCount } from '../actions/instances';
+import { getInstanceByID, get3DMesh, triggerInstanceFailure, setBulkLoadingCount, clearUrlLoadingState, focusInstance, selectInstance } from '../actions/instances';
 import * as GeppettoActions from '@metacell/geppetto-meta-client/common/actions';
 
 function updateUrlParameterWithCurrentUrl(param, value, reset) {
@@ -29,7 +29,21 @@ function updateUrlParameterWithCurrentUrl(param, value, reset) {
 }
 
 // This function updates the URL with the instances and the selected ID
-function updateUrlWithInstancesAndSelectedId(selectedId) {
+function updateUrlWithInstancesAndSelectedId(selectedId, store) {
+  const { isLoadingFromUrl, launchTemplate } = store.getState().instances;
+  
+  
+  // During URL load, don't update the URL at all - let the initial URL parameters stay unchanged
+  if (isLoadingFromUrl) {
+    return;
+  }
+  
+  // Block template from overwriting the focused instance during initial load
+  const isTemplate = launchTemplate?.metadata?.Id === selectedId;
+  if (initialUrlFocusId && initialUrlFocusId !== selectedId && isTemplate) {
+    return;
+  }
+
   const urlObj = new URL(window.location.href);
   if (urlObj.searchParams.has('id')) {
     const currentId = urlObj.searchParams.get('id');
@@ -42,6 +56,9 @@ function updateUrlWithInstancesAndSelectedId(selectedId) {
 
 const DEFAULT_ID = "VFB_00101567";
 const APP_LOADED_FLAG_KEY = "CURRENT_LOADED_URL";
+
+// Track the initial focus ID from URL to prevent templates from overwriting it
+let initialUrlFocusId = null;
 
 const isFirstTimeLoad = (allLoadedInstances, store) => {
   const appLoadedUrl = localStorage.getItem(APP_LOADED_FLAG_KEY);
@@ -74,16 +91,23 @@ const isFirstTimeLoad = (allLoadedInstances, store) => {
     const instancesToLoad = uniqueLoadOrder.filter(id => !allLoadedInstances?.find(i => i.metadata?.Id === id));
 
     if (instancesToLoad.length > 0) {
-      store.dispatch(setBulkLoadingCount(instancesToLoad.length));
+      store.dispatch(setBulkLoadingCount(instancesToLoad.length, true));
     }
 
-    const focusTarget = queuedInstances.length > 0
-    ? queuedInstances[queuedInstances.length - 1]
-    : (idSelected || uniqueLoadOrder[uniqueLoadOrder.length - 1]);
+    // id= parameter should always take priority for focus
+    const focusTarget = idSelected || 
+      (queuedInstances.length > 0 
+        ? queuedInstances[queuedInstances.length - 1]
+        : uniqueLoadOrder[uniqueLoadOrder.length - 1]);
+
+    // Update URL with default template if no parameters were provided
+    if (!idsFromUrl && !idSelected) {
+      updateUrlParameterWithCurrentUrl('id', DEFAULT_ID, true);
+    }
 
     uniqueLoadOrder.forEach(id => {
-      const shouldFocus = id === focusTarget;
-      getInstance(allLoadedInstances, id, shouldFocus);
+      const isFocusTarget = id === focusTarget;
+      getInstance(allLoadedInstances, id, isFocusTarget, false);
     });
   }
 };
@@ -93,9 +117,10 @@ const getUrlParameter = (param) => {
   return urlParams.get(param);
 };
 
-const getInstance = (allLoadedInstances, id, focus) => {
-  if ( !allLoadedInstances?.find( i => i.metadata?.Id === id ) ){
-    getInstanceByID(id, true, focus, focus, true);
+const getInstance = (allLoadedInstances, id, focus, select) => {
+  const isAlreadyLoaded = allLoadedInstances?.find( i => i.metadata?.Id === id );
+  if (!isAlreadyLoaded) {
+    getInstanceByID(id, true, focus, select, true);
   }
 }
 
@@ -103,6 +128,7 @@ export const urlUpdaterMiddleware = store => next => (action) => {
   const launchTemplate = store.getState().instances.launchTemplate;
   const allLoadedInstances = store.getState().instances.allLoadedInstances;
   const firstIDLoaded = store.getState().globalInfo.firstIDLoaded;
+  const isLoadingFromUrl = store.getState().instances.isLoadingFromUrl;
 
   // Only call isFirstTimeLoad if we haven't loaded the first ID yet
   if (!firstIDLoaded) {
@@ -120,6 +146,37 @@ export const urlUpdaterMiddleware = store => next => (action) => {
       break;
     }
     case getInstancesTypes.GET_INSTANCES_SUCCESS : {
+      // Check if bulk loading just completed
+      const state = store.getState().instances;
+      const newFinishedCount = state.finishedLoadedInstances + 1;
+      const isAllBulkInstancesLoaded = state.isBulkLoading && newFinishedCount >= state.bulkLoadingCount;
+      
+      // If bulk loading completed from URL, apply focus/select and clear the flag
+      if (isAllBulkInstancesLoaded && isLoadingFromUrl) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const pendingFocusId = urlParams.get('id');
+
+        // Store the initial focus ID to prevent templates from overwriting it
+        initialUrlFocusId = pendingFocusId;
+
+        // Apply focus and select to the id= parameter from URL
+        if (pendingFocusId) {
+          // Use async IIFE to wait for focus/select to complete before clearing URL loading state
+          (async () => {
+            await focusInstance(pendingFocusId);
+            await selectInstance(pendingFocusId);
+            // Clear URL loading state after async operations complete
+            store.dispatch(clearUrlLoadingState());            
+            // Clear the initial focus ID after a longer delay to allow all pending template operations to complete
+            setTimeout(() => {
+              initialUrlFocusId = null;
+            }, 1000);
+          })();
+        } else {
+          store.dispatch(clearUrlLoadingState());
+        }
+      }
+      
       const IsTemplate = action.payload?.IsTemplate || false;
       const isClass = action.payload?.IsClass || false;
       const isIndividual = action.payload?.IsIndividual || false;
@@ -145,7 +202,10 @@ export const urlUpdaterMiddleware = store => next => (action) => {
         }
         get3DMesh(action.payload);
         store.dispatch(setTemplateID(action.payload.Id));
-        updateUrlWithInstancesAndSelectedId(action.payload.Id);
+        
+        if (!(initialUrlFocusId && initialUrlFocusId !== action.payload.Id)) {
+          updateUrlWithInstancesAndSelectedId(action.payload.Id, store);
+        }
         next(action);
         return;
       } else if (IsTemplate && launchTemplate?.metadata?.Id !== action.payload.Id) {
@@ -157,7 +217,7 @@ export const urlUpdaterMiddleware = store => next => (action) => {
       // if it's a class just load it, since classes are not aligned with templates
       if (isClass) {
         next(action);
-        updateUrlWithInstancesAndSelectedId(action.payload.Id);
+        updateUrlWithInstancesAndSelectedId(action.payload.Id, store);
         return;
       }
 
@@ -169,18 +229,26 @@ export const urlUpdaterMiddleware = store => next => (action) => {
         const loadedTemplate = launchTemplate?.metadata?.Id;
         if (loadedTemplate && templates.includes(loadedTemplate)) {
           // If the individual is aligned with the current template, continue with the action
-          updateUrlWithInstancesAndSelectedId(action.payload.Id);
+          updateUrlWithInstancesAndSelectedId(action.payload.Id, store);
           next(action);
           get3DMesh(action.payload);
           return;
         } else if (loadedTemplate === null || loadedTemplate === undefined) {
           // if the template is not defined, we need to set the template ID
           const template = Object.keys(templateLookup)?.[0];
-          getInstanceByID(template, true, true, true);
+          // Load template WITHOUT focus/select to avoid overriding user's intended focus
+          getInstanceByID(template, true, false, false);
           store.dispatch(setTemplateID(template));
-          updateUrlWithInstancesAndSelectedId(template);
+          
+          // Don't update URL with template ID if we're loading from URL with a specific id= parameter
+          const urlParams = new URLSearchParams(window.location.search);
+          const pendingFocusId = urlParams.get('id');
+          if (!isLoadingFromUrl || !pendingFocusId) {
+            updateUrlWithInstancesAndSelectedId(template, store);
+          }
+          
           // Continue with the action and get the 3D mesh
-          updateUrlWithInstancesAndSelectedId(action.payload.Id);
+          updateUrlWithInstancesAndSelectedId(action.payload.Id, store);
           next(action);
           get3DMesh(action.payload);
           return;
@@ -203,9 +271,9 @@ export const urlUpdaterMiddleware = store => next => (action) => {
     case getInstancesTypes.SELECT_INSTANCE:
     case getInstancesTypes.FOCUS_INSTANCE: {
       const instance = action.payload.id;
+      
       if (instance) {
-        // Update the URL with the selected instance ID
-        updateUrlWithInstancesAndSelectedId(instance);
+        updateUrlWithInstancesAndSelectedId(instance, store);
       }
       next(action);
       break;

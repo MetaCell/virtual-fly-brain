@@ -26,6 +26,7 @@ export const initialStateInstancesReducer = {
   finishedLoadedInstances: 0,
   bulkLoadingCount: 0,
   isBulkLoading: false,
+  isLoadingFromUrl: false,
 };
 
 const getMappedCanvasData = (loadedInstances) => {
@@ -134,6 +135,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
           action: getInstancesTypes.ADD_INSTANCE,
           id: response.payload.Id,
           trigger: Date.now(),
+          bulkLoadComplete: isAllBulkInstancesLoaded,
         },
         isLoading: state.isBulkLoading ? !isAllBulkInstancesLoaded : false,
         error: false,
@@ -744,6 +746,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         isBulkLoading: true,
         loadingInstances: 0,
         finishedLoadedInstances: 0,
+        isLoadingFromUrl: response.payload.isFromUrl || false,
       });
     }
     case getInstancesTypes.RESET_BULK_LOADING: {
@@ -753,6 +756,11 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
         loadingInstances: 0,
         finishedLoadedInstances: 0,
         isLoading: false,
+      });
+    }
+    case getInstancesTypes.CLEAR_URL_LOADING_STATE: {
+      return Object.assign({}, state, {
+        isLoadingFromUrl: false,
       });
     }
     default:

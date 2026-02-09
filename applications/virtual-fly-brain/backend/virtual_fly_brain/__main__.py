@@ -110,7 +110,14 @@ def init_webapp_routes(app):
         try:
             result = vfb.get_instances(short_form)
             if isinstance(result, pd.DataFrame):
-                result = result.to_dict(orient='records')
+                rows = result.to_dict(orient='records')
+                headers = {col: {'title': col, 'order': i} for i, col in enumerate(result.columns)}
+                response = {
+                    'count': len(rows),
+                    'headers': headers,
+                    'rows': rows
+                }
+                return flask.jsonify(response)
             elif isinstance(result, pd.Series):
                 result = result.to_dict()
             return flask.jsonify(result)

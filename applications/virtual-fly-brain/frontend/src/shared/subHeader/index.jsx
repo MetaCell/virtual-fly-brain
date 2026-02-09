@@ -164,7 +164,7 @@ const SubHeader = ({ setBottomNav, bottomNav }) => {
         },
       }}
     >
-      {isLoading && (
+      {(isLoading || isBulkLoading) && (
         <Box
           sx={{
             position: "absolute",
@@ -261,8 +261,14 @@ const SubHeader = ({ setBottomNav, bottomNav }) => {
           {navArr.map((item, index) => (
             <Button
               aria-label={item.name}
-              onClick={() => {
-                setBottomNav(index);
+              onClick={(event) => {
+                event.stopPropagation();
+                // Clear All button (index 4) should not toggle
+                if (index === 4) {
+                  setBottomNav(4);
+                } else {
+                  setBottomNav(bottomNav === index ? undefined : index);
+                }
               }}
               sx={{
                 minWidth: "0.0625rem",

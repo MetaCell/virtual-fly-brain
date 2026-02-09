@@ -1129,7 +1129,7 @@ const TermInfo = ({ open, setOpen }) => {
                               <Typography>{group?.label}</Typography>
                               <Box display="flex" sx={{ zIndex: 6 }} pl={0.5}>
                                 <Typography sx={{ pr: 0.5 }}>
-                                  {group.queries.length}
+                                  {group.queries.reduce((n, { count }) => n + (count || 0), 0)}
                                 </Typography>
                                 <ListAltIcon
                                   sx={{ fontSize: "1.25rem", color: "#A0A0A0" }}

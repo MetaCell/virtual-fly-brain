@@ -517,6 +517,10 @@ const TermInfo = ({ open, setOpen }) => {
 
   // Helper to order headers: Name first, then others by order, then Add (empty)
   const getOrderedHeaders = (headers) => {
+    if (!headers || typeof headers !== 'object') {
+      return [];
+    }
+
     const headerArr = Object.entries(headers)
       .map(([key, value]) => ({ key, ...value }))
       .filter(h => h.key !== 'id' && h.key !== 'name');
@@ -1141,7 +1145,8 @@ const TermInfo = ({ open, setOpen }) => {
                           {group.queries.slice().sort(sortByCountDescending).map((query, index) => {
                               const headers = getOrderedHeaders(query?.preview_results?.headers);
                               return (query.output_format === "table" &&
-                                query?.preview_results?.rows?.length > 0 ? (
+                                query?.preview_results?.rows?.length > 0 &&
+                                headers?.length > 0 ? (
                                 <TreeItem
                                   sx={{ "paddingLeft": "1.25rem" }}
                                   key={`table-query-${groupIndex}-${index}`}
@@ -1370,7 +1375,8 @@ const TermInfo = ({ open, setOpen }) => {
                           .map((query, index) => {
                             const headers = getOrderedHeaders(query?.preview_results?.headers);
                             return (query.output_format === "table" &&
-                              query?.preview_results?.rows?.length > 0 ? (
+                              query?.preview_results?.rows?.length > 0 &&
+                              headers?.length > 0 ? (
                               <TreeItem
                                 sx={{ "paddingLeft": "1.25rem" }}
                                 key={query.label + index}

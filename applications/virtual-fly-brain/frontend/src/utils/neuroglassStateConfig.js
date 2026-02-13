@@ -1,10 +1,10 @@
 /**
- * Neuroglancer state for VFB_00101567 (Template)
+ * Neuroglass state for VFB_00101567 (Template)
  * Shows all 3 layers with VFB_00101567_1567 selected
  * 
  * Source: gs://neuroglass/vfb/VFB_00101567_1567/
  */
-export const NEUROGLASSER_STATE_VFB_00101567 = {
+export const NEUROGLASS_STATE_VFB_00101567 = {
   dimensions: {
     x: [1e-9, 'm'],
     y: [5.189161e-10, 'm'],
@@ -73,12 +73,12 @@ export const NEUROGLASSER_STATE_VFB_00101567 = {
 };
 
 /**
- * Neuroglancer state for VFB_0010101b (Instance)
+ * Neuroglass state for VFB_0010101b (Instance)
  * Shows all 3 layers with VFB_00101567_101b selected
  * 
  * Source: gs://neuroglass/vfb/VFB_00101567_101b/
  */
-export const NEUROGLASSER_STATE_VFB_0010101b = {
+export const NEUROGLASS_STATE_VFB_0010101b = {
   dimensions: {
     x: [1e-9, 'm'],
     y: [5.189161e-10, 'm'],
@@ -147,12 +147,12 @@ export const NEUROGLASSER_STATE_VFB_0010101b = {
 };
 
 /**
- * Neuroglancer state for VFB_001012vj (Instance)
+ * Neuroglass state for VFB_001012vj (Instance)
  * Shows all 3 layers with VFB_00101567_12vj selected
  * 
  * Source: gs://neuroglass/vfb/VFB_00101567_12vj/
  */
-export const NEUROGLASSER_STATE_VFB_001012vj = {
+export const NEUROGLASS_STATE_VFB_001012vj = {
   dimensions: {
     x: [1e-9, 'm'],
     y: [5.189161e-10, 'm'],
@@ -221,25 +221,25 @@ export const NEUROGLASSER_STATE_VFB_001012vj = {
 };
 
 /**
- * Map of instance IDs to their corresponding Neuroglancer states
+ * Map of instance IDs to their corresponding Neuroglass states
  * 
  * Usage:
- * const state = NEUROGLASSER_STATES_MAP['VFB_00101567'];
+ * const state = NEUROGLASS_STATES_MAP['VFB_00101567'];
  */
-export const NEUROGLASSER_STATES_MAP = {
-  'VFB_00101567': NEUROGLASSER_STATE_VFB_00101567,
-  'VFB_0010101b': NEUROGLASSER_STATE_VFB_0010101b,
-  'VFB_001012vj': NEUROGLASSER_STATE_VFB_001012vj,
+export const NEUROGLASS_STATES_MAP = {
+  'VFB_00101567': NEUROGLASS_STATE_VFB_00101567,
+  'VFB_0010101b': NEUROGLASS_STATE_VFB_0010101b,
+  'VFB_001012vj': NEUROGLASS_STATE_VFB_001012vj,
 };
 
 /**
- * Get Neuroglancer state for a specific VFB instance ID
+ * Get Neuroglass state for a specific VFB instance ID
  * 
  * @param {string} instanceId - VFB instance ID (e.g., 'VFB_00101567')
- * @returns {Object|null} Neuroglancer viewer state or null if not found
+ * @returns {Object|null} Neuroglass viewer state or null if not found
  */
-export const getNeuroglasserState = (instanceId) => {
-  return NEUROGLASSER_STATES_MAP[instanceId] || null;
+export const getNeuroglassState = (instanceId) => {
+  return NEUROGLASS_STATES_MAP[instanceId] || null;
 };
 
 /**
@@ -248,6 +248,6 @@ export const getNeuroglasserState = (instanceId) => {
  * @param {string} instanceId - VFB instance ID
  * @returns {boolean} True if state exists for this instance
  */
-export const hasNeuroglasserState = (instanceId) => {
-  return instanceId in NEUROGLASSER_STATES_MAP;
+export const hasNeuroglassState = (instanceId) => {
+  return instanceId in NEUROGLASS_STATES_MAP;
 };

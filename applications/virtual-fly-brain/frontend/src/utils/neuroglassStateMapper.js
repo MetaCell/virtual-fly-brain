@@ -1,20 +1,20 @@
 /**
- * Neuroglancer State Mapper
+ * Neuroglass State Mapper
  * 
- * Converts between VFB's Redux state and Neuroglancer state schema
+ * Converts between VFB's Redux state and Neuroglass state schema
  * compatible with Neuroglass storage format.
  */
 
 /**
- * Convert VFB Redux state to Neuroglancer state schema
+ * Convert VFB Redux state to Neuroglass state schema
  * @param {Object} vfbState - Full Redux state from VFB
- * @returns {Object} Neuroglancer state object
+ * @returns {Object} Neuroglass state object
  */
-export const vfbToNeuroglancerState = (vfbState) => {
-  const { instances, globalInfo } = vfbState;
+export const vfbToNeuroglassState = (vfbState) => {
+  const { instances, _globalInfo } = vfbState;
   const { allLoadedInstances, launchTemplate, focusedInstance } = instances;
 
-  // Convert VFB instances to Neuroglancer layers
+  // Convert VFB instances to Neuroglass layers
   const layers = [];
 
   // Add template as base layer if it exists
@@ -51,7 +51,7 @@ export const vfbToNeuroglancerState = (vfbState) => {
   });
 
   // Build navigation/camera state
-  const navigation = {
+  const _navigation = {
     pose: {
       position: {
         voxelSize: [1.0, 0.5189161, 0.5189161], // VFB default from precomputed data
@@ -61,7 +61,7 @@ export const vfbToNeuroglancerState = (vfbState) => {
     zoomFactor: 8,
   };
 
-  // Build complete Neuroglancer state
+  // Build complete Neuroglass state
   return {
     dimensions: {
       x: [1e-9, 'm'],
@@ -83,15 +83,15 @@ export const vfbToNeuroglancerState = (vfbState) => {
 };
 
 /**
- * Convert Neuroglancer state to VFB-compatible format
+ * Convert Neuroglass state to VFB-compatible format
  * Note: This is a partial conversion for loading studies back into VFB
- * @param {Object} ngState - Neuroglancer state object
+ * @param {Object} neuroglassState - Neuroglass state object
  * @returns {Object} VFB-compatible state updates
  */
-export const neuroglancerToVFBState = (ngState) => {
-  const { layers, selectedLayer } = ngState;
+export const neuroglassToVFBState = (neuroglassState) => {
+  const { layers, selectedLayer } = neuroglassState;
 
-  // Extract instance IDs from Neuroglancer layers
+  // Extract instance IDs from Neuroglass layers
   const instanceIds = layers
     ?.filter((layer) => layer.type === 'segmentation')
     ?.map((layer) => {
@@ -109,17 +109,17 @@ export const neuroglancerToVFBState = (ngState) => {
   return {
     instanceIds,
     focusedId,
-    // Camera/navigation state could be extracted from ngState.position, etc.
+    // Camera/navigation state could be extracted from neuroglassState.position, etc.
   };
 };
 
 /**
- * Create a minimal Neuroglancer state for a single VFB instance
+ * Create a minimal Neuroglass state for a single VFB instance
  * Useful for quick sharing or bookmarking
  * @param {Object} instance - VFB instance object
- * @returns {Object} Minimal Neuroglancer state
+ * @returns {Object} Minimal Neuroglass state
  */
-export const instanceToNeuroglancerState = (instance) => {
+export const instanceToNeuroglassState = (instance) => {
   return {
     layers: [
       {
@@ -134,7 +134,7 @@ export const instanceToNeuroglancerState = (instance) => {
 };
 
 export default {
-  vfbToNeuroglancerState,
-  neuroglancerToVFBState,
-  instanceToNeuroglancerState,
+  vfbToNeuroglassState,
+  neuroglassToVFBState,
+  instanceToNeuroglassState,
 };

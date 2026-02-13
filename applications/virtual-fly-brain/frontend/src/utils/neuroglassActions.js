@@ -3,16 +3,10 @@
  * Controls visibility and state of the Neuroglass viewer widget
  */
 
-import { setWidgetVisible } from '@metacell/geppetto-meta-client/common/layout/actions';
+import { setWidgetVisible, WidgetStatus } from '@metacell/geppetto-meta-client/common/layout/actions';
 import { widgetsIDs } from '../layout/widgets';
-import { hasNeuroglasserState, getNeuroglasserState } from './neuroglassStateConfig';
+import { hasNeuroglassState, getNeuroglassState, NEUROGLASS_STATES_MAP } from './neuroglassStateConfig';
 
-// Instances with available Neuroglass datasets
-export const NEUROGLASS_COMPATIBLE_INSTANCES = [
-  'VFB_0010101b',
-  'VFB_001012vj',
-  'VFB_00101567',
-];
 
 /**
  * Show the Neuroglass viewer widget
@@ -39,7 +33,7 @@ export const toggleNeuroglassViewer = (store) => {
   const widgets = state.widgets || {};
   const neuroglassWidget = widgets[widgetsIDs.neuroglassViewerWidgetID];
   
-  const isVisible = neuroglassWidget?.status === 'ACTIVE';
+  const isVisible = neuroglassWidget?.status === WidgetStatus.ACTIVE;
   store.dispatch(setWidgetVisible(widgetsIDs.neuroglassViewerWidgetID, !isVisible));
 };
 
@@ -49,16 +43,16 @@ export const toggleNeuroglassViewer = (store) => {
  * @returns {boolean} True if Neuroglass data exists
  */
 export const hasNeuroglassData = (instanceId) => {
-  return NEUROGLASS_COMPATIBLE_INSTANCES.includes(instanceId) && hasNeuroglasserState(instanceId);
+  return hasNeuroglassState(instanceId);
 };
 
 /**
- * Get the Neuroglancer viewer state for a specific instance
+ * Get the Neuroglass viewer state for a specific instance
  * @param {string} instanceId - VFB instance ID
- * @returns {Object|null} Neuroglancer state or null if not available
+ * @returns {Object|null} Neuroglass state or null if not available
  */
 export const getNeuroglassStateForInstance = (instanceId) => {
-  return getNeuroglasserState(instanceId);
+  return getNeuroglassState(instanceId);
 };
 
 /**

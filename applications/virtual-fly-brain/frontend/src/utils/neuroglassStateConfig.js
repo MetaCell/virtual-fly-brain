@@ -249,5 +249,5 @@ export const getNeuroglassState = (instanceId) => {
  * @returns {boolean} True if state exists for this instance
  */
 export const hasNeuroglassState = (instanceId) => {
-  return instanceId in NEUROGLASS_STATES_MAP;
+  return Object.prototype.hasOwnProperty.call(NEUROGLASS_STATES_MAP, instanceId);
 };

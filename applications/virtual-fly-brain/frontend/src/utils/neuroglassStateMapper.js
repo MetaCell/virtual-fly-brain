@@ -96,7 +96,7 @@ export const neuroglassToVFBState = (neuroglassState) => {
     ?.filter((layer) => layer.type === 'segmentation')
     ?.map((layer) => {
       // Try to extract VFB ID from source URL
-      const match = layer.source?.match(/\/datasets\/([A-Z]+_\d+)/);
+      const match = layer.source?.match(/\/datasets\/([A-Z]+_[A-Za-z0-9]+)/);
       return match ? match[1] : null;
     })
     .filter(Boolean);
@@ -104,7 +104,7 @@ export const neuroglassToVFBState = (neuroglassState) => {
   // Determine focused instance from selectedLayer
   const focusedLayerName = selectedLayer?.layer;
   const focusedLayer = layers?.find((layer) => layer.name === focusedLayerName);
-  const focusedId = focusedLayer?.source?.match(/\/datasets\/([A-Z]+_\d+)/)?.[1];
+  const focusedId = focusedLayer?.source?.match(/\/datasets\/([A-Z]+_[A-Za-z0-9]+)/)?.[1];
 
   return {
     instanceIds,

@@ -3,8 +3,9 @@
  * Controls visibility and state of the Neuroglass viewer widget
  */
 
-import { setWidgetVisible, WidgetStatus } from '@metacell/geppetto-meta-client/common/layout/actions';
-import { widgetsIDs } from '../layout/widgets';
+import { setWidgetVisible } from '@metacell/geppetto-meta-client/common/layout/actions';
+import { WidgetStatus } from '@metacell/geppetto-meta-client/common/layout/model';
+import { widgetsIDs } from '../components/layout/widgets';
 import { hasNeuroglassState, getNeuroglassState, NEUROGLASS_STATES_MAP } from './neuroglassStateConfig';
 
 

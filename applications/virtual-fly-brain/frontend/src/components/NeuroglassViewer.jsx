@@ -49,7 +49,8 @@ export default function NeuroglassViewer() {
               backgroundColor: '#000',
             }}
             title="Neuroglass Viewer"
-            sandbox="allow-scripts"
+            allow="accelerometer; camera; gyroscope; microphone; web-share"
+            sandbox="allow-scripts allow-same-origin allow-forms"
           />
         </Box>
       ) : (

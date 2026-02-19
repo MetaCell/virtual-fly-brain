@@ -70,6 +70,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
       return Object.assign({}, state, {
         loadingInstances: 0,
         finishedLoadedInstances: 0,
+        isLoading: false,
       });
     }
     case getInstancesTypes.GET_INSTANCES_STARTED: {
@@ -137,7 +138,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
           trigger: Date.now(),
           bulkLoadComplete: isAllBulkInstancesLoaded,
         },
-        isLoading: state.isBulkLoading ? !isAllBulkInstancesLoaded : false,
+        isLoading: state.isBulkLoading ? !isAllBulkInstancesLoaded : true,
         error: false,
         errorMessage: undefined,
         finishedLoadedInstances: newFinishedCount,

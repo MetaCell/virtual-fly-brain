@@ -79,18 +79,18 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
   const queryComponentOpened = useSelector( state => state.globalInfo?.queryComponentOpened );
 
   useEffect( () => {
-    if ( queryComponentOpened && bottomNav == undefined ){
+    if ( queryComponentOpened && bottomNav !== 2 ){
       setBottomNav(2)
-    } else if ( !queryComponentOpened ) {
-      setBottomNav(undefined)
     }
   }, [bottomNav, queryComponentOpened, setBottomNav]);
 
   // Handle Clear All functionality
   useEffect(() => {
-    if (bottomNav === 4 && allLoadedInstances?.length > 1) {
-      removeAllInstances();
-      // Reset bottomNav to clear the "Clear All" state
+    if (bottomNav === 4) {
+      if (allLoadedInstances?.length > 1) {
+        removeAllInstances();
+      }
+      // Always reset bottomNav to clear the "Clear All" state
       setBottomNav(undefined);
     }
   }, [bottomNav, allLoadedInstances?.length, setBottomNav]);

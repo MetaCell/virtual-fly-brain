@@ -5,6 +5,7 @@ import { getInstancesTypes } from '../actions/types/getInstancesTypes';
 import { setFirstIDLoaded, setAlignTemplates, setTemplateID } from '../actions/globals';
 import { getInstanceByID, get3DMesh, triggerInstanceFailure, setBulkLoadingCount, clearUrlLoadingState, focusInstance, selectInstance } from '../actions/instances';
 import * as GeppettoActions from '@metacell/geppetto-meta-client/common/actions';
+import { DEFAULT_TEMPLATE_ID } from '../../utils/constants';
 
 function updateUrlParameterWithCurrentUrl(param, value, reset) {
   const urlObj = new URL(window.location.href);
@@ -54,7 +55,7 @@ function updateUrlWithInstancesAndSelectedId(selectedId, store) {
   }
 }
 
-const DEFAULT_ID = "VFB_00101567";
+const DEFAULT_ID = DEFAULT_TEMPLATE_ID;
 const APP_LOADED_FLAG_KEY = "CURRENT_LOADED_URL";
 
 // Track the initial focus ID from URL to prevent templates from overwriting it
@@ -95,8 +96,8 @@ const isFirstTimeLoad = (allLoadedInstances, store) => {
     }
 
     // id= parameter should always take priority for focus
-    const focusTarget = idSelected || 
-      (queuedInstances.length > 0 
+    const focusTarget = idSelected ||
+      (queuedInstances.length > 0
         ? queuedInstances[queuedInstances.length - 1]
         : uniqueLoadOrder[uniqueLoadOrder.length - 1]);
 
@@ -150,9 +151,14 @@ export const urlUpdaterMiddleware = store => next => (action) => {
       const state = store.getState().instances;
       const newFinishedCount = state.finishedLoadedInstances + 1;
       const isAllBulkInstancesLoaded = state.isBulkLoading && newFinishedCount >= state.bulkLoadingCount;
-      
+
       // If bulk loading completed from URL, apply focus/select and clear the flag
       if (isAllBulkInstancesLoaded && isLoadingFromUrl) {
+        if (!launchTemplate?.metadata?.Id && !action.payload?.IsTemplate) {
+          getInstanceByID(DEFAULT_TEMPLATE_ID, true, false, false);
+          updateUrlParameterWithCurrentUrl('i', DEFAULT_TEMPLATE_ID, false);
+        }
+
         const urlParams = new URLSearchParams(window.location.search);
         const pendingFocusId = urlParams.get('id');
 
@@ -166,7 +172,7 @@ export const urlUpdaterMiddleware = store => next => (action) => {
             await focusInstance(pendingFocusId);
             await selectInstance(pendingFocusId);
             // Clear URL loading state after async operations complete
-            store.dispatch(clearUrlLoadingState());            
+            store.dispatch(clearUrlLoadingState());
             // Clear the initial focus ID after a longer delay to allow all pending template operations to complete
             setTimeout(() => {
               initialUrlFocusId = null;
@@ -176,13 +182,11 @@ export const urlUpdaterMiddleware = store => next => (action) => {
           store.dispatch(clearUrlLoadingState());
         }
       }
-      
+
       const IsTemplate = action.payload?.IsTemplate || false;
       const isClass = action.payload?.IsClass || false;
       const isIndividual = action.payload?.IsIndividual || false;
 
-    
-      
       if (!IsTemplate && !isClass && !isIndividual) {
         // If the instance is not a template, class, or individual, dispatch the getInstanceFailure with an error message
         if (action.payload?.Id === undefined) {
@@ -202,7 +206,7 @@ export const urlUpdaterMiddleware = store => next => (action) => {
         }
         get3DMesh(action.payload);
         store.dispatch(setTemplateID(action.payload.Id));
-        
+
         if (!(initialUrlFocusId && initialUrlFocusId !== action.payload.Id)) {
           updateUrlWithInstancesAndSelectedId(action.payload.Id, store);
         }

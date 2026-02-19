@@ -256,9 +256,6 @@ const TermInfo = ({ open, setOpen }) => {
   const queryComponentOpened = useSelector(
     (state) => state.globalInfo.queryComponentOpened
   );
-  const currentTemplate = useSelector(
-    (state) => state.instances.launchTemplate
-  );
 
   const [termInfoData, setTermInfoData] = useState(data);
   const [toggleReadMore, setToggleReadMore] = useState(false);
@@ -534,40 +531,6 @@ const TermInfo = ({ open, setOpen }) => {
     ];
   };
 
-  const handleLinkClick = (href, event) => {
-    event.preventDefault();
-
-    const idsArray = href.split(',');
-    const templateId = idsArray[idsArray.length - 1];
-    const currentTemplateId = currentTemplate?.metadata?.Id;
-
-    let isAlignedTemplate = false;
-    if (data?.metadata?.Examples && typeof data?.metadata?.Examples === 'object' && Object.keys(data?.metadata?.Examples).length > 0) {
-      isAlignedTemplate = !!(data.metadata.Examples[currentTemplateId] && data.metadata.Examples[currentTemplateId].find(e => e.id === templateId));
-    } else if (data?.metadata?.Images && Array.isArray(data?.metadata?.Images) && data?.metadata?.Images.length > 0) {
-      isAlignedTemplate = !!(data.metadata.Images[currentTemplateId] && data.metadata.Images[currentTemplateId].find(e => e.id === templateId));
-    }
-    
-    if (href.startsWith("http")) {
-      window.open(href, "_blank", "noopener,noreferrer");
-    } else {
-     if (isAlignedTemplate) {
-           getInstanceByID(
-             templateId, 
-             true, 
-             true, 
-             true
-           );
-         } else {
-           setConfirmationModal({
-             open: true,
-             id: templateId,
-             message: "The image you requested is aligned to another template. Click Load Template to open it in a new tab or Cancel to just view the image metadata."
-           });
-         }
-    }
-  };
-
   const queryGroups = useMemo(() => [
     { label: "Types of neurons with...", keys: ["Find neurons", "Find all", "Neurons with"] },
     { label: "Individual neurons with ", keys: ["Images of neurons with"] },
@@ -630,15 +593,16 @@ const TermInfo = ({ open, setOpen }) => {
         return (
           <ReactMarkdown
             components={{
+              // eslint-disable-next-line no-unused-vars
               a: ({ href, children, ...props }) => (
                 <span
                   style={{
                     fontSize: '0.875rem',
                     ":hover": {
                       color: tabActiveColor,
-                      cursor: 'pointer',
+                      cursor: 'default',
                     }}}
-                  onClick={e => handleLinkClick(href, e)}
+                  // onClick={e => handleLinkClick(href, e)}
                   {...props}
                 >
                   {children}
@@ -648,7 +612,7 @@ const TermInfo = ({ open, setOpen }) => {
               img: ({node, ...props}) => (
                 <img
                   {...props}
-                  style={{ maxWidth: 180, maxHeight: 90, width: 'auto', height: 'auto' }}
+                  style={{ maxWidth: 180, maxHeight: 90, width: 'auto', height: 'auto', cursor: 'default' }}
                   alt={props.alt}
                 />
               ),
@@ -1195,7 +1159,7 @@ const TermInfo = ({ open, setOpen }) => {
                                               return ( <TableRow key={row.id + '-' + rowIdx}>
                                                     {headers.slice(0, -1).map((h) =>
                                                     (
-                                                      <TableCell key={h.key}>
+                                                      <TableCell key={h.key} style={{ cursor: 'default' }}>
                                                         {renderCellContent(h.type, row[h.key])}
                                                       </TableCell>
                                                     )
@@ -1425,7 +1389,7 @@ const TermInfo = ({ open, setOpen }) => {
                                           return ( <TableRow key={row.id + '-' + rowIdx}>
                                                   {headers.slice(0, -1).map((h) =>
                                                   (
-                                                    <TableCell key={h.key}>
+                                                    <TableCell key={h.key} style={{ cursor: 'default' }}>
                                                       {renderCellContent(h.type, row[h.key])}
                                                     </TableCell>
                                                   )

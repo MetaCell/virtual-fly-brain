@@ -4,6 +4,7 @@ import ThreeDCanvas from '../ThreeDCanvas';
 import VFBCircuitBrowser from '../VFBCircuitBrowser';
 import VFBGraph from '../VFBGraph';
 import VFBListViewer from '../VFBListViewer';
+import NeuroglassViewer from '../NeuroglassViewer';
 /**
  * Key of the component is the `component` attribute of the widgetConfiguration.
  * This map is used inside the LayoutManager to know which component to display for a given widget.
@@ -14,7 +15,8 @@ const componentMap = {
     'roiBrowser': ROIBrowser,
     'termContext' : VFBGraph,
     'circuitBrowser' : VFBCircuitBrowser,
-    'listViewer': VFBListViewer
+    'listViewer': VFBListViewer,
+    'neuroglassViewer': NeuroglassViewer
 };
 
 export default componentMap

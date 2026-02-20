@@ -6,7 +6,8 @@ export const widgetsIDs = {
     roiBrowserWidgetID : 'roiBrowserWidget',
     termContextWidgetID : 'termContextWidget',
     circuitBrowserWidgetID : 'circuitBrowserWidget',
-    listViewerWidgetID : 'listViewerWidget'
+    listViewerWidgetID : 'listViewerWidget',
+    neuroglassViewerWidgetID : 'neuroglassViewerWidget'
 };
 
 export const widgets = {
@@ -80,5 +81,17 @@ export const widgets = {
         defaultPosition: 'RIGHT',
         pos: 4,
         props: { size: { height: 600, width: 300 } }
+    },
+
+    neuroglassViewerWidget : {
+        id: widgetsIDs.neuroglassViewerWidgetID,
+        name: "Neuroglass Viewer",
+        component: "neuroglassViewer",
+        panelName: "right",
+        hideOnClose: true,
+        status: WidgetStatus.HIDDEN,
+        defaultPosition: 'RIGHT',
+        pos: 5,
+        props: { size: { height: 600, width: 800 } }
     },
 }

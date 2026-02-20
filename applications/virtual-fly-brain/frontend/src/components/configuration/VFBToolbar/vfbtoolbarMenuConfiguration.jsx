@@ -243,6 +243,14 @@ export const toolbarMenu = (autoSaveLayout) => { return {
           }
         },
         {
+          label: "Neuroglass Viewer",
+          icon: "fa fa-brain",
+          action: {
+            handlerAction: ACTIONS.SHOW_WIDGET,
+            parameters: [widgets?.neuroglassViewerWidget?.id]
+          }
+        },
+        {
           label: "Template ROI Browser",
           icon: "fa fa-indent",
           action: {

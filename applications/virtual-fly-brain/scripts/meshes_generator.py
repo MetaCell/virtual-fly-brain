@@ -223,6 +223,7 @@ def generate_meshes_with_skimage(
     num_workers=None,
     filter_noise=False,  # Disabled by default - too slow
     merge_segments=False,
+    compress=True,
 ):
     """Generate meshes using scikit-image marching cubes."""
 
@@ -281,7 +282,7 @@ def generate_meshes_with_skimage(
             vertices[:, 2] = vertices[:, 2] * resolution[2] + voxel_offset[2]
 
             mesh_obj = Mesh(vertices, merged_mesh["faces"], segid=1)
-            vol.mesh.put(mesh_obj, compress=True)
+            vol.mesh.put(mesh_obj, compress=compress)
 
             return {
                 "generated": 1,
@@ -352,7 +353,7 @@ def generate_meshes_with_skimage(
 
             # Write mesh to cloudvolume
             mesh_obj = Mesh(vertices, result["faces"], segid=int(seg_id))
-            vol.mesh.put(mesh_obj, compress=True)
+            vol.mesh.put(mesh_obj, compress=compress)
             segments_with_meshes.append(int(seg_id))
             meshes_generated += 1
 
@@ -496,6 +497,11 @@ def main():
         help="Merge all segments into a single mesh per dataset",
     )
     parser.add_argument(
+        "--no-compress",
+        action="store_true",
+        help="Disable gzip compression for mesh files (store raw uncompressed)",
+    )
+    parser.add_argument(
         "--verbose", action="store_true", help="Print detailed progress"
     )
     parser.add_argument(
@@ -538,6 +544,8 @@ def main():
 
     datasets_info = []
 
+    compress = not args.no_compress
+
     for dataset in datasets:
         try:
             stats = generate_meshes_with_skimage(
@@ -547,6 +555,7 @@ def main():
                 num_workers=args.workers,
                 filter_noise=args.filter_noise,  # Now opt-in instead of opt-out
                 merge_segments=args.merge_segments,
+                compress=compress,
             )
 
             total_stats["generated"] += stats["generated"]

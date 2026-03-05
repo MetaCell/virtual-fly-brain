@@ -155,7 +155,7 @@ Possible other Use Cases that could change state :
 
 -  Camera position for each given quadrant on Neuroglass. If these are saved as part of Neuroglass state, and updated in URL as well, we could extract this information from the IFrame as it updates and save the camera position for each quadrant in Global Redux state of VFB.
 
-- Missing data in VFB Server, if a loaded instance doesn’t have data in the VFB Server we can use in Neuroglass, we can’t render this instance in neuroglass. Nueroglassviewer component will need to remember not to keep trying to fetch data for this instance when not available, maybe here we need to expand the global state to flag a VFB loaded instance as non Neuroglass candidate and avoid retrying in future component updates. 
+- Missing data in VFB Server, if a loaded instance doesn’t have data in the VFB Server we can use in Neuroglass, we can’t render this instance in Neuroglass. NeuroglassViewer component will need to remember not to keep trying to fetch data for this instance when not available, maybe here we need to expand the global state to flag a VFB loaded instance as non Neuroglass candidate and avoid retrying in future component updates. 
 
 
 ### Files Changed Needed

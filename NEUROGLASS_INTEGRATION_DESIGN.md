@@ -12,6 +12,8 @@
 
 Add a param in the URL to handle the NG widget view (1 VS 4 quadrants). Neuroglass handles this with the layout query parameter, the following proposal uses the same name ‘layout’ as query parameter in VFB URL. `?id=VFB_001012vj&layout=3d` — the `layout` parameter sets the Neuroglancer layout. Must survive page refresh and be shareable.
 
+<img width="6926" height="1504" alt="image" src="https://github.com/user-attachments/assets/97c3652e-6d5a-4af9-8cf7-64783f419d85" />
+
 ### 3 Scenarios → Neuroglancer Layout Values
 
 Possible Scenarios for Layout:
@@ -54,7 +56,10 @@ The user's explicit `?layout=` param always wins over the responsive default.
 
 ## Requirement — Layer Sync from VFBListViewer Actions
 
-This FigJam below is the flow proposed for VFBListViewer to Neuroglass synchronization actions. NO changes are needed on the Redux state, or middleware. NeuroglassViewer component already responds to allLoadedInstances in global state. To prevent iframe re-rendering multiple times when multiple actions are triggered from VFBListViewer fast, e.g. color slider changes, a debouncer needs to be added in the NeuroglassViewer component to prevent iframe re-rendering on every change when not needed.
+This [FigJam](https://www.figma.com/board/wChto0YkFbMyoPNmXoRn8Y/VFB-Neuroglass-Synchrinozation?node-id=4-328&t=fQ8YdeWz2JKfFWP5-0) below is the flow proposed for VFBListViewer to Neuroglass synchronization actions. NO changes are needed on the Redux state, or middleware. NeuroglassViewer component already responds to allLoadedInstances in global state. To prevent iframe re-rendering multiple times when multiple actions are triggered from VFBListViewer fast, e.g. color slider changes, a debouncer needs to be added in the NeuroglassViewer component to prevent iframe re-rendering on every change when not needed.
+
+<img width="6628" height="3076" alt="image" src="https://github.com/user-attachments/assets/bf1e72de-fdd8-4c91-aeff-717000346d00" />
+
 
 ### How VFBListViewer Actions Reach the Iframe
 

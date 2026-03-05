@@ -29,12 +29,12 @@ Possible Scenarios for Layout:
 
 | File | What changes |
 |---|---|
-| `reducers/actions/types/GlobalTypes.js` | Add `SET_NEUROGLASS_VIEW` constant |
-| `reducers/actions/globals.js` | Add `setNeuroglassView(view)` action creator |
-| `reducers/GlobalReducer.js` | Add `neuroglassView: null` field + case handler |
-| `reducers/middleware/urlUpdaterMiddleware.js` | Read `layout` on first load; write on `SET_NEUROGLASS_VIEW` |
-| `utils/neuroglassStateConfig.js` | Add `VALID_NG_VIEWS` array + `resolveNeuroglassLayout()` |
-| `components/NeuroglassViewer.jsx` | Read `neuroglassView` from Redux, pass to `resolveNeuroglassLayout` |
+| `applications/virtual-fly-brain/frontend/src/reducers/actions/types/GlobalTypes.js` | Add `SET_NEUROGLASS_VIEW` constant |
+| `applications/virtual-fly-brain/frontend/src/reducers/actions/globals.js` | Add `setNeuroglassView(view)` action creator |
+| `applications/virtual-fly-brain/frontend/src/reducers/GlobalReducer.js` | Add `neuroglassView: null` field + case handler |
+| `applications/virtual-fly-brain/frontend/src/reducers/middleware/urlUpdaterMiddleware.js` | Read `layout` on first load; write on `SET_NEUROGLASS_VIEW` |
+| `applications/virtual-fly-brain/frontend/src/utils/neuroglassStateConfig.js` | Add `VALID_NG_VIEWS` array + `resolveNeuroglassLayout()` |
+| `applications/virtual-fly-brain/frontend/src/components/NeuroglassViewer.jsx` | Read `neuroglassView` from Redux, pass to `resolveNeuroglassLayout` |
 
 
 ---
@@ -49,8 +49,8 @@ The user's explicit `?layout=` param always wins over the responsive default.
 
 | File | What changes |
 |---|---|
-| `utils/neuroglassStateConfig.js` | `resolveNeuroglassLayout(userPref, isMobile)` function |
-| `components/NeuroglassViewer.jsx` | `const isMobile = !useMediaQuery(theme.breakpoints.up('lg'))` (1200px) + call `resolveNeuroglassLayout` |
+| `applications/virtual-fly-brain/frontend/src/utils/neuroglassStateConfig.js` | `resolveNeuroglassLayout(userPref, isMobile)` function |
+| `applications/virtual-fly-brain/frontend/src/components/NeuroglassViewer.jsx` | `const isMobile = !useMediaQuery(theme.breakpoints.up('lg'))` (1200px) + call `resolveNeuroglassLayout` |
 
 ---
 
@@ -99,8 +99,8 @@ Each VFB instance in `allLoadedInstances` maps to exactly one Neuroglancer image
 
 | File | What changes |
 |---|---|
-| `utils/neuroglassStateConfig.js` | Add `buildNeuroglassState()`, `LAYER_SHADER` fixed template, `INSTANCE_TO_DATASET_PATH` lookup table |
-| `components/NeuroglassViewer.jsx` | `useSelector(allLoadedInstances)`, `useMemo` + 300ms debounce → rebuild iframe src on every instance change |
+| `applications/virtual-fly-brain/frontend/src/utils/neuroglassStateConfig.js` | Add `buildNeuroglassState()`, `LAYER_SHADER` fixed template, `INSTANCE_TO_DATASET_PATH` lookup table |
+| `applications/virtual-fly-brain/frontend/src/components/NeuroglassViewer.jsx` | `useSelector(allLoadedInstances)`, `useMemo` + 300ms debounce → rebuild iframe src on every instance change |
 
 ---
 
@@ -137,8 +137,8 @@ export const NEUROGLASS_DATASOURCE = {
 
 | File | What changes |
 |---|---|
-| `utils/neuroglassStateConfig.js` | Add `NEUROGLASS_DATASOURCE = { protocol, baseUrl, buildUrl(id) }` |
-| `frontend/.env.example` | Document `VITE_NEUROGLASS_DATA_PROTOCOL`, `VITE_NEUROGLASS_DATA_BASE_URL` |
+| `applications/virtual-fly-brain/frontend/src/utils/neuroglassStateConfig.js` | Add `NEUROGLASS_DATASOURCE = { protocol, baseUrl, buildUrl(id) }` |
+| `applications/virtual-fly-brain/frontend/src/frontend/.env.example` | Document `VITE_NEUROGLASS_DATA_PROTOCOL`, `VITE_NEUROGLASS_DATA_BASE_URL` |
 
 ---
 
@@ -167,7 +167,7 @@ Possible other Use Cases that could change state :
 
 | File | What changes |
 |---|---|
-| `reducers/actions/types/GlobalTypes.js` | Add `SET_NEUROGLASS_VIEW` |
-| `reducers/actions/globals.js` | Add `setNeuroglassView(view)` action creator |
-| `reducers/GlobalReducer.js` | Add `neuroglassView: null` + `SET_NEUROGLASS_VIEW` case |
-| `reducers/middleware/urlUpdaterMiddleware.js` | Read `?layout` on first load → dispatch `setNeuroglassView`; write URL back on `SET_NEUROGLASS_VIEW` |
+| `applications/virtual-fly-brain/frontend/src/reducers/actions/types/GlobalTypes.js` | Add `SET_NEUROGLASS_VIEW` |
+| `applications/virtual-fly-brain/frontend/src/reducers/actions/globals.js` | Add `setNeuroglassView(view)` action creator |
+| `applications/virtual-fly-brain/frontend/src/reducers/GlobalReducer.js` | Add `neuroglassView: null` + `SET_NEUROGLASS_VIEW` case |
+| `applications/virtual-fly-brain/frontend/src/educers/middleware/urlUpdaterMiddleware.js` | Read `?layout` on first load → dispatch `setNeuroglassView`; write URL back on `SET_NEUROGLASS_VIEW` |

@@ -5,6 +5,7 @@ import { ribbonConfiguration } from "../components/configuration/TermInfo/TermIn
 import configuration from "../components/configuration/TermInfo/configuration.json";
 import {
   Box,
+  Checkbox,
   Chip,
   Button,
   Tooltip,
@@ -147,7 +148,8 @@ const CustomBox = styled(Box)(({ theme }) => ({
 }));
 
 const TableContainerBoxWrapper = styled(Box)(({ theme }) => ({
-  overflowX: "auto",
+  width: "100%",
+  display: "block",
   [theme.breakpoints.down("md")]: {
     "&:before": {
       background: "none",
@@ -157,6 +159,29 @@ const TableContainerBoxWrapper = styled(Box)(({ theme }) => ({
     "&:before": {
       background: "none",
     },
+  },
+}));
+
+const ScrollableTableContainer = styled(TableContainer)(() => ({
+  overflowX: "scroll",
+  scrollbarWidth: "thin",
+  scrollbarColor: "#888 #1a1a1a",
+  WebkitOverflowScrolling: "touch",
+  "&::-webkit-scrollbar": {
+    height: "8px",
+    display: "block",
+  },
+  "&::-webkit-scrollbar-track": {
+    background: "#1a1a1a",
+    borderRadius: "4px",
+  },
+  "&::-webkit-scrollbar-thumb": {
+    background: "#888",
+    borderRadius: "4px",
+    border: "1px solid #444",
+  },
+  "&::-webkit-scrollbar-thumb:hover": {
+    background: "#aaa",
   },
 }));
 
@@ -600,7 +625,6 @@ const TermInfo = ({ open, setOpen }) => {
                     fontSize: '0.875rem',
                     ":hover": {
                       color: tabActiveColor,
-                      cursor: 'default',
                     }}}
                   // onClick={e => handleLinkClick(href, e)}
                   {...props}
@@ -612,7 +636,7 @@ const TermInfo = ({ open, setOpen }) => {
               img: ({node, ...props}) => (
                 <img
                   {...props}
-                  style={{ maxWidth: 180, maxHeight: 90, width: 'auto', height: 'auto', cursor: 'default' }}
+                  style={{ maxWidth: 180, maxHeight: 90, width: 'auto', height: 'auto' }}
                   alt={props.alt}
                 />
               ),
@@ -1112,7 +1136,12 @@ const TermInfo = ({ open, setOpen }) => {
                                 query?.preview_results?.rows?.length > 0 &&
                                 headers?.length > 0 ? (
                                 <TreeItem
-                                  sx={{ "paddingLeft": "1.25rem" }}
+                                  sx={{
+                                    "paddingLeft": "1.25rem",
+                                    "& > .MuiCollapse-root": { overflow: "visible" },
+                                    "& > .MuiCollapse-root .MuiCollapse-wrapper": { overflow: "visible" },
+                                    "& > .MuiCollapse-root .MuiCollapse-wrapperInner": { overflow: "visible" },
+                                  }}
                                   key={`table-query-${groupIndex}-${index}`}
                                   itemId={`table-query-${groupIndex}-${index}`}
                                   label={
@@ -1136,75 +1165,61 @@ const TermInfo = ({ open, setOpen }) => {
                                     </CustomBox>
                                   }
                                 >
-                                  <TreeItem
-                                    itemId={`terminfo-queries-table-${groupIndex}-${index}`}
-                                    label={
-                                      <>
-                                        <TableContainerBoxWrapper>
-                                          <TableContainer component={Paper}>
-                                            <Table>
-                                              <TableHead>
-                                                <TableRow>
-                                                  {headers.slice(0, -1).map(h => (
-                                                    <TableCell key={h.key}>{h.title}</TableCell>
-                                                  ))}
-                                                  <TableCell /> {/* Last header is always empty for Add button */}
-                                                </TableRow>
-                                              </TableHead>
-                                              <TableBody>
-                                                {query?.preview_results?.rows.map((row, rowIdx) => {
-                                                  const isLoaded = allLoadedInstances?.find(
-                                                    (instance) => instance.metadata?.Id === row.id
-                                                  );
-                                              return ( <TableRow key={row.id + '-' + rowIdx}>
-                                                    {headers.slice(0, -1).map((h) =>
-                                                    (
-                                                      <TableCell key={h.key} style={{ cursor: 'default' }}>
-                                                        {renderCellContent(h.type, row[h.key])}
-                                                      </TableCell>
-                                                    )
-                                                    )}
-                                                    <TableCell>
-                                                      {isLoaded ? (
-                                                        <Button
-                                                          variant="text"
-                                                          color="error"
-                                                          onClick={() => deleteId()}
-                                                        >
-                                                          Delete
-                                                        </Button>
-                                                      ) : (
-                                                        <Button
-                                                          variant="outlined"
-                                                          onClick={() =>
-                                                            addId(row.id)
-                                                          }
-                                                          color="success"
-                                                          sx={{
-                                                            borderRadius:
-                                                              "0.25rem",
-                                                            border:
-                                                              "1px solid #0AB7FE",
-                                                            color: "#0AB7FE",
-                                                            "&:hover": {
-                                                              border:
-                                                                "1px solid #0AB7FE",
-                                                            },
-                                                          }}
-                                                        >
-                                                          Add
-                                                        </Button>
-                                                      )}
-                                                    </TableCell>
-                                                  </TableRow>
-                                            )})}
-                                              </TableBody>
-                                            </Table>
-                                          </TableContainer>
-                                        </TableContainerBoxWrapper>
-                                      </>
-                                    }
-                                  />
+                                  <TableContainerBoxWrapper>
+                                    <ScrollableTableContainer component={Paper}>
+                                      <Table sx={{ minWidth: 'max-content' }}>
+                                        <TableHead>
+                                          <TableRow>
+                                            <TableCell sx={{ width: '40px', padding: '0 8px', minWidth: '40px' }} />
+                                            {headers.slice(0, -1).map(h => (
+                                              <TableCell key={h.key} sx={{ whiteSpace: 'nowrap' }}>{h.title}</TableCell>
+                                            ))}
+                                          </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                          {query?.preview_results?.rows.map((row, rowIdx) => {
+                                            const isLoaded = allLoadedInstances?.find(
+                                              (instance) => instance.metadata?.Id === row.id
+                                            );
+                                            const handleRowClick = () => {
+                                              if (isLoaded) {
+                                                deleteId();
+                                              } else {
+                                                addId(row.id);
+                                              }
+                                            };
+                                            return (
+                                              <TableRow
+                                                key={row.id + '-' + rowIdx}
+                                                onClick={handleRowClick}
+                                                sx={{
+                                                  cursor: 'pointer',
+                                                  '&:hover': {
+                                                    backgroundColor: 'rgba(255, 255, 255, 0.05)'
+                                                  }
+                                                }}
+                                              >
+                                                <TableCell sx={{ width: '40px', padding: '0 8px', minWidth: '40px' }}>
+                                                  <Checkbox
+                                                    checked={!!isLoaded}
+                                                    sx={{
+                                                      color: '#0AB7FE',
+                                                      '&.Mui-checked': { color: '#0AB7FE' },
+                                                    }}
+                                                  />
+                                                </TableCell>
+                                                {headers.slice(0, -1).map((h) => (
+                                                  <TableCell key={h.key} style={{ cursor: 'pointer' }}>
+                                                    {renderCellContent(h.type, row[h.key])}
+                                                  </TableCell>
+                                                ))}
+                                              </TableRow>
+                                            );
+                                          })}
+                                        </TableBody>
+                                      </Table>
+                                    </ScrollableTableContainer>
+                                  </TableContainerBoxWrapper>
                                   <TreeItem
                                     itemId={`toggle-${groupIndex}-${index}`}
                                     label={
@@ -1342,7 +1357,12 @@ const TermInfo = ({ open, setOpen }) => {
                               query?.preview_results?.rows?.length > 0 &&
                               headers?.length > 0 ? (
                               <TreeItem
-                                sx={{ "paddingLeft": "1.25rem" }}
+                                sx={{
+                                  "paddingLeft": "1.25rem",
+                                  "& > .MuiCollapse-root": { overflow: "visible" },
+                                  "& > .MuiCollapse-root .MuiCollapse-wrapper": { overflow: "visible" },
+                                  "& > .MuiCollapse-root .MuiCollapse-wrapperInner": { overflow: "visible" },
+                                }}
                                 key={query.label + index}
                                 itemId={`table-query-root-${index}`}
                                 label={
@@ -1366,75 +1386,61 @@ const TermInfo = ({ open, setOpen }) => {
                                   </CustomBox>
                                 }
                               >
-                                <TreeItem
-                                  itemId={`terminfo-queries-table-root-${index}`}
-                                  label={
-                                    <>
-                                      <TableContainerBoxWrapper>
-                                        <TableContainer component={Paper}>
-                                          <Table>
-                                            <TableHead>
-                                              <TableRow>
-                                                {headers.slice(0, -1).map(h => (
-                                                  <TableCell key={h.key}>{h.title}</TableCell>
-                                                ))}
-                                                <TableCell /> {/* Last header is always empty for Add button */}
-                                              </TableRow>
-                                            </TableHead>
-                                            <TableBody>
-                                              {query?.preview_results?.rows.map((row, rowIdx) => {
-                                                const isLoaded = allLoadedInstances?.find(
-                                                  (instance) => instance.metadata?.Id === row.id
-                                                );
-                                          return ( <TableRow key={row.id + '-' + rowIdx}>
-                                                  {headers.slice(0, -1).map((h) =>
-                                                  (
-                                                    <TableCell key={h.key} style={{ cursor: 'default' }}>
-                                                      {renderCellContent(h.type, row[h.key])}
-                                                    </TableCell>
-                                                  )
-                                                  )}
-                                                  <TableCell>
-                                                    {isLoaded ? (
-                                                      <Button
-                                                        variant="text"
-                                                        color="error"
-                                                        onClick={() => deleteId()}
-                                                      >
-                                                        Delete
-                                                      </Button>
-                                                    ) : (
-                                                      <Button
-                                                        variant="outlined"
-                                                        onClick={() =>
-                                                          addId(row.id)
-                                                        }
-                                                        color="success"
-                                                        sx={{
-                                                          borderRadius:
-                                                            "0.25rem",
-                                                          border:
-                                                            "1px solid #0AB7FE",
-                                                          color: "#0AB7FE",
-                                                          "&:hover": {
-                                                            border:
-                                                              "1px solid #0AB7FE",
-                                                          },
-                                                        }}
-                                                      >
-                                                        Add
-                                                      </Button>
-                                                    )}
-                                                  </TableCell>
-                                                </TableRow>
-                                        )})}
-                                            </TableBody>
-                                          </Table>
-                                        </TableContainer>
-                                      </TableContainerBoxWrapper>
-                                    </>
-                                  }
-                                />
+                                <TableContainerBoxWrapper>
+                                  <ScrollableTableContainer component={Paper}>
+                                    <Table sx={{ minWidth: 'max-content' }}>
+                                      <TableHead>
+                                        <TableRow>
+                                          <TableCell sx={{ width: '40px', padding: '0 8px', minWidth: '40px' }} />
+                                          {headers.slice(0, -1).map(h => (
+                                            <TableCell key={h.key} sx={{ whiteSpace: 'nowrap' }}>{h.title}</TableCell>
+                                          ))}
+                                        </TableRow>
+                                      </TableHead>
+                                      <TableBody>
+                                        {query?.preview_results?.rows.map((row, rowIdx) => {
+                                          const isLoaded = allLoadedInstances?.find(
+                                            (instance) => instance.metadata?.Id === row.id
+                                          );
+                                          const handleRowClick = () => {
+                                            if (isLoaded) {
+                                              deleteId();
+                                            } else {
+                                              addId(row.id);
+                                            }
+                                          };
+                                          return (
+                                            <TableRow
+                                              key={row.id + '-' + rowIdx}
+                                              onClick={handleRowClick}
+                                              sx={{
+                                                cursor: 'pointer',
+                                                '&:hover': {
+                                                  backgroundColor: 'rgba(255, 255, 255, 0.05)'
+                                                }
+                                              }}
+                                            >
+                                              <TableCell sx={{ width: '40px', padding: '0 8px', minWidth: '40px' }}>
+                                                <Checkbox
+                                                  checked={!!isLoaded}
+                                                  sx={{
+                                                    color: '#0AB7FE',
+                                                    '&.Mui-checked': { color: '#0AB7FE' },
+                                                  }}
+                                                />
+                                              </TableCell>
+                                              {headers.slice(0, -1).map((h) => (
+                                                <TableCell key={h.key} style={{ cursor: 'pointer' }}>
+                                                  {renderCellContent(h.type, row[h.key])}
+                                                </TableCell>
+                                              ))}
+                                            </TableRow>
+                                          );
+                                        })}
+                                      </TableBody>
+                                    </Table>
+                                  </ScrollableTableContainer>
+                                </TableContainerBoxWrapper>
                                 <TreeItem
                                   itemId={`toggle-root-${index}`}
                                   label={

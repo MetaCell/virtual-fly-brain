@@ -61,7 +61,7 @@ export const hexToRGBA = (hexColor) => {
   return { r, g, b, a: 1 };
 }
 
-// ─── Neuroglass / Neuroglancer ───────────────────────────────────────────────
+// Neuroglass viewer integration constants and utilities
 export const KNOWN_NG_VIEWS = Object.freeze([
   '4panel-alt', '4panel',              // all quadrants
   '3d', 'xy', 'xz', 'yz',             // single panel fullscreen

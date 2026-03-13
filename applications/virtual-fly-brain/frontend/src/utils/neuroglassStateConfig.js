@@ -19,19 +19,12 @@ const SHARED_VIEWPORT = {
   projectionScale: 1024,
 };
 
-// Mapping from VFB instance IDs to dataset paths in the Neuroglancer datasource.
-export const INSTANCE_TO_DATASET_PATH = {
-  'VFB_00101567': 'VFB_00101567_1567', // template
-  'VFB_0010101b': 'VFB_00101567_101b',
-  'VFB_001012vj': 'VFB_00101567_12vj',
-};
-
 // Datasource configuration for Datasource
 export const NEUROGLASS_DATASOURCE = {
   protocol: import.meta.env.VITE_NEUROGLASS_DATA_PROTOCOL || 'neuroglancer-precomputed',
   baseUrl: import.meta.env.VITE_NEUROGLASS_DATA_BASE_URL || 'gs://neuroglass/vfb',
   buildUrl(instanceId) {
-    const path = INSTANCE_TO_DATASET_PATH[instanceId] || instanceId;
+    const path = instanceId;
     if (this.protocol === 'neuroglancer-precomputed' || this.protocol === 'n5') {
       // GCS / S3 reqire Neuroglancer's pipe notation
       return `${this.baseUrl}/${path}/|${this.protocol}:`;
@@ -85,7 +78,7 @@ export function buildNeuroglassState(allLoadedInstances, focusedInstanceId, layo
   const instances = allLoadedInstances || [];
   // Only render instances whose data exists in the VFB datasource.
   const layers = instances
-    .filter(inst => inst?.metadata?.Id && Object.prototype.hasOwnProperty.call(INSTANCE_TO_DATASET_PATH, inst.metadata.Id))
+    .filter(inst => inst?.metadata?.Id)
     .map(inst => buildSingleInstanceLayer(inst));
 
   if (layers.length === 0) return null;

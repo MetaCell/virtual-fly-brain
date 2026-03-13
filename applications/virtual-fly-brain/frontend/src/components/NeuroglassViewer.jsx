@@ -14,8 +14,7 @@ export default function NeuroglassViewer() {
   const neuroglassView     = useSelector(state => state.globalInfo?.neuroglassView);
 
   const theme    = useTheme();
-  // Matches Layout.jsx: const desktopScreen = useMediaQuery(theme.breakpoints.up('lg'))
-  const isMobile = !useMediaQuery(theme.breakpoints.up('lg')); // true when < 1200px
+  const isMobile = !useMediaQuery(theme.breakpoints.up('lg'));
 
   // Rebuilds whenever instances, focused item, layout preference, or viewport size changes.
   const iframeSrc = useMemo(() => {

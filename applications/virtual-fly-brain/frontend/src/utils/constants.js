@@ -61,6 +61,16 @@ export const hexToRGBA = (hexColor) => {
   return { r, g, b, a: 1 };
 }
 
+// ─── Neuroglass / Neuroglancer ───────────────────────────────────────────────
+export const KNOWN_NG_VIEWS = Object.freeze([
+  '4panel-alt', '4panel',              // all quadrants
+  '3d', 'xy', 'xz', 'yz',             // single panel fullscreen
+  'xy-3d', 'xz-3d', 'yz-3d',          // slice + volumetric side-by-side
+]);
+export const NG_LAYOUT_URL_PARAM = 'layout';
+export const NG_DEFAULT_LAYOUT = '4panel-alt';
+export const NG_DEFAULT_MOBILE_LAYOUT = '3d';
+
 export const RGBAToHexA = (color) => {
     let r =  Math.round(color?.r * 255).toString(16);
     let g =  Math.round(color?.g * 255).toString(16);

@@ -4,6 +4,8 @@ FROM ${CLOUDHARNESS_FLASK}
 
 ARG DOMAIN
 ARG BE_DOMAIN
+ARG NEUROGLASS_DATA_PROTOCOL
+ARG NEUROGLASS_DATA_BASE_URL
 
 ENV MODULE_NAME=virtual_fly_brain
 ENV WORKERS=2
@@ -59,8 +61,11 @@ RUN echo "=== Environment Check ===" && \
     export VFB_DOMAIN="https://${BE_DOMAIN}" && \
     echo "Exported VFB_DOMAIN: $VFB_DOMAIN" && \
     echo "========================"
-# Pass VFB_DOMAIN to Vite build process explicitly
-RUN export VFB_DOMAIN="https://${BE_DOMAIN}" && yarn run build
+# Pass VFB_DOMAIN and Neuroglass datasource config to Vite build process explicitly
+RUN export VFB_DOMAIN="https://${BE_DOMAIN}" && \
+    export NEUROGLASS_DATA_PROTOCOL="${NEUROGLASS_DATA_PROTOCOL}" && \
+    export NEUROGLASS_DATA_BASE_URL="${NEUROGLASS_DATA_BASE_URL}" && \
+    yarn run build
 
 WORKDIR /usr/src/app
 COPY backend/requirements.txt /usr/src/app/

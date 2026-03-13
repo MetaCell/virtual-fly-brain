@@ -78,3 +78,8 @@ export const cameraControlAction = (action) => ({
     action : action
   }
 });
+
+export const setNeuroglassView = (view) => ({
+  type: getGlobalTypes.SET_NEUROGLASS_VIEW,
+  payload: { view },
+});

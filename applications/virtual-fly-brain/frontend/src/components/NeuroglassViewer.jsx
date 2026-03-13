@@ -29,7 +29,10 @@ export default function NeuroglassViewer() {
   }, [allLoadedInstances, focusedInstance, neuroglassView, isMobile]);
 
   useEffect(() => {
-    if (!iframeSrc) return;
+    if (!iframeSrc) {
+      setDebouncedSrc('');
+      return;
+    } 
     const t = setTimeout(() => setDebouncedSrc(iframeSrc), 300);
     return () => clearTimeout(t);
   }, [iframeSrc]);

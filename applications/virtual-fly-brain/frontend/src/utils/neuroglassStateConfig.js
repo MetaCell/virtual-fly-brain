@@ -21,12 +21,12 @@ const SHARED_VIEWPORT = {
 
 // Datasource configuration for Datasource
 export const NEUROGLASS_DATASOURCE = {
-  protocol: import.meta.env.VITE_NEUROGLASS_DATA_PROTOCOL || 'neuroglancer-precomputed',
-  baseUrl: import.meta.env.VITE_NEUROGLASS_DATA_BASE_URL || 'gs://neuroglass/vfb',
+  protocol: import.meta.env.NEUROGLASS_DATA_PROTOCOL || 'neuroglancer-precomputed',
+  baseUrl: import.meta.env.NEUROGLASS_DATA_BASE_URL || 'gs://neuroglass/vfb',
   buildUrl(instanceId) {
     const path = instanceId;
     if (this.protocol === 'neuroglancer-precomputed' || this.protocol === 'n5') {
-      // GCS / S3 reqire Neuroglancer's pipe notation
+      // GCS / S3 require Neuroglancer's pipe notation
       return `${this.baseUrl}/${path}/|${this.protocol}:`;
     }
     // HTTP fileservers use a precomputed:// prefix
@@ -83,11 +83,16 @@ export function buildNeuroglassState(allLoadedInstances, focusedInstanceId, layo
 
   if (layers.length === 0) return null;
 
+  const selectedLayerName = 
+    focusedInstanceId && layers.some( layer => layer.name === focusedInstanceId) 
+      ? focusedInstanceId 
+      : layers[0].name;
+
   return {
     ...SHARED_VIEWPORT,
     layers,
     showSlices: false,
-    selectedLayer: { visible: false, layer: focusedInstanceId || layers[0].name },
+    selectedLayer: { visible: false, layer: selectedLayerName },
     layout: layout || NG_DEFAULT_LAYOUT,
     layerListPanel: { visible: false },
   };

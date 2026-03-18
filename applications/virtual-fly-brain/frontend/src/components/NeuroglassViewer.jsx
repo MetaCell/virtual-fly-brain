@@ -4,7 +4,7 @@ import { Box, Typography, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { buildNeuroglassState, resolveNeuroglassLayout } from '../utils/neuroglassStateConfig';
 
-const NEUROGLASS_URL = import.meta.env.VITE_NEUROGLASS_URL || 'https://www.research.neuroglass.dev.metacell.us';
+const NEUROGLASS_URL = import.meta.env.NEUROGLASS_URL;
 
 export default function NeuroglassViewer() {
   const [debouncedSrc, setDebouncedSrc] = useState('');

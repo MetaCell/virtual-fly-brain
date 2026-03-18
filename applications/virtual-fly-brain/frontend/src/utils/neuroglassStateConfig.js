@@ -21,8 +21,8 @@ const SHARED_VIEWPORT = {
 
 // Datasource configuration for Datasource
 export const NEUROGLASS_DATASOURCE = {
-  protocol: import.meta.env.NEUROGLASS_DATA_PROTOCOL || 'neuroglancer-precomputed',
-  baseUrl: import.meta.env.NEUROGLASS_DATA_BASE_URL || 'gs://neuroglass/vfb',
+  protocol: import.meta.env.NEUROGLASS_DATA_PROTOCOL,
+  baseUrl: import.meta.env.NEUROGLASS_DATA_BASE_URL,
   buildUrl(instanceId) {
     const path = instanceId;
     if (this.protocol === 'neuroglancer-precomputed' || this.protocol === 'n5') {

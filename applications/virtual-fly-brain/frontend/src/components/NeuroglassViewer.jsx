@@ -4,7 +4,7 @@ import { Box, Typography, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { buildNeuroglassState, resolveNeuroglassLayout } from '../utils/neuroglassStateConfig';
 
-const NEUROGLASS_URL = import.meta.env.NEUROGLASS_URL;
+const NEUROGLASS_URL = import.meta.env.NEUROGLASS_URL ?? '';
 
 export default function NeuroglassViewer() {
   const [debouncedSrc, setDebouncedSrc] = useState('');
@@ -24,7 +24,7 @@ export default function NeuroglassViewer() {
       focusedInstance?.metadata?.Id,
       layout,
     );
-    if (!state) return '';
+    if (!state || !NEUROGLASS_URL) return '';
     return `${NEUROGLASS_URL}/new#!${encodeURIComponent(JSON.stringify(state))}`;
   }, [allLoadedInstances, focusedInstance, neuroglassView, isMobile]);
 

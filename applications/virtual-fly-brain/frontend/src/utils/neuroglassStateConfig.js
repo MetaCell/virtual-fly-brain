@@ -76,7 +76,6 @@ function buildSingleInstanceLayer(inst) {
 // Main state builder: Converts all loaded VFB instances + UI state into a Neuroglass viewer state object.
 export function buildNeuroglassState(allLoadedInstances, focusedInstanceId, layout) {
   const instances = allLoadedInstances || [];
-  // Only render instances whose data exists in the VFB datasource.
   const layers = instances
     .filter(inst => inst?.metadata?.Id)
     .map(inst => buildSingleInstanceLayer(inst));

@@ -12,9 +12,12 @@ export default defineConfig(({ mode }) => {
   // Check both loadEnv result and direct process.env for Docker builds
   // eslint-disable-next-line no-undef
   const apiUrl = env.VFB_DOMAIN || process.env.VFB_DOMAIN || 'https://vfb.dev.metacell.us';
+  // eslint-disable-next-line no-undef
   const neuroglassProtocol = env.NEUROGLASS_DATA_PROTOCOL || process.env.NEUROGLASS_DATA_PROTOCOL || 'neuroglancer-precomputed';
+  // eslint-disable-next-line no-undef
   const neuroglassBaseUrl = env.NEUROGLASS_DATA_BASE_URL || process.env.NEUROGLASS_DATA_BASE_URL || 'gs://neuroglass/vfb';
-  const neuroglassUrl = process.env.NEUROGLASS_URL || 'https://www.research.neuroglass.dev.metacell.us';
+  // eslint-disable-next-line no-undef
+  const neuroglassUrl = env.NEUROGLASS_URL || process.env.NEUROGLASS_URL || 'https://www.research.neuroglass.dev.metacell.us';
 
   console.log('=== Vite Build Configuration ===');
   console.log('Mode:', mode);
@@ -42,7 +45,7 @@ export default defineConfig(({ mode }) => {
       'import.meta.env.VITE_API_URL': JSON.stringify(apiUrl),
       'import.meta.env.NEUROGLASS_DATA_PROTOCOL': JSON.stringify(neuroglassProtocol),
       'import.meta.env.NEUROGLASS_DATA_BASE_URL': JSON.stringify(neuroglassBaseUrl),
-      'import.meta.NEUROGLASS_URL': JSON.stringify(neuroglassUrl)
+      'import.meta.env.NEUROGLASS_URL': JSON.stringify(neuroglassUrl)
     }
   }
 })

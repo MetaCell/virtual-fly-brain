@@ -19,16 +19,18 @@ export default defineConfig(({ mode }) => {
   // eslint-disable-next-line no-undef
   const neuroglassUrl = env.NEUROGLASS_URL || process.env.NEUROGLASS_URL || 'https://www.research.neuroglass.dev.metacell.us';
 
-  console.log('=== Vite Build Configuration ===');
-  console.log('Mode:', mode);
-  console.log('VFB_DOMAIN from loadEnv:', env.VFB_DOMAIN);
-  // eslint-disable-next-line no-undef
-  console.log('VFB_DOMAIN from process.env:', process.env.VFB_DOMAIN);
-  console.log('NEUROGLASS_DATA_PROTOCOL:', neuroglassProtocol);
-  console.log('NEUROGLASS_DATA_BASE_URL:', neuroglassBaseUrl);
-  console.log('NEUROGLASS_URL:', neuroglassUrl);
-  console.log('Final API URL:', apiUrl);
-  console.log('================================');
+  if (mode === 'development') {
+    console.log('=== Vite Build Configuration ===');
+    console.log('Mode:', mode);
+    console.log('VFB_DOMAIN from loadEnv:', env.VFB_DOMAIN);
+    // eslint-disable-next-line no-undef
+    console.log('VFB_DOMAIN from process.env:', process.env.VFB_DOMAIN);
+    console.log('NEUROGLASS_DATA_PROTOCOL:', neuroglassProtocol);
+    console.log('NEUROGLASS_DATA_BASE_URL:', neuroglassBaseUrl);
+    console.log('NEUROGLASS_URL:', neuroglassUrl);
+    console.log('Final API URL:', apiUrl);
+    console.log('================================');
+  }
 
   return {
     plugins: [react()],

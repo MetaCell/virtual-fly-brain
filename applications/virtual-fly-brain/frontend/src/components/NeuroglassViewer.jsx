@@ -56,7 +56,11 @@ export default function NeuroglassViewer() {
         </Box>
       ) : (
         <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fafafa' }}>
-          <Typography color="textSecondary">Loading Neuroglass viewer...</Typography>
+          <Typography color="textSecondary">
+             {!allLoadedInstances || allLoadedInstances.length === 0
+                 ? 'No layers selected to display in the Neuroglass viewer.'
+                 : 'Loading Neuroglass viewer...'}
+           </Typography>
         </Box>
       )}
     </Box>

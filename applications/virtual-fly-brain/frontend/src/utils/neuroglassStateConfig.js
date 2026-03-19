@@ -19,18 +19,26 @@ const SHARED_VIEWPORT = {
   projectionScale: 1024,
 };
 
+function buildNeuroglassLayerUrl(protocol, baseUrl, instanceId) {
+  const path = instanceId;
+  if (protocol === 'neuroglancer-precomputed' || protocol === 'n5') {
+    // GCS / S3 require Neuroglancer's pipe notation
+    return `${baseUrl}/${path}/|${protocol}:`;
+  }
+  // HTTP fileservers use a precomputed:// prefix
+  return `precomputed://${baseUrl}/${path}`;
+}
+
 // Datasource configuration for Datasource
 export const NEUROGLASS_DATASOURCE = {
   protocol: import.meta.env.NEUROGLASS_DATA_PROTOCOL,
   baseUrl: import.meta.env.NEUROGLASS_DATA_BASE_URL,
   buildUrl(instanceId) {
-    const path = instanceId;
-    if (this.protocol === 'neuroglancer-precomputed' || this.protocol === 'n5') {
-      // GCS / S3 require Neuroglancer's pipe notation
-      return `${this.baseUrl}/${path}/|${this.protocol}:`;
-    }
-    // HTTP fileservers use a precomputed:// prefix
-    return `precomputed://${this.baseUrl}/${path}`;
+    return buildNeuroglassLayerUrl(
+      NEUROGLASS_DATASOURCE.protocol,
+      NEUROGLASS_DATASOURCE.baseUrl,
+      instanceId,
+    );
   },
 };
 

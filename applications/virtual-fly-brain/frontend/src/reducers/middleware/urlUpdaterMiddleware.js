@@ -6,7 +6,7 @@ import { getGlobalTypes } from '../actions/types/GlobalTypes';
 import { setFirstIDLoaded, setAlignTemplates, setTemplateID, setNeuroglassView } from '../actions/globals';
 import { getInstanceByID, get3DMesh, triggerInstanceFailure, setBulkLoadingCount, clearUrlLoadingState, focusInstance, selectInstance } from '../actions/instances';
 import * as GeppettoActions from '@metacell/geppetto-meta-client/common/actions';
-import { DEFAULT_TEMPLATE_ID, NG_LAYOUT_URL_PARAM } from '../../utils/constants';
+import { DEFAULT_TEMPLATE_ID, NG_LAYOUT_URL_PARAM, KNOWN_NG_VIEWS } from '../../utils/constants';
 
 function updateUrlParameterWithCurrentUrl(param, value, reset) {
   const urlObj = new URL(window.location.href);
@@ -109,7 +109,12 @@ const isFirstTimeLoad = (allLoadedInstances, store) => {
 
     // Read ?layout param and sync into Redux
     const ngView = getUrlParameter(NG_LAYOUT_URL_PARAM);
-    if (ngView) store.dispatch(setNeuroglassView(ngView));
+    if (ngView && Array.isArray(KNOWN_NG_VIEWS) && KNOWN_NG_VIEWS.includes(ngView)) {
+      store.dispatch(setNeuroglassView(ngView));
+    } else if (ngView) {
+      // Clear unrecognized layout parameter from URL to avoid propagating invalid values
+      updateUrlParameterWithCurrentUrl(NG_LAYOUT_URL_PARAM, '', true);
+    }
 
     uniqueLoadOrder.forEach(id => {
       const isFocusTarget = id === focusTarget;
@@ -301,8 +306,10 @@ export const urlUpdaterMiddleware = store => next => (action) => {
       break;
     }
     case getGlobalTypes.SET_NEUROGLASS_VIEW: {
-      if (action.payload.view) {
-        updateUrlParameterWithCurrentUrl(NG_LAYOUT_URL_PARAM, action.payload.view, true);
+      const view = action.payload.view;
+      const isValidView = typeof view === 'string' && view.trim().length > 0;
+      if (isValidView) {
+        updateUrlParameterWithCurrentUrl(NG_LAYOUT_URL_PARAM, view, true);
       } else {
         const urlObj = new URL(window.location.href);
         urlObj.searchParams.delete(NG_LAYOUT_URL_PARAM);

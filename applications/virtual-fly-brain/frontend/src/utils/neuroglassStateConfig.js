@@ -142,7 +142,10 @@ export function buildNeuroglassState(allLoadedInstances, focusedInstanceId, layo
   const instances = allLoadedInstances || [];
   const layers = instances
     .filter(inst => inst?.metadata?.Id)
-    .map(inst => buildSingleInstanceLayer(inst));
+    .map(inst => ({
+      ...buildSingleInstanceLayer(inst),
+      volumeRendering: 'on',
+    }));
 
   if (layers.length === 0) return null;
 

@@ -2,11 +2,11 @@ import { KNOWN_NG_VIEWS, NG_DEFAULT_LAYOUT, NG_DEFAULT_MOBILE_LAYOUT } from './c
 
 // ─── Coordinate space shared by all VFB instances ────────────────────────────
 const SHARED_VIEWPORT = {
-  dimensions: {
-    x: [1e-9, 'm'],
-    y: [5.189161e-10, 'm'],
-    z: [5.189161e-10, 'm'],
-  },
+  dimensions: [
+    { name: 'x', scale: [1e-9, 'm'] },
+    { name: 'y', scale: [5.189161e-10, 'm'] },
+    { name: 'z', scale: [5.189161e-10, 'm'] },
+  ],
   relativeDisplayScales: { x: 2, y: 2, z: 2 },
   position: [87.5, 280.5, 605.5],
   crossSectionScale: 0.5,
@@ -63,30 +63,81 @@ export function resolveNeuroglassLayout(userPref, isMobile) {
   return isMobile ? NG_DEFAULT_MOBILE_LAYOUT : NG_DEFAULT_LAYOUT;
 }
 
-// Per-instance layer builder: Converts a VFB instance into a Neuroglancer layer config.
-function buildSingleInstanceLayer(inst) {
-  // Extract color from the instance, default to white if not provided
-  const { r = 1, g = 1, b = 1, a = 1 } = inst.color || { r: 1, g: 1, b: 1, a: 1 };
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
 
+function toHexByte(value) {
+  const v = clamp(Math.round(value), 0, 255);
+  return v.toString(16).padStart(2, '0');
+}
+
+function colorToHex(color = {}) {
+  let { r = 255, g = 255, b = 255 } = color;
+
+  // If RGB values look normalized (0–1), convert to 0–255.
+  if (r <= 1 && g <= 1 && b <= 1) {
+    r *= 255;
+    g *= 255;
+    b *= 255;
+  }
+
+  return `#${toHexByte(r)}${toHexByte(g)}${toHexByte(b)}`;
+}
+
+function alphaToOpacity(a = 1) {
+  if (a == null) return 1;
+
+  // If alpha looks like 0–255, normalize it.
+  if (a > 1) return clamp(a / 255, 0, 1);
+
+  // Otherwise assume already normalized 0–1.
+  return clamp(a, 0, 1);
+}
+
+function normalizeContrast(inst) {
+  const contrast = inst?.contrast;
+
+  if (
+    contrast &&
+    typeof contrast === 'object' &&
+    Array.isArray(contrast.range) &&
+    contrast.range.length === 2
+  ) {
+    return contrast;
+  }
+
+  if (Array.isArray(contrast) && contrast.length === 2) {
+    return { range: contrast };
+  }
+
+  return { range: [0, 123] };
+}
+
+// Per-instance layer builder: converts a VFB instance into a Neuroglancer layer config.
+function buildSingleInstanceLayer(inst) {
   const layer = {
     type: 'image',
     source: NEUROGLASS_DATASOURCE.buildUrl(inst.metadata.Id),
     tab: 'rendering',
-    opacity: a,
+    opacity: alphaToOpacity(inst.color?.a),
     blend: 'additive',
     shader: LAYER_SHADER,
-    shaderControls: { color: [r, g, b] },
+    shaderControls: {
+      contrast: normalizeContrast(inst),
+      color: colorToHex(inst.color),
+    },
     volumeRenderingDepthSamples: 256,
     name: inst.metadata.Id,
   };
 
-  // If the instance has a visibleMesh property set to false, hide the layer
+  // If the instance has visibleMesh set to false, hide the layer.
   if (inst.visibleMesh === false) layer.visible = false;
 
   return layer;
 }
 
-// Main state builder: Converts all loaded VFB instances + UI state into a Neuroglass viewer state object.
+// Main state builder: converts loaded VFB instances + UI state into a Neuroglass viewer state object.
 export function buildNeuroglassState(allLoadedInstances, focusedInstanceId, layout) {
   const instances = allLoadedInstances || [];
   const layers = instances
@@ -95,9 +146,9 @@ export function buildNeuroglassState(allLoadedInstances, focusedInstanceId, layo
 
   if (layers.length === 0) return null;
 
-  const selectedLayerName = 
-    focusedInstanceId && layers.some( layer => layer.name === focusedInstanceId) 
-      ? focusedInstanceId 
+  const selectedLayerName =
+    focusedInstanceId && layers.some(layer => layer.name === focusedInstanceId)
+      ? focusedInstanceId
       : layers[0].name;
 
   return {
@@ -109,4 +160,3 @@ export function buildNeuroglassState(allLoadedInstances, focusedInstanceId, layo
     layerListPanel: { visible: false },
   };
 }
-

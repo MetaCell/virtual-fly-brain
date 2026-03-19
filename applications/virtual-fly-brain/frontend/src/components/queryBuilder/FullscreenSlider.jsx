@@ -1,4 +1,4 @@
- 
+ /* eslint-disable no-undef */
 import { Typography } from '@mui/material';
 import React, { useEffect } from 'react';
 import { Slide } from 'react-slideshow-image';

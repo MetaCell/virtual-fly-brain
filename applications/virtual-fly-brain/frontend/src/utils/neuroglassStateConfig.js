@@ -65,7 +65,9 @@ export function resolveNeuroglassLayout(userPref, isMobile) {
 
 // Per-instance layer builder: Converts a VFB instance into a Neuroglancer layer config.
 function buildSingleInstanceLayer(inst) {
-  const { r = 1, g = 1, b = 1, a = 1 } = inst.color || {};
+  // Extract color from the instance, default to white if not provided
+  const { r = 1, g = 1, b = 1, a = 1 } = inst.color || { r: 1, g: 1, b: 1, a: 1 };
+
   const layer = {
     type: 'image',
     source: NEUROGLASS_DATASOURCE.buildUrl(inst.metadata.Id),
@@ -77,7 +79,10 @@ function buildSingleInstanceLayer(inst) {
     volumeRenderingDepthSamples: 256,
     name: inst.metadata.Id,
   };
+
+  // If the instance has a visibleMesh property set to false, hide the layer
   if (inst.visibleMesh === false) layer.visible = false;
+
   return layer;
 }
 

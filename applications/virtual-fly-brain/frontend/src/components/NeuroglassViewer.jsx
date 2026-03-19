@@ -26,7 +26,7 @@ export default function NeuroglassViewer() {
     );
     if (!state || !NEUROGLASS_URL) return '';
     return `${NEUROGLASS_URL}/new#!${encodeURIComponent(JSON.stringify(state))}`;
-  }, [allLoadedInstances, focusedInstance, neuroglassView, isMobile]);
+  }, [allLoadedInstances, focusedInstance?.metadata?.Id, neuroglassView, isMobile]);
 
   useEffect(() => {
     if (!iframeSrc) {

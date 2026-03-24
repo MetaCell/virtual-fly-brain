@@ -1,5 +1,7 @@
 import { KNOWN_NG_VIEWS, NG_DEFAULT_LAYOUT, NG_DEFAULT_MOBILE_LAYOUT } from './constants';
 
+const DEFAULT_CONTRAST_RANGE = [0, 123];
+
 // ─── Coordinate space shared by all VFB instances ────────────────────────────
 const SHARED_VIEWPORT = {
   dimensions: [
@@ -35,8 +37,8 @@ export const NEUROGLASS_DATASOURCE = {
   baseUrl: import.meta.env.NEUROGLASS_DATA_BASE_URL,
   buildUrl(instanceId) {
     return buildNeuroglassLayerUrl(
-      NEUROGLASS_DATASOURCE.protocol,
-      NEUROGLASS_DATASOURCE.baseUrl,
+      this.protocol,
+      this.baseUrl,
       instanceId,
     );
   },
@@ -111,7 +113,7 @@ function normalizeContrast(inst) {
     return { range: contrast };
   }
 
-  return { range: [0, 123] };
+  return { range: [0, DEFAULT_CONTRAST_RANGE] };
 }
 
 // Per-instance layer builder: converts a VFB instance into a Neuroglancer layer config.
@@ -128,24 +130,26 @@ function buildSingleInstanceLayer(inst) {
       color: colorToHex(inst.color),
     },
     volumeRenderingDepthSamples: 256,
+    volumeRendering: 'on',
     name: inst.metadata.Id,
   };
 
-  // If the instance has visibleMesh set to false, hide the layer.
   if (inst.visibleMesh === false) layer.visible = false;
 
   return layer;
 }
-
 // Main state builder: converts loaded VFB instances + UI state into a Neuroglass viewer state object.
 export function buildNeuroglassState(allLoadedInstances, focusedInstanceId, layout) {
   const instances = allLoadedInstances || [];
   const layers = instances
-    .filter(inst => inst?.metadata?.Id)
-    .map(inst => ({
-      ...buildSingleInstanceLayer(inst),
-      volumeRendering: 'on',
-    }));
+    .filter(inst => {
+      if (!inst?.metadata?.Id) {
+        console.warn(`[buildNeuroglassState] Instance missing metadata ID:`, inst);
+        return false;
+      }
+      return true;
+    })
+    .map(inst => buildSingleInstanceLayer(inst));
 
   if (layers.length === 0) return null;
 

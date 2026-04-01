@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => {
   // Use VFB_DOMAIN if available (production), otherwise fallback to dev URL
   // Check both loadEnv result and direct process.env for Docker builds
   // eslint-disable-next-line no-undef
-  const apiUrl = env.VFB_DOMAIN || process.env.VFB_DOMAIN || 'https://vfb.dev.metacell.us';
+  const apiUrl = env.VFB_DOMAIN || process.env.VFB_DOMAIN || 'https:/v3-cached.virtualflybrain.org';
   
   console.log('=== Vite Build Configuration ===');
   console.log('Mode:', mode);

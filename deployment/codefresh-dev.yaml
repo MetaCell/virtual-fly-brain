@@ -99,6 +99,7 @@ steps:
         - TAG=${{CF_BUILD_ID}}
         - DOMAIN=${{DOMAIN}}
         - BE_DOMAIN=${{BE_DOMAIN}}
+        - BUILD_BACKEND=${{BUILD_BACKEND}}
         - NOCACHE=${{CF_BUILD_ID}}
         - REGISTRY=${{REGISTRY}}/virtual-fly-brain
         - CLOUDHARNESS_FLASK=${{REGISTRY}}/virtual-fly-brain/cloudharness-flask:${{CF_BUILD_ID}}

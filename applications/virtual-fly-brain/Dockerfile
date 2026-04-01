@@ -4,6 +4,7 @@ FROM ${CLOUDHARNESS_FLASK}
 
 ARG DOMAIN
 ARG BE_DOMAIN
+ARG BUILD_BACKEND=true
 
 ENV MODULE_NAME=virtual_fly_brain
 ENV WORKERS=2
@@ -64,9 +65,19 @@ RUN export VFB_DOMAIN="https://${BE_DOMAIN}" && yarn run build
 
 WORKDIR /usr/src/app
 COPY backend/requirements.txt /usr/src/app/
-RUN pip3 install --no-cache-dir -r requirements.txt
+# === CONDITIONAL BACKEND BUILD: only if BUILD_BACKEND != "false" ===
+RUN if [ "$BUILD_BACKEND" != "false" ]; then \
+      pip3 install --no-cache-dir -r requirements.txt; \
+    else \
+      echo "Skipping backend requirements install."; \
+    fi
+
 COPY backend/ /usr/src/app
-RUN pip3 install -e .
+RUN if [ "$BUILD_BACKEND" != "false" ]; then \
+      pip3 install -e .; \
+    else \
+      echo "Skipping backend build."; \
+    fi
 
 RUN cp -r ${BUILDDIR}/dist/ /usr/src/app/virtual_fly_brain/www
 

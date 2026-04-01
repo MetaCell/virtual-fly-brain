@@ -17,7 +17,9 @@ const facets_annotations_colors = getUpdatedTags(colors_config)
 
 // Memoize the helper functions to avoid recreating them on every render
 const getTags = (tags) => {
-  return tags ? tags.split("|") : [];
+  if (!tags) return [];
+  // Handle both string and array formats
+  return Array.isArray(tags) ? tags : tags.split("|");
 }
 
 const getQueries = (newQueries, searchTerm) => {

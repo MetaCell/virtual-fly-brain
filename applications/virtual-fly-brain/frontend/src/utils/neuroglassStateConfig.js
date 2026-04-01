@@ -113,7 +113,7 @@ function normalizeContrast(inst) {
     return { range: contrast };
   }
 
-  return { range: [0, DEFAULT_CONTRAST_RANGE] };
+  return { range: DEFAULT_CONTRAST_RANGE };
 }
 
 // Per-instance layer builder: converts a VFB instance into a Neuroglancer layer config.

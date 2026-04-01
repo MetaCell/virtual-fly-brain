@@ -88,6 +88,24 @@ export const Search = (props) => {
   )
 };
 
+export const Screenshot = (props) => {
+  return (
+    <svg {...props} width={props.size || 21} height={props.size || 20} viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <g clipPath="url(#clip0_screenshot)">
+        <rect x="3.5" y="5" width="14" height="10" rx="2" stroke={props.color || "white"} strokeWidth="1.5" fill="none"/>
+        <circle cx="10.5" cy="10" r="2.5" stroke={props.color || "white"} strokeWidth="1.5" fill="none"/>
+        <rect x="7" y="4" width="1.5" height="2" rx=".5" fill={props.color || "white"} opacity="0.7"/>
+        <rect x="12.5" y="4" width="2" height="1.2" rx=".6" fill={props.color || "white"} opacity="0.7"/>
+      </g>
+      <defs>
+        <clipPath id="clip0_screenshot">
+          <rect width={props.size || 20} height={props.size || 20} fill={props.color || "white"} transform="translate(0.5)" />
+        </clipPath>
+      </defs>
+    </svg>
+  )
+};
+
 export const Upload = (props) => {
   return (
     <svg {...props} width={props.size || 21} height={props.size || 20} viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">

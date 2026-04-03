@@ -1,4 +1,8 @@
 #!/bin/bash
+set -e
+
+echo "BUILD_BACKEND=$BUILD_BACKEND"
+env | sort | grep BUILD
 
 # Start cron service in the background (only if backend is enabled)
 if [ "$BUILD_BACKEND" != "false" ]; then

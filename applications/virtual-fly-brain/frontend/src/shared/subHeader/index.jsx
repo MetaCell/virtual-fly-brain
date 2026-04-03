@@ -13,9 +13,9 @@ import {
   Layers,
   Query,
   Search,
-  Upload,
-  Screenshot
+  Upload
 } from "../../icons";
+import Screenshot from '@mui/icons-material/CameraAlt';
 import vars from "../../theme/variables";
 import MediaQuery from "react-responsive";
 import { useDispatch, useSelector } from "react-redux";

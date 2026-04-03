@@ -89,20 +89,25 @@ RUN if [ "$BUILD_BACKEND" != "false" ]; then \
 
 RUN cp -r ${BUILDDIR}/dist/ /usr/src/app/virtual_fly_brain/www
 
-# Set up cache cleanup cron job
-COPY backend/vfb_cache_cleanup.sh /usr/local/bin/vfb_cache_cleanup.sh
-RUN chmod +x /usr/local/bin/vfb_cache_cleanup.sh
-
 # Copy and set up entrypoint script
 COPY backend/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# Create cron job to run cache cleanup daily at 2 AM
-RUN echo "0 2 * * * /usr/local/bin/vfb_cache_cleanup.sh" | crontab -
+# Copy and set up entrypoint script (always)
+COPY backend/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# Create log directory for cache cleanup logs
-RUN mkdir -p /var/log && touch /var/log/vfb_cache_cleanup.log
+# Only set up cache cleanup cron if BUILD_BACKEND != "false"
+RUN if [ "$BUILD_BACKEND" != "false" ]; then \
+      cp backend/vfb_cache_cleanup.sh /usr/local/bin/vfb_cache_cleanup.sh && \
+      chmod +x /usr/local/bin/vfb_cache_cleanup.sh && \
+      echo "0 2 * * * /usr/local/bin/vfb_cache_cleanup.sh" | crontab - && \
+      mkdir -p /var/log && touch /var/log/vfb_cache_cleanup.log ; \
+    else \
+      echo "Skipping cronjob setup for frontend-only builds"; \
+    fi
+    
 WORKDIR /usr/src/app/virtual_fly_brain
 
 EXPOSE 8080
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh", "gunicorn", "--log-level=info", "--preload", "--bind=0.0.0.0:8080", "--timeout=240", "--graceful-timeout=30", "--keep-alive=5", "virtual_fly_brain.__main__:app"]

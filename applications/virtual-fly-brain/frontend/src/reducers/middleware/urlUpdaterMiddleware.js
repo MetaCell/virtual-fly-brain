@@ -2,10 +2,11 @@ import { addRecentSearch } from '../actions/globals';
 import { getQueriesFailure } from '../actions/queries';
 import { getQueriesTypes } from '../actions/types/getQueriesTypes';
 import { getInstancesTypes } from '../actions/types/getInstancesTypes';
-import { setFirstIDLoaded, setAlignTemplates, setTemplateID } from '../actions/globals';
+import { getGlobalTypes } from '../actions/types/GlobalTypes';
+import { setFirstIDLoaded, setAlignTemplates, setTemplateID, setNeuroglassView } from '../actions/globals';
 import { getInstanceByID, get3DMesh, triggerInstanceFailure, setBulkLoadingCount, clearUrlLoadingState, focusInstance, selectInstance } from '../actions/instances';
 import * as GeppettoActions from '@metacell/geppetto-meta-client/common/actions';
-import { DEFAULT_TEMPLATE_ID } from '../../utils/constants';
+import { DEFAULT_TEMPLATE_ID, NG_LAYOUT_URL_PARAM, KNOWN_NG_VIEWS } from '../../utils/constants';
 
 function updateUrlParameterWithCurrentUrl(param, value, reset) {
   const urlObj = new URL(window.location.href);
@@ -104,6 +105,15 @@ const isFirstTimeLoad = (allLoadedInstances, store) => {
     // Update URL with default template if no parameters were provided
     if (!idsFromUrl && !idSelected) {
       updateUrlParameterWithCurrentUrl('id', DEFAULT_ID, true);
+    }
+
+    // Read ?layout param and sync into Redux
+    const ngView = getUrlParameter(NG_LAYOUT_URL_PARAM);
+    if (ngView && Array.isArray(KNOWN_NG_VIEWS) && KNOWN_NG_VIEWS.includes(ngView)) {
+      store.dispatch(setNeuroglassView(ngView));
+    } else if (ngView) {
+      // Clear unrecognized layout parameter from URL to avoid propagating invalid values
+      updateUrlParameterWithCurrentUrl(NG_LAYOUT_URL_PARAM, '', true);
     }
 
     uniqueLoadOrder.forEach(id => {
@@ -291,6 +301,19 @@ export const urlUpdaterMiddleware = store => next => (action) => {
         if ( !globalRecentSearches?.find( recent => recent.short_form === action.payload.short_form && recent.is_query) && (action.payload.query?.rows) ){
           store.dispatch(addRecentSearch(action.payload , true));
         }
+      }
+      next(action);
+      break;
+    }
+    case getGlobalTypes.SET_NEUROGLASS_VIEW: {
+      const view = action.payload.view;
+      const isValidView = typeof view === 'string' && view.trim().length > 0;
+      if (isValidView) {
+        updateUrlParameterWithCurrentUrl(NG_LAYOUT_URL_PARAM, view, true);
+      } else {
+        const urlObj = new URL(window.location.href);
+        urlObj.searchParams.delete(NG_LAYOUT_URL_PARAM);
+        window.history.replaceState(null, '', decodeURIComponent(urlObj.toString()));
       }
       next(action);
       break;

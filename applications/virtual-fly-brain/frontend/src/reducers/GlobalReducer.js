@@ -13,6 +13,7 @@ export const initialStateGlobalReducer = {
   misalignedIDs : {},
   showSliceDisplay : {},
   autoSaveLayout : false,
+  neuroglassView : null,
 };
 
 const GlobalReducer = (state = initialStateGlobalReducer, response) => {
@@ -110,6 +111,11 @@ const GlobalReducer = (state = initialStateGlobalReducer, response) => {
       case getLayoutTypes.AUTOSAVE_LAYOUT : {
         return Object.assign({}, state, {
           autoSaveLayout: !state.autoSaveLayout
+        });
+      }
+      case getGlobalTypes.SET_NEUROGLASS_VIEW: {
+        return Object.assign({}, state, {
+          neuroglassView: response.payload.view,
         });
       }
       default:

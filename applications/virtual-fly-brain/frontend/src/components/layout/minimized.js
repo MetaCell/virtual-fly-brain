@@ -1,4 +1,5 @@
 import { WidgetStatus } from "@metacell/geppetto-meta-client/common/layout/model";
+import { widgetsIDs } from './../../components/layout/widgets';
 
 export const minimized = {
     threeDCanvasWidget : {
@@ -71,6 +72,17 @@ export const minimized = {
         pos: 6,
         defaultPosition: 'RIGHT',
         props: { size: { height: 600, width: 300 } }
+    },
+
+    neuroglassViewerWidget : {
+        id: widgetsIDs.neuroglassViewerWidgetID,
+        name: "Neuroglass Viewer",
+        component: "neuroglassViewer",
+        panelName: "right",
+        hideOnClose: true,
+        status: WidgetStatus.HIDDEN,
+        defaultPosition: 'RIGHT',
+        props: { size: { height: 600, width: 800 } }
     }
 }
 
@@ -128,6 +140,17 @@ export const imagesWidgets = {
     status: WidgetStatus.MINIMIZED,
     defaultPosition: 'RIGHT',
     props: { size: { height: 600, width: 300 } }
+    },
+
+    neuroglassViewerWidget : {
+        id: widgetsIDs.neuroglassViewerWidgetID,
+        name: "Neuroglass Viewer",
+        component: "neuroglassViewer",
+        panelName: "right",
+        hideOnClose: true,
+        status: WidgetStatus.HIDDEN,
+        defaultPosition: 'RIGHT',
+        props: { size: { height: 600, width: 800 } }
     }
 }
 

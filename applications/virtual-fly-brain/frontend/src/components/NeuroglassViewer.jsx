@@ -1,47 +1,48 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { Box, Typography } from '@mui/material';
-import { getNeuroglassState, hasNeuroglassState } from '../utils/neuroglassStateConfig';
+import { Box, Typography, useMediaQuery } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+import { buildNeuroglassState, resolveNeuroglassLayout } from '../utils/neuroglassStateConfig';
 
-const NEUROGLASS_URL = import.meta.env.VITE_NEUROGLASS_URL || 'https://www.research.neuroglass.dev.metacell.us';
+const NEUROGLASS_URL = import.meta.env.NEUROGLASS_URL ?? '';
 
 export default function NeuroglassViewer() {
-  const [iframeSrc, setIframeSrc] = useState('');
-  
-  const focusedInstance = useSelector(state => state.instances?.focusedInstance);
+  const [debouncedSrc, setDebouncedSrc] = useState('');
 
-  const iframeSrcUrl = useMemo(() => {
-    if (!focusedInstance?.metadata?.Id) return '';
+  const allLoadedInstances = useSelector(state => state.instances?.allLoadedInstances);
+  const focusedInstance    = useSelector(state => state.instances?.focusedInstance);
+  const neuroglassView     = useSelector(state => state.globalInfo?.neuroglassView);
 
-    // Priority 1: Predefined state for focused instance (if available)
-    let stateToUse = null;
-    if (hasNeuroglassState(focusedInstance.metadata.Id)) {
-      stateToUse = getNeuroglassState(focusedInstance.metadata.Id);
-    }
-    // Priority 2: Default to template
-    else {
-      stateToUse = getNeuroglassState('VFB_00101567');
-    }
+  const theme    = useTheme();
+  const isMobile = !useMediaQuery(theme.breakpoints.up('lg'));
 
-    if (!stateToUse) return '';
-
-    const stateStr = JSON.stringify(stateToUse);
-    const encodedState = encodeURIComponent(stateStr);
-    return `${NEUROGLASS_URL}/new#!${encodedState}`;
-  }, [focusedInstance?.metadata?.Id]);
+  // Rebuilds whenever instances, focused item, layout preference, or viewport size changes.
+  const iframeSrc = useMemo(() => {
+    const layout = resolveNeuroglassLayout(neuroglassView, isMobile);
+    const state  = buildNeuroglassState(
+      allLoadedInstances,
+      focusedInstance?.metadata?.Id,
+      layout,
+    );
+    if (!state || !NEUROGLASS_URL) return '';
+    return `${NEUROGLASS_URL}/new#!${encodeURIComponent(JSON.stringify(state))}`;
+  }, [allLoadedInstances, focusedInstance?.metadata?.Id, neuroglassView, isMobile]);
 
   useEffect(() => {
-    if (iframeSrcUrl) {
-      setIframeSrc(iframeSrcUrl);
-    }
-  }, [iframeSrcUrl]);
+    if (!iframeSrc) {
+      setDebouncedSrc('');
+      return;
+    } 
+    const t = setTimeout(() => setDebouncedSrc(iframeSrc), 300);
+    return () => clearTimeout(t);
+  }, [iframeSrc]);
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      {iframeSrc ? (
+      {debouncedSrc ? (
         <Box sx={{ flex: 1, border: '1px solid #ccc', borderRadius: 1, overflow: 'hidden' }}>
           <iframe
-            src={iframeSrc}
+            src={debouncedSrc}
             style={{
               width: '100%',
               height: '100%',
@@ -55,7 +56,11 @@ export default function NeuroglassViewer() {
         </Box>
       ) : (
         <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fafafa' }}>
-          <Typography color="textSecondary">Loading Neuroglass viewer...</Typography>
+          <Typography color="textSecondary">
+             {!allLoadedInstances || allLoadedInstances.length === 0
+                 ? 'No layers selected to display in the Neuroglass viewer.'
+                 : 'Loading Neuroglass viewer...'}
+           </Typography>
         </Box>
       )}
     </Box>

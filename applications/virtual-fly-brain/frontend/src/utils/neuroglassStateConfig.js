@@ -1,9 +1,14 @@
+import { KNOWN_NG_VIEWS, NG_DEFAULT_LAYOUT, NG_DEFAULT_MOBILE_LAYOUT } from './constants';
+
+const DEFAULT_CONTRAST_RANGE = [0, 123];
+
+// ─── Coordinate space shared by all VFB instances ────────────────────────────
 const SHARED_VIEWPORT = {
-  dimensions: {
-    x: [1e-9, 'm'],
-    y: [5.189161e-10, 'm'],
-    z: [5.189161e-10, 'm'],
-  },
+  dimensions: [
+    { name: 'x', scale: [1e-9, 'm'] },
+    { name: 'y', scale: [5.189161e-10, 'm'] },
+    { name: 'z', scale: [5.189161e-10, 'm'] },
+  ],
   relativeDisplayScales: { x: 2, y: 2, z: 2 },
   position: [87.5, 280.5, 605.5],
   crossSectionScale: 0.5,
@@ -16,100 +21,149 @@ const SHARED_VIEWPORT = {
   projectionScale: 1024,
 };
 
-const SHARED_LAYERS = [
-  {
+function buildNeuroglassLayerUrl(protocol, baseUrl, instanceId) {
+  const path = instanceId;
+  if (protocol === 'neuroglancer-precomputed' || protocol === 'n5') {
+    // GCS / S3 require Neuroglancer's pipe notation
+    return `${baseUrl}/${path}/|${protocol}:`;
+  }
+  // HTTP fileservers use a precomputed:// prefix
+  return `precomputed://${baseUrl}/${path}`;
+}
+
+// Datasource configuration for Datasource
+export const NEUROGLASS_DATASOURCE = {
+  protocol: import.meta.env.NEUROGLASS_DATA_PROTOCOL,
+  baseUrl: import.meta.env.NEUROGLASS_DATA_BASE_URL,
+  buildUrl(instanceId) {
+    return buildNeuroglassLayerUrl(
+      this.protocol,
+      this.baseUrl,
+      instanceId,
+    );
+  },
+};
+
+// Fixed GLSL shader template : Only shaderControls.color and layer.opacity change per instance.
+export const LAYER_SHADER = [
+  '#uicontrol invlerp contrast',
+  '#uicontrol vec3 color color',
+  'void main() {',
+  '  float contrast_value = contrast();',
+  '  if (VOLUME_RENDERING) {',
+  '    emitRGBA(vec4(color * contrast_value, contrast_value));',
+  '  }',
+  '  else {',
+  '    emitRGB(color * contrast_value);',
+  '  }',
+  '}',
+].join('\n');
+
+// Layout resolver : mobile (< 1200 px) → '3d', desktop → '4panel-alt'.
+export function resolveNeuroglassLayout(userPref, isMobile) {
+  if (userPref && KNOWN_NG_VIEWS.includes(userPref)) return userPref;
+  return isMobile ? NG_DEFAULT_MOBILE_LAYOUT : NG_DEFAULT_LAYOUT;
+}
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function toHexByte(value) {
+  const v = clamp(Math.round(value), 0, 255);
+  return v.toString(16).padStart(2, '0');
+}
+
+function colorToHex(color = {}) {
+  let { r = 255, g = 255, b = 255 } = color;
+
+  // If RGB values look normalized (0–1), convert to 0–255.
+  if (r <= 1 && g <= 1 && b <= 1) {
+    r *= 255;
+    g *= 255;
+    b *= 255;
+  }
+
+  return `#${toHexByte(r)}${toHexByte(g)}${toHexByte(b)}`;
+}
+
+function alphaToOpacity(a = 1) {
+  if (a == null) return 1;
+
+  // If alpha looks like 0–255, normalize it.
+  if (a > 1) return clamp(a / 255, 0, 1);
+
+  // Otherwise assume already normalized 0–1.
+  return clamp(a, 0, 1);
+}
+
+function normalizeContrast(inst) {
+  const contrast = inst?.contrast;
+
+  if (
+    contrast &&
+    typeof contrast === 'object' &&
+    Array.isArray(contrast.range) &&
+    contrast.range.length === 2
+  ) {
+    return contrast;
+  }
+
+  if (Array.isArray(contrast) && contrast.length === 2) {
+    return { range: contrast };
+  }
+
+  return { range: DEFAULT_CONTRAST_RANGE };
+}
+
+// Per-instance layer builder: converts a VFB instance into a Neuroglancer layer config.
+function buildSingleInstanceLayer(inst) {
+  const layer = {
     type: 'image',
-    source: 'gs://neuroglass/vfb/VFB_00101567_1567/|neuroglancer-precomputed:',
+    source: NEUROGLASS_DATASOURCE.buildUrl(inst.metadata.Id),
     tab: 'rendering',
-    shader: '#uicontrol invlerp normalized\nvoid main() {\n  float val = toNormalized(getDataValue());\n  emitRGBA(vec4(val, val, val, val * 0.3));  // Grayscale with 30% opacity\n}\n\n',
+    opacity: alphaToOpacity(inst.color?.a),
+    blend: 'additive',
+    shader: LAYER_SHADER,
+    shaderControls: {
+      contrast: normalizeContrast(inst),
+      color: colorToHex(inst.color),
+    },
+    volumeRenderingDepthSamples: 256,
     volumeRendering: 'on',
-    renderingAccordion: { volumeRenderingExpanded: true },
-    name: 'VFB_00101567_1567',
-  },
-  {
-    type: 'image',
-    source: 'gs://neuroglass/vfb/VFB_00101567_12vj/|neuroglancer-precomputed:',
-    tab: 'rendering',
-    shader: '#uicontrol invlerp normalized\nvoid main() {\n  float val = toNormalized(getDataValue());\n  emitRGB(vec3(0.0, val, 0.0));  // Green\n}',
-    volumeRendering: 'on',
-    volumeRenderingDepthSamples: 90.50966799187809,
-    renderingAccordion: { volumeRenderingExpanded: true },
-    name: 'VFB_00101567_12vj',
-  },
-  {
-    type: 'image',
-    source: 'gs://neuroglass/vfb/VFB_00101567/|neuroglancer-precomputed:',
-    tab: 'source',
-    shader: '#uicontrol invlerp normalized\nvoid main() {\n  float val = toNormalized(getDataValue());\n  emitRGB(vec3(val, 0.0, val));  // Magenta\n}\n',
-    volumeRendering: 'on',
-    volumeRenderingDepthSamples: 90.50966799187809,
-    renderingAccordion: { volumeRenderingExpanded: true },
-    name: 'VFB_00101567_101b',
-  },
-];
+    name: inst.metadata.Id,
+  };
 
-const createNeuroglassState = (selectedLayerId) => ({
-  ...SHARED_VIEWPORT,
-  layers: SHARED_LAYERS,
-  showSlices: false,
-  selectedLayer: { visible: false, layer: selectedLayerId },
-  layout: '4panel-alt',
-  layerListPanel: { visible: false },
-});
+  if (inst.visibleMesh === false) layer.visible = false;
 
-export const NEUROGLASS_STATE_VFB_00101567 = createNeuroglassState('VFB_00101567_1567');
+  return layer;
+}
+// Main state builder: converts loaded VFB instances + UI state into a Neuroglass viewer state object.
+export function buildNeuroglassState(allLoadedInstances, focusedInstanceId, layout) {
+  const instances = allLoadedInstances || [];
+  const layers = instances
+    .filter(inst => {
+      if (!inst?.metadata?.Id) {
+        console.warn(`[buildNeuroglassState] Instance missing metadata ID:`, inst);
+        return false;
+      }
+      return true;
+    })
+    .map(inst => buildSingleInstanceLayer(inst));
 
-export const NEUROGLASS_STATE_VFB_0010101b = createNeuroglassState('VFB_00101567_101b');
+  if (layers.length === 0) return null;
 
-export const NEUROGLASS_STATE_VFB_001012vj = createNeuroglassState('VFB_00101567_12vj');
+  const selectedLayerName =
+    focusedInstanceId && layers.some(layer => layer.name === focusedInstanceId)
+      ? focusedInstanceId
+      : layers[0].name;
 
-export const NEUROGLASS_STATES_MAP = {
-  'VFB_00101567': NEUROGLASS_STATE_VFB_00101567,
-  'VFB_0010101b': NEUROGLASS_STATE_VFB_0010101b,
-  'VFB_001012vj': NEUROGLASS_STATE_VFB_001012vj,
-};
-
-export const SUPPORTED_NEUROGLASS_INSTANCES = Object.freeze([
-  'VFB_00101567',
-  'VFB_0010101b',
-  'VFB_001012vj',
-]);
-
-const validateInstanceId = (instanceId) => {
-  if (typeof instanceId !== 'string') {
-    return { valid: false, error: `Expected string, got ${typeof instanceId}` };
-  }
-  if (!/^VFB_[A-Za-z0-9]+$/.test(instanceId)) {
-    return { valid: false, error: `Invalid VFB ID format: ${instanceId}` };
-  }
-  return { valid: true };
-};
-
-export const getNeuroglassState = (instanceId) => {
-  const validation = validateInstanceId(instanceId);
-  if (!validation.valid) {
-    console.error(`[Neuroglass] ${validation.error}`);
-    return null;
-  }
-  const state = NEUROGLASS_STATES_MAP[instanceId];
-  if (!state) console.warn(`[Neuroglass] No state for instance: ${instanceId}`);
-  return state || null;
-};
-
-export const hasNeuroglassState = (instanceId) => {
-  const validation = validateInstanceId(instanceId);
-  if (!validation.valid) return false;
-  return Object.prototype.hasOwnProperty.call(NEUROGLASS_STATES_MAP, instanceId);
-};
-
-export const isNeuroglassSupportedInstance = (instanceId) => {
-  const validation = validateInstanceId(instanceId);
-  if (!validation.valid) return false;
-  return SUPPORTED_NEUROGLASS_INSTANCES.includes(instanceId);
-};
-
-export const NEUROGLASS_CONFIG = {
-  instances: SUPPORTED_NEUROGLASS_INSTANCES,
-  layers: SHARED_LAYERS,
-  viewport: SHARED_VIEWPORT,
-};
+  return {
+    ...SHARED_VIEWPORT,
+    layers,
+    showSlices: false,
+    selectedLayer: { visible: false, layer: selectedLayerName },
+    layout: layout || NG_DEFAULT_LAYOUT,
+    layerListPanel: { visible: false },
+  };
+}

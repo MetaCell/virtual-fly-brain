@@ -110,4 +110,4 @@ RUN if [ "$BUILD_BACKEND" != "false" ]; then \
 WORKDIR /usr/src/app/virtual_fly_brain
 
 EXPOSE 8080
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh", "gunicorn", "--log-level=info", "--preload", "--bind=0.0.0.0:8080", "--timeout=240", "--graceful-timeout=30", "--keep-alive=5", "virtual_fly_brain.__main__:app"]
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]

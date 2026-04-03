@@ -14,9 +14,6 @@ harness:
       limits:
         memory: 3048Mi
         cpu: 1000m
-    env:
-      - name: BUILD_BACKEND
-        value: {{ .Values.buildBackend | quote }}
   dependencies:
     build:
       - cloudharness-base-debian

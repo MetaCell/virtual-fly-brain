@@ -99,6 +99,9 @@ steps:
         - TAG=${{CF_BUILD_ID}}
         - DOMAIN=${{DOMAIN}}
         - BE_DOMAIN=${{BE_DOMAIN}}
+        - NEUROGLASS_DATA_PROTOCOL=${{NEUROGLASS_DATA_PROTOCOL}}
+        - NEUROGLASS_DATA_BASE_URL=${{NEUROGLASS_DATA_BASE_URL}}
+        - NEUROGLASS_URL=${{NEUROGLASS_URL}}
         - NOCACHE=${{CF_BUILD_ID}}
         - REGISTRY=${{REGISTRY}}/virtual-fly-brain
         - CLOUDHARNESS_FLASK=${{REGISTRY}}/virtual-fly-brain/cloudharness-flask:${{CF_BUILD_ID}}

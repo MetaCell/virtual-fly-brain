@@ -128,6 +128,7 @@ const vfbMiddleware = store => next => (action) => {
                 keys.push(widgetsIDs.termContextWidgetID);
                 keys.push(widgetsIDs.roiBrowserWidgetID);
                 keys.push(widgetsIDs.listViewerWidgetID);
+                keys.push(widgetsIDs.neuroglassViewerWidgetID);
             }
             const layoutManager = getLayoutManagerInstance();
             const activePanel = layoutManager.model.getRoot().getModel().getActiveTabset().getId();

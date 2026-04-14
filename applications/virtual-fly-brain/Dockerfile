@@ -4,6 +4,7 @@ FROM ${CLOUDHARNESS_FLASK}
 
 ARG DOMAIN
 ARG BE_DOMAIN
+ARG BUILD_BACKEND
 ARG NEUROGLASS_DATA_PROTOCOL
 ARG NEUROGLASS_DATA_BASE_URL
 ARG NEUROGLASS_URL
@@ -12,6 +13,7 @@ ENV MODULE_NAME=virtual_fly_brain
 ENV WORKERS=2
 ENV PORT=8080
 ENV BUILDDIR=/app
+ENV BUILD_BACKEND=$BUILD_BACKEND
 
 # Update ImageMagick to fix critical security vulnerabilities
 # CVE-2025-57807, CVE-2025-55298, CVE-2025-55154, CVE-2025-55212, CVE-2025-57803
@@ -45,7 +47,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y nodejs && \
     node --version
 
-RUN npm install -g yarn && \
+RUN npm install -g yarn serve && \
     yarn --version
 
 # Set up virtual display for OpenGL
@@ -72,9 +74,19 @@ RUN export VFB_DOMAIN="https://${BE_DOMAIN}" && \
 
 WORKDIR /usr/src/app
 COPY backend/requirements.txt /usr/src/app/
-RUN pip3 install --no-cache-dir -r requirements.txt
+# === CONDITIONAL BACKEND BUILD: only if BUILD_BACKEND != "false" ===
+RUN if [ "$BUILD_BACKEND" != "false" ]; then \
+      pip3 install --no-cache-dir -r requirements.txt; \
+    else \
+      echo "Skipping backend requirements install."; \
+    fi
+
 COPY backend/ /usr/src/app
-RUN pip3 install -e .
+RUN if [ "$BUILD_BACKEND" != "false" ]; then \
+      pip3 install -e .; \
+    else \
+      echo "Skipping backend build."; \
+    fi
 
 RUN cp -r ${BUILDDIR}/dist/ /usr/src/app/virtual_fly_brain/www
 
@@ -86,12 +98,15 @@ RUN chmod +x /usr/local/bin/vfb_cache_cleanup.sh
 COPY backend/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# Create cron job to run cache cleanup daily at 2 AM
-RUN echo "0 2 * * * /usr/local/bin/vfb_cache_cleanup.sh" | crontab -
-
-# Create log directory for cache cleanup logs
-RUN mkdir -p /var/log && touch /var/log/vfb_cache_cleanup.log
+# Only set up cache cleanup cron if BUILD_BACKEND != "false"
+RUN if [ "$BUILD_BACKEND" != "false" ]; then \
+      echo "0 2 * * * /usr/local/bin/vfb_cache_cleanup.sh" | crontab - && \
+      mkdir -p /var/log && touch /var/log/vfb_cache_cleanup.log ; \
+    else \
+      echo "Skipping cronjob setup for frontend-only builds"; \
+    fi
+    
 WORKDIR /usr/src/app/virtual_fly_brain
 
 EXPOSE 8080
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh", "gunicorn", "--log-level=info", "--preload", "--bind=0.0.0.0:8080", "--timeout=240", "--graceful-timeout=30", "--keep-alive=5", "virtual_fly_brain.__main__:app"]
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]

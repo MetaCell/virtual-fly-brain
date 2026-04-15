@@ -25,7 +25,7 @@ export default function NeuroglassViewer() {
       layout,
     );
     if (!state || !NEUROGLASS_URL) return '';
-    return `${NEUROGLASS_URL}/new#!${encodeURIComponent(JSON.stringify(state))}`;
+    return `${NEUROGLASS_URL}/embed#!${encodeURIComponent(JSON.stringify(state))}`;
   }, [allLoadedInstances, focusedInstance?.metadata?.Id, neuroglassView, isMobile]);
 
   useEffect(() => {

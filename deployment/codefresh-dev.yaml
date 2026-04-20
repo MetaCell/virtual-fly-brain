@@ -48,11 +48,11 @@ steps:
     type: parallel
     stage: build
     steps:
-      cloudharness-base-debian:
+      cloudharness-base:
         type: build
         stage: build
         tag: '${{CF_BUILD_ID}}'
-        dockerfile: infrastructure/base-images/cloudharness-base-debian/Dockerfile
+        dockerfile: infrastructure/base-images/cloudharness-base/Dockerfile
         registry: '${{CODEFRESH_REGISTRY}}'
         buildkit: true
         build_arguments:
@@ -60,8 +60,8 @@ steps:
         - DOMAIN=${{DOMAIN}}
         - NOCACHE=${{CF_BUILD_ID}}
         - REGISTRY=${{REGISTRY}}/virtual-fly-brain
-        image_name: virtual-fly-brain/cloudharness-base-debian
-        title: Cloudharness base debian
+        image_name: virtual-fly-brain/cloudharness-base
+        title: Cloudharness base
         working_directory: ./cloud-harness
   build_static_images:
     title: Build static images
@@ -80,7 +80,7 @@ steps:
         - DOMAIN=${{DOMAIN}}
         - NOCACHE=${{CF_BUILD_ID}}
         - REGISTRY=${{REGISTRY}}/virtual-fly-brain
-        - CLOUDHARNESS_BASE=${{REGISTRY}}/virtual-fly-brain/cloudharness-base-debian:${{CF_BUILD_ID}}
+        - CLOUDHARNESS_BASE=${{REGISTRY}}/virtual-fly-brain/cloudharness-base:${{CF_BUILD_ID}}
         image_name: virtual-fly-brain/cloudharness-flask
         title: Cloudharness flask
         working_directory: ./cloud-harness/infrastructure/common-images/cloudharness-flask
@@ -129,14 +129,6 @@ steps:
     type: parallel
     stage: publish
     steps:
-      publish_cloudharness-base-debian:
-        stage: publish
-        type: push
-        title: Cloudharness base debian
-        candidate: '${{REGISTRY}}/virtual-fly-brain/cloudharness-base-debian:${{CF_BUILD_ID}}'
-        tags:
-        - '${{DEPLOYMENT_PUBLISH_TAG}}'
-        registry: '${{REGISTRY_PUBLISH_URL}}'
       publish_cloudharness-flask:
         stage: publish
         type: push

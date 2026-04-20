@@ -16,7 +16,7 @@ harness:
         cpu: 1000m
   dependencies:
     build:
-      - cloudharness-base-debian
+      - cloudharness-base
       - cloudharness-flask
   ingress:
     annotations:

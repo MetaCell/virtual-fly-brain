@@ -23,6 +23,7 @@ RUN apt-get update && apt-get upgrade -y imagemagick
 RUN apt-get remove -y bluez bluez-obexd libbluetooth3 || true
 
 RUN apt-get update && apt-get install -y \
+    curl \
     git \
     build-essential \
     libgl1 \

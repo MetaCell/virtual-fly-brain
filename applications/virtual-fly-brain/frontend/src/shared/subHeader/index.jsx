@@ -13,8 +13,9 @@ import {
   Layers,
   Query,
   Search,
-  Upload,
+  Upload
 } from "../../icons";
+import Screenshot from '@mui/icons-material/CameraAlt';
 import vars from "../../theme/variables";
 import MediaQuery from "react-responsive";
 import { useDispatch, useSelector } from "react-redux";
@@ -25,31 +26,36 @@ import { resetLoadingState } from "../../reducers/actions/instances";
 const navArr = [
   {
     id: 0,
+    icon: Screenshot,
+    name: "Screenshot",
+  },
+  {
+    id: 1,
     icon: Upload,
     name: "Upload",
   },
   {
-    id: 1,
+    id: 2,
     icon: Download,
     name: "Download",
   },
   {
-    id: 2,
+    id: 3,
     icon: Query,
     name: "Query",
   },
   {
-    id: 3,
+    id: 4,
     icon: Layers,
     name: "Layer",
   },
   {
-    id: 4,
+    id: 5,
     icon: ClearAll,
     name: "Clear all",
   },
   {
-    id: 5,
+    id: 6,
     icon: History,
     name: "Recent",
   },

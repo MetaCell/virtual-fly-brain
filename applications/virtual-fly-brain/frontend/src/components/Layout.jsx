@@ -6,6 +6,7 @@ import ErrorDialog from "./ErrorDialog";
 import QueryBuilder from "./queryBuilder";
 import MediaQuery from 'react-responsive';
 import VFBUploader from "./VFBUploader/VFBUploader";
+import VFBSnapshot from "./VFBSnapshot/VFBSnapshot";
 import { useDispatch, useSelector, useStore } from 'react-redux';
 import { widgets } from "./layout/widgets";
 import VFBDownloadContents from "./VFBDownloadContents/VFBDownloadContents";
@@ -251,20 +252,22 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
         {desktopScreen ? (
           <>
             {tabContent}
-            {bottomNav === 0 && < VFBUploader open={true} setBottomNav={setBottomNav} />}
-            {bottomNav === 1 && <VFBDownloadContents open={true} setBottomNav={setBottomNav} />}
-            {bottomNav === 2 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} tabSelected={0}/>}
-            {bottomNav === 5 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} tabSelected={1}/>}
+            {bottomNav === 0 && < VFBSnapshot open={true} setBottomNav={setBottomNav} />}
+            {bottomNav === 1 && < VFBUploader open={true} setBottomNav={setBottomNav} />}
+            {bottomNav === 2 && <VFBDownloadContents open={true} setBottomNav={setBottomNav} />}
+            {bottomNav === 3 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} tabSelected={0}/>}
+            {bottomNav === 6 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} tabSelected={1}/>}
           </>
         ) : (
           <>
             {
-              bottomNav != 2 && tabContent
+              bottomNav != 3 && tabContent
             }
-            {bottomNav === 0 && <VFBUploader open={true} setBottomNav={setBottomNav} />}
-            {bottomNav === 1 && <VFBDownloadContents open={true} setBottomNav={setBottomNav} />}
-            {bottomNav === 2 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} tabSelected={0}/>}
-            {bottomNav === 5 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} tabSelected={1}/>}
+            {bottomNav === 0 && <VFBSnapshot open={true} setBottomNav={setBottomNav} />}
+            {bottomNav === 1 && <VFBUploader open={true} setBottomNav={setBottomNav} />}
+            {bottomNav === 2 && <VFBDownloadContents open={true} setBottomNav={setBottomNav} />}
+            {bottomNav === 3 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} tabSelected={0}/>}
+            {bottomNav === 6 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} tabSelected={1}/>}
           </>
         )}
       </Box>

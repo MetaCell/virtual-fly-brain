@@ -60,8 +60,12 @@ class ThreeDCanvas extends Component {
       canvasWidth: 0,
       canvasHeight: 0,
       trigger: undefined,
+      isRecording: false,
     };
     this.canvasRef = React.createRef();
+    this._mediaRecorder = null;
+    this._recordedChunks = [];
+    this.handleRecordToggle = this.handleRecordToggle.bind(this);
   }
 
   isMeshLoaded(instanceData) {
@@ -302,9 +306,47 @@ class ThreeDCanvas extends Component {
     }
   }
 
+  handleRecordToggle() {
+    if (!this.state.isRecording) {
+      const canvas = this.canvasRef.current?.threeDEngine?.renderer?.domElement;
+      if (!canvas) return;
+      const stream = canvas.captureStream(30);
+      const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
+        ? 'video/webm;codecs=vp9'
+        : 'video/webm';
+      const mediaRecorder = new MediaRecorder(stream, { mimeType });
+      this._recordedChunks = [];
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) this._recordedChunks.push(e.data);
+      };
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(this._recordedChunks, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'vfb-scene.webm';
+        a.click();
+        URL.revokeObjectURL(url);
+      };
+      mediaRecorder.start();
+      this._mediaRecorder = mediaRecorder;
+      this.setState({ isRecording: true });
+    } else {
+      this._mediaRecorder?.stop();
+      this._mediaRecorder = null;
+      this.setState({ isRecording: false });
+    }
+  }
+
   componentWillUnmount() {
     document.removeEventListener("mousedown", this.handleClickOutside);
     
+    // Stop any active recording
+    if (this._mediaRecorder) {
+      this._mediaRecorder.stop();
+      this._mediaRecorder = null;
+    }
+
     // Cancel any ongoing mesh polling to prevent operations on unmounted component
     if (this._meshPolling && this._meshPollHandle) {
       cancelAnimationFrame(this._meshPollHandle);
@@ -413,8 +455,19 @@ class ThreeDCanvas extends Component {
   }
 
   render() {
-    const { cameraOptions } = this.state;
+    const { cameraOptions, isRecording } = this.state;
     const { classes, mappedCanvasData, threeDObjects } = this.props;
+    const dynamicCameraOptions = {
+      ...cameraOptions,
+      cameraControls: {
+        ...cameraOptions.cameraControls,
+        props: {
+          ...cameraOptions.cameraControls.props,
+          isRecording,
+          onRecordToggle: this.handleRecordToggle,
+        },
+      },
+    };
 
     return (
       <Box
@@ -441,7 +494,7 @@ class ThreeDCanvas extends Component {
                 ref={this.canvasRef}
                 data={mappedCanvasData?.filter((d) => d?.visibility)}
                 threeDObjects={threeDObjects}
-                cameraOptions={cameraOptions}
+                cameraOptions={dynamicCameraOptions}
                 onMount={(scene) => (this.scene = scene)}
                 backgroundColor={blackBG}
                 onSelection={this.onSelection}

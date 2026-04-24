@@ -176,10 +176,12 @@ function normalizeContrast(inst) {
 }
 
 // Per-instance layer builder: converts a VFB instance into a Neuroglancer layer config.
-function buildSingleInstanceLayer(inst) {
+async function buildSingleInstanceLayer(inst) {
+  const source = await NEUROGLASS_DATASOURCE.buildUrl(inst.metadata.Id);
+
   const layer = {
     type: 'image',
-    source: NEUROGLASS_DATASOURCE.buildUrl(inst.metadata.Id),
+    source: source,
     tab: 'rendering',
     opacity: alphaToOpacity(inst.color?.a),
     blend: 'additive',
@@ -192,6 +194,8 @@ function buildSingleInstanceLayer(inst) {
     volumeRendering: 'on',
     name: inst.metadata.Id,
   };
+
+  console.log(`[buildSingleInstanceLayer] Built layer for instance ${inst.metadata.Id}:`, layer);
 
   if (inst.visibleMesh === false) layer.visible = false;
 

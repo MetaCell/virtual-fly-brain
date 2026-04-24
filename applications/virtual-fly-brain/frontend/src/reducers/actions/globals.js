@@ -36,9 +36,9 @@ export const setFirstIDLoaded = () => ({
   payload : {}
 })
 
-export const setAlignTemplates = (aligned, templateID) => ({
+export const setAlignTemplates = (aligned, id, templateID) => ({
   type: getGlobalTypes.ALIGN_TEMPLATES,
-  payload : { aligned, templateID }
+  payload : { aligned, id, templateID }
 })
 
 export const setTemplateID = (id) => ({

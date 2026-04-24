@@ -36,10 +36,11 @@ const GlobalReducer = (state = initialStateGlobalReducer, response) => {
           })
       case getGlobalTypes.ALIGN_TEMPLATES:{
         const aligned = response.payload.aligned;
-        const id = response.payload.templateID
+        const templateID = response.payload.templateID
+        const id = response.payload.id
         return Object.assign({}, state, {
           alignedTemplates: aligned,
-          misalignedTemplate : id,
+          misalignedTemplate : templateID,
           misalignedIDs : {...state.misalignedIDs, [id] : id }
         })
       }

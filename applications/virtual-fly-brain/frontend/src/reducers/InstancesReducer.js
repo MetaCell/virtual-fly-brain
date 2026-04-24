@@ -762,6 +762,7 @@ const InstancesReducer = (state = initialStateInstancesReducer, response) => {
     case getInstancesTypes.CLEAR_URL_LOADING_STATE: {
       return Object.assign({}, state, {
         isLoadingFromUrl: false,
+        isLoading: false,
       });
     }
     default:

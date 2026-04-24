@@ -79,6 +79,7 @@ const SubHeader = ({ setBottomNav, bottomNav }) => {
   const [filterOpened, setFilterOpened] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState({});
   const [desktop, setDesktop] = useState(window.innerWidth >= 1200);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -89,7 +90,6 @@ const SubHeader = ({ setBottomNav, bottomNav }) => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const isLoading = useSelector((state) => state.instances.isLoading);
   const loadingInstances = useSelector(
     (state) => state.instances.loadingInstances
   );
@@ -123,6 +123,12 @@ const SubHeader = ({ setBottomNav, bottomNav }) => {
       color: whiteColor,
     },
   };
+  const instanceLoading = useSelector((state) => state.instances.isLoading);
+
+  useEffect(() => {
+    setIsLoading(instanceLoading)
+  }, [instanceLoading])
+
 
   useEffect(() => {
     // For bulk loading, check if all instances are loaded using bulk count

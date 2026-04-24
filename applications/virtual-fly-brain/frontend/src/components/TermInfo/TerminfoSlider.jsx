@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 import { Slide } from 'react-slideshow-image';
 import { ChevronLeft, FullScreen } from '../../icons';
 import { Box, Button, Typography } from '@mui/material';
-import { getInstanceByID } from '../../reducers/actions/instances';
+import { getInstanceByID, clearUrlLoadingState } from '../../reducers/actions/instances';
 import Modal from '../../shared/modal/Modal';
 import 'react-slideshow-image/dist/styles.css'
 
@@ -115,12 +115,16 @@ const TerminfoSlider = (props) => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const reduxState = useSelector(state => state);
+  const misalignedTemplate = useSelector(state => state.globalInfo.misalignedTemplate)
+  const alignedTemplates = useSelector(state => state.globalInfo.alignedTemplates)
+  const misalignedIDs = useSelector(state => state.globalInfo.misalignedIDs)
 
   const handleConfirmLoad = async () => {
     if (!confirmationModal.example) return;
     
     setIsLoading(true);
     try {
+      clearUrlLoadingState()
       window.open(
         window.location.origin + '/?id=' + confirmationModal.example.template + '&i=' + confirmationModal.example.id,
         '_blank'
@@ -158,6 +162,18 @@ const TerminfoSlider = (props) => {
       }
     }
   }
+
+
+  useEffect(() => {
+    if ( misalignedTemplate && !alignedTemplates ){
+      setConfirmationModal({
+        open: true,
+        example: { id : Object.keys(misalignedIDs) , template: misalignedTemplate },  
+        message: `The image you requested is aligned to another template. Click Load Template to open it in a new tab or Cancel to just view the image metadata.`
+      });
+    }
+  }, [misalignedTemplate, misalignedIDs])
+
 
   useEffect( () => {
     if(props?.examples) {

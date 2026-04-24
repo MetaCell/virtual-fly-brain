@@ -182,14 +182,14 @@ export const urlUpdaterMiddleware = store => next => (action) => {
             await focusInstance(pendingFocusId);
             await selectInstance(pendingFocusId);
             // Clear URL loading state after async operations complete
-            store.dispatch(clearUrlLoadingState());
+            clearUrlLoadingState();
             // Clear the initial focus ID after a longer delay to allow all pending template operations to complete
             setTimeout(() => {
               initialUrlFocusId = null;
             }, 1000);
           })();
         } else {
-          store.dispatch(clearUrlLoadingState());
+          clearUrlLoadingState();
         }
       }
 
@@ -272,7 +272,7 @@ export const urlUpdaterMiddleware = store => next => (action) => {
               return;
             }
           // If the individual is not aligned with the current template, we need to show the misalignment dialog
-          store.dispatch(setAlignTemplates(false, action.payload.Id));
+          store.dispatch(setAlignTemplates(false, action.payload.Id, Object.keys(action.payload?.Images)|| Object.keys(action.payload?.Examples || {})));
           return;
         }
       }

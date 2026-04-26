@@ -77,7 +77,7 @@ async function buildNeuroglassLayerUrl(protocol, baseUrl, instanceId) {
           );
 
           if (neuroglancerFolder) {
-            return `${vfbFolderUrl}/${neuroglancerFolder}:`;
+            return `${vfbFolderUrl}/${neuroglancerFolder}|${protocol}:`;
           }
         }
       } else {

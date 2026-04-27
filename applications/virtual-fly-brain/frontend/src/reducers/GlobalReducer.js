@@ -41,7 +41,7 @@ const GlobalReducer = (state = initialStateGlobalReducer, response) => {
         return Object.assign({}, state, {
           alignedTemplates: aligned,
           misalignedTemplate : templateID,
-          misalignedIDs : {...state.misalignedIDs, [id] : id }
+          misalignedIDs : id ? {...state.misalignedIDs, [id] : id } : state.misalignedIDs
         })
       }
       case getGlobalTypes.OPEN_QUERY_COMPONENT:

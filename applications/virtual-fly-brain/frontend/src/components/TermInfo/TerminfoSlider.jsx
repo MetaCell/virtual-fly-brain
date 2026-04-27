@@ -165,14 +165,16 @@ const TerminfoSlider = (props) => {
 
 
   useEffect(() => {
-    if ( misalignedTemplate && !alignedTemplates ){
+    const misalignedIdKeys = Object.keys(misalignedIDs || {});
+    const activeMisalignedId = misalignedIdKeys[misalignedIdKeys.length - 1];
+    if (misalignedTemplate && !alignedTemplates && activeMisalignedId) {
       setConfirmationModal({
         open: true,
-        example: { id : Object.keys(misalignedIDs) , template: misalignedTemplate },  
+        example: { id: activeMisalignedId, template: misalignedTemplate },
         message: `The image you requested is aligned to another template. Click Load Template to open it in a new tab or Cancel to just view the image metadata.`
       });
     }
-  }, [misalignedTemplate, misalignedIDs])
+  }, [misalignedTemplate, misalignedIDs, alignedTemplates])
 
 
   useEffect( () => {

@@ -8,6 +8,7 @@ const NEUROGLASS_URL = import.meta.env.NEUROGLASS_URL ?? '';
 
 export default function NeuroglassViewer() {
   const [debouncedSrc, setDebouncedSrc] = useState('');
+  const [iframeSrc, setIframeSrc] = useState('');
 
   const allLoadedInstances = useSelector(state => state.instances?.allLoadedInstances);
   const focusedInstance    = useSelector(state => state.instances?.focusedInstance);
@@ -16,16 +17,35 @@ export default function NeuroglassViewer() {
   const theme    = useTheme();
   const isMobile = !useMediaQuery(theme.breakpoints.up('lg'));
 
-  // Rebuilds whenever instances, focused item, layout preference, or viewport size changes.
-  const iframeSrc = useMemo(() => {
-    const layout = resolveNeuroglassLayout(neuroglassView, isMobile);
-    const state  = buildNeuroglassState(
-      allLoadedInstances,
-      focusedInstance?.metadata?.Id,
-      layout,
-    );
-    if (!state || !NEUROGLASS_URL) return '';
-    return `${NEUROGLASS_URL}/embed#!${encodeURIComponent(JSON.stringify(state))}`;
+  useEffect(() => {
+    let cancelled = false;
+
+    async function buildSrc() {
+      const layout = resolveNeuroglassLayout(neuroglassView, isMobile);
+
+      const state = await buildNeuroglassState(
+        allLoadedInstances,
+        focusedInstance?.metadata?.Id,
+        layout,
+      );
+
+      if (cancelled) return;
+
+      if (!state || !NEUROGLASS_URL) {
+        setIframeSrc('');
+        return;
+      }
+
+      setIframeSrc(
+        `${NEUROGLASS_URL}/embed#!${encodeURIComponent(JSON.stringify(state))}`
+      );
+    }
+
+    buildSrc();
+
+    return () => {
+      cancelled = true;
+    };
   }, [allLoadedInstances, focusedInstance?.metadata?.Id, neuroglassView, isMobile]);
 
   useEffect(() => {

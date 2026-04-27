@@ -77,7 +77,7 @@ async function buildNeuroglassLayerUrl(protocol, baseUrl, instanceId) {
           );
 
           if (neuroglancerFolder) {
-            return `${vfbFolderUrl}/${neuroglancerFolder}|${protocol}:`;
+            return `${vfbFolderUrl}/${neuroglancerFolder}/|${protocol}:`;
           }
         }
       } else {
@@ -201,18 +201,21 @@ async function buildSingleInstanceLayer(inst) {
 
   return layer;
 }
-// Main state builder: converts loaded VFB instances + UI state into a Neuroglass viewer state object.
-export function buildNeuroglassState(allLoadedInstances, focusedInstanceId, layout) {
+
+export async function buildNeuroglassState(allLoadedInstances, focusedInstanceId, layout) {
   const instances = allLoadedInstances || [];
-  const layers = instances
-    .filter(inst => {
-      if (!inst?.metadata?.Id) {
-        console.warn(`[buildNeuroglassState] Instance missing metadata ID:`, inst);
-        return false;
-      }
-      return true;
-    })
-    .map(inst => buildSingleInstanceLayer(inst));
+
+  const layers = await Promise.all(
+    instances
+      .filter(inst => {
+        if (!inst?.metadata?.Id) {
+          console.warn(`[buildNeuroglassState] Instance missing metadata ID:`, inst);
+          return false;
+        }
+        return true;
+      })
+      .map(inst => buildSingleInstanceLayer(inst))
+  );
 
   if (layers.length === 0) return null;
 

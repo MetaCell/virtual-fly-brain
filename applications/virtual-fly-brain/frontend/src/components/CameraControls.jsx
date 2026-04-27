@@ -46,12 +46,19 @@ const CameraControls = (props) => {
   const {
     cameraControlsHandler,
     canvasHeight,
-    canvasWidth
+    canvasWidth,
+    onRecordToggle,
+    isRecording,
   } = props;
 
   const dispatch = useDispatch();
   const [showControls, setShowControls] = useState(false);
   const isSmallViewport = canvasWidth < 300 || canvasHeight < 300;
+
+  const handleRotateClick = () => {
+    cameraControlsHandler(cameraControlsActions.ROTATE);
+    if (onRecordToggle) onRecordToggle();
+  };
 
   const handleClick = (event, value) => {
     cameraControlsHandler(value?.action);
@@ -110,7 +117,11 @@ const CameraControls = (props) => {
         {iconButton("Rotate Up", cameraControlsActions.ROTATE_UP, () => rotateIcon('scaleX(-1) rotate(-180deg)'))}
         <Box display="flex" gap={0.5}>
           {iconButton("Rotate Left", cameraControlsActions.ROTATE_LEFT, () => rotateIcon('rotate(-90deg)'))}
-          {iconButton("Rotate", cameraControlsActions.ROTATE, VideocamOutlined)}
+            <Tooltip title={isRecording ? "Stop Rotation & Download" : "Rotate & Record"} placement="top">
+              <IconButton aria-label={isRecording ? "Stop Recording" : "Rotate and Record"} onClick={handleRotateClick}>
+                <VideocamOutlined fontSize="small" sx={{ color: isRecording ? '#f44336' : 'rgba(255, 255, 255, 0.8)' }} />
+              </IconButton>
+            </Tooltip>
           {iconButton("Rotate Right", cameraControlsActions.ROTATE_RIGHT, () => rotateIcon('scaleX(-1) rotate(-90deg)'))}
         </Box>
         <Box display="flex" gap={0.5}>

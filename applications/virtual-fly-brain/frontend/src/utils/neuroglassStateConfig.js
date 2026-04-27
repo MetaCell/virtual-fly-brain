@@ -1,6 +1,7 @@
 import { KNOWN_NG_VIEWS, NG_DEFAULT_LAYOUT, NG_DEFAULT_MOBILE_LAYOUT } from './constants';
 
 const DEFAULT_CONTRAST_RANGE = [0, 123];
+const neuroglassLayerUrlCache = new Map();
 
 // ─── Coordinate space shared by all VFB instances ────────────────────────────
 const SHARED_VIEWPORT = {
@@ -25,72 +26,101 @@ export const NEUROGLASS_DATASOURCE = {
   protocol: import.meta.env.NEUROGLASS_DATA_PROTOCOL,
   baseUrl: import.meta.env.NEUROGLASS_DATA_BASE_URL,
   async buildUrl(instanceId) {
+    if (neuroglassLayerUrlCache.has(instanceId)) {
+      return neuroglassLayerUrlCache.get(instanceId);
+    }
+  
     let instancePath = instanceId.replace(
       /^VFB_(\d{4})([a-zA-Z0-9]+)$/i,
-      "VFB/i/$1/$2/"
+      'VFB/i/$1/$2/'
     );
-    const layerURL = await buildNeuroglassLayerUrl(
+  
+    const layerURLPromise = buildNeuroglassLayerUrl(
       this.protocol,
       this.baseUrl,
-      instancePath,
+      instancePath
     );
-    console.log(`[NEUROGLASS_DATASOURCE] Built URL for instance ${instanceId}: ${layerURL}`);
-    return layerURL;
-  },
+  
+    neuroglassLayerUrlCache.set(instanceId, layerURLPromise);
+  
+    try {
+      const layerURL = await layerURLPromise;
+      neuroglassLayerUrlCache.set(instanceId, layerURL);
+      return layerURL;
+    } catch (error) {
+      neuroglassLayerUrlCache.delete(instanceId);
+      throw error;
+    }
+  }
 };
+
+function isObjectStoreUrl(baseUrl = '') {
+  return baseUrl.startsWith('gs://') || baseUrl.startsWith('s3://');
+}
+
+function isHttpUrl(baseUrl = '') {
+  return baseUrl.startsWith('http://') || baseUrl.startsWith('https://');
+}
 
 async function buildNeuroglassLayerUrl(protocol, baseUrl, instanceId) {
   let path = instanceId;
 
-  // Check if the protocol is 'neuroglancer-precomputed' or 'n5'
+  // Check if the protocol is 'neuroglancer-precomputed'
   if (protocol === 'neuroglancer-precomputed') {
-    const url = `${baseUrl}/${path}`;
-    try {
-      // Fetch the folder contents of the URL
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch URL: ${url}`);
-      }
-
-      // Check if the response is HTML
-      const contentType = response.headers.get('Content-Type');
-      if (contentType && contentType.includes('text/html')) {
-        // Parse the HTML response
-        const html = await response.text();
-        const folderNames = extractFolderNamesFromHtml(html);
-
-        // Find the folder starting with VFB_
-        const vfbFolder = folderNames.find((name) => name.startsWith('VFB_'));
-
-        if (vfbFolder) {
-          // Check if the VFB_ folder contains a 'neuroglancer' folder
-          const vfbFolderUrl = `${url}/${vfbFolder}`;
-          const vfbResponse = await fetch(vfbFolderUrl);
-          if (!vfbResponse.ok) {
-            throw new Error(`Failed to fetch VFB folder: ${vfbFolderUrl}`);
-          }
-
-          const vfbHtml = await vfbResponse.text();
-          const vfbFolderNames = extractFolderNamesFromHtml(vfbHtml);
-          const neuroglancerFolder = vfbFolderNames.find(
-            (name) => name === 'neuroglancer/'
-          );
-
-          if (neuroglancerFolder) {
-            return `${vfbFolderUrl}/${neuroglancerFolder}/|${protocol}:`;
-          }
-        }
-      } else {
-        throw new Error(`Unexpected Content-Type: ${contentType}`);
-      }
-    } catch (error) {
-      console.error(`[buildNeuroglassLayerUrl] Error: ${error.message}`);
+    if (isObjectStoreUrl(baseUrl)) {
+      return `${baseUrl}/${path}/|${protocol}:`;
     }
-  } else if (protocol === 'gs' || protocol === 'n5') {
+
+    if (isHttpUrl(baseUrl)) {
+      const url = `${baseUrl}/${path}`;
+      try {
+        // Fetch the folder contents of the URL
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch URL: ${url}`);
+        }
+
+        // Check if the response is HTML
+        const contentType = response.headers.get('Content-Type');
+        if (contentType && contentType.includes('text/html')) {
+          // Parse the HTML response
+          const html = await response.text();
+          const folderNames = extractFolderNamesFromHtml(html);
+
+          // Find the folder starting with VFB_
+          const vfbFolder = folderNames.find((name) => name.startsWith('VFB_'));
+
+          if (vfbFolder) {
+            // Check if the VFB_ folder contains a 'neuroglancer' folder
+            const vfbFolderUrl = `${url}/${vfbFolder}`;
+            const vfbResponse = await fetch(vfbFolderUrl);
+            if (!vfbResponse.ok) {
+              throw new Error(`Failed to fetch VFB folder: ${vfbFolderUrl}`);
+            }
+
+            const vfbHtml = await vfbResponse.text();
+            const vfbFolderNames = extractFolderNamesFromHtml(vfbHtml);
+            const neuroglancerFolder = vfbFolderNames.find(
+              (name) => name === 'neuroglancer/'
+            );
+
+            if (neuroglancerFolder) {
+              return `${vfbFolderUrl}${neuroglancerFolder}|${protocol}:`;
+            }
+          }
+        } else {
+          throw new Error(`Unexpected Content-Type: ${contentType}`);
+        }
+      } catch (error) {
+        console.error(`[buildNeuroglassLayerUrl] Error: ${error.message}`);
+      }
+    }
     return `${baseUrl}/${path}/|${protocol}:`;
   }
 
-  return `precomputed://${baseUrl}/${path}`;
+  if (protocol === 'gs' || protocol === 'n5') {
+    return `${baseUrl}/${path}/|${protocol}:`;
+  }
 }
 
 function extractFolderNamesFromHtml(html) {
@@ -194,8 +224,6 @@ async function buildSingleInstanceLayer(inst) {
     volumeRendering: 'on',
     name: inst.metadata.Id,
   };
-
-  console.log(`[buildSingleInstanceLayer] Built layer for instance ${inst.metadata.Id}:`, layer);
 
   if (inst.visibleMesh === false) layer.visible = false;
 

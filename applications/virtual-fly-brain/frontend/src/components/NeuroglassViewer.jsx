@@ -19,32 +19,40 @@ export default function NeuroglassViewer() {
 
   useEffect(() => {
     let cancelled = false;
-
+    const abortController = new AbortController();
     async function buildSrc() {
       const layout = resolveNeuroglassLayout(neuroglassView, isMobile);
+      try{
+        const state = await buildNeuroglassState(
+          allLoadedInstances,
+          focusedInstance?.metadata?.Id,
+          layout,
+          abortController.signal
+        );
 
-      const state = await buildNeuroglassState(
-        allLoadedInstances,
-        focusedInstance?.metadata?.Id,
-        layout,
-      );
+        if (cancelled || abortController.signal.aborted) return;
 
-      if (cancelled) return;
+        if (!state || !NEUROGLASS_URL) {
+          setIframeSrc('');
+          return;
+        }
 
-      if (!state || !NEUROGLASS_URL) {
-        setIframeSrc('');
-        return;
+        setIframeSrc(
+          `${NEUROGLASS_URL}/embed#!${encodeURIComponent(JSON.stringify(state))}`
+        );
+      } catch (error) {
+        if (error?.name === 'AbortError' || abortController.signal.aborted) {
+          return;
+        }
+        throw error;
       }
-
-      setIframeSrc(
-        `${NEUROGLASS_URL}/embed#!${encodeURIComponent(JSON.stringify(state))}`
-      );
     }
 
     buildSrc();
 
     return () => {
       cancelled = true;
+      abortController.abort();
     };
   }, [allLoadedInstances, focusedInstance?.metadata?.Id, neuroglassView, isMobile]);
 

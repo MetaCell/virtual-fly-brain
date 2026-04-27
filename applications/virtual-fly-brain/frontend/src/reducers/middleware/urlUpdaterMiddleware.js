@@ -224,7 +224,7 @@ export const urlUpdaterMiddleware = store => next => (action) => {
         return;
       } else if (IsTemplate && launchTemplate?.metadata?.Id !== action.payload.Id) {
         // If it's a template and the launchTemplate is defined, we need to show the widget to open this template in a new tab
-        store.dispatch(setAlignTemplates(false, action.payload.Id));
+        store.dispatch(setAlignTemplates(false, action.payload.Id, action.payload.Id));
         return;
       }
 

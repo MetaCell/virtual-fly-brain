@@ -22,6 +22,11 @@ RUN apt-get update && apt-get upgrade -y imagemagick
 # Remove bluez if present (CVE-2023-44431 - no fix available, not needed for this app)
 RUN apt-get remove -y bluez bluez-obexd libbluetooth3 || true
 
+# Remove golang if present (not needed for this Python/Node.js application)
+# CVE-2026-27143 - arithmetic overflow in loop induction variables (CVSS 9.8 CRITICAL)
+# CVE-2025-68121 - improper TLS session resumption via mutated ClientCAs/RootCAs (CVSS 10.0 CRITICAL)
+RUN apt-get remove -y golang golang-go golang-1.* || true
+
 RUN apt-get update && apt-get install -y \
     curl \
     git \

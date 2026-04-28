@@ -88,6 +88,11 @@
   },
   "resolutions": {
     "node-fetch": "^2.6.7",
-    "cross-spawn": "^7.0.6"
+    "cross-spawn": "^7.0.6",
+    "immutable": "^5.1.5",
+    "flatted": "^3.4.0",
+    "preact": "^10.26.10",
+    "lodash": "^4.18.0",
+    "lodash-es": "^4.18.0"
   }
 }

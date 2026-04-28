@@ -23,8 +23,9 @@ RUN apt-get update && apt-get upgrade -y imagemagick
 RUN apt-get remove -y bluez bluez-obexd libbluetooth3 || true
 
 # Remove golang if present (not needed for this Python/Node.js application)
-# CVE-2026-27143 - arithmetic overflow in loop induction variables (CVSS 9.8 CRITICAL)
+# CVE-2026-27143 / GO-2026-4868 - arithmetic overflow in loop induction variables (CVSS 9.8 CRITICAL)
 # CVE-2025-68121 - improper TLS session resumption via mutated ClientCAs/RootCAs (CVSS 10.0 CRITICAL)
+# CVE-2026-27144 / GO-2026-4867 - memory corruption via no-op interface conversion in compiler (CVSS critical)
 RUN apt-get remove -y golang golang-go golang-1.* || true
 
 RUN apt-get update && apt-get install -y \
@@ -54,6 +55,14 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
 
 RUN npm install -g yarn serve && \
     yarn --version
+
+# Upgrade node-tar to fix node-tar vulnerabilities from the base image:
+# CVE-2026-24842 - path traversal via hardlink bypass (CVSS 8.2 HIGH, fixed in 7.5.7)
+# CVE-2026-23950 - symlink poisoning via Unicode path collision race condition (CVSS 8.8 HIGH, fixed in 7.5.4)
+RUN npm install -g tar@^7.5.7 2>/dev/null || true
+
+# Upgrade cross-spawn to fix CVE-2024-21538 (ReDoS via improper input sanitization, CVSS 7.5 HIGH, fixed in 7.0.5)
+RUN npm install -g cross-spawn@^7.0.5 2>/dev/null || true
 
 # Set up virtual display for OpenGL
 ENV DISPLAY=:99

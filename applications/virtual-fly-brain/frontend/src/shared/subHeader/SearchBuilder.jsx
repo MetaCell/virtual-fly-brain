@@ -20,6 +20,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { getQueries, deleteQuery, updateQueries } from '../../reducers/actions/queries';
 import { getUpdatedTags } from '../../utils/utils';
 import { debounce } from '@mui/material';
+import { bottomNavQuery } from '../../utils/constants';
 
 const QUERIES = "Queries";
 const SEARCH_DEBOUNCE = 500;
@@ -165,7 +166,7 @@ export default function SearchBuilder(props) {
 
   const checkResults = () => {
     // getQueriesStarted();
-    props.setBottomNav(2)
+    props.setBottomNav(bottomNavQuery)
     setIsOpen(false)
     props.setFocused(false);
     let updatedQueries = [];

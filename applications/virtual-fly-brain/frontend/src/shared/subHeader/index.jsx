@@ -265,7 +265,7 @@ const SubHeader = ({ setBottomNav, bottomNav }) => {
 
       <MediaQuery minWidth={1200}>
         <Box display="flex" flexWrap="wrap" sx={classes.nav}>
-          {navArr.map((item, index) => (
+          {navArr.map((item) => (
             <Button
               aria-label={item.name}
               onClick={(event) => {

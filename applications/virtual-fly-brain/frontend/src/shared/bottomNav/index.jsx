@@ -73,7 +73,7 @@ const BottomNav = ({ setBottomNav, bottomNav }) => {
       flexWrap='wrap'
       sx={classes.root}
     >
-      {navArr.map((item, index) => (
+      {navArr.map((item) => (
         <Button
           sx={{
             height: '100%',

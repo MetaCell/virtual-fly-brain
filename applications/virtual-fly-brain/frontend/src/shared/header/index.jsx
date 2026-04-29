@@ -141,12 +141,12 @@ const Header = ({ setBottomNav }) => {
             Object.keys(query.queries)?.forEach(q => query.queries[q].active = false);
           }
         });
-        if (matchQuery?.queries?.[action?.parameters[1]]) {
-          matchQuery.queries[action.parameters[1]].active = true;
+        if (matchQuery?.short_form == action?.parameters[0]) {
+          Object.keys(matchQuery.queries)?.forEach(q => matchQuery.queries[q].active = true);
           updateQueries(updatedQueries);
           setBottomNav(bottomNavQuery)
         } else {
-          getQueries(action.parameters[0], action.parameters[1])
+          getQueries(action.parameters[0])
           setBottomNav(bottomNavQuery)
         }
         break;

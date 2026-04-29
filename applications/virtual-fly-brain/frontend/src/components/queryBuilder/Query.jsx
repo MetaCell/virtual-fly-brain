@@ -279,8 +279,8 @@ const Query = forwardRef(({ fullWidth, queries, searchTerm }, ref) => {
         return acc;
       }, {})
     }));
-    dispatch(updateQueries(clearQueries));
-  }, [queries, dispatch]);
+    updateQueries(clearQueries);
+  }, [queries]);
 
   const clearAllTags = useCallback(() => {
     setChipTags(prevTags => prevTags.map(tag => ({ ...tag, active: true })));

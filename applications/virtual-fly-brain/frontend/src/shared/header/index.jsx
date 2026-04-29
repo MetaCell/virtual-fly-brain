@@ -146,7 +146,7 @@ const Header = ({ setBottomNav }) => {
           updateQueries(updatedQueries);
           setBottomNav(bottomNavQuery)
         } else {
-          getQueries(action.parameters[0])
+          getQueries(action.parameters[0], action.parameters[1])
           setBottomNav(bottomNavQuery)
         }
         break;

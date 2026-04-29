@@ -271,10 +271,10 @@ const SubHeader = ({ setBottomNav, bottomNav }) => {
               onClick={(event) => {
                 event.stopPropagation();
                 // Clear All button (index 4) should not toggle
-                if (index === bottomNavClearAll) {
+                if (item.id === bottomNavClearAll) {
                   setBottomNav(bottomNavClearAll);
                 } else {
-                  setBottomNav(bottomNav === index ? undefined : index);
+                  setBottomNav(bottomNav === item?.id ? undefined : item?.id);
                 }
               }}
               sx={{

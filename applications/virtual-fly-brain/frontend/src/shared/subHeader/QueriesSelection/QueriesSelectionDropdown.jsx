@@ -171,9 +171,8 @@ export const QueriesSelectionDropdown = ({option, selectedOption, goBackToInitia
                     </ListItem>
                   }
                   { Object.keys(option.queries)?.length && Object.keys(option.queries)?.map((query, index) => (<ListItem key={query.short_form+index}>
-                    <ListItemButton onClick={(event) => {
-                      const selectedName = event.target.innerText;
-                      handleSelect(option.queries[query], option, selectedName);
+                    <ListItemButton onClick={() => {
+                      handleSelect(option.queries[query], option, option.queries[query].label);
                     }}>
                       <ListItemText primary={option.queries[query].label} />
                     </ListItemButton>

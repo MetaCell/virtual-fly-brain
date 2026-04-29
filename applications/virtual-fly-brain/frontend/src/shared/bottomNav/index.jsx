@@ -84,7 +84,7 @@ const BottomNav = ({ setBottomNav, bottomNav }) => {
             flexDirection: 'column',
           }}
 
-          onClick={() => setBottomNav(index)}
+          onClick={() => setBottomNav(item?.id)}
           key={item.id}
         >
           <item.icon color={item?.id === bottomNav ? tabActiveColor : 'white'} />

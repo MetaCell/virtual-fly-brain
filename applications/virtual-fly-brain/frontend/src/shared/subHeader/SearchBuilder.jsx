@@ -173,14 +173,7 @@ export default function SearchBuilder(props) {
     queries.length > 0 ? updatedQueries = [...queries] : []
     updatedQueries.forEach( q => {
       let match = value?.find( v => v.short_form === q.short_form );
-      if ( match !== undefined ) {
-        Object.keys(q.queries)?.forEach( key => {
-          //q.queries[key].active = true;
-          if ( q.queries[key].rows === undefined ) {
-            // getQueries(q.short_form, key)
-          }
-        })
-      } else {
+      if ( match === undefined ) {
         Object.keys(q.queries)?.forEach( key => {
           q.queries[key].active = false
         })

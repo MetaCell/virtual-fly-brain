@@ -3,6 +3,7 @@ import { Box, Button } from "@mui/material";
 import React from "react";
 import { ClearAll, Download, Query, Upload, Layers } from "../../icons";
 import vars from "../../theme/variables";
+import { bottomNavClearAll, bottomNavDownload, bottomNavQuery, bottomNavSnapshot } from "../../utils/constants";
 
 const {
   whiteColor,
@@ -12,22 +13,22 @@ const {
 
 const navArr = [
   {
-    id: 0,
+    id: bottomNavSnapshot,
     icon: Upload,
     name: 'Upload'
   },
   {
-    id: 1,
+    id: bottomNavDownload,
     icon: Download,
     name: 'Download'
   },
   {
-    id: 2,
+    id: bottomNavQuery,
     icon: Query,
     name: 'Query'
   },
   {
-    id: 3,
+    id: bottomNavClearAll,
     icon: ClearAll,
     name: 'Clear all'
   },

@@ -22,6 +22,7 @@ import { useDispatch, useSelector } from "react-redux";
 import SearchBuilder from "./SearchBuilder";
 import { FilterMenu } from "./FilterMenu";
 import { resetLoadingState } from "../../reducers/actions/instances";
+import { bottomNavClearAll } from "../../utils/constants";
 
 const navArr = [
   {
@@ -270,8 +271,8 @@ const SubHeader = ({ setBottomNav, bottomNav }) => {
               onClick={(event) => {
                 event.stopPropagation();
                 // Clear All button (index 4) should not toggle
-                if (index === 4) {
-                  setBottomNav(4);
+                if (index === bottomNavClearAll) {
+                  setBottomNav(bottomNavClearAll);
                 } else {
                   setBottomNav(bottomNav === index ? undefined : index);
                 }

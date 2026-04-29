@@ -92,3 +92,11 @@ export const RGBAToHexA = (color) => {
 export const BOTTOM = "bottom";
 export const LEFT = "left";
 export const RIGHT = "right";
+
+export const bottomNavSnapshot = 0;
+export const bottomNavUpload = 1;
+export const bottomNavDownload = 2;
+export const bottomNavQuery = 3;
+export const bottomNavLayers = 4;
+export const bottomNavClearAll = 5;
+export const bottomNavSearch = 6;

@@ -1,6 +1,7 @@
 import React from 'react';
 import vars from "../../../theme/variables";
 import { widgets } from "../../layout/widgets";
+import { bottomNavDownload, bottomNavQuery, bottomNavSearch, bottomNavUpload } from '../../../utils/constants';
 const { primaryFont, whiteColor, tabActiveColor, primaryBg } = vars;
 
 const ACTIONS = {
@@ -199,7 +200,7 @@ export const toolbarMenu = (autoSaveLayout) => { return {
           icon: "fa fa-search",
           action: {
             handlerAction: ACTIONS.SHOW_COMPONENT,
-            parameters: [5]
+            parameters: [bottomNavSearch]
           }
         },
         {
@@ -207,7 +208,7 @@ export const toolbarMenu = (autoSaveLayout) => { return {
           icon: "fa fa-clipboard-question",
           action: {
             handlerAction: ACTIONS.SHOW_COMPONENT,
-            parameters: [2]
+            parameters: [bottomNavQuery]
           }
         },
         {
@@ -279,7 +280,7 @@ export const toolbarMenu = (autoSaveLayout) => { return {
           icon: "fa fa-download",
           action: {
             handlerAction: ACTIONS.SHOW_COMPONENT,
-            parameters: [1]
+            parameters: [bottomNavDownload]
           }
         },
         {
@@ -287,7 +288,7 @@ export const toolbarMenu = (autoSaveLayout) => { return {
           icon: "fa fa-upload",
           action: {
             handlerAction: ACTIONS.SHOW_COMPONENT,
-            parameters: [0]
+            parameters: [bottomNavUpload]
           }
         },
         {

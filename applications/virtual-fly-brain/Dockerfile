@@ -59,13 +59,21 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
 RUN npm install -g yarn serve && \
     yarn --version
 
-# Upgrade node-tar to fix node-tar vulnerabilities from the base image:
+# Upgrade npm itself to fix CVE-2026-31802 and CVE-2024-21538 in npm's bundled packages.
+# npm's internal copies at /usr/lib/node_modules/npm/node_modules/ are not affected by
+# global package upgrades; upgrading npm to 11.x brings patched versions of both:
+#   - tar@^7.5.13 (fixes CVE-2026-31802 - drive-relative symlink path traversal, fixed in 7.5.11)
+#   - cross-spawn@^7.0.6 (fixes CVE-2024-21538 - ReDoS, fixed in 7.0.5)
+RUN npm install -g npm@^11.0.0 && npm --version
+
+# Also upgrade node-tar and cross-spawn globally to fix vulnerabilities in other locations:
+# CVE-2026-31802 - drive-relative symlink path traversal (CVSS 5.5, fixed in 7.5.11)
 # CVE-2026-24842 - path traversal via hardlink bypass (CVSS 8.2 HIGH, fixed in 7.5.7)
 # CVE-2026-23950 - symlink poisoning via Unicode path collision race condition (CVSS 8.8 HIGH, fixed in 7.5.4)
-RUN npm install -g tar@^7.5.7 2>/dev/null || true
+RUN npm install -g tar@^7.5.11 2>/dev/null || true
 
-# Upgrade cross-spawn to fix CVE-2024-21538 (ReDoS via improper input sanitization, CVSS 7.5 HIGH, fixed in 7.0.5)
-RUN npm install -g cross-spawn@^7.0.5 2>/dev/null || true
+# CVE-2024-21538 - ReDoS via improper input sanitization (CVSS 7.5 HIGH, fixed in 7.0.5)
+RUN npm install -g cross-spawn@^7.0.6 2>/dev/null || true
 
 # Set up virtual display for OpenGL
 ENV DISPLAY=:99

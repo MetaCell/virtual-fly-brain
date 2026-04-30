@@ -26,7 +26,10 @@ RUN apt-get remove -y bluez bluez-obexd libbluetooth3 || true
 # CVE-2026-27143 / GO-2026-4868 - arithmetic overflow in loop induction variables (CVSS 9.8 CRITICAL)
 # CVE-2025-68121 - improper TLS session resumption via mutated ClientCAs/RootCAs (CVSS 10.0 CRITICAL)
 # CVE-2026-27144 / GO-2026-4867 - memory corruption via no-op interface conversion in compiler (CVSS critical)
-RUN apt-get remove -y golang golang-go golang-1.* || true
+RUN apt-get purge -y golang golang-go golang-1.* 2>/dev/null || true && \
+    apt-get autoremove -y 2>/dev/null || true && \
+    rm -rf /usr/local/go /usr/local/bin/go /usr/local/bin/gofmt && \
+    find /usr/bin /usr/local/bin -name 'go' -o -name 'gofmt' -o -name 'gopls' 2>/dev/null | xargs rm -f
 
 RUN apt-get update && apt-get install -y \
     curl \

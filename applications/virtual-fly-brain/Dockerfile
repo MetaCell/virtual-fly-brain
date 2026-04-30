@@ -26,7 +26,10 @@ RUN apt-get remove -y bluez bluez-obexd libbluetooth3 || true
 # CVE-2026-27143 / GO-2026-4868 - arithmetic overflow in loop induction variables (CVSS 9.8 CRITICAL)
 # CVE-2025-68121 - improper TLS session resumption via mutated ClientCAs/RootCAs (CVSS 10.0 CRITICAL)
 # CVE-2026-27144 / GO-2026-4867 - memory corruption via no-op interface conversion in compiler (CVSS critical)
-RUN apt-get remove -y golang golang-go golang-1.* || true
+RUN apt-get purge -y golang golang-go golang-1.* 2>/dev/null || true && \
+    apt-get autoremove -y 2>/dev/null || true && \
+    rm -rf /usr/local/go /usr/local/bin/go /usr/local/bin/gofmt && \
+    find /usr/bin /usr/local/bin -name 'go' -o -name 'gofmt' -o -name 'gopls' 2>/dev/null | xargs rm -f
 
 RUN apt-get update && apt-get install -y \
     curl \
@@ -56,13 +59,21 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
 RUN npm install -g yarn serve && \
     yarn --version
 
-# Upgrade node-tar to fix node-tar vulnerabilities from the base image:
+# Upgrade npm itself to fix CVE-2026-31802 and CVE-2024-21538 in npm's bundled packages.
+# npm's internal copies at /usr/lib/node_modules/npm/node_modules/ are not affected by
+# global package upgrades; upgrading npm to 11.x brings patched versions of both:
+#   - tar@^7.5.13 (fixes CVE-2026-31802 - drive-relative symlink path traversal, fixed in 7.5.11)
+#   - cross-spawn@^7.0.6 (fixes CVE-2024-21538 - ReDoS, fixed in 7.0.5)
+RUN npm install -g npm@^11.0.0 && npm --version
+
+# Also upgrade node-tar and cross-spawn globally to fix vulnerabilities in other locations:
+# CVE-2026-31802 - drive-relative symlink path traversal (CVSS 5.5, fixed in 7.5.11)
 # CVE-2026-24842 - path traversal via hardlink bypass (CVSS 8.2 HIGH, fixed in 7.5.7)
 # CVE-2026-23950 - symlink poisoning via Unicode path collision race condition (CVSS 8.8 HIGH, fixed in 7.5.4)
-RUN npm install -g tar@^7.5.7 2>/dev/null || true
+RUN npm install -g tar@^7.5.11 2>/dev/null || true
 
-# Upgrade cross-spawn to fix CVE-2024-21538 (ReDoS via improper input sanitization, CVSS 7.5 HIGH, fixed in 7.0.5)
-RUN npm install -g cross-spawn@^7.0.5 2>/dev/null || true
+# CVE-2024-21538 - ReDoS via improper input sanitization (CVSS 7.5 HIGH, fixed in 7.0.5)
+RUN npm install -g cross-spawn@^7.0.6 2>/dev/null || true
 
 # Set up virtual display for OpenGL
 ENV DISPLAY=:99
@@ -85,6 +96,12 @@ RUN export VFB_DOMAIN="https://${BE_DOMAIN}" && \
     export NEUROGLASS_DATA_BASE_URL="${NEUROGLASS_DATA_BASE_URL}" && \
     export NEUROGLASS_URL="${NEUROGLASS_URL}" && \
     yarn run build
+
+# Remove node_modules and yarn cache after build to eliminate Go-compiled esbuild binaries.
+# CVE-2026-27143 / GO-2026-4868 affects all esbuild releases up to and including 0.28.0
+# (compiled with Go <=1.26.1; fix requires Go >=1.25.9 or >=1.26.2). These binaries are
+# only needed at build time and must not remain in the final image.
+RUN rm -rf ${BUILDDIR}/node_modules /usr/local/share/.cache/yarn
 
 WORKDIR /usr/src/app
 COPY backend/requirements.txt /usr/src/app/

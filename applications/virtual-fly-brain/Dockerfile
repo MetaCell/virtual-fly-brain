@@ -89,6 +89,12 @@ RUN export VFB_DOMAIN="https://${BE_DOMAIN}" && \
     export NEUROGLASS_URL="${NEUROGLASS_URL}" && \
     yarn run build
 
+# Remove node_modules and yarn cache after build to eliminate Go-compiled esbuild binaries.
+# CVE-2026-27143 / GO-2026-4868 affects all esbuild releases up to and including 0.28.0
+# (compiled with Go <=1.26.1; fix requires Go >=1.25.9 or >=1.26.2). These binaries are
+# only needed at build time and must not remain in the final image.
+RUN rm -rf ${BUILDDIR}/node_modules /usr/local/share/.cache/yarn
+
 WORKDIR /usr/src/app
 COPY backend/requirements.txt /usr/src/app/
 # === CONDITIONAL BACKEND BUILD: only if BUILD_BACKEND != "false" ===

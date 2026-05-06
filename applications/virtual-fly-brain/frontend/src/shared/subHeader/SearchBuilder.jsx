@@ -20,6 +20,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { getQueries, deleteQuery, updateQueries } from '../../reducers/actions/queries';
 import { getUpdatedTags } from '../../utils/utils';
 import { debounce } from '@mui/material';
+import { bottomNavQuery } from '../../utils/constants';
 
 const QUERIES = "Queries";
 const SEARCH_DEBOUNCE = 500;
@@ -165,21 +166,14 @@ export default function SearchBuilder(props) {
 
   const checkResults = () => {
     // getQueriesStarted();
-    props.setBottomNav(2)
+    props.setBottomNav(bottomNavQuery)
     setIsOpen(false)
     props.setFocused(false);
     let updatedQueries = [];
     queries.length > 0 ? updatedQueries = [...queries] : []
     updatedQueries.forEach( q => {
       let match = value?.find( v => v.short_form === q.short_form );
-      if ( match !== undefined ) {
-        Object.keys(q.queries)?.forEach( key => {
-          q.queries[key].active = true;
-          if ( q.queries[key].rows === undefined ) {
-            getQueries(q.short_form, key)
-          }
-        })
-      } else {
+      if ( match === undefined ) {
         Object.keys(q.queries)?.forEach( key => {
           q.queries[key].active = false
         })

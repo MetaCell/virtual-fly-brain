@@ -26,15 +26,15 @@ const getQueries = (newQueries, searchTerm) => {
   if (!newQueries || newQueries.length === 0) return [];
   
   let updatedQueries = [];
-  const term = searchTerm ? searchTerm.toLowerCase() : undefined;
+  const term = searchTerm ? searchTerm.toLowerCase() : "";
   
   newQueries.forEach((query) => {
     if (query.queries) {
       Object.keys(query.queries).forEach((key) => {
         if (query.queries[key]?.active) {
-          let rows = query.queries[key]?.rows || [];
+          let rows = query.queries[key]?.rows || query.queries[key]?.preview_results?.rows || [];
           
-          if (term) {
+          if (term != undefined) {
             rows = rows.filter(row => {
               // Cache the string conversion for performance
               const values = Object.values(row);
@@ -95,20 +95,41 @@ const Query = forwardRef(({ fullWidth, queries, searchTerm }, ref) => {
   const [sortDirection, setSortDirection] = useState(1); // 1 for ascending, -1 for descending
   
   // Memoize filtered searches
-  const filteredSearches = useMemo(() => getQueries(queries, searchTerm), [queries, searchTerm]);
+  const filteredSearches = useMemo(() => {
+    return getQueries(queries, searchTerm);
+  }, [queries, searchTerm]);
+
+  const getRows = (item) => {
+    if (item?.rows?.length > 0) {
+      return item.rows;
+    }
+  
+    if (item?.preview_results?.rows?.length > 0) {
+      return item.preview_results.rows;
+    }
+  
+    return null;
+  };
   
   // Memoize the final filtered results based on both search term and active chip tags
   const finalFilteredResults = useMemo(() => {
     if (!filteredSearches || filteredSearches.length === 0) return [];
     
-    const activeChipLabels = chipTags.filter(f => f.active).map(tag => tag.label);
+    const rows = filteredSearches.flatMap(item => {
+      const nestedRows = getRows(item);
+      return nestedRows || [item];
+    });
     
-    // Filter by active chip tags
+    const activeChipLabels = chipTags
+      .filter(f => f.active)
+      .map(tag => tag.label);
+
     let filtered;
+
     if (activeChipLabels.length === 0) {
-      filtered = filteredSearches;
+      filtered = rows;
     } else {
-      filtered = filteredSearches.filter(row => {
+      filtered = rows.filter(row => {
         const tags = getTags(row.tags);
         return activeChipLabels.some(label => tags.includes(label));
       });
@@ -146,13 +167,22 @@ const Query = forwardRef(({ fullWidth, queries, searchTerm }, ref) => {
     if (!queries || queries.length === 0) return [];
     
     const tagMap = new Map();
+  
     queries.forEach(query => {
       if (query.queries) {
         Object.keys(query.queries).forEach(q => {
-          if (query.queries[q]?.active) {
-            query.queries[q]?.rows?.forEach(row => {
+          const currentQuery = query.queries[q];
+  
+          if (currentQuery?.active) {
+            const rows =
+              currentQuery?.rows?.length > 0
+                ? currentQuery.rows
+                : currentQuery?.preview_results?.rows || [];
+  
+            rows.forEach(row => {
               if (row.tags) {
                 const rowTags = getTags(row.tags);
+  
                 rowTags.forEach(rowTag => {
                   if (!tagMap.has(rowTag)) {
                     tagMap.set(rowTag, { label: rowTag, active: true });
@@ -343,7 +373,7 @@ const Query = forwardRef(({ fullWidth, queries, searchTerm }, ref) => {
                 onClick={() => null}
                 disabled={!tag.active}
                 onDelete={() => handleChipDelete(tag.label)}
-                key={tag}
+                key={tag?.label}
                 deleteIcon={
                   <Cross
                     size={12}

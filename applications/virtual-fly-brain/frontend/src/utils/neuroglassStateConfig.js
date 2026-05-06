@@ -1,6 +1,7 @@
 import { KNOWN_NG_VIEWS, NG_DEFAULT_LAYOUT, NG_DEFAULT_MOBILE_LAYOUT } from './constants';
 
 const DEFAULT_CONTRAST_RANGE = [0, 123];
+const neuroglassLayerUrlCache = new Map();
 
 // ─── Coordinate space shared by all VFB instances ────────────────────────────
 const SHARED_VIEWPORT = {
@@ -21,28 +22,116 @@ const SHARED_VIEWPORT = {
   projectionScale: 1024,
 };
 
-function buildNeuroglassLayerUrl(protocol, baseUrl, instanceId) {
-  const path = instanceId;
-  if (protocol === 'neuroglancer-precomputed' || protocol === 'n5') {
-    // GCS / S3 require Neuroglancer's pipe notation
-    return `${baseUrl}/${path}/|${protocol}:`;
-  }
-  // HTTP fileservers use a precomputed:// prefix
-  return `precomputed://${baseUrl}/${path}`;
-}
-
-// Datasource configuration for Datasource
 export const NEUROGLASS_DATASOURCE = {
   protocol: import.meta.env.NEUROGLASS_DATA_PROTOCOL,
   baseUrl: import.meta.env.NEUROGLASS_DATA_BASE_URL,
-  buildUrl(instanceId) {
-    return buildNeuroglassLayerUrl(
+  async buildUrl(instanceId) {
+    if (neuroglassLayerUrlCache.has(instanceId)) {
+      return neuroglassLayerUrlCache.get(instanceId);
+    }
+  
+    let instancePath = instanceId.replace(
+      /^VFB_(\d{4})([a-zA-Z0-9]+)$/i,
+      'VFB/i/$1/$2/'
+    );
+  
+    const layerURLPromise = buildNeuroglassLayerUrl(
       this.protocol,
       this.baseUrl,
-      instanceId,
+      instancePath
     );
-  },
+  
+    neuroglassLayerUrlCache.set(instanceId, layerURLPromise);
+  
+    try {
+      const layerURL = await layerURLPromise;
+      neuroglassLayerUrlCache.set(instanceId, layerURL);
+      return layerURL;
+    } catch (error) {
+      neuroglassLayerUrlCache.delete(instanceId);
+      throw error;
+    }
+  }
 };
+
+function isObjectStoreUrl(baseUrl = '') {
+  return baseUrl.startsWith('gs://') || baseUrl.startsWith('s3://');
+}
+
+function isHttpUrl(baseUrl = '') {
+  return baseUrl.startsWith('http://') || baseUrl.startsWith('https://');
+}
+
+async function buildNeuroglassLayerUrl(protocol, baseUrl, instanceId) {
+  let path = instanceId;
+
+  // Check if the protocol is 'neuroglancer-precomputed'
+  if (protocol === 'neuroglancer-precomputed') {
+    if (isObjectStoreUrl(baseUrl)) {
+      return `${baseUrl}/${path}/|${protocol}:`;
+    }
+
+    if (isHttpUrl(baseUrl)) {
+      const url = `${baseUrl}/${path}`;
+      try {
+        // Fetch the folder contents of the URL
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch URL: ${url}`);
+        }
+
+        // Check if the response is HTML
+        const contentType = response.headers.get('Content-Type');
+        if (contentType && contentType.includes('text/html')) {
+          // Parse the HTML response
+          const html = await response.text();
+          const folderNames = extractFolderNamesFromHtml(html);
+
+          // Find the folder starting with VFB_
+          const vfbFolder = folderNames.find((name) => name.startsWith('VFB_'));
+
+          if (vfbFolder) {
+            // Check if the VFB_ folder contains a 'neuroglancer' folder
+            const vfbFolderUrl = `${url}/${vfbFolder}`;
+            const vfbResponse = await fetch(vfbFolderUrl);
+            if (!vfbResponse.ok) {
+              throw new Error(`Failed to fetch VFB folder: ${vfbFolderUrl}`);
+            }
+
+            const vfbHtml = await vfbResponse.text();
+            const vfbFolderNames = extractFolderNamesFromHtml(vfbHtml);
+            const neuroglancerFolder = vfbFolderNames.find(
+              (name) => name === 'neuroglancer/'
+            );
+
+            if (neuroglancerFolder) {
+              return `${vfbFolderUrl}${neuroglancerFolder}|${protocol}:`;
+            }
+          }
+        } else {
+          throw new Error(`Unexpected Content-Type: ${contentType}`);
+        }
+      } catch (error) {
+        console.error(`[buildNeuroglassLayerUrl] Error: ${error.message}`);
+      }
+    }
+    return `${baseUrl}/${path}/|${protocol}:`;
+  }
+
+  if (protocol === 'gs' || protocol === 'n5') {
+    return `${baseUrl}/${path}/|${protocol}:`;
+  }
+}
+
+function extractFolderNamesFromHtml(html) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+  const links = doc.querySelectorAll('a'); // Select all <a> tags
+  const folderNames = Array.from(links)
+    .map((link) => link.textContent.trim()) // Extract text content
+    .filter((name) => name && !name.startsWith('..')); // Exclude parent directory links
+  return folderNames;
+}
 
 // Fixed GLSL shader template : Only shaderControls.color and layer.opacity change per instance.
 export const LAYER_SHADER = [
@@ -117,10 +206,12 @@ function normalizeContrast(inst) {
 }
 
 // Per-instance layer builder: converts a VFB instance into a Neuroglancer layer config.
-function buildSingleInstanceLayer(inst) {
+async function buildSingleInstanceLayer(inst) {
+  const source = await NEUROGLASS_DATASOURCE.buildUrl(inst.metadata.Id);
+
   const layer = {
     type: 'image',
-    source: NEUROGLASS_DATASOURCE.buildUrl(inst.metadata.Id),
+    source: source,
     tab: 'rendering',
     opacity: alphaToOpacity(inst.color?.a),
     blend: 'additive',
@@ -138,18 +229,21 @@ function buildSingleInstanceLayer(inst) {
 
   return layer;
 }
-// Main state builder: converts loaded VFB instances + UI state into a Neuroglass viewer state object.
-export function buildNeuroglassState(allLoadedInstances, focusedInstanceId, layout) {
+
+export async function buildNeuroglassState(allLoadedInstances, focusedInstanceId, layout) {
   const instances = allLoadedInstances || [];
-  const layers = instances
-    .filter(inst => {
-      if (!inst?.metadata?.Id) {
-        console.warn(`[buildNeuroglassState] Instance missing metadata ID:`, inst);
-        return false;
-      }
-      return true;
-    })
-    .map(inst => buildSingleInstanceLayer(inst));
+
+  const layers = await Promise.all(
+    instances
+      .filter(inst => {
+        if (!inst?.metadata?.Id) {
+          console.warn(`[buildNeuroglassState] Instance missing metadata ID:`, inst);
+          return false;
+        }
+        return true;
+      })
+      .map(inst => buildSingleInstanceLayer(inst))
+  );
 
   if (layers.length === 0) return null;
 

@@ -21,17 +21,26 @@ export const QueriesSelectionDropdown = ({option, selectedOption, goBackToInitia
     setPopoverAnchorEl(null);
   }
 
-  const handleSelect = (option, query) => {
+  const handleSelect = (option, query, selection) => {
     let count = 0;
     if ( !selectedOption[query.short_form]) {
         count = option.count;
     }
 
     let updatedQueries = [...queries];
-    let matchQuery = updatedQueries?.find( q => q.short_form === query.short_form );
-    if (  matchQuery.queries?.[option.query] ){
-      matchQuery.active = true
-      matchQuery.queries[option.query].active = true;
+    let matchQuery = updatedQueries?.find(q => q.short_form === query.short_form);
+
+    if (matchQuery?.queries) {
+      matchQuery.active = true;
+
+      // Loop through matchQuery.queries keys
+      Object.keys(matchQuery.queries).forEach(key => {
+        if (matchQuery.queries[key]?.label === selection) {
+          matchQuery.queries[key].active = true;
+        } else if (matchQuery.queries[key]?.active) {
+          matchQuery.queries[key].active = false;
+        }
+      });
     }
     updateQueries(updatedQueries);
     Object.keys(selectedOption)?.forEach( o => {
@@ -162,7 +171,9 @@ export const QueriesSelectionDropdown = ({option, selectedOption, goBackToInitia
                     </ListItem>
                   }
                   { Object.keys(option.queries)?.length && Object.keys(option.queries)?.map((query, index) => (<ListItem key={query.short_form+index}>
-                    <ListItemButton onClick={() => handleSelect(option.queries[query], option)}>
+                    <ListItemButton onClick={() => {
+                      handleSelect(option.queries[query], option, option.queries[query].label);
+                    }}>
                       <ListItemText primary={option.queries[query].label} />
                     </ListItemButton>
                   </ListItem>) )}

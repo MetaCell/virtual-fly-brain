@@ -18,6 +18,7 @@ import { removeAllInstances } from './../reducers/actions/instances';
 import { Box, Button,Modal, useMediaQuery, useTheme, Typography, CircularProgress, Link } from "@mui/material";
 import { activateCircuits, activateImages } from "../reducers/actions/layout";
 import { widgetsIDs } from "./layout/widgets";
+import { bottomNavClearAll, bottomNavDownload, bottomNavLayers, bottomNavQuery, bottomNavSearch, bottomNavSnapshot, bottomNavUpload } from "../utils/constants";
 
 const {
   secondaryBg,
@@ -80,14 +81,14 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
   const queryComponentOpened = useSelector( state => state.globalInfo?.queryComponentOpened );
 
   useEffect( () => {
-    if ( queryComponentOpened && bottomNav !== 2 ){
-      setBottomNav(2)
+    if ( queryComponentOpened && bottomNav !== bottomNavQuery ){
+      setBottomNav(bottomNavQuery)
     }
   }, [bottomNav, queryComponentOpened, setBottomNav]);
 
   // Handle Clear All functionality
   useEffect(() => {
-    if (bottomNav === 4) {
+    if (bottomNav === bottomNavClearAll) {
       if (allLoadedInstances?.length > 1) {
         removeAllInstances();
       }
@@ -97,7 +98,7 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
   }, [bottomNav, allLoadedInstances?.length, setBottomNav]);
 
   useEffect( () => {
-    if ( bottomNav === 3 ){
+    if ( bottomNav === bottomNavLayers ){
       const layoutManager = getLayoutManagerInstance();
       if (!layoutManager.model.getNodeById("listViewerWidget").isVisible()) {
         const newWidget = { ...widgets[widgetsIDs.listViewerWidgetID] }
@@ -252,22 +253,22 @@ const MainLayout = ({ bottomNav, setBottomNav }) => {
         {desktopScreen ? (
           <>
             {tabContent}
-            {bottomNav === 0 && < VFBSnapshot open={true} setBottomNav={setBottomNav} />}
-            {bottomNav === 1 && < VFBUploader open={true} setBottomNav={setBottomNav} />}
-            {bottomNav === 2 && <VFBDownloadContents open={true} setBottomNav={setBottomNav} />}
-            {bottomNav === 3 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} tabSelected={0}/>}
-            {bottomNav === 6 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} tabSelected={1}/>}
+            {bottomNav === bottomNavSnapshot && < VFBSnapshot open={true} setBottomNav={setBottomNav} />}
+            {bottomNav === bottomNavUpload && < VFBUploader open={true} setBottomNav={setBottomNav} />}
+            {bottomNav === bottomNavDownload && <VFBDownloadContents open={true} setBottomNav={setBottomNav} />}
+            {bottomNav === bottomNavQuery && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} tabSelected={0}/>}
+            {bottomNav === bottomNavSearch && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} tabSelected={1}/>}
           </>
         ) : (
           <>
             {
-              bottomNav != 3 && tabContent
+              bottomNav != bottomNavQuery && tabContent
             }
-            {bottomNav === 0 && <VFBSnapshot open={true} setBottomNav={setBottomNav} />}
-            {bottomNav === 1 && <VFBUploader open={true} setBottomNav={setBottomNav} />}
-            {bottomNav === 2 && <VFBDownloadContents open={true} setBottomNav={setBottomNav} />}
-            {bottomNav === 3 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} tabSelected={0}/>}
-            {bottomNav === 6 && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} tabSelected={1}/>}
+            {bottomNav === bottomNavSnapshot && <VFBSnapshot open={true} setBottomNav={setBottomNav} />}
+            {bottomNav === bottomNavUpload && <VFBUploader open={true} setBottomNav={setBottomNav} />}
+            {bottomNav === bottomNavDownload && <VFBDownloadContents open={true} setBottomNav={setBottomNav} />}
+            {bottomNav === bottomNavQuery && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} tabSelected={0}/>}
+            {bottomNav === bottomNavSearch && <QueryBuilder setBottomNav={setBottomNav} fullWidth={sidebarOpen} tabSelected={1}/>}
           </>
         )}
       </Box>

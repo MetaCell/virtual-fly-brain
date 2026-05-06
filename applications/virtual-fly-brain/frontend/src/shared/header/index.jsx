@@ -17,6 +17,7 @@ import layout2 from "../../components/layout/layout2";
 import layout3 from "../../components/layout/layout3";
 import { WidgetStatus } from "@metacell/geppetto-meta-client/common/layout/model";
 import { getLayoutManagerInstance } from "@metacell/geppetto-meta-client/common/layout/LayoutManager";
+import { bottomNavQuery } from "../../utils/constants";
 
 const { primaryBg, headerBoxShadow } = vars;
 
@@ -68,7 +69,7 @@ const Header = ({ setBottomNav }) => {
       }
 
       // Open the query component panel
-      setBottomNav(2);
+      setBottomNav(bottomNavQuery);
     }
   }
 
@@ -140,13 +141,13 @@ const Header = ({ setBottomNav }) => {
             Object.keys(query.queries)?.forEach(q => query.queries[q].active = false);
           }
         });
-        if (matchQuery?.queries?.[action?.parameters[1]]) {
-          matchQuery.queries[action.parameters[1]].active = true;
+        if (matchQuery?.short_form == action?.parameters[0]) {
+          Object.keys(matchQuery.queries)?.forEach(q => matchQuery.queries[q].active = true);
           updateQueries(updatedQueries);
-          setBottomNav(2)
+          setBottomNav(bottomNavQuery)
         } else {
           getQueries(action.parameters[0], action.parameters[1])
-          setBottomNav(2)
+          setBottomNav(bottomNavQuery)
         }
         break;
       }
@@ -310,7 +311,7 @@ const Header = ({ setBottomNav }) => {
       <MediaQuery minWidth={1200}>
         {focusedInstance?.metadata?.Id && (focusedInstance?.metadata?.Queries?.length > 0 || queries?.find(q => q.short_form === focusedInstance.metadata.Id)) && (
           <Button
-            onClick={() => setBottomNav((prev) => prev === 2 ? null : 2)}
+            onClick={() => setBottomNav((prev) => prev === bottomNavQuery ? null : bottomNavQuery)}
             variant="outlined"
           >
             <QueryStats size={16} />

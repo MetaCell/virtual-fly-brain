@@ -40,6 +40,8 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
     }
   };
 
+  const extractMarkdownText = (str) => str.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+
   return (
     <>
       <Card sx={{
@@ -169,7 +171,7 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
               return (
                 <Box key={key} display='flex' justifyContent='space-between' alignItems='center' sx={{mb: 0}}>
                   <Typography sx={{fontWeight: 500, fontSize: '0.875rem', color: listHeadingColor, textTransform: 'capitalize', flex: 1, lineHeight: 0, py: 0.25}}>{key}</Typography>
-                  <Tooltip placement="right" arrow title={String(value)}>
+                  <Tooltip placement="right" arrow title={extractMarkdownText(String(value))}>
                     <Box
                       sx={{
                         color: whiteColor,
@@ -199,33 +201,51 @@ const QueryCard = ({ fullWidth, facets_annotation, query }) => {
                           textOverflow: 'ellipsis'
                         }
                       }}>
-                      <ReactMarkdown
-                        components={{
-                          a: ({ href, children, ...props }) => (
-                            <span
-                              style={{
-                                fontSize: '0.875rem',
-                                cursor: 'pointer',
-                                textDecoration: 'underline',
-                                whiteSpace: 'nowrap',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                display: 'inline-block',
-                                maxWidth: '100%'
-                              }}
-                              onClick={e => handleLinkClick(href, e)}
-                              {...props}
-                            >
-                              {children}
-                            </span>
-                          ),
-                          p: ({ children, ...props }) => (
-                            <span {...props}>{children}</span>
-                          )
-                        }}
-                      >
-                        {String(value)}
-                      </ReactMarkdown>
+                      {key === 'id' ? (
+                        <span
+                          style={{
+                            fontSize: '0.875rem',
+                            cursor: 'pointer',
+                            textDecoration: 'underline',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            display: 'inline-block',
+                            maxWidth: '100%'
+                          }}
+                          onClick={() => getInstanceByID(String(value), true, true, true)}
+                        >
+                          {String(value)}
+                        </span>
+                      ) : (
+                        <ReactMarkdown
+                          components={{
+                            a: ({ href, children, ...props }) => (
+                              <span
+                                style={{
+                                  fontSize: '0.875rem',
+                                  cursor: 'pointer',
+                                  textDecoration: 'underline',
+                                  whiteSpace: 'nowrap',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  display: 'inline-block',
+                                  maxWidth: '100%'
+                                }}
+                                onClick={e => handleLinkClick(href, e)}
+                                {...props}
+                              >
+                                {children}
+                              </span>
+                            ),
+                            p: ({ children, ...props }) => (
+                              <span {...props}>{children}</span>
+                            )
+                          }}
+                        >
+                          {String(value)}
+                        </ReactMarkdown>
+                      )}
                     </Box>
                   </Tooltip>
                 </Box>

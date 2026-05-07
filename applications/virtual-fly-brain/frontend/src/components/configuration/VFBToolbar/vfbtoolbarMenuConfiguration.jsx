@@ -200,7 +200,7 @@ export const toolbarMenu = (autoSaveLayout) => { return {
           icon: "fa fa-search",
           action: {
             handlerAction: ACTIONS.SHOW_COMPONENT,
-            parameters: [bottomNavSearch]
+            parameters: [String(bottomNavSearch)]
           }
         },
         {
@@ -208,7 +208,7 @@ export const toolbarMenu = (autoSaveLayout) => { return {
           icon: "fa fa-clipboard-question",
           action: {
             handlerAction: ACTIONS.SHOW_COMPONENT,
-            parameters: [bottomNavQuery]
+            parameters: [String(bottomNavQuery)]
           }
         },
         {
@@ -280,7 +280,7 @@ export const toolbarMenu = (autoSaveLayout) => { return {
           icon: "fa fa-download",
           action: {
             handlerAction: ACTIONS.SHOW_COMPONENT,
-            parameters: [bottomNavDownload]
+            parameters: [String(bottomNavDownload)]
           }
         },
         {
@@ -288,13 +288,13 @@ export const toolbarMenu = (autoSaveLayout) => { return {
           icon: "fa fa-upload",
           action: {
             handlerAction: ACTIONS.SHOW_COMPONENT,
-            parameters: [bottomNavUpload]
+            parameters: [String(bottomNavUpload)]
           }
         },
         {
           label: "NBLAST",
           icon: "",
-          action: {},
+          action: { handlerAction: "submenu", parameters: ["undefinedAction"] },
           position: "right-start",
           list: [
             {
@@ -320,7 +320,7 @@ export const toolbarMenu = (autoSaveLayout) => { return {
         {
           label: "CATMAID",
           icon: "",
-          action: {},
+          action: { handlerAction: "submenu", parameters: ["undefinedAction"] },
           position: "right-start",
           list: [
             {
@@ -505,7 +505,7 @@ export const toolbarMenu = (autoSaveLayout) => { return {
         {
           label: "VFB CONNECT (API)",
           icon: "",
-          action: {},
+          action: { handlerAction: "submenu", parameters: ["undefinedAction"] },
           position: "right-start",
           list: [
             {
@@ -544,10 +544,13 @@ export const toolbarMenu = (autoSaveLayout) => { return {
       icon: "",
       action: {},
       position: "bottom-start",
-      dynamicListInjector: {
+      list: [],
+      dynamicListInjector: [{
+        label: "",
+        icon: "",
         handlerAction: ACTIONS.HISTORY_MENU_INJECTOR,
         parameters: [""]
-      }
+      }]
     },
     {
       label: "Templates",

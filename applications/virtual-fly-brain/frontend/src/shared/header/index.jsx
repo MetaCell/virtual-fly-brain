@@ -112,7 +112,7 @@ const Header = ({ setBottomNav }) => {
         break;
       }
       case ACTIONS.SHOW_COMPONENT:
-        setBottomNav(action.parameters[0])
+        setBottomNav(Number(action.parameters[0]))
         break;
       case ACTIONS.SHOW_TERM_INFO: {
         dispatch(setTermInfoOpened(true))

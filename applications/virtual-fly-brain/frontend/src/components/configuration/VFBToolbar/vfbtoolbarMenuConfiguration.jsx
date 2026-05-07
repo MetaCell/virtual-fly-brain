@@ -682,7 +682,7 @@ export const toolbarMenu = (autoSaveLayout) => { return {
               icon: "",
               action: {
                 handlerAction: ACTIONS.RUN_QUERY,
-                parameters: ["VFB_00101567"]
+                parameters: ["AllDatasets", "VFB_00101567"]
               }
             },
             {
@@ -690,7 +690,7 @@ export const toolbarMenu = (autoSaveLayout) => { return {
               icon: "",
               action: {
                 handlerAction: ACTIONS.RUN_QUERY,
-                parameters: ["VFB_00200000"]
+                parameters: ["AllDatasets", "VFB_00200000"]
               }
             },
             {
@@ -707,7 +707,7 @@ export const toolbarMenu = (autoSaveLayout) => { return {
                   icon: "",
                   action: {
                     handlerAction: ACTIONS.RUN_QUERY,
-                    parameters: ["VFB_00110000"]
+                    parameters: ["AllDatasets", "VFB_00110000"]
                   }
                 },
                 {
@@ -715,7 +715,7 @@ export const toolbarMenu = (autoSaveLayout) => { return {
                   icon: "",
                   action: {
                     handlerAction: ACTIONS.RUN_QUERY,
-                    parameters: ["VFB_00017894"]
+                    parameters: ["AllDatasets", "VFB_00017894"]
                   }
                 },
                 {
@@ -723,7 +723,7 @@ export const toolbarMenu = (autoSaveLayout) => { return {
                   icon: "",
                   action: {
                     handlerAction: ACTIONS.RUN_QUERY,
-                    parameters: ["VFB_00100000"]
+                    parameters: ["AllDatasets", "VFB_00100000"]
                   }
                 },
                 {
@@ -731,7 +731,7 @@ export const toolbarMenu = (autoSaveLayout) => { return {
                   icon: "",
                   action: {
                     handlerAction: ACTIONS.RUN_QUERY,
-                    parameters: ["VFB_00101384"]
+                    parameters: ["AllDatasets", "VFB_00101384"]
                   }
                 },
                 {
@@ -739,7 +739,7 @@ export const toolbarMenu = (autoSaveLayout) => { return {
                   icon: "",
                   action: {
                     handlerAction: ACTIONS.RUN_QUERY,
-                    parameters: ["VFB_00030786"]
+                    parameters: ["AllDatasets", "VFB_00030786"]
                   }
                 }
               ]
@@ -760,7 +760,7 @@ export const toolbarMenu = (autoSaveLayout) => { return {
               icon: "",
               action: {
                 handlerAction: ACTIONS.RUN_QUERY,
-                parameters: ["VFB_00050000"]
+                parameters: ["AllDatasets", "VFB_00050000"]
               }
             },
             {
@@ -768,7 +768,7 @@ export const toolbarMenu = (autoSaveLayout) => { return {
               icon: "",
               action: {
                 handlerAction: ACTIONS.RUN_QUERY,
-                parameters: ["VFB_00049000"]
+                parameters: ["AllDatasets", "VFB_00049000"]
               }
             }
           ]

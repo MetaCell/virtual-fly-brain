@@ -1073,7 +1073,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
           },
           width: showMetadataOnly ? '100%' : 'initial'
         }} size={{ xs: 12, sm: showMetadataOnly ? 12 : 8, md: showMetadataOnly ? 12 : 7, lg: showMetadataOnly ? 12 : 7 }}>
-          <Box display='flex' flexDirection='column' sx={{ rowGap: { xs: 1.25, sm: 1, lg: 1.25 }, width: showMetadataOnly ? '100%' : '15rem' }}>
+          <Box display='flex' flexDirection='column' sx={{ rowGap: { xs: 1.25, sm: 1, lg: 1.25 }, width: '100%' }}>
           {getMetadataProperties().map(({ key, value, isStatic, isAlignedTo }) => {
               // Handle special cases
               if (key === 'Description' || key === 'Comment') {
@@ -1123,7 +1123,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
               
               return (
                 <Box key={key} display='flex' justifyContent='space-between' columnGap={key === 'Name' ? '0.188rem' : 1}>
-                  <Typography sx={classes.heading}>{key}</Typography>
+                  <Typography sx={{...classes.heading, paddingLeft: showMetadataOnly ? 0 : '1.5rem'}}>{key}</Typography>
                   {renderedValue}
                 </Box>
               );

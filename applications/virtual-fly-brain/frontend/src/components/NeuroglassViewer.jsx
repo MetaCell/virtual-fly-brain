@@ -79,7 +79,7 @@ export default function NeuroglassViewer() {
             }}
             title="Neuroglass Viewer"
             allow="accelerometer; camera; gyroscope; microphone; web-share"
-            sandbox="allow-scripts allow-same-origin allow-forms"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
           />
         </Box>
       ) : (

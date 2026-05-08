@@ -42,6 +42,7 @@ export const cameraControlsRotateState = {
   STOPPING: 'stopping',
 };
 
+// eslint-disable-next-line no-unused-vars
 const CameraControls = forwardRef((props, _ref) => {
   const {
     cameraControlsHandler,

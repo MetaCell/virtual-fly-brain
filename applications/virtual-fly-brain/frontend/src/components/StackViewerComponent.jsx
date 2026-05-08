@@ -1521,7 +1521,7 @@ const rgbToHex = (color) => {
      */
     render: function () {
       return (
-        < div className="stack-canvas-container" ref={(el) => { this.stackCanvas = el; }}> </div>
+        <div className="stack-canvas-container" ref={(el) => { this.stackCanvas = el; }}></div>
       );
     },
 

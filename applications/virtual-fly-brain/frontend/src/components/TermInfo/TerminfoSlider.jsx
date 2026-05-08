@@ -114,7 +114,8 @@ const TerminfoSlider = (props) => {
     message: ''
   });
   const [isLoading, setIsLoading] = useState(false);
-  const reduxState = useSelector(state => state);
+  const launchTemplate = useSelector(state => state.instances.launchTemplate);
+  const focusedInstance = useSelector(state => state.instances.focusedInstance);
   const misalignedTemplate = useSelector(state => state.globalInfo.misalignedTemplate)
   const alignedTemplates = useSelector(state => state.globalInfo.alignedTemplates)
   const misalignedIDs = useSelector(state => state.globalInfo.misalignedIDs)
@@ -142,16 +143,16 @@ const TerminfoSlider = (props) => {
   };
 
   const imageClick = (image) => {
-    if (image !== reduxState.instances.launchTemplate?.metadata?.Id) {
-      const templates = Object.keys(reduxState.instances.focusedInstance.metadata.Examples);
+    if (image !== launchTemplate?.metadata?.Id) {
+      const templates = Object.keys(focusedInstance.metadata.Examples);
       const examples = new Map();
       templates.forEach(t => {
-        reduxState.instances.focusedInstance.metadata.Examples[t].forEach(e => {
+        focusedInstance.metadata.Examples[t].forEach(e => {
           examples.set(e.id, {...e, template: t});
         });
       });
       const example = examples.get(image);
-      if (example.template !== reduxState.instances.launchTemplate?.metadata?.Id) {
+      if (example.template !== launchTemplate?.metadata?.Id) {
         setConfirmationModal({
           open: true,
           example,
@@ -183,7 +184,7 @@ const TerminfoSlider = (props) => {
       const keys = Object.keys(props.examples);
       
       // Get current template from store
-      const currentTemplate = reduxState.instances.launchTemplate?.metadata?.Id;
+      const currentTemplate = launchTemplate?.metadata?.Id;
       
       // Define the priority order for templates
       const templatePriorityOrder = [
@@ -225,12 +226,11 @@ const TerminfoSlider = (props) => {
         });
       });
       
-      console.log('TerminfoSlider: Setting slideImages with priority order', images);
       setSlideImages(images);
     } else {
       setSlideImages([]);
     }
-  }, [props.examples, reduxState.instances.launchTemplate?.metadata?.Id]);
+  }, [props.examples, launchTemplate?.metadata?.Id]);
 
   return (
     <Box sx={classes.root}>
@@ -255,8 +255,7 @@ const TerminfoSlider = (props) => {
                   src={slideImage.url}
                   onClick={() => imageClick(slideImage.id)}
                   alt={slideImage.caption}
-                  onLoad={() => console.log(`Image ${index} loaded:`, slideImage.url)}
-                  onError={() => console.log(`Image ${index} failed to load:`, slideImage.url)}
+                  onError={() => console.error(`Image ${index} failed to load:`, slideImage.url)}
                 />
             ))}
       </Slide>

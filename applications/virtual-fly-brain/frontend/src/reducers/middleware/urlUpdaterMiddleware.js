@@ -237,8 +237,15 @@ export const urlUpdaterMiddleware = store => next => (action) => {
 
       // if it's an individual, we need to check if it's aligned with the current template
       if (isIndividual) {
+        // If Images is empty, the individual has no visuals and can be loaded by any template
+        if (Object.keys(action.payload?.Images || {}).length === 0) {
+          next(action);
+          updateUrlWithInstancesAndSelectedId(action.payload.Id, store);
+          return;
+        }
+
         // Check if the individual is aligned with the current template
-        const templateLookup = action.payload?.Images || action.payload?.Examples || {};
+        const templateLookup = action.payload?.Images || {};
         const templates = Object.keys(templateLookup);
         const loadedTemplate = launchTemplate?.metadata?.Id;
         if (loadedTemplate && templates.includes(loadedTemplate)) {
@@ -267,10 +274,6 @@ export const urlUpdaterMiddleware = store => next => (action) => {
           get3DMesh(action.payload);
           return;
         } else if (!templates.includes(loadedTemplate) && !IsTemplate) {
-            if(Object.keys(action.payload?.Images || {}).length === 0 && Object.keys(action.payload?.Examples || {}).length === 0) {
-              next(action);
-              return;
-            }
           // If the individual is not aligned with the current template, we need to show the misalignment dialog
           store.dispatch(setAlignTemplates(false, action.payload.Id, Object.keys(action.payload?.Images)|| Object.keys(action.payload?.Examples || {})));
           return;

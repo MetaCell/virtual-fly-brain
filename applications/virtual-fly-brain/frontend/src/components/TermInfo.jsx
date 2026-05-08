@@ -748,6 +748,7 @@ const TermInfo = ({ open, setOpen }) => {
       >
         {!open ? (
           <Typography
+            component="div"
             sx={{
               maxWidth: "10rem",
               display: "flex",
@@ -771,9 +772,10 @@ const TermInfo = ({ open, setOpen }) => {
                 sx={{ justifyContent: { lg: "space-between", xs: "flex-end" } }}
               >
                 <MediaQuery minWidth={768}>
-                  <Grid item xs={12} lg={4.5} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6, lg: 4.5 }}>
                     <Box>
                       <Typography
+                        component="div"
                         sx={{
                           maxWidth: "10rem",
                           fontWeight: 500,
@@ -790,7 +792,7 @@ const TermInfo = ({ open, setOpen }) => {
                   </Grid>
                 </MediaQuery>
 
-                <Grid item xs={12} lg={7.5} sm={6}>
+                <Grid size={{ xs: 12, sm: 6, lg: 7.5 }}>
                   <Box
                     display="flex"
                     rowGap={1}
@@ -1106,8 +1108,7 @@ const TermInfo = ({ open, setOpen }) => {
                 <AccordionDetails>
                   <SimpleTreeView
                     aria-label="customized"
-                    defaultExpandIcon={<ArrowRight />}
-                    defaultCollapseIcon={<ArrowDown />}
+                    slots={{ expandIcon: ArrowRight, collapseIcon: ArrowDown }}
                   >
                     {/* Group queries that start with "Neurons with" */}
                     {groupedQueries.map((group, groupIndex) => (

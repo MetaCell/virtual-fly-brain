@@ -173,7 +173,7 @@ const rgbToHex = (color) => {
       this.app = new Application({ width : this.props.width, height : this.props.height});
       // this.app.renderer.backgroundColor = '#1a1a1a';
       // maintain full window size
-      this.refs.stackCanvas?.getElementsByTagName("canvas")?.length == 0 && this.refs.stackCanvas?.appendChild(this.app.view);
+      this.stackCanvas?.getElementsByTagName("canvas")?.length == 0 && this.stackCanvas?.appendChild(this.app.view);
 
       this.disp = new Container({ width : this.props.width, height : this.props.height});
       this.disp.pivot.x = 0;
@@ -243,8 +243,8 @@ const rgbToHex = (color) => {
       this.lastWindowHeight = window.innerHeight;
       
       // Create bound methods for proper cleanup
-      this.boundHandleWindowResize = this.handleWindowResize.bind(this);
-      this.boundHandleVisualViewportChange = this.handleVisualViewportChange.bind(this);
+      this.boundHandleWindowResize = this.handleWindowResize;
+      this.boundHandleVisualViewportChange = this.handleVisualViewportChange;
       
       // Listen for window resize events (covers most zoom scenarios)
       window.addEventListener('resize', this.boundHandleWindowResize);
@@ -255,7 +255,7 @@ const rgbToHex = (color) => {
       }
       
       // Setup ResizeObserver for the canvas container if available
-      if (window.ResizeObserver && this.refs.stackCanvas) {
+      if (window.ResizeObserver && this.stackCanvas) {
         this.resizeObserver = new ResizeObserver(() => {
           if (!this._isMounted) return;
           
@@ -268,13 +268,13 @@ const rgbToHex = (color) => {
           }
         });
         
-        this.resizeObserver.observe(this.refs.stackCanvas);
+        this.resizeObserver.observe(this.stackCanvas);
       }
       
       // Fallback: Listen for devicePixelRatio changes (Webkit-based browsers)
       if (window.matchMedia) {
         this.mediaQueryList = window.matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`);
-        this.boundHandleDevicePixelRatioChange = this.handleDevicePixelRatioChange.bind(this);
+        this.boundHandleDevicePixelRatioChange = this.handleDevicePixelRatioChange;
         this.mediaQueryList.addListener(this.boundHandleDevicePixelRatioChange);
       }
 
@@ -343,7 +343,7 @@ const rgbToHex = (color) => {
       // Properly cleanup PIXI application and WebGL context
       if (this.app) {
         // Remove canvas from DOM
-        if (this.refs.stackCanvas && this.app.view && this.app.view.parentNode) {
+        if (this.stackCanvas && this.app.view && this.app.view.parentNode) {
           this.app.view.parentNode.removeChild(this.app.view);
         }
         
@@ -494,7 +494,9 @@ const rgbToHex = (color) => {
             let extent = { imageX: imageX, imageY: imageY };
             that.setState(extent);
             that.props.setExtent(extent);
-            that.onResize(that.props.width, that.props.height);
+            if (typeof that.onResize === 'function') {
+              that.onResize(that.props.width, that.props.height);
+            }
             that.checkStack();
             that.callPlaneEdges();
             that.state.iBuffer = {};
@@ -1519,7 +1521,7 @@ const rgbToHex = (color) => {
      */
     render: function () {
       return (
-        < div className="stack-canvas-container" ref="stackCanvas"> </div>
+        <div className="stack-canvas-container" ref={(el) => { this.stackCanvas = el; }}></div>
       );
     },
 
@@ -2251,7 +2253,7 @@ const StackViewerComponent = () => createClass({
       }
 
       return <ReactResizeDetector skipOnMount={true} onResize={this.onResize}>
-        <div id='slice-viewer' style={{width: '100%', height: '100%'}} ref={this.refs.stackCanvas}>
+        <div id='slice-viewer' style={{width: '100%', height: '100%'}}>
         {markup}
         </div>
         </ReactResizeDetector>

@@ -35,7 +35,8 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
     message: ''
   });
   const [isLoading, setIsLoading] = useState(false);
-  const reduxState = useSelector(state => state);
+  const launchTemplate = useSelector(state => state.instances.launchTemplate);
+  const alignedTemplates = useSelector(state => state.globalInfo.alignedTemplates);
   const MAX_LENGTH = 300;
 
   // Utility function to decode URL-encoded strings
@@ -50,7 +51,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
   };
 
   // Get current template information
-  const currentTemplate = reduxState.instances.launchTemplate;
+  const currentTemplate = launchTemplate;
   const currentTemplateName = currentTemplate?.metadata?.Name || 'Unknown Template';
   const currentTemplateId = currentTemplate?.metadata?.Id;
 
@@ -64,7 +65,6 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
       );
     } else {
       // Check if template is aligned
-      const alignedTemplates = reduxState.globalInfo.alignedTemplates;
       const isAligned = alignedTemplates[templateId];
       
       // If template is aligned, load it directly
@@ -410,7 +410,8 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
         {
         templateIds.map((templateId) => {
           return (
-            templateId !== currentTemplateId && <Chip 
+            templateId !== currentTemplateId && <Chip
+              key={templateId}
               icon={<LinkIcon />} 
               label={alignedTemplatesLabels[templateId] || templateId} 
                 sx={{ 
@@ -1042,7 +1043,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
   return (
     <>
       <Grid container columnSpacing={2}>
-        {!showMetadataOnly && <Grid item xs={12} sm={4} md={5} lg={5}>
+        {!showMetadataOnly && <Grid size={{ xs: 12, sm: 4, md: 5, lg: 5 }}>
           <Box
             sx={{
               width: '15rem',
@@ -1071,8 +1072,8 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
             sm: 0,
           },
           width: showMetadataOnly ? '100%' : 'initial'
-        }} item xs={12} sm={showMetadataOnly ? 12 : 8} md={showMetadataOnly ? 12 : 7} lg={showMetadataOnly ? 12 : 7}>
-          <Box display='flex' flexDirection='column' sx={{ rowGap: { xs: 1.25, sm: 1, lg: 1.25 }, width: showMetadataOnly ? '100%' : '15rem' }}>
+        }} size={{ xs: 12, sm: showMetadataOnly ? 12 : 8, md: showMetadataOnly ? 12 : 7, lg: showMetadataOnly ? 12 : 7 }}>
+          <Box display='flex' flexDirection='column' sx={{ rowGap: { xs: 1.25, sm: 1, lg: 1.25 }, width: '100%' }}>
           {getMetadataProperties().map(({ key, value, isStatic, isAlignedTo }) => {
               // Handle special cases
               if (key === 'Description' || key === 'Comment') {
@@ -1122,7 +1123,7 @@ const GeneralInformation = ({ data, classes, showMetadataOnly = false }) => {
               
               return (
                 <Box key={key} display='flex' justifyContent='space-between' columnGap={key === 'Name' ? '0.188rem' : 1}>
-                  <Typography sx={classes.heading}>{key}</Typography>
+                  <Typography sx={{...classes.heading, paddingLeft: showMetadataOnly ? 0 : '1.5rem'}}>{key}</Typography>
                   {renderedValue}
                 </Box>
               );

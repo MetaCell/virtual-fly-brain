@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import React, { useState } from 'react';
+import React, { useState, forwardRef } from 'react';
 import { Box, IconButton, Tooltip } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import {
@@ -42,7 +42,8 @@ export const cameraControlsRotateState = {
   STOPPING: 'stopping',
 };
 
-const CameraControls = (props) => {
+// eslint-disable-next-line no-unused-vars
+const CameraControls = forwardRef((props, _ref) => {
   const {
     cameraControlsHandler,
     canvasHeight,
@@ -163,6 +164,8 @@ const CameraControls = (props) => {
       )}
     </Box>
   );
-};
+});
+
+CameraControls.displayName = 'CameraControls';
 
 export default CameraControls;

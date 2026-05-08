@@ -6,7 +6,7 @@ import { Box, Button } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import Menu from '@metacell/geppetto-meta-ui/menu/Menu';
 import { History, Logo, Menu as MenuIcon, QueryStats } from "../../icons";
-import { getQueries, updateQueries } from '../../reducers/actions/queries';
+import { getQueries } from '../../reducers/actions/queries';
 import { loadCustomLayout, saveCustomLayout } from "../../reducers/actions/layout";
 import { updateWidget } from "@metacell/geppetto-meta-client/common/layout/actions";
 import { selectInstance, focusInstance, getInstanceByID, triggerInstanceFailure } from '../../reducers/actions/instances';
@@ -112,7 +112,7 @@ const Header = ({ setBottomNav }) => {
         break;
       }
       case ACTIONS.SHOW_COMPONENT:
-        setBottomNav(action.parameters[0])
+        setBottomNav(Number(action.parameters[0]))
         break;
       case ACTIONS.SHOW_TERM_INFO: {
         dispatch(setTermInfoOpened(true))
@@ -134,21 +134,10 @@ const Header = ({ setBottomNav }) => {
         break;
       }
       case ACTIONS.RUN_QUERY: {
-        let updatedQueries = [...queries];
-        let matchQuery = updatedQueries?.find(q => q.short_form === action.parameters[0]);
-        updatedQueries?.forEach(query => {
-          if (query.queries) {
-            Object.keys(query.queries)?.forEach(q => query.queries[q].active = false);
-          }
-        });
-        if (matchQuery?.short_form == action?.parameters[0]) {
-          Object.keys(matchQuery.queries)?.forEach(q => matchQuery.queries[q].active = true);
-          updateQueries(updatedQueries);
-          setBottomNav(bottomNavQuery)
-        } else {
-          getQueries(action.parameters[0], action.parameters[1])
-          setBottomNav(bottomNavQuery)
-        }
+        const type = action.parameters[0];
+        const short_form = action.parameters[1];
+        getQueries(short_form, type);
+        setBottomNav(bottomNavQuery);
         break;
       }
       case ACTIONS.HISTORY_MENU_INJECTOR: {
@@ -161,7 +150,7 @@ const Header = ({ setBottomNav }) => {
               icon: i?.is_query ? "fa fa-quora" : "fa fa-eye", // TODO : replace with figma icon
               action: {
                 handlerAction: i?.is_query ? ACTIONS.RUN_QUERY : ACTIONS.SELECT_INSTANCE,
-                parameters: [i?.short_form, i?.type]
+                parameters: [i?.type, i?.short_form]
               }
             },
           );

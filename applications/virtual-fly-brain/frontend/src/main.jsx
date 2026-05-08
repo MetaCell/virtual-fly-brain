@@ -1,6 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import reportWebVitals from './reportWebVitals';
+
+// Suppress legacy childContextTypes warning from griddle-react/recompose (third-party, no fix available)
+const _origConsoleError = console.error;
+console.error = (...args) => {
+  if (typeof args[0] === 'string' && args[0].includes('childContextTypes')) return;
+  _origConsoleError(...args);
+};
 import './index.css';
 import App from './App';
 import { Provider } from 'react-redux'

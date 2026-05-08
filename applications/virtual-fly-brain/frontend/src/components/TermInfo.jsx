@@ -283,6 +283,7 @@ const TermInfo = ({ open, setOpen }) => {
   );
 
   const [termInfoData, setTermInfoData] = useState(data);
+  const isClass = !!termInfoData?.metadata?.IsClass;
   const [toggleReadMore, setToggleReadMore] = useState(false);
   const [currentOpenQuery, setCurrentOpenQuery] = useState(null);
   const [confirmationModal, setConfirmationModal] = useState({
@@ -895,7 +896,9 @@ const TermInfo = ({ open, setOpen }) => {
                     >
                       <div ref={popover}>
                         <Tooltip title={"Edit 3D Canvas Color"}>
+                          <span>
                           <Button
+                            disabled={isClass}
                             sx={{
                               width: 75,
                               height: "1.875rem",
@@ -929,6 +932,7 @@ const TermInfo = ({ open, setOpen }) => {
                             />
                             Edit
                           </Button>
+                          </span>
                         </Tooltip>
                         {displayColorPicker ? (
                           <ChromePicker
@@ -961,7 +965,7 @@ const TermInfo = ({ open, setOpen }) => {
                         <Tooltip
                           title={getInstance()?.visible ? "Hide" : "Show"}
                         >
-                          <Button onClick={() => handleVisibility()}>
+                          <Button disabled={isClass} onClick={() => handleVisibility()}>
                             {getInstance()?.visible ? <EyeOff /> : <Eye />}
                           </Button>
                         </Tooltip>
@@ -970,7 +974,7 @@ const TermInfo = ({ open, setOpen }) => {
                             getInstance()?.selected ? "Deselect" : "Select"
                           }
                         >
-                          <Button onClick={(event) => handleSelection(event)}>
+                          <Button disabled={isClass} onClick={(event) => handleSelection(event)}>
                             {getInstance()?.selected ? (
                               <SelectOff />
                             ) : (
@@ -979,7 +983,7 @@ const TermInfo = ({ open, setOpen }) => {
                           </Button>
                         </Tooltip>
                         <Tooltip title={"Focus on 3D Mesh"}>
-                          <Button onClick={(event) => handleFocus(event, true)}>
+                          <Button disabled={isClass} onClick={(event) => handleFocus(event, true)}>
                             <Target />
                           </Button>
                         </Tooltip>
@@ -990,7 +994,7 @@ const TermInfo = ({ open, setOpen }) => {
                               : "Show 3D Mesh"
                           }
                         >
-                          <Button onClick={() => handleMeshVisibility()}>
+                          <Button disabled={isClass} onClick={() => handleMeshVisibility()}>
                             {getInstance()?.visibleMesh ? (
                               <ArViewOff />
                             ) : (
@@ -1008,7 +1012,7 @@ const TermInfo = ({ open, setOpen }) => {
                                 : "Enable 3D Skeleton"
                             }
                           >
-                            <Button onClick={(event) => handleSkeleton(event)}>
+                            <Button disabled={isClass} onClick={(event) => handleSkeleton(event)}>
                               {getInstance()?.skeleton?.[SKELETON]?.visible ? (
                                 <SkeletonOff />
                               ) : (
@@ -1027,7 +1031,7 @@ const TermInfo = ({ open, setOpen }) => {
                                 : "Show 3D Cylinder Skeleton"
                             }
                           >
-                            <Button onClick={(event) => handleCylinder(event)}>
+                            <Button disabled={isClass} onClick={(event) => handleCylinder(event)}>
                               {getInstance()?.skeleton?.[CYLINDERS]?.visible ? (
                                 <CylinderOff id={SKELETON} />
                               ) : (

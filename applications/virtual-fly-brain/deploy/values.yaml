@@ -9,11 +9,8 @@ harness:
     port: 8080
     resources:
       requests:
-        memory: 1512Mi
-        cpu: 500m
-      limits:
-        memory: 3048Mi
-        cpu: 1000m
+        memory: 256Mi
+        cpu: 10m
   dependencies:
     build:
       - cloudharness-base

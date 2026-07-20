@@ -1,0 +1,10 @@
+/.claude
+.vscode
+/data/
+!/data/fetch_test_instances.py
+__pycache__/
+
+convert/*
+server/*
+.DS_Store
+

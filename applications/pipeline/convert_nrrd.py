@@ -94,6 +94,64 @@ def detect_origin(header: dict) -> list[float]:
     return [0.0, 0.0, 0.0]
 
 
+def validate_mesh_params(mask: str, mesh_min_intensity: int | None, mesh_max_intensity: int | None,
+                          mesh_percentile: float | None, mesh_format: str, decimate_fraction: float,
+                          generate_mesh: bool, verbose: bool = True) -> None:
+    """Reject mesh-related flag combinations that are contradictory or meaningless,
+    rather than silently ignoring one of them. Called once, early -- by both CLIs'
+    main() (before any NRRD I/O) and convert_nrrd() itself (defense-in-depth for
+    direct/programmatic callers like vfb_pipeline.py) -- so a bad combination fails
+    fast instead of surfacing after expensive work has already run.
+    """
+    have_percentile = mesh_percentile is not None
+    have_range = mesh_min_intensity is not None or mesh_max_intensity is not None
+    have_mesh_intensity_args = have_percentile or have_range
+
+    if mask == "none" and have_mesh_intensity_args:
+        raise ValueError(
+            "--mesh-min-intensity/--mesh-max-intensity/--mesh-percentile only apply "
+            "when --mask is 'otsu' or 'minmax' -- they have no effect with the default "
+            "--mask none. Did you forget --mask minmax?"
+        )
+    if mask == "otsu" and have_mesh_intensity_args:
+        raise ValueError(
+            "--mesh-min-intensity/--mesh-max-intensity/--mesh-percentile are only used "
+            "with --mask minmax, not --mask otsu."
+        )
+    if mask == "minmax":
+        if have_range and have_percentile:
+            raise ValueError(
+                "--mask minmax takes either --mesh-percentile OR "
+                "--mesh-min-intensity/--mesh-max-intensity, not both."
+            )
+        if not have_range and not have_percentile:
+            raise ValueError(
+                "--mask minmax requires --mesh-percentile, or --mesh-min-intensity/"
+                "--mesh-max-intensity, to be set."
+            )
+    if mesh_format == "multires_draco" and decimate_fraction > 0:
+        raise ValueError(
+            "--decimate-fraction only applies to --mesh-format legacy (pyfqmr "
+            "decimation); multires_draco has its own simplification via "
+            "--max-simplification-error instead. Can't combine legacy decimation with Draco."
+        )
+
+    if not generate_mesh:
+        touched = []
+        if mask != "none":
+            touched.append(f"--mask {mask}")
+        if have_mesh_intensity_args:
+            touched.append("--mesh-min-intensity/--mesh-max-intensity/--mesh-percentile")
+        if mesh_format != "legacy":
+            touched.append(f"--mesh-format {mesh_format}")
+        if decimate_fraction > 0:
+            touched.append("--decimate-fraction")
+        if touched and verbose:
+            print(f"  WARNING: --generate-mesh not set -- {', '.join(touched)} will have "
+                  f"no effect (no mesh is being generated). Pass --generate-mesh if you "
+                  f"meant to use these.")
+
+
 def convert_nrrd(
     nrrd_path: str,
     output_dir: str,
@@ -143,6 +201,8 @@ def convert_nrrd(
          with Draco (they're different mesh formats), but masking (axis 2) combines
          freely with either.
     """
+    validate_mesh_params(mask, mesh_min_intensity, mesh_max_intensity, mesh_percentile,
+                         mesh_format, decimate_fraction, generate_mesh, verbose)
 
     if verbose:
         print(f"Reading NRRD: {nrrd_path}")
@@ -268,7 +328,11 @@ def _select_mesh_mask(arr: np.ndarray, mask: str,
     fixed band, not both; see convert_nrrd()'s docstring). Otsu/minmax are known to
     backfire on dense data (confirmed: +23% bigger on a whole-brain template) -- that's
     a real risk you're opting into by choosing mask != "none" on dense data, not
-    something this function protects you from."""
+    something this function protects you from.
+
+    Parameter-combination validation (otsu/minmax vs mesh_min_intensity/mesh_max_intensity/
+    mesh_percentile) happens upfront in validate_mesh_params(), called by convert_nrrd()
+    before this is ever reached -- not repeated here."""
     if mask == "none":
         if verbose:
             print("  No mask cleanup (mask='none', the default -- pass mask='otsu' or "
@@ -276,22 +340,12 @@ def _select_mesh_mask(arr: np.ndarray, mask: str,
         return arr > 0
 
     if mask == "otsu":
-        if mesh_min_intensity is not None or mesh_max_intensity is not None or mesh_percentile is not None:
-            raise ValueError("mesh_min_intensity/mesh_max_intensity/mesh_percentile are only used "
-                             "when mask='minmax', not mask='otsu'")
         if verbose:
             print("  Otsu mask")
         return mesh_compression.otsu_mask(arr)
 
     if mask == "minmax":
-        have_range = mesh_min_intensity is not None or mesh_max_intensity is not None
         have_percentile = mesh_percentile is not None
-        if have_range and have_percentile:
-            raise ValueError("mask='minmax' takes either mesh_percentile OR "
-                             "mesh_min_intensity/mesh_max_intensity, not both")
-        if not have_range and not have_percentile:
-            raise ValueError("mask='minmax' requires mesh_percentile, or mesh_min_intensity/"
-                             "mesh_max_intensity, to be set")
         if have_percentile:
             lo = mesh_compression.percentile_intensity(arr, mesh_percentile)
             if verbose:
@@ -528,6 +582,13 @@ def main():
 
     if not args.input_nrrd and not args.vfb_id:
         parser.error("Must provide either --input-nrrd or --vfb-id")
+
+    try:
+        validate_mesh_params(args.mask, args.mesh_min_intensity, args.mesh_max_intensity,
+                              args.mesh_percentile, args.mesh_format, args.decimate_fraction,
+                              args.generate_mesh, args.verbose)
+    except ValueError as e:
+        parser.error(str(e))
 
     output_dir = os.path.abspath(os.path.expanduser(args.output_dir))
     os.makedirs(output_dir, exist_ok=True)

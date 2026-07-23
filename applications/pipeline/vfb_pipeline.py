@@ -78,9 +78,10 @@ from cloudvolume.mesh import Mesh
 
 # Import NRRD converter (same package)
 try:
-    from convert_nrrd import convert_nrrd as _convert_nrrd
+    from convert_nrrd import convert_nrrd as _convert_nrrd, validate_mesh_params as _validate_mesh_params
 except ImportError:
     _convert_nrrd = None
+    _validate_mesh_params = None
 
 import mesh_compression
 
@@ -794,6 +795,14 @@ def main():
     parser.add_argument("--verbose", "-v", action="store_true",
                         help="Verbose output")
     args = parser.parse_args()
+
+    if _validate_mesh_params is not None:
+        try:
+            _validate_mesh_params(args.mask, args.mesh_min_intensity, args.mesh_max_intensity,
+                                   args.mesh_percentile, args.mesh_format, args.decimate_fraction,
+                                   args.generate_mesh, args.verbose)
+        except ValueError as e:
+            parser.error(str(e))
 
     # Setup logging
     level = logging.DEBUG if args.verbose else logging.INFO

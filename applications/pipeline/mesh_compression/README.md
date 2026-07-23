@@ -82,7 +82,7 @@ Simplifies an existing mesh using quadric edge-collapse (via `pyfqmr`).
 `target_reduction` is the fraction of triangles to remove — for example, `0.7` removes
 approximately 70% of triangles, keeping about 30%. Safe to use on any volume.
 
-### `generate_draco_mesh(precomputed_segmentation_path, mesh_directory="mesh_czi", max_lod=2, max_simplification_error=10, mesh_shape=None)`
+### `generate_draco_mesh(precomputed_segmentation_path, mesh_directory="mesh_multires", max_lod=2, max_simplification_error=10, mesh_shape=None)`
 Generates a multi-resolution Draco-compressed mesh for an existing precomputed
 segmentation volume. `max_simplification_error` controls the simplification level —
 lower values preserve more detail, higher values produce smaller output. For best

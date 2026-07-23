@@ -12,6 +12,7 @@ from .cleanup import (
     otsu_mask,
     percentile_intensity,
 )
+from .zip_output import zip_neuroglancer_dir
 
 __all__ = [
     "otsu_mask",
@@ -22,4 +23,5 @@ __all__ = [
     "MIN_COMPONENT_VOXELS_DEFAULT",
     "MAX_LOD_DEFAULT",
     "MAX_SIMPLIFICATION_ERROR_DEFAULT",
+    "zip_neuroglancer_dir",
 ]

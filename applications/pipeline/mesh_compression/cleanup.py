@@ -12,8 +12,6 @@ try:
 except ImportError:
     threshold_otsu = None
 
-from . import _draco_vendored
-
 MIN_COMPONENT_VOXELS_DEFAULT = 50
 MAX_LOD_DEFAULT = 2
 MAX_SIMPLIFICATION_ERROR_DEFAULT = 10  # Draco's own library default, not tuned further
@@ -77,7 +75,7 @@ def decimate_mesh(vertices: np.ndarray, faces: np.ndarray, target_reduction: flo
     return new_vertices.astype(np.float32), new_faces.astype(np.uint32)
 
 
-def generate_draco_mesh(precomputed_segmentation_path: str, mesh_directory: str = "mesh_czi",
+def generate_draco_mesh(precomputed_segmentation_path: str, mesh_directory: str = "mesh_multires",
                          max_lod: int = MAX_LOD_DEFAULT,
                          max_simplification_error: int = MAX_SIMPLIFICATION_ERROR_DEFAULT,
                          mesh_shape=None) -> None:
@@ -99,6 +97,7 @@ def generate_draco_mesh(precomputed_segmentation_path: str, mesh_directory: str 
     Does not write segment properties metadata -- that should be handled by the calling
     pipeline.
     """
+    from . import _draco_vendored
     _draco_vendored.generate_multiresolution_mesh_from_segmentation(
         precomputed_segmentation_path=precomputed_segmentation_path,
         mesh_directory=mesh_directory,

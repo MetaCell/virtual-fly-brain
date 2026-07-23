@@ -23,16 +23,20 @@ Folder structure per image:
   ├── volume_man.obj        ← generated from SWC if missing
   ├── volume.nrrd           (existing)
   ├── volume.wlz            (existing)
-  └── neuroglancer/         ← NEW precomputed mesh
-      ├── info
-      ├── mesh/
-      │   ├── info
-      │   ├── 1:0
-      │   └── 1:0:1
-      └── segment_properties/
-          └── info
+  ├── neuroglancer/         ← NEW precomputed mesh (chunks/mesh written uncompressed,
+  │   ├── info                no segment_properties/ -- our mesh is always a single
+  │   └── mesh/                synthetic merged segment, never real per-segment labels)
+  │       ├── info
+  │       ├── 1:0
+  │       └── 1:0:1
+  └── neuroglancer.zip      ← whole neuroglancer/ folder zipped as one artifact,
+                              only when --compress is passed (see mesh_compression/zip_output.py);
+                              this is what Neuroglancer's client-side zip-kvstore
+                              adapter reads via HTTP
+                              Range requests, instead of per-chunk gzip/brotli
+                              + a server-side Content-Encoding hack.
 
-Neuroglancer URL:
+Neuroglancer URL (directory form, still works locally):
   precomputed://https://www.virtualflybrain.org/data/VFB/i/{first4}/{last4}/{template_id}/neuroglancer
 
 Usage:
@@ -77,6 +81,8 @@ try:
     from convert_nrrd import convert_nrrd as _convert_nrrd
 except ImportError:
     _convert_nrrd = None
+
+import mesh_compression
 
 # ---------------------------------------------------------------------------
 # Configuration
@@ -473,7 +479,7 @@ def generate_obj_from_swc(image_dir: str) -> str:
 
 def write_precomputed(obj_path: str, output_dir: str,
                       resolution: list[float] = DEFAULT_RESOLUTION,
-                      segment_id: int = 1, label: str | None = None):
+                      segment_id: int = 1):
     """Convert OBJ mesh to Neuroglancer precomputed format (uncompressed)."""
 
     mesh = trimesh.load(obj_path, force="mesh")
@@ -485,6 +491,13 @@ def write_precomputed(obj_path: str, output_dir: str,
 
     os.makedirs(output_dir, exist_ok=True)
     dest = "file://" + output_dir
+
+    # OBJ vertices from VFB are in physical microns, but Neuroglancer's precomputed
+    # world coordinates (and this function's "resolution" arg, e.g. DEFAULT_RESOLUTION's
+    # 518.9161/1000.0) are nanometers -- without this conversion the mesh renders at
+    # 1/1000th its real size (a ~16 micron structure collapses to ~16nm, indistinguishable
+    # from a point/degenerate box in the viewer).
+    mesh.vertices = mesh.vertices * 1000.0
 
     mesh_max = mesh.vertices.max(axis=0)
     mesh_min = mesh.vertices.min(axis=0)
@@ -498,7 +511,6 @@ def write_precomputed(obj_path: str, output_dir: str,
         "num_channels": 1,
         "type": "segmentation",
         "mesh": "mesh",
-        "segment_properties": "segment_properties",
         "scales": [{
             "chunk_sizes": [[64, 64, 64]],
             "encoding": "raw",
@@ -522,22 +534,10 @@ def write_precomputed(obj_path: str, output_dir: str,
     faces = mesh.faces.astype(np.uint32)
     mesh_obj = Mesh(vertices, faces, segid=segment_id)
     vol.mesh.put(mesh_obj, compress=False)
-
-    # Segment properties
-    seg_dir = os.path.join(output_dir, "segment_properties")
-    os.makedirs(seg_dir, exist_ok=True)
-    display_label = label or "mesh"
-    seg_info = {
-        "@type": "neuroglancer_segment_properties",
-        "inline": {
-            "ids": [str(segment_id)],
-            "properties": [
-                {"id": "label", "type": "label", "values": [display_label]},
-            ],
-        },
-    }
-    with open(os.path.join(seg_dir, "info"), "w") as f:
-        json.dump(seg_info, f, indent=2)
+    # No segment_properties -- this is always a single synthetic segment with a
+    # placeholder label ("mesh"), never real per-segment labels, so a
+    # segment_properties list would be misleading rather than informative
+    # (see NEUROGLANCER_STANDARDIZATION.md item 3).
 
     log.info("  Precomputed written: %s", output_dir)
 
@@ -553,17 +553,18 @@ def process_image(image_dir: str, vfb_id: str, template_id: str,
                   min_intensity: int | None = None,
                   max_intensity: int | None = None,
                   resolution: list[float] = DEFAULT_RESOLUTION,
-                  compress: bool | str = "br",
+                  generate_mesh: bool = False,
                   mask: str = "none",
                   mesh_min_intensity: int | None = None,
                   mesh_max_intensity: int | None = None,
                   mesh_percentile: float | None = None,
                   mesh_format: str = "legacy",
                   decimate_fraction: float = 0.0,
-                  max_simplification_error: int = 10) -> dict:
+                  max_simplification_error: int = 10,
+                  compress: bool = False) -> dict:
     """Process a single image directory. Returns a status dict.
 
-    compress/mask/mesh_*/decimate_fraction/max_simplification_error are passed
+    generate_mesh/mask/mesh_*/decimate_fraction/max_simplification_error are passed
     straight through to convert_nrrd.convert_nrrd() for the NRRD path -- see that
     function's docstring for what each one does. The OBJ mesh path (write_precomputed,
     above) doesn't generate a mesh from a volume mask, so none of this applies there.
@@ -686,7 +687,7 @@ def process_image(image_dir: str, vfb_id: str, template_id: str,
                     merge_segments=merge_segments,
                     min_intensity=min_intensity,
                     max_intensity=max_intensity,
-                    compress=compress,
+                    generate_mesh=generate_mesh,
                     mask=mask,
                     mesh_min_intensity=mesh_min_intensity,
                     mesh_max_intensity=mesh_max_intensity,
@@ -700,6 +701,13 @@ def process_image(image_dir: str, vfb_id: str, template_id: str,
             except Exception as e:
                 result["error"] = f"NRRD precomputed generation failed: {e}"
                 log.error("  ERROR generating precomputed from NRRD: %s", e)
+
+    if result["precomputed_generated"] and compress:
+        try:
+            mesh_compression.zip_neuroglancer_dir(ng_dir, verbose=log.isEnabledFor(logging.DEBUG))
+        except Exception as e:
+            result["error"] = f"Zipping neuroglancer/ failed: {e}"
+            log.error("  ERROR zipping neuroglancer/: %s", e)
 
     return result
 
@@ -746,8 +754,10 @@ def main():
     parser.add_argument("--max-intensity", type=int, default=None,
                         help="Maximum segment ID/intensity to keep in the STORED volume "
                              "(destructive, values above will be set to 0)")
-    parser.add_argument("--compress", choices=["none", "gzip", "br"], default="br",
-                        help="NRRD path chunk/mesh compression codec (default: br/brotli)")
+    parser.add_argument("--generate-mesh", action="store_true",
+                        help="NRRD path only. Generate a marching-cubes mesh from the volume's "
+                             "external boundary (default: off) -- most instances already have a "
+                             "usable volume_man.obj and don't need one regenerated from the NRRD.")
     parser.add_argument("--mask", choices=["none", "otsu", "minmax"], default="none",
                         help="NRRD path, OPTIONAL. 'none' (default): no mask cleanup. 'otsu': "
                              "automatic threshold. 'minmax': explicit band -- also set "
@@ -774,6 +784,11 @@ def main():
     parser.add_argument("--max-simplification-error", type=int, default=10,
                         help="NRRD path, --mesh-format multires_draco only. Draco simplification "
                              "error tolerance (default: 10) -- lower is gentler.")
+    parser.add_argument("--compress", action="store_true",
+                        help="Zip each instance's neuroglancer/ folder into a single artifact "
+                             "(default: off, leaves the raw uncompressed tree as-is). No "
+                             "gzip/brotli choice anymore -- if set, this simply zips the whole "
+                             "folder; see mesh_compression/zip_output.py.")
     parser.add_argument("--dry-run", action="store_true",
                         help="Show what would be done without making changes")
     parser.add_argument("--verbose", "-v", action="store_true",
@@ -878,8 +893,6 @@ def main():
         "errors": 0,
     }
 
-    compress = {"none": False, "gzip": True, "br": "br"}[args.compress]
-
     for i, (image_dir, vfb_id, template_id) in enumerate(targets, 1):
         if i % 500 == 0 or args.verbose:
             log.info("Progress: %d / %d", i, stats["total"])
@@ -892,7 +905,7 @@ def main():
             min_intensity=args.min_intensity,
             max_intensity=args.max_intensity,
             resolution=args.resolution,
-            compress=compress,
+            generate_mesh=args.generate_mesh,
             mask=args.mask,
             mesh_min_intensity=args.mesh_min_intensity,
             mesh_max_intensity=args.mesh_max_intensity,
@@ -900,6 +913,7 @@ def main():
             mesh_format=args.mesh_format,
             decimate_fraction=args.decimate_fraction,
             max_simplification_error=args.max_simplification_error,
+            compress=args.compress,
         )
 
         if result["obj_generated"]:

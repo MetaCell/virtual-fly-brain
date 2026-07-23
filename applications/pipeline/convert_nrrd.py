@@ -12,9 +12,12 @@ This script:
 Volume conversion approach matches MetaCell/virtual-fly-brain converter.py:
   - Detects voxel spacing and origin from NRRD header
   - Writes data as-is (no thresholding/relabeling for integer data)
-  - Supports gzip/brotli compression
+  - Writes chunks/mesh fragments uncompressed -- the whole neuroglancer/ output folder is
+    zipped as a single artifact afterward (see mesh_compression/zip_output.py) instead of per-chunk gzip/
+    brotli, so Neuroglancer's client-side zip-kvstore adapter can decompress it without any
+    server-side Content-Encoding hacks.
 
-Mesh-size reduction (compression, mask cleanup, decimation, Draco) is implemented in
+Mesh-size reduction (mask cleanup, decimation, Draco) is implemented in
 mesh_compression/ and wired in here -- see mesh_compression/README.md
 Two independent knobs:
   - mask ("none"|"otsu"|"minmax"): whether/how to mask before meshing. Masking (Otsu/
@@ -100,7 +103,7 @@ def convert_nrrd(
     merge_segments: bool = False,
     min_intensity: int | None = None,
     max_intensity: int | None = None,
-    compress: bool | str = "br",
+    generate_mesh: bool = False,
     mask: str = "none",
     mesh_min_intensity: int | None = None,
     mesh_max_intensity: int | None = None,
@@ -121,8 +124,10 @@ def convert_nrrd(
     see mesh_compression/README.md for the full validation. Three separate decisions,
     each on its own axis (pick at most one thing per axis; axes combine freely):
 
-      1. compress: "br" (default, brotli) | "gzip" | "none". Always safe, no tradeoff --
-         on by default.
+      1. generate_mesh: False (default) | True. Whether to generate a marching-cubes
+         mesh from the volume's external boundary at all -- off by default since most
+         instances already ship a usable volume_man.obj (see vfb_pipeline.py) and don't
+         need one regenerated from the NRRD.
       2. mask: "none" (default -- no mask cleanup at all) | "otsu" (automatic threshold,
          no extra params) | "minmax" (explicit band -- supply mesh_percentile for a
          per-sample floor, OR mesh_min_intensity/mesh_max_intensity for a fixed band;
@@ -195,29 +200,37 @@ def convert_nrrd(
         "type": layer_type,
     }
 
-    if is_segmentation:
+    if is_segmentation and generate_mesh:
+        # Only declare a mesh directory when we're actually going to write one --
+        # otherwise Neuroglancer requests neuroglancer/mesh/info and gets a 404
+        # (see _generate_external_mesh/_generate_draco_mesh for what populates it).
+        # segment_properties is NOT declared: our mesh is always a single merged
+        # blob with a placeholder label ("Segment N"), never real per-segment
+        # labels, so a segment_properties list would be misleading rather than
+        # informative (see NEUROGLANCER_STANDARDIZATION.md item 3).
         info["mesh"] = "mesh"
-        info["segment_properties"] = "segment_properties"
 
-    vol = CloudVolume(dest, mip=0, info=info, compress=compress)
+    vol = CloudVolume(dest, mip=0, info=info, compress=False)
     vol.commit_info()
     vol[:, :, :] = arr
 
     if verbose:
-        compress_label = {"br": "brotli", True: "gzip", False: "none"}.get(compress, str(compress))
         print(f"  Wrote precomputed volume to {dest_local}")
         print(f"  Layer type: {layer_type}")
-        print(f"  Compression: {compress_label}")
 
     # Generate mesh from the external boundary of all non-zero voxels
     if is_segmentation:
-        _generate_external_mesh(
-            arr, dest_local, vol, voxel_size, voxel_offset, dust_threshold, compress, verbose,
-            mask=mask,
-            mesh_min_intensity=mesh_min_intensity, mesh_max_intensity=mesh_max_intensity,
-            mesh_percentile=mesh_percentile, mesh_format=mesh_format,
-            decimate_fraction=decimate_fraction, max_simplification_error=max_simplification_error,
-        )
+        if generate_mesh:
+            _generate_external_mesh(
+                arr, dest_local, vol, voxel_size, voxel_offset, dust_threshold, verbose,
+                mask=mask,
+                mesh_min_intensity=mesh_min_intensity, mesh_max_intensity=mesh_max_intensity,
+                mesh_percentile=mesh_percentile, mesh_format=mesh_format,
+                decimate_fraction=decimate_fraction, max_simplification_error=max_simplification_error,
+            )
+        else:
+            if verbose:
+                print("  generate_mesh=False, skipping mesh generation")
 
     return dest_local
 
@@ -227,9 +240,6 @@ def _setup_mesh_metadata(dest_local, vol, verbose):
     needs_update = False
     if "mesh" not in vol.info or vol.info["mesh"] is None:
         vol.info["mesh"] = "mesh"
-        needs_update = True
-    if "segment_properties" not in vol.info or vol.info["segment_properties"] is None:
-        vol.info["segment_properties"] = "segment_properties"
         needs_update = True
     if needs_update:
         vol.commit_info()
@@ -294,7 +304,7 @@ def _select_mesh_mask(arr: np.ndarray, mask: str,
     raise ValueError(f"Unknown mask {mask!r}, expected 'none', 'otsu', or 'minmax'")
 
 
-def _generate_external_mesh(arr, dest_local, vol, voxel_size, voxel_offset, dust_threshold, compress, verbose,
+def _generate_external_mesh(arr, dest_local, vol, voxel_size, voxel_offset, dust_threshold, verbose,
                             mask="none", mesh_min_intensity=None, mesh_max_intensity=None,
                             mesh_percentile=None, mesh_format="legacy",
                             decimate_fraction=0.0, max_simplification_error=10):
@@ -313,13 +323,11 @@ def _generate_external_mesh(arr, dest_local, vol, voxel_size, voxel_offset, dust
     if voxel_count == 0:
         if verbose:
             print("  No non-zero voxels found, skipping mesh generation")
-        _write_segment_properties(dest_local, [], [], [])
         return
 
     if voxel_count < dust_threshold:
         if verbose:
             print(f"  Skipping mesh: only {voxel_count} non-zero voxels (< {dust_threshold})")
-        _write_segment_properties(dest_local, [], [], [])
         return
 
     all_segments = np.unique(arr)
@@ -343,13 +351,11 @@ def _generate_external_mesh(arr, dest_local, vol, voxel_size, voxel_offset, dust
     except (ValueError, RuntimeError) as e:
         if verbose:
             print(f"  Failed to generate merged mesh: {e}")
-        _write_segment_properties(dest_local, [], [], [])
         return
 
     if len(vertices) == 0 or len(faces) == 0:
         if verbose:
             print("  Merged mesh has no geometry")
-        _write_segment_properties(dest_local, [], [], [])
         return
 
     # Transform vertices to physical coordinates (resolution + offset)
@@ -371,13 +377,7 @@ def _generate_external_mesh(arr, dest_local, vol, voxel_size, voxel_offset, dust
             )
 
     mesh_obj = Mesh(vertices, faces, segid=mesh_seg_id)
-    vol.mesh.put(mesh_obj, compress=compress)
-
-    _write_segment_properties(
-        dest_local, [mesh_seg_id],
-        [f"Segment {mesh_seg_id}"],
-        ["Merged external boundary"],
-    )
+    vol.mesh.put(mesh_obj, compress=False)
 
     if verbose:
         print(f"  Wrote merged external boundary mesh (segment ID {mesh_seg_id})")
@@ -390,7 +390,7 @@ def _generate_draco_mesh(
     """CZI multi-resolution Draco mesh (see mesh_compression.generate_draco_mesh). Requires a
     SEPARATE precomputed segmentation dataset (resolution forced to [1,1,1] to work around
     a real float-precision bug in igneous -- see mesh_compression/README.md), generated in a
-    throwaway temp directory next to dest_local, with just the resulting mesh_czi/
+    throwaway temp directory next to dest_local, with just the resulting mesh_multires/
     directory moved into dest_local afterward and its resolution metadata patched to the
     real per-sample values (mesh geometry doesn't depend on this metadata, only
     display-space scaling does)."""
@@ -420,23 +420,16 @@ def _generate_draco_mesh(
     tmp_vol[:, :, :] = label_arr
 
     mesh_compression.generate_draco_mesh(
-        draco_tmp, mesh_directory="mesh_czi",
+        draco_tmp, mesh_directory="mesh_multires",
         max_simplification_error=max_simplification_error,
         mesh_shape=label_arr.shape,
     )
 
-    src_mesh = os.path.join(draco_tmp, "mesh_czi")
-    dst_mesh = os.path.join(dest_local, "mesh_czi")
+    src_mesh = os.path.join(draco_tmp, "mesh_multires")
+    dst_mesh = os.path.join(dest_local, "mesh_multires")
     if os.path.isdir(dst_mesh):
         shutil.rmtree(dst_mesh)
     shutil.move(src_mesh, dst_mesh)
-
-    # mesh_compression.generate_draco_mesh() doesn't write segment_properties itself
-    # (see its docstring) -- we always write our own here instead.
-    _write_segment_properties(
-        dest_local, [mesh_seg_id], [f"Segment {mesh_seg_id}"],
-        ["Merged external boundary (Draco)"]
-    )
 
     mesh_info_path = os.path.join(dst_mesh, "info")
     with open(mesh_info_path) as f:
@@ -451,11 +444,11 @@ def _generate_draco_mesh(
     with open(mesh_info_path, "w") as f:
         json.dump(mesh_info, f, indent=2)
 
-    # point the main dataset's info at mesh_czi/ instead of the legacy mesh/ dir
+    # point the main dataset's info at mesh_multires/ instead of the legacy mesh/ dir
     info_path = os.path.join(dest_local, "info")
     with open(info_path) as f:
         info = json.load(f)
-    info["mesh"] = "mesh_czi"
+    info["mesh"] = "mesh_multires"
     with open(info_path, "w") as f:
         json.dump(info, f, indent=2)
 
@@ -463,25 +456,6 @@ def _generate_draco_mesh(
 
     if verbose:
         print(f"  Wrote multi-resolution Draco mesh (segment ID {mesh_seg_id})")
-
-
-def _write_segment_properties(dest_local, seg_ids, seg_labels, seg_descriptions):
-    """Write segment_properties/info for Neuroglancer."""
-    seg_dir = os.path.join(dest_local, "segment_properties")
-    os.makedirs(seg_dir, exist_ok=True)
-    ids = [str(s) for s in seg_ids]
-    seg_info = {
-        "@type": "neuroglancer_segment_properties",
-        "inline": {
-            "ids": ids,
-            "properties": [
-                {"id": "label", "type": "label", "values": seg_labels},
-                {"id": "description", "type": "description", "values": seg_descriptions},
-            ],
-        },
-    }
-    with open(os.path.join(seg_dir, "info"), "w") as f:
-        json.dump(seg_info, f, indent=2)
 
 
 def main():
@@ -510,8 +484,10 @@ def main():
     parser.add_argument("--max-intensity", type=int, default=None,
                         help="Maximum segment ID/intensity to keep in the STORED volume "
                              "(destructive, values above will be set to 0)")
-    parser.add_argument("--compress", choices=["none", "gzip", "br"], default="br",
-                        help="Chunk/mesh compression codec (default: br/brotli)")
+    parser.add_argument("--generate-mesh", action="store_true",
+                        help="Generate a marching-cubes mesh from the NRRD volume's external "
+                             "boundary (default: off). Independent of --mesh-format/--mask/"
+                             "--decimate-fraction/etc, which only take effect when this is set.")
     parser.add_argument("--mask", choices=["none", "otsu", "minmax"], default="none",
                         help="OPTIONAL. 'none' (default): no mask cleanup. 'otsu': automatic "
                              "threshold, no extra params needed. 'minmax': explicit intensity "
@@ -542,6 +518,11 @@ def main():
     parser.add_argument("--force", action="store_true",
                         help="Regenerate even if --output-dir/--dataset-name already has an "
                              "info file (default: skip existing results without touching them)")
+    parser.add_argument("--compress", action="store_true",
+                        help="Zip the output neuroglancer/ folder into a single artifact "
+                             "(default: off, leaves the raw uncompressed tree as-is). "
+                             "No gzip/brotli choice anymore -- if set, this simply zips the "
+                             "whole folder; see mesh_compression/zip_output.py.")
     parser.add_argument("--verbose", action="store_true")
     args = parser.parse_args()
 
@@ -581,17 +562,15 @@ def main():
     if not dataset_name:
         dataset_name = os.path.splitext(os.path.basename(nrrd_path))[0]
 
-    compress = {"none": False, "gzip": True, "br": "br"}[args.compress]
-
     try:
-        convert_nrrd(
+        dest_local = convert_nrrd(
             nrrd_path, output_dir, dataset_name,
             threshold=args.threshold,
             dust_threshold=args.dust_threshold,
             merge_segments=args.merge_segments,
             min_intensity=args.min_intensity,
             max_intensity=args.max_intensity,
-            compress=compress,
+            generate_mesh=args.generate_mesh,
             mask=args.mask,
             mesh_min_intensity=args.mesh_min_intensity,
             mesh_max_intensity=args.mesh_max_intensity,
@@ -604,6 +583,9 @@ def main():
     finally:
         if tmp_nrrd:
             os.unlink(nrrd_path)
+
+    if args.compress:
+        mesh_compression.zip_neuroglancer_dir(dest_local, verbose=args.verbose)
 
     print(f"Done. Output at: {output_dir}/{dataset_name}")
 

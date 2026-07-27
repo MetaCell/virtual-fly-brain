@@ -41,6 +41,7 @@ import tempfile
 import numpy as np
 import nrrd
 import requests
+import trimesh
 from cloudvolume import CloudVolume
 from cloudvolume.mesh import Mesh
 
@@ -169,6 +170,7 @@ def convert_nrrd(
     mesh_format: str = "legacy",
     decimate_fraction: float = 0.0,
     max_simplification_error: int = 10,
+    mesh_obj_path: str | None = None,
     verbose: bool = True
 ):
     """Convert an NRRD volume to precomputed format with external-boundary mesh.
@@ -178,14 +180,21 @@ def convert_nrrd(
     A single mesh is generated from the outer boundary of non-zero voxels, rather than
     one mesh per segmented region.
 
+    mesh_obj_path: if given (and generate_mesh is True), the mesh is loaded from this
+    OBJ file instead of running marching cubes on the NRRD volume -- mask/mesh_format/
+    decimate_fraction/max_simplification_error are ignored in that case (see
+    _generate_mesh_from_obj). Volume chunks (0/) are still written from the NRRD either
+    way; only the mesh source changes. See vfb_pipeline.py's --mesh-from-obj.
+
     Everything below mesh-size reduction is OPTIONAL and each choice is independent --
     see mesh_compression/README.md for the full validation. Three separate decisions,
     each on its own axis (pick at most one thing per axis; axes combine freely):
 
-      1. generate_mesh: False (default) | True. Whether to generate a marching-cubes
-         mesh from the volume's external boundary at all -- off by default since most
-         instances already ship a usable volume_man.obj (see vfb_pipeline.py) and don't
-         need one regenerated from the NRRD.
+      1. generate_mesh: False (default) | True. Whether to generate a mesh from the
+         volume's external boundary at all -- off by default since most instances
+         already ship a usable volume_man.obj (see vfb_pipeline.py) and don't need one
+         regenerated from the NRRD. When True, mesh_obj_path picks the source: an
+         existing volume_man.obj (used as-is) or marching cubes on the NRRD (default).
       2. mask: "none" (default -- no mask cleanup at all) | "otsu" (automatic threshold,
          no extra params) | "minmax" (explicit band -- supply mesh_percentile for a
          per-sample floor, OR mesh_min_intensity/mesh_max_intensity for a fixed band;
@@ -278,9 +287,25 @@ def convert_nrrd(
         print(f"  Wrote precomputed volume to {dest_local}")
         print(f"  Layer type: {layer_type}")
 
-    # Generate mesh from the external boundary of all non-zero voxels
+    # Generate mesh from the external boundary of all non-zero voxels, or from an
+    # existing volume_man.obj if mesh_obj_path was given
     if is_segmentation:
-        if generate_mesh:
+        if generate_mesh and mesh_obj_path:
+            if verbose:
+                touched = []
+                if mask != "none":
+                    touched.append(f"--mask {mask}")
+                if mesh_format != "legacy":
+                    touched.append(f"--mesh-format {mesh_format}")
+                if decimate_fraction > 0:
+                    touched.append("--decimate-fraction")
+                if mesh_min_intensity is not None or mesh_max_intensity is not None or mesh_percentile is not None:
+                    touched.append("--mesh-min-intensity/--mesh-max-intensity/--mesh-percentile")
+                if touched:
+                    print(f"  WARNING: mesh_obj_path set -- {', '.join(touched)} will have no "
+                          f"effect (mesh sourced from {mesh_obj_path}, no marching cubes step runs).")
+            _generate_mesh_from_obj(mesh_obj_path, arr, dest_local, vol, verbose)
+        elif generate_mesh:
             _generate_external_mesh(
                 arr, dest_local, vol, voxel_size, voxel_offset, dust_threshold, verbose,
                 mask=mask,
@@ -435,6 +460,42 @@ def _generate_external_mesh(arr, dest_local, vol, voxel_size, voxel_offset, dust
 
     if verbose:
         print(f"  Wrote merged external boundary mesh (segment ID {mesh_seg_id})")
+
+
+def _generate_mesh_from_obj(obj_path, arr, dest_local, vol, verbose):
+    """Use an existing volume_man.obj as the mesh source instead of marching cubes
+    on the NRRD volume (see vfb_pipeline.py's --mesh-from-obj). The OBJ is used
+    as-is -- mask/mesh_format/decimate_fraction/max_simplification_error don't apply
+    here, only to the marching-cubes path in _generate_external_mesh.
+    """
+    _setup_mesh_metadata(dest_local, vol, verbose)
+
+    mesh = trimesh.load(obj_path, force="mesh")
+    if not isinstance(mesh, trimesh.Trimesh):
+        raise ValueError(f"Could not load as triangle mesh: {obj_path}")
+
+    all_segments = np.unique(arr)
+    all_segments = all_segments[all_segments > 0]
+    if len(all_segments) == 0:
+        if verbose:
+            print("  No non-zero voxels found, skipping mesh generation")
+        return
+    mesh_seg_id = int(all_segments[0])
+
+    # OBJ vertices are physical microns; Neuroglancer's precomputed world coordinates
+    # here are nanometers (matches the NRRD-derived voxel_size) -- same conversion as
+    # vfb_pipeline.write_precomputed uses for the OBJ-only path.
+    vertices = (mesh.vertices * 1000.0).astype(np.float32)
+    faces = mesh.faces.astype(np.uint32)
+
+    if verbose:
+        print(f"  Using mesh from {obj_path}: {len(vertices)} vertices, {len(faces)} faces")
+
+    mesh_obj = Mesh(vertices, faces, segid=mesh_seg_id)
+    vol.mesh.put(mesh_obj, compress=False)
+
+    if verbose:
+        print(f"  Wrote mesh from volume_man.obj (segment ID {mesh_seg_id})")
 
 
 def _generate_draco_mesh(

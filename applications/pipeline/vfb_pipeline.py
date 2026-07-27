@@ -555,6 +555,7 @@ def process_image(image_dir: str, vfb_id: str, template_id: str,
                   max_intensity: int | None = None,
                   resolution: list[float] = DEFAULT_RESOLUTION,
                   generate_mesh: bool = False,
+                  mesh_from_obj: bool = False,
                   mask: str = "none",
                   mesh_min_intensity: int | None = None,
                   mesh_max_intensity: int | None = None,
@@ -569,6 +570,14 @@ def process_image(image_dir: str, vfb_id: str, template_id: str,
     straight through to convert_nrrd.convert_nrrd() for the NRRD path -- see that
     function's docstring for what each one does. The OBJ mesh path (write_precomputed,
     above) doesn't generate a mesh from a volume mask, so none of this applies there.
+
+    mesh_from_obj: only relevant on the NRRD path (e.g. template images, which always
+    go via NRRD for their volume chunks -- see is_template_image below). When
+    generate_mesh is also set and this image directory has a usable volume_man.obj,
+    that OBJ is used as the mesh source instead of running marching cubes on the
+    NRRD volume (mask/mesh_*/decimate_fraction/max_simplification_error are then
+    ignored for this image). Falls back to marching-cubes NRRD generation, same as
+    mesh_from_obj=False, when no usable volume_man.obj exists.
     """
 
     # --overwrite: remove existing neuroglancer/ so it will be regenerated
@@ -635,7 +644,11 @@ def process_image(image_dir: str, vfb_id: str, template_id: str,
         if needs_obj:
             log.info("  Would generate: volume_man.obj from volume.swc")
         if needs_precomputed and is_template_image and status["has_nrrd"]:
-            log.info("  Would generate: neuroglancer/ (including 0/ chunks) from volume.nrrd (template image)")
+            if generate_mesh and mesh_from_obj and has_usable_obj:
+                log.info("  Would generate: neuroglancer/ (including 0/ chunks) from volume.nrrd, "
+                         "mesh from volume_man.obj (template image)")
+            else:
+                log.info("  Would generate: neuroglancer/ (including 0/ chunks) from volume.nrrd (template image)")
         elif needs_precomputed and (has_usable_obj or needs_obj):
             log.info("  Would generate: neuroglancer/ from volume_man.obj")
         elif needs_precomputed and status["has_nrrd"]:
@@ -677,7 +690,14 @@ def process_image(image_dir: str, vfb_id: str, template_id: str,
         else:
             try:
                 nrrd_path = os.path.join(image_dir, "volume.nrrd")
-                log.info("  Generating neuroglancer/ (with 0/ chunks) from NRRD: %s", nrrd_path)
+                mesh_obj_path = (os.path.join(image_dir, "volume_man.obj")
+                                 if generate_mesh and mesh_from_obj and has_usable_obj
+                                 else None)
+                if mesh_obj_path:
+                    log.info("  Generating neuroglancer/ (with 0/ chunks) from NRRD: %s, "
+                             "mesh from volume_man.obj", nrrd_path)
+                else:
+                    log.info("  Generating neuroglancer/ (with 0/ chunks) from NRRD: %s", nrrd_path)
                 # convert_nrrd writes to {output_dir}/{dataset_name}/, so passing
                 # image_dir + "neuroglancer" produces image_dir/neuroglancer/ with
                 # the 0/ chunk directory, mesh/, segment_properties/ all inside it.
@@ -696,6 +716,7 @@ def process_image(image_dir: str, vfb_id: str, template_id: str,
                     mesh_format=mesh_format,
                     decimate_fraction=decimate_fraction,
                     max_simplification_error=max_simplification_error,
+                    mesh_obj_path=mesh_obj_path,
                     verbose=log.isEnabledFor(logging.DEBUG),
                 )
                 result["precomputed_generated"] = True
@@ -756,9 +777,20 @@ def main():
                         help="Maximum segment ID/intensity to keep in the STORED volume "
                              "(destructive, values above will be set to 0)")
     parser.add_argument("--generate-mesh", action="store_true",
-                        help="NRRD path only. Generate a marching-cubes mesh from the volume's "
-                             "external boundary (default: off) -- most instances already have a "
-                             "usable volume_man.obj and don't need one regenerated from the NRRD.")
+                        help="NRRD path only. Generate a mesh for the volume (default: off) -- "
+                             "most instances already have a usable volume_man.obj and don't need "
+                             "one regenerated from the NRRD. By default this runs marching cubes "
+                             "on the volume's external boundary; pass --mesh-from-obj to source "
+                             "the mesh from an existing volume_man.obj instead.")
+    parser.add_argument("--mesh-from-obj", action="store_true",
+                        help="With --generate-mesh: if this image directory has a usable "
+                             "volume_man.obj, use it as the mesh source instead of running "
+                             "marching cubes on the NRRD volume -- --mask/--mesh-*/"
+                             "--decimate-fraction/--max-simplification-error are ignored for "
+                             "that image, since no marching-cubes step runs. Falls back to "
+                             "marching-cubes NRRD generation, same as without this flag, when no "
+                             "usable volume_man.obj exists. Volume chunks (0/) are still "
+                             "generated from the NRRD either way -- only the mesh source changes.")
     parser.add_argument("--mask", choices=["none", "otsu", "minmax"], default="none",
                         help="NRRD path, OPTIONAL. 'none' (default): no mask cleanup. 'otsu': "
                              "automatic threshold. 'minmax': explicit band -- also set "
@@ -915,6 +947,7 @@ def main():
             max_intensity=args.max_intensity,
             resolution=args.resolution,
             generate_mesh=args.generate_mesh,
+            mesh_from_obj=args.mesh_from_obj,
             mask=args.mask,
             mesh_min_intensity=args.mesh_min_intensity,
             mesh_max_intensity=args.mesh_max_intensity,

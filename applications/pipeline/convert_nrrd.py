@@ -482,10 +482,16 @@ def _generate_mesh_from_obj(obj_path, arr, dest_local, vol, verbose):
         return
     mesh_seg_id = int(all_segments[0])
 
-    # OBJ vertices are physical microns; Neuroglancer's precomputed world coordinates
-    # here are nanometers (matches the NRRD-derived voxel_size) -- same conversion as
-    # vfb_pipeline.write_precomputed uses for the OBJ-only path.
-    vertices = (mesh.vertices * 1000.0).astype(np.float32)
+    # OBJ vertices are physical microns, same as this dataset's voxel_size (detected
+    # straight from the NRRD header's "space directions"/"spacings", themselves in
+    # microns -- see detect_spacing() and README.md's template voxel-size table, e.g.
+    # JRC2018Unisex 0.519 um). No unit conversion here: unlike vfb_pipeline's standalone
+    # write_precomputed() (OBJ-only path, no NRRD to read a voxel_size from -- it uses
+    # a hardcoded nm-scale resolution and therefore multiplies vertices by 1000 to
+    # bridge um->nm), this vol's resolution field is already in the same microns as the
+    # OBJ. Applying that *1000.0 here would make the mesh ~1000x too big relative to
+    # this volume's own grid.
+    vertices = mesh.vertices.astype(np.float32)
     faces = mesh.faces.astype(np.uint32)
 
     if verbose:

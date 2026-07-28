@@ -571,13 +571,14 @@ def process_image(image_dir: str, vfb_id: str, template_id: str,
     function's docstring for what each one does. The OBJ mesh path (write_precomputed,
     above) doesn't generate a mesh from a volume mask, so none of this applies there.
 
-    mesh_from_obj: only relevant on the NRRD path (e.g. template images, which always
-    go via NRRD for their volume chunks -- see is_template_image below). When
-    generate_mesh is also set and this image directory has a usable volume_man.obj,
-    that OBJ is used as the mesh source instead of running marching cubes on the
-    NRRD volume (mask/mesh_*/decimate_fraction/max_simplification_error are then
-    ignored for this image). Falls back to marching-cubes NRRD generation, same as
-    mesh_from_obj=False, when no usable volume_man.obj exists.
+    mesh_from_obj: only relevant when generate_mesh is also set. generate_mesh forces
+    the NRRD path (even for a non-template image that would otherwise take the
+    lightweight OBJ-only path) -- mesh_from_obj then picks the mesh source within it:
+    if this image directory has a usable volume_man.obj, that OBJ is used as the mesh
+    source instead of running marching cubes on the NRRD volume (mask/mesh_*/
+    decimate_fraction/max_simplification_error are then ignored for this image).
+    Falls back to marching-cubes NRRD generation, same as mesh_from_obj=False, when no
+    usable volume_man.obj exists.
     """
 
     # --overwrite: remove existing neuroglancer/ so it will be regenerated
@@ -643,16 +644,21 @@ def process_image(image_dir: str, vfb_id: str, template_id: str,
     if dry_run:
         if needs_obj:
             log.info("  Would generate: volume_man.obj from volume.swc")
-        if needs_precomputed and is_template_image and status["has_nrrd"]:
-            if generate_mesh and mesh_from_obj and has_usable_obj:
+        # Mirrors the real Step 2a/2b dispatch below (has_usable_obj may still flip to
+        # True post-dry-run once Step 1 actually generates the OBJ from SWC).
+        predicted_has_obj = has_usable_obj or needs_obj
+        predicted_use_nrrd = status["has_nrrd"] and (
+            is_template_image or not predicted_has_obj or generate_mesh
+        )
+        suffix = " (template image)" if is_template_image else ""
+        if needs_precomputed and predicted_use_nrrd:
+            if generate_mesh and mesh_from_obj and predicted_has_obj:
                 log.info("  Would generate: neuroglancer/ (including 0/ chunks) from volume.nrrd, "
-                         "mesh from volume_man.obj (template image)")
+                         "mesh from volume_man.obj%s", suffix)
             else:
-                log.info("  Would generate: neuroglancer/ (including 0/ chunks) from volume.nrrd (template image)")
-        elif needs_precomputed and (has_usable_obj or needs_obj):
+                log.info("  Would generate: neuroglancer/ (including 0/ chunks) from volume.nrrd%s", suffix)
+        elif needs_precomputed and predicted_has_obj:
             log.info("  Would generate: neuroglancer/ from volume_man.obj")
-        elif needs_precomputed and status["has_nrrd"]:
-            log.info("  Would generate: neuroglancer/ (including 0/ chunks) from volume.nrrd")
         return result
 
     # Step 1: Generate OBJ from SWC if needed
@@ -666,9 +672,13 @@ def process_image(image_dir: str, vfb_id: str, template_id: str,
             log.error("  ERROR generating OBJ: %s", e)
             return result
 
-    # For template images, prefer the NRRD path so volume chunks are produced.
+    # Template images always need volume chunks, so always go via NRRD. Non-template
+    # images with a usable obj normally take the lightweight OBJ-only path (Step 2a)
+    # and skip NRRD entirely -- but generate_mesh is an explicit request to run the
+    # NRRD-based mesh pipeline, so it forces the NRRD path too, for any image;
+    # mesh_from_obj then picks the mesh source within it (see Step 2b below).
     use_nrrd_path = needs_precomputed and status["has_nrrd"] and (
-        is_template_image or not has_usable_obj
+        is_template_image or not has_usable_obj or generate_mesh
     )
 
     # Step 2a: Generate precomputed from OBJ (mesh-only)
@@ -777,11 +787,13 @@ def main():
                         help="Maximum segment ID/intensity to keep in the STORED volume "
                              "(destructive, values above will be set to 0)")
     parser.add_argument("--generate-mesh", action="store_true",
-                        help="NRRD path only. Generate a mesh for the volume (default: off) -- "
-                             "most instances already have a usable volume_man.obj and don't need "
-                             "one regenerated from the NRRD. By default this runs marching cubes "
-                             "on the volume's external boundary; pass --mesh-from-obj to source "
-                             "the mesh from an existing volume_man.obj instead.")
+                        help="Generate a mesh for the volume (default: off) -- most instances "
+                             "already have a usable volume_man.obj and don't need one regenerated. "
+                             "Forces the NRRD path (with 0/ volume chunks) even for a non-template "
+                             "image that would otherwise take the lightweight OBJ-only path. By "
+                             "default this runs marching cubes on the volume's external boundary; "
+                             "pass --mesh-from-obj to source the mesh from an existing "
+                             "volume_man.obj instead.")
     parser.add_argument("--mesh-from-obj", action="store_true",
                         help="With --generate-mesh: if this image directory has a usable "
                              "volume_man.obj, use it as the mesh source instead of running "

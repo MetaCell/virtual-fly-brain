@@ -183,6 +183,7 @@ def convert_nrrd(
     decimate_fraction: float = 0.0,
     max_simplification_error: int = 10,
     mesh_obj_path: str | None = None,
+    mesh_obj_swap_xz: bool = False,
     verbose: bool = True
 ):
     """Convert an NRRD volume to precomputed format with external-boundary mesh.
@@ -197,6 +198,11 @@ def convert_nrrd(
     decimate_fraction/max_simplification_error are ignored in that case (see
     _generate_mesh_from_obj). Volume chunks (0/) are still written from the NRRD either
     way; only the mesh source changes. See vfb_pipeline.py's --mesh-from-obj.
+
+    mesh_obj_swap_xz: pass True when mesh_obj_path is a pre-existing external obj built
+    upstream directly off the raw NRRD array (Z,Y,X order) rather than one generated
+    from a .swc file this run -- see vfb_pipeline.write_precomputed()'s swap_xz for the
+    full explanation and how it's determined per-image.
 
     Everything below mesh-size reduction is OPTIONAL and each choice is independent --
     see mesh_compression/README.md for the full validation. Three separate decisions,
@@ -316,7 +322,8 @@ def convert_nrrd(
                 if touched:
                     print(f"  WARNING: mesh_obj_path set -- {', '.join(touched)} will have no "
                           f"effect (mesh sourced from {mesh_obj_path}, no marching cubes step runs).")
-            _generate_mesh_from_obj(mesh_obj_path, arr, dest_local, vol, verbose)
+            _generate_mesh_from_obj(mesh_obj_path, arr, dest_local, vol, verbose,
+                                     swap_xz=mesh_obj_swap_xz)
         elif generate_mesh:
             _generate_external_mesh(
                 arr, dest_local, vol, voxel_size, voxel_offset, dust_threshold, verbose,
@@ -474,17 +481,23 @@ def _generate_external_mesh(arr, dest_local, vol, voxel_size, voxel_offset, dust
         print(f"  Wrote merged external boundary mesh (segment ID {mesh_seg_id})")
 
 
-def _generate_mesh_from_obj(obj_path, arr, dest_local, vol, verbose):
+def _generate_mesh_from_obj(obj_path, arr, dest_local, vol, verbose, swap_xz=False):
     """Use an existing volume_man.obj as the mesh source instead of marching cubes
     on the NRRD volume (see vfb_pipeline.py's --mesh-from-obj). The OBJ is used
     as-is -- mask/mesh_format/decimate_fraction/max_simplification_error don't apply
     here, only to the marching-cubes path in _generate_external_mesh.
+
+    swap_xz: True for a pre-existing external obj stored in NRRD's native (Z, Y, X)
+    order instead of (X, Y, Z) -- see vfb_pipeline.write_precomputed()'s swap_xz.
     """
     _setup_mesh_metadata(dest_local, vol, verbose)
 
     mesh = trimesh.load(obj_path, force="mesh")
     if not isinstance(mesh, trimesh.Trimesh):
         raise ValueError(f"Could not load as triangle mesh: {obj_path}")
+
+    if swap_xz:
+        mesh.vertices = mesh.vertices[:, [2, 1, 0]]
 
     all_segments = np.unique(arr)
     all_segments = all_segments[all_segments > 0]

@@ -42,6 +42,10 @@ class RangeCORSRequestHandler(http.server.SimpleHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Methods", "GET, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type, Range")
+        self.send_header(
+            "Access-Control-Expose-Headers",
+            "Content-Length, Content-Range, Accept-Ranges",
+        )
         self.send_header("Accept-Ranges", "bytes")
         super().end_headers()
 

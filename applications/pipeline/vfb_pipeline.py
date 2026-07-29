@@ -78,10 +78,15 @@ from cloudvolume.mesh import Mesh
 
 # Import NRRD converter (same package)
 try:
-    from convert_nrrd import convert_nrrd as _convert_nrrd, validate_mesh_params as _validate_mesh_params
+    from convert_nrrd import (
+        convert_nrrd as _convert_nrrd,
+        validate_mesh_params as _validate_mesh_params,
+        read_nrrd_voxel_size as _read_nrrd_voxel_size,
+    )
 except ImportError:
     _convert_nrrd = None
     _validate_mesh_params = None
+    _read_nrrd_voxel_size = None
 
 import mesh_compression
 
@@ -92,8 +97,10 @@ import mesh_compression
 IMAGE_ROOT = "/IMAGE_WRITE"
 VFB_DATA_DIR = os.path.join(IMAGE_ROOT, "VFB", "i")
 
-# Default resolution for JRC2018Unisex template (nm)
-DEFAULT_RESOLUTION = [518.9161, 518.9161, 1000.0]
+# Fallback resolution (um, JRC2018Unisex), used by write_precomputed() ONLY when an
+# image directory has no volume.nrrd of its own to read the real voxel size from --
+# see process_image()'s Step 2a and read_nrrd_voxel_size() in convert_nrrd.py.
+DEFAULT_RESOLUTION = [0.5189161, 0.5189161, 1.0]
 
 # Default processing order when --template is not given.
 # Templates listed here are processed first, in order; any others come after.
@@ -481,7 +488,18 @@ def generate_obj_from_swc(image_dir: str) -> str:
 def write_precomputed(obj_path: str, output_dir: str,
                       resolution: list[float] = DEFAULT_RESOLUTION,
                       segment_id: int = 1):
-    """Convert OBJ mesh to Neuroglancer precomputed format (uncompressed)."""
+    """Convert OBJ mesh to Neuroglancer precomputed format (uncompressed).
+
+    `resolution` must be in the OBJ's own physical units (microns), matching
+    whatever this image's (or its template's) volume.nrrd header reports via
+    detect_spacing() -- see process_image()'s Step 2a, which resolves this per
+    image before calling here. No unit conversion is applied to the mesh: OBJ
+    vertices are already physical microns, same as `resolution`, so the two stay
+    in the same coordinate space as the NRRD path (convert_nrrd.py) -- these used
+    to disagree by a hardcoded 1000x nm conversion here, which misaligned/oversized
+    OBJ-path meshes relative to anything produced via the NRRD path (e.g. templates,
+    always NRRD-path -- see is_template_image in process_image()).
+    """
 
     mesh = trimesh.load(obj_path, force="mesh")
     if not isinstance(mesh, trimesh.Trimesh):
@@ -493,19 +511,19 @@ def write_precomputed(obj_path: str, output_dir: str,
     os.makedirs(output_dir, exist_ok=True)
     dest = "file://" + output_dir
 
-    # OBJ vertices from VFB are in physical microns, but Neuroglancer's precomputed
-    # world coordinates (and this function's "resolution" arg, e.g. DEFAULT_RESOLUTION's
-    # 518.9161/1000.0) are nanometers -- without this conversion the mesh renders at
-    # 1/1000th its real size (a ~16 micron structure collapses to ~16nm, indistinguishable
-    # from a point/degenerate box in the viewer).
-    mesh.vertices = mesh.vertices * 1000.0
-
     mesh_max = mesh.vertices.max(axis=0)
     mesh_min = mesh.vertices.min(axis=0)
     size = [
         int(np.ceil((mesh_max[i] - mesh_min[i]) / resolution[i])) + 2
         for i in range(3)
     ]
+    # voxel_offset is in VOXEL units (physical origin = voxel_offset * resolution) --
+    # anchor the declared grid at the mesh's own bounding box, not [0, 0, 0]. A mesh
+    # that isn't near world-origin (e.g. an individual neuron registered onto a
+    # whole-brain template, sitting at physical position ~300+ instead of ~0) would
+    # otherwise declare a grid nowhere near its actual vertices, and Neuroglancer's
+    # default camera (centered on the declared grid) would never show it.
+    voxel_offset = [int(np.floor(mesh_min[i] / resolution[i])) for i in range(3)]
 
     info = {
         "data_type": "uint32",
@@ -518,7 +536,7 @@ def write_precomputed(obj_path: str, output_dir: str,
             "key": "0",
             "resolution": resolution,
             "size": size,
-            "voxel_offset": [0, 0, 0],
+            "voxel_offset": voxel_offset,
         }],
     }
 
@@ -686,7 +704,20 @@ def process_image(image_dir: str, vfb_id: str, template_id: str,
         try:
             obj_path = os.path.join(image_dir, "volume_man.obj")
             ng_dir = os.path.join(image_dir, "neuroglancer")
-            write_precomputed(obj_path, ng_dir, resolution=resolution)
+            # Prefer this image's own volume.nrrd header for the physical voxel size --
+            # matches the NRRD path's convention exactly (see convert_nrrd.detect_spacing),
+            # so an OBJ-path mesh sits in the same coordinate space as anything produced
+            # via the NRRD path (e.g. the template it's aligned to). Only falls back to
+            # the passed-in `resolution` (default: DEFAULT_RESOLUTION) when this image
+            # has no volume.nrrd of its own to read.
+            obj_resolution = resolution
+            if status["has_nrrd"] and _read_nrrd_voxel_size is not None:
+                try:
+                    obj_resolution = _read_nrrd_voxel_size(os.path.join(image_dir, "volume.nrrd"))
+                except Exception as e:
+                    log.warning("  [%s] Could not read volume.nrrd header for resolution, "
+                                "falling back to %s: %s", vfb_id, resolution, e)
+            write_precomputed(obj_path, ng_dir, resolution=obj_resolution)
             result["precomputed_generated"] = True
         except Exception as e:
             result["error"] = f"Precomputed generation failed: {e}"
@@ -773,7 +804,11 @@ def main():
                              "(vfb_id == template_id) is processed first.")
     parser.add_argument("--resolution", type=float, nargs=3,
                         default=DEFAULT_RESOLUTION,
-                        help="Voxel resolution in nm [x y z]")
+                        help="Fallback voxel resolution in um [x y z] (default: JRC2018U) for "
+                             "the OBJ-only mesh path -- only used when an image directory has no "
+                             "volume.nrrd of its own; when it does, that file's own header "
+                             "spacing is used instead, to stay in the same coordinate space as "
+                             "the NRRD path (see process_image()'s Step 2a).")
     parser.add_argument("--force", action="store_true",
                         help="Regenerate even if output already exists")
     parser.add_argument("--overwrite", action="store_true",

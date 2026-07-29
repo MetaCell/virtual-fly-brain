@@ -95,6 +95,18 @@ def detect_origin(header: dict) -> list[float]:
     return [0.0, 0.0, 0.0]
 
 
+def read_nrrd_voxel_size(nrrd_path: str) -> list[float]:
+    """Read just the voxel spacing from an NRRD file's header (no data array read) --
+    native header units, no conversion, same convention as convert_nrrd()'s own
+    voxel_size (see detect_spacing()). Used by vfb_pipeline.py so its OBJ-only mesh
+    path can match the physical scale of this image's (or its template's) NRRD,
+    instead of a hardcoded resolution -- keeping both conversion paths in the same
+    coordinate space.
+    """
+    header = nrrd.read_header(nrrd_path)
+    return detect_spacing(header)
+
+
 def validate_mesh_params(mask: str, mesh_min_intensity: int | None, mesh_max_intensity: int | None,
                           mesh_percentile: float | None, mesh_format: str, decimate_fraction: float,
                           generate_mesh: bool, verbose: bool = True) -> None:

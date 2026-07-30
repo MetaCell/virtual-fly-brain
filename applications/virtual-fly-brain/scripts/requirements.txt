@@ -10,7 +10,6 @@ pynrrd>=1.0.0
 
 # Neuroglancer precomputed format
 cloud-volume>=8.0.0
-neuroglancer>=2.0
 
 # Mesh generation and image processing
 scikit-image>=0.18.0

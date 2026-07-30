@@ -69,6 +69,7 @@ import shutil
 import sys
 import time
 import types
+import zipfile
 from pathlib import Path
 
 import numpy as np
@@ -78,10 +79,15 @@ from cloudvolume.mesh import Mesh
 
 # Import NRRD converter (same package)
 try:
-    from convert_nrrd import convert_nrrd as _convert_nrrd, validate_mesh_params as _validate_mesh_params
+    from convert_nrrd import (
+        convert_nrrd as _convert_nrrd,
+        validate_mesh_params as _validate_mesh_params,
+        read_nrrd_voxel_size as _read_nrrd_voxel_size,
+    )
 except ImportError:
     _convert_nrrd = None
     _validate_mesh_params = None
+    _read_nrrd_voxel_size = None
 
 import mesh_compression
 
@@ -92,8 +98,10 @@ import mesh_compression
 IMAGE_ROOT = "/IMAGE_WRITE"
 VFB_DATA_DIR = os.path.join(IMAGE_ROOT, "VFB", "i")
 
-# Default resolution for JRC2018Unisex template (nm)
-DEFAULT_RESOLUTION = [518.9161, 518.9161, 1000.0]
+# Fallback resolution (um, JRC2018Unisex), used by write_precomputed() ONLY when an
+# image directory has no volume.nrrd of its own to read the real voxel size from --
+# see process_image()'s Step 2a and read_nrrd_voxel_size() in convert_nrrd.py.
+DEFAULT_RESOLUTION = [0.5189161, 0.5189161, 1.0]
 
 # Default processing order when --template is not given.
 # Templates listed here are processed first, in order; any others come after.
@@ -329,9 +337,25 @@ def has_faces(obj_path: str) -> bool:
     return False
 
 
+def _zip_has_volume_chunks(zip_path: Path) -> bool:
+    """Whether a compressed neuroglancer.zip contains 0/ volume chunks, without
+    extracting anything -- mirrors the uncompressed (d / "neuroglancer" / "0").is_dir()
+    check for the case where the source folder was removed after zipping (see
+    process_image()'s compress step)."""
+    try:
+        with zipfile.ZipFile(zip_path) as zf:
+            return any(n.startswith("0/") for n in zf.namelist())
+    except zipfile.BadZipFile:
+        return False
+
+
 def classify_dir(image_dir: str) -> dict:
     """Classify what files exist and what needs to be done for an image directory."""
     d = Path(image_dir)
+    ng_dir = d / "neuroglancer"
+    ng_zip = d / "neuroglancer.zip"
+    has_ng_dir = (ng_dir / "info").is_file()
+    has_ng_zip = ng_zip.is_file()
     return {
         "has_swc": (d / "volume.swc").is_file(),
         "has_nrrd": (d / "volume.nrrd").is_file(),
@@ -341,10 +365,16 @@ def classify_dir(image_dir: str) -> dict:
             if (d / "volume_man.obj").is_file()
             else False
         ),
-        "has_neuroglancer": (d / "neuroglancer" / "info").is_file(),
+        # --compress removes neuroglancer/ after zipping it (see process_image()), so
+        # a completed compressed instance only has neuroglancer.zip, no folder.
+        "has_neuroglancer": has_ng_dir or has_ng_zip,
         # 0/ directory holds the volume chunks. Mesh-only outputs from
-        # write_precomputed() have neuroglancer/info but no neuroglancer/0/.
-        "has_volume_chunks": (d / "neuroglancer" / "0").is_dir(),
+        # write_precomputed() have neuroglancer/info but no neuroglancer/0/. Checked
+        # inside the zip too, since compress removes the loose folder.
+        "has_volume_chunks": (
+            (ng_dir / "0").is_dir()
+            or (has_ng_zip and _zip_has_volume_chunks(ng_zip))
+        ),
     }
 
 
@@ -480,12 +510,35 @@ def generate_obj_from_swc(image_dir: str) -> str:
 
 def write_precomputed(obj_path: str, output_dir: str,
                       resolution: list[float] = DEFAULT_RESOLUTION,
-                      segment_id: int = 1):
-    """Convert OBJ mesh to Neuroglancer precomputed format (uncompressed)."""
+                      segment_id: int = 1, swap_xz: bool = False):
+    """Convert OBJ mesh to Neuroglancer precomputed format (uncompressed).
+
+    `resolution` must be in the OBJ's own physical units (microns), matching
+    whatever this image's (or its template's) volume.nrrd header reports via
+    detect_spacing() -- see process_image()'s Step 2a, which resolves this per
+    image before calling here. No unit conversion is applied to the mesh: OBJ
+    vertices are already physical microns, same as `resolution`, so the two stay
+    in the same coordinate space as the NRRD path (convert_nrrd.py) -- these used
+    to disagree by a hardcoded 1000x nm conversion here, which misaligned/oversized
+    OBJ-path meshes relative to anything produced via the NRRD path (e.g. templates,
+    always NRRD-path -- see is_template_image in process_image()).
+
+    swap_xz: some pre-existing volume_man.obj files (built upstream directly off the
+    raw NRRD array) store vertices in NRRD's native (Z, Y, X) order instead of
+    Neuroglancer's (X, Y, Z) -- the same axis reshuffle convert_nrrd.py applies via
+    np.transpose(data, (2, 1, 0)) for the volume itself. Confirmed empirically
+    (VFB_jrchk0ew): obj column 0 matched the correct physical Z range, column 2
+    matched X, column 1 (Y) was already correct. Only pass True for such
+    pre-existing objs -- ones generate_obj_from_swc() builds from a .swc file this
+    run are already in true X,Y,Z (no NRRD array involved) and must NOT be swapped.
+    """
 
     mesh = trimesh.load(obj_path, force="mesh")
     if not isinstance(mesh, trimesh.Trimesh):
         raise ValueError("Could not load as triangle mesh: " + obj_path)
+
+    if swap_xz:
+        mesh.vertices = mesh.vertices[:, [2, 1, 0]]
 
     log.info("  Writing precomputed: %s (%d verts, %d faces)",
              output_dir, len(mesh.vertices), len(mesh.faces))
@@ -493,19 +546,19 @@ def write_precomputed(obj_path: str, output_dir: str,
     os.makedirs(output_dir, exist_ok=True)
     dest = "file://" + output_dir
 
-    # OBJ vertices from VFB are in physical microns, but Neuroglancer's precomputed
-    # world coordinates (and this function's "resolution" arg, e.g. DEFAULT_RESOLUTION's
-    # 518.9161/1000.0) are nanometers -- without this conversion the mesh renders at
-    # 1/1000th its real size (a ~16 micron structure collapses to ~16nm, indistinguishable
-    # from a point/degenerate box in the viewer).
-    mesh.vertices = mesh.vertices * 1000.0
-
     mesh_max = mesh.vertices.max(axis=0)
     mesh_min = mesh.vertices.min(axis=0)
     size = [
         int(np.ceil((mesh_max[i] - mesh_min[i]) / resolution[i])) + 2
         for i in range(3)
     ]
+    # voxel_offset is in VOXEL units (physical origin = voxel_offset * resolution) --
+    # anchor the declared grid at the mesh's own bounding box, not [0, 0, 0]. A mesh
+    # that isn't near world-origin (e.g. an individual neuron registered onto a
+    # whole-brain template, sitting at physical position ~300+ instead of ~0) would
+    # otherwise declare a grid nowhere near its actual vertices, and Neuroglancer's
+    # default camera (centered on the declared grid) would never show it.
+    voxel_offset = [int(np.floor(mesh_min[i] / resolution[i])) for i in range(3)]
 
     info = {
         "data_type": "uint32",
@@ -518,7 +571,7 @@ def write_precomputed(obj_path: str, output_dir: str,
             "key": "0",
             "resolution": resolution,
             "size": size,
-            "voxel_offset": [0, 0, 0],
+            "voxel_offset": voxel_offset,
         }],
     }
 
@@ -581,14 +634,24 @@ def process_image(image_dir: str, vfb_id: str, template_id: str,
     usable volume_man.obj exists.
     """
 
-    # --overwrite: remove existing neuroglancer/ so it will be regenerated
+    # --overwrite: remove existing neuroglancer/ (and/or its zipped artifact -- see
+    # the compress step below, which removes the folder after zipping, so a
+    # completed --compress run leaves only neuroglancer.zip) so it will be regenerated
     ng_dir = os.path.join(image_dir, "neuroglancer")
-    if overwrite and os.path.isdir(ng_dir):
-        if dry_run:
-            log.info("  [%s] Would delete existing neuroglancer/ for overwrite", vfb_id)
-        else:
-            log.info("  [%s] Deleting existing neuroglancer/ (--overwrite)", vfb_id)
-            shutil.rmtree(ng_dir)
+    ng_zip = ng_dir + ".zip"
+    if overwrite:
+        if os.path.isdir(ng_dir):
+            if dry_run:
+                log.info("  [%s] Would delete existing neuroglancer/ for overwrite", vfb_id)
+            else:
+                log.info("  [%s] Deleting existing neuroglancer/ (--overwrite)", vfb_id)
+                shutil.rmtree(ng_dir)
+        if os.path.isfile(ng_zip):
+            if dry_run:
+                log.info("  [%s] Would delete existing neuroglancer.zip for overwrite", vfb_id)
+            else:
+                log.info("  [%s] Deleting existing neuroglancer.zip (--overwrite)", vfb_id)
+                os.remove(ng_zip)
 
     status = classify_dir(image_dir)
     result = {
@@ -616,11 +679,18 @@ def process_image(image_dir: str, vfb_id: str, template_id: str,
             and status["has_neuroglancer"]
             and not status["has_volume_chunks"]):
         needs_precomputed = True
-        # Wipe the mesh-only output so convert_nrrd writes a clean tree.
+        # Wipe the mesh-only output (folder and/or its zipped artifact -- compress
+        # removes the folder after zipping, see the compress step below) so
+        # convert_nrrd writes a clean tree.
         ng_path = Path(image_dir) / "neuroglancer"
-        if not dry_run and ng_path.is_dir():
-            log.info("  [%s] Existing neuroglancer/ has no 0/ chunks — removing for regeneration", vfb_id)
-            shutil.rmtree(ng_path)
+        ng_zip_path = Path(ng_zip)
+        if not dry_run:
+            if ng_path.is_dir():
+                log.info("  [%s] Existing neuroglancer/ has no 0/ chunks — removing for regeneration", vfb_id)
+                shutil.rmtree(ng_path)
+            if ng_zip_path.is_file():
+                log.info("  [%s] Existing neuroglancer.zip has no 0/ chunks — removing for regeneration", vfb_id)
+                ng_zip_path.unlink()
     has_usable_obj = status["has_obj_man"] and status["has_obj_man_faces"]
 
     if force:
@@ -686,7 +756,25 @@ def process_image(image_dir: str, vfb_id: str, template_id: str,
         try:
             obj_path = os.path.join(image_dir, "volume_man.obj")
             ng_dir = os.path.join(image_dir, "neuroglancer")
-            write_precomputed(obj_path, ng_dir, resolution=resolution)
+            # Prefer this image's own volume.nrrd header for the physical voxel size --
+            # matches the NRRD path's convention exactly (see convert_nrrd.detect_spacing),
+            # so an OBJ-path mesh sits in the same coordinate space as anything produced
+            # via the NRRD path (e.g. the template it's aligned to). Only falls back to
+            # the passed-in `resolution` (default: DEFAULT_RESOLUTION) when this image
+            # has no volume.nrrd of its own to read.
+            obj_resolution = resolution
+            if status["has_nrrd"] and _read_nrrd_voxel_size is not None:
+                try:
+                    obj_resolution = _read_nrrd_voxel_size(os.path.join(image_dir, "volume.nrrd"))
+                except Exception as e:
+                    log.warning("  [%s] Could not read volume.nrrd header for resolution, "
+                                "falling back to %s: %s", vfb_id, resolution, e)
+            # status["has_obj_man_faces"] reflects classify_dir()'s PRE-run snapshot --
+            # True only if the obj already existed (and had faces) before Step 1 ran,
+            # i.e. a pre-existing external obj (needs the Z,Y,X->X,Y,Z swap), never one
+            # generate_obj_from_swc() just built this run from a .swc.
+            write_precomputed(obj_path, ng_dir, resolution=obj_resolution,
+                               swap_xz=status["has_obj_man_faces"])
             result["precomputed_generated"] = True
         except Exception as e:
             result["error"] = f"Precomputed generation failed: {e}"
@@ -727,6 +815,10 @@ def process_image(image_dir: str, vfb_id: str, template_id: str,
                     decimate_fraction=decimate_fraction,
                     max_simplification_error=max_simplification_error,
                     mesh_obj_path=mesh_obj_path,
+                    # status["has_obj_man_faces"] is classify_dir()'s pre-run snapshot --
+                    # True only for a pre-existing external obj (needs the swap), never
+                    # one generate_obj_from_swc() just built this run.
+                    mesh_obj_swap_xz=bool(mesh_obj_path) and status["has_obj_man_faces"],
                     verbose=log.isEnabledFor(logging.DEBUG),
                 )
                 result["precomputed_generated"] = True
@@ -737,6 +829,10 @@ def process_image(image_dir: str, vfb_id: str, template_id: str,
     if result["precomputed_generated"] and compress:
         try:
             mesh_compression.zip_neuroglancer_dir(ng_dir, verbose=log.isEnabledFor(logging.DEBUG))
+            # Remove the uncompressed source now that it's safely inside the zip --
+            # otherwise both copies linger on disk (see classify_dir(), which treats
+            # neuroglancer.zip alone as a complete, already-done output).
+            shutil.rmtree(ng_dir)
         except Exception as e:
             result["error"] = f"Zipping neuroglancer/ failed: {e}"
             log.error("  ERROR zipping neuroglancer/: %s", e)
@@ -773,7 +869,11 @@ def main():
                              "(vfb_id == template_id) is processed first.")
     parser.add_argument("--resolution", type=float, nargs=3,
                         default=DEFAULT_RESOLUTION,
-                        help="Voxel resolution in nm [x y z]")
+                        help="Fallback voxel resolution in um [x y z] (default: JRC2018U) for "
+                             "the OBJ-only mesh path -- only used when an image directory has no "
+                             "volume.nrrd of its own; when it does, that file's own header "
+                             "spacing is used instead, to stay in the same coordinate space as "
+                             "the NRRD path (see process_image()'s Step 2a).")
     parser.add_argument("--force", action="store_true",
                         help="Regenerate even if output already exists")
     parser.add_argument("--overwrite", action="store_true",

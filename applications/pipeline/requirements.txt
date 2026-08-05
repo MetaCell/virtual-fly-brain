@@ -1,0 +1,29 @@
+# Core dependencies
+numpy>=1.20.0
+requests>=2.25.0
+
+# NRRD file handling
+pynrrd>=1.0.0
+
+# Neuroglancer precomputed format
+cloud-volume>=8.0.0
+
+# Mesh generation and processing
+scikit-image>=0.18.0
+scipy>=1.7.0
+trimesh>=3.10.0
+pyfqmr>=0.5.0  # legacy mesh decimation (mesh_compression --decimate-fraction)
+
+# Multi-resolution Draco mesh generation (mesh_compression --mesh-format multires_draco)
+igneous-pipeline==4.36.0
+zmesh>=1.13.1
+DracoPy>=1.7.0
+
+# VFB Knowledge Base connectivity (optional, for --use-kb mode)
+vfb-connect>=2.0.0
+
+# SWC to mesh conversion
+navis>=1.0.0
+
+# OBJ file parsing (included with trimesh)
+# trimesh handles OBJ natively

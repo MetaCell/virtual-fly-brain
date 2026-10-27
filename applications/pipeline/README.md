@@ -2,23 +2,64 @@
 
 ## Overview
 
-This repository contains scripts and documentation for converting Virtual Fly Brain (VFB) image files into [Neuroglancer precomputed format](https://github.com/google/neuroglancer/tree/master/src/datasource/precomputed) for use in Neuroglancer/Neuroglass viewers.
+This folder converts Virtual Fly Brain (VFB) image files into [Neuroglancer precomputed format](https://github.com/google/neuroglancer/tree/master/src/datasource/precomputed) for the Neuroglancer/Neuroglass viewer.
 
 VFB image data lives at `https://www.virtualflybrain.org/data/VFB/i/{first4}/{last4}/{template_id}/` and contains several file types per image:
 
 | File | Format | Description |
 |------|--------|-------------|
-| `volume.nrrd` | NRRD | 3D volumetric voxel data |
-| `volume_man.obj` | OBJ mesh | Manually curated or generated mesh (vertices + faces) |
+| `volume.nrrd` | NRRD | 3D volumetric voxel data (uint8, X Y Z, microns) |
+| `volume_man.obj` | OBJ mesh | Manually curated or generated mesh (vertices + faces, X Y Z, microns) |
 | `volume.obj` | OBJ point cloud | Auto-generated point cloud (vertices only, no faces) |
-| `volume.swc` | SWC | Neuron skeleton/morphology tracing |
+| `volume.swc` | SWC | Neuron skeleton/morphology tracing (microns) |
 | `volume.wlz` | Woolz | Format for the IIP3D slice viewer |
+
+## The production pipeline: `vfb_pipeline.py`
+
+`vfb_pipeline.py` is what runs against the image store. For each image folder it writes **one file**, `precomputed.zip`, next to the source files: a precomputed dataset (`info`, `0/` chunks, `mesh/`) zipped as a single archive that Neuroglancer reads through its zip kvstore with HTTP Range requests:
+
+```
+https://www.virtualflybrain.org/data/VFB/i/0010/1567/VFB_00101567/precomputed.zip|zip:|neuroglancer-precomputed:
+```
+
+What is written depends on what the image **is** (its VFB category, from the KB), because every VFB NRRD is uint8 and the dtype cannot tell a template from a neuron:
+
+| category | KB rule | layer | chunks (`0/`) | mesh |
+|---|---|---|---|---|
+| template | `:Template` individual | `image` | intensities | none |
+| expression | typed by a `VFBexp_*` (GAL4 / split pattern) or `VFBext_*` (fragment) class | `image` | intensities | none |
+| object | everything else: `FBbt_*`-typed neurons, clones, painted domains | `segmentation` | `{0,1}`, segment 1 | `volume_man.obj` if it has faces, else generated from `volume.swc`, else marching cubes on the NRRD |
+
+Without a KB category (filesystem scan, `--ids`) the same decision is made from the data: a `volume_man.obj` with faces or a `volume.swc` means an object; a single-valued mask is an object; intensities are an image.
+
+Axes and units: everything stays X, Y, Z as pynrrd returns it — no transposes, no swaps (OBJ and SWC vertices were checked against the NRRD voxel extents of templates, domains, FlyWire/hemibrain neurons and LM neurons). Source files are in microns; `resolution`, `voxel_offset` (voxel units) and mesh vertices are written in **nanometres**, the unit the precomputed spec defines, so VFB datasets compose with other precomputed sources.
+
+The zip also carries `provenance.json` (pipeline version, category, mesh source, size+mtime of the source files). A re-run skips a folder whose zip was made by the current `PIPELINE_VERSION` from unchanged sources, so the job is idempotent and resumable; bump `PIPELINE_VERSION` to regenerate everything.
+
+Each dataset is built in `--work-dir` (local scratch; a template-sized volume is ~120 MB of raw chunks) and only the finished zip is copied into the image folder, as `precomputed.zip.tmp-<pid>` then renamed — a reader never sees a partial file.
+
+```bash
+# What would be done for everything on JRC2018U, live images only (KB)
+python vfb_pipeline.py --image-root /data --use-kb --template VFB_00101567 --dry-run
+
+# A few folders, building on local scratch
+python vfb_pipeline.py --image-root /data --ids VFB_00101567 VFB_00102107 VFB_jrchk0ew --work-dir /scratch
+
+# A batch file (one id per line), e.g. one Argo task
+python vfb_pipeline.py --image-root /data --ids-file batch.txt --work-dir /scratch
+```
+
+`--layer-type image|segmentation` overrides the per-image decision; `--mask/--mesh-percentile/--decimate-fraction/--mesh-format` only affect the marching-cubes path (objects with no mesh); `--no-compress` leaves an uncompressed `precomputed/` folder for debugging. Discovery needs only HTTP access to `kb.virtualflybrain.org` (read-only, published credentials).
+
+Measured on JRC2018U samples (one core): template 29 MB in 5 s; neurons and painted domains 0.3–0.9 MB in ~2 s; a dense GAL4 line 16 MB in 5 s; an MCFO fragment 6 MB in 3.5 s.
 
 ## VFB Image Categories & Conversion Strategies
 
 There are four distinct categories of VFB images, each requiring a different conversion approach:
 
 ---
+
+(The standalone scripts below predate `vfb_pipeline.py` and are kept for experiments; the production pipeline does not call `convert_templates.py` or `convert_all.py`.)
 
 ### Category A: Templates with Painted Domains (Index Regions)
 
@@ -171,20 +212,18 @@ For each VFB image:
 
 ## Output: Neuroglancer Precomputed Format
 
-All conversion paths produce the same output structure:
+`vfb_pipeline.py` writes `precomputed.zip` (see above) whose entries are:
 
 ```
-output/{vfb_id}/
-  ├── info                  # JSON metadata (type, data_type, scales, resolution)
-  ├── mesh/
-  │   ├── info              # Mesh metadata (@type: neuroglancer_legacy_mesh)
-  │   ├── {seg_id}          # Binary mesh data per segment
-  │   └── {seg_id}:0        # Fragment manifest
-  ├── segment_properties/
-  │   └── info              # Segment labels and descriptions
-  └── 0/                    # Scale level 0 volume chunks (for segmentation types)
-      └── 0-64_0-64_0-64    # Chunk files
+info                  # JSON metadata (type image|segmentation, uint8, one scale, resolution in nm)
+provenance.json       # pipeline version, category, mesh source, source-file stamps
+0/                    # scale-0 chunks, 64^3, raw (absent for a mesh-only object with no NRRD)
+mesh/info             # {"@type": "neuroglancer_legacy_mesh"}      (segmentation only)
+mesh/1:0              # fragment manifest for segment 1
+mesh/1:0:1            # the mesh
 ```
+
+No `segment_properties/`: a VFB image is one object, so there is nothing to label.
 
 ## Requirements
 

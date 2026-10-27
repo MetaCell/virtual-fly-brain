@@ -152,7 +152,7 @@ def process_image(vfb_id: str, template_id: str, category: str,
             download_file(url, tmp_path)
             convert_nrrd(
                 tmp_path, output_dir, vfb_id,
-                merge_segments=True, verbose=verbose,
+                layer_type="auto", verbose=verbose,
             )
         finally:
             os.unlink(tmp_path)

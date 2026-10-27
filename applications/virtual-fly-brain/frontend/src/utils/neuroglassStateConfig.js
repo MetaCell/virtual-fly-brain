@@ -4,23 +4,28 @@ const DEFAULT_CONTRAST_RANGE = [0, 123];
 const neuroglassLayerUrlCache = new Map();
 
 // ─── Coordinate space shared by all VFB instances ────────────────────────────
+// The precomputed datasets are X, Y, Z with resolution and mesh vertices in
+// nanometres (the precomputed spec's unit; the pipeline converts VFB's micron
+// sources), so the shared space is 1 nm per unit on every axis and positions are
+// in nm. JRC2018U is 1210 x 566 x 174 voxels of 0.519 x 0.519 x 1.0 um, so its
+// centre is (314, 147, 87) um. Identity orientation = the anterior view (x right,
+// y down), which is how VFB shows the brain.
 const SHARED_VIEWPORT = {
   dimensions: [
     { name: 'x', scale: [1e-9, 'm'] },
-    { name: 'y', scale: [5.189161e-10, 'm'] },
-    { name: 'z', scale: [5.189161e-10, 'm'] },
+    { name: 'y', scale: [1e-9, 'm'] },
+    { name: 'z', scale: [1e-9, 'm'] },
   ],
-  relativeDisplayScales: { x: 2, y: 2, z: 2 },
-  position: [87.5, 280.5, 605.5],
-  crossSectionScale: 0.5,
-  projectionOrientation: [
-    0.03356223925948143,
-    -0.7611185908317566,
-    -0.049303606152534485,
-    -0.645864725112915,
-  ],
-  projectionScale: 1024,
+  position: [314000, 147000, 87000],
+  crossSectionScale: 500,
+  projectionOrientation: [0, 0, 0, 1],
+  projectionScale: 700000,
 };
+
+// Each image folder holds one precomputed.zip (info, chunks, mesh/) that
+// Neuroglancer reads through its zip kvstore via HTTP Range requests:
+//   https://host/data/VFB/i/0010/1567/VFB_00101567/precomputed.zip|zip:|neuroglancer-precomputed:
+const PRECOMPUTED_ZIP = 'precomputed.zip';
 
 export const NEUROGLASS_DATASOURCE = {
   protocol: import.meta.env.NEUROGLASS_DATA_PROTOCOL,
@@ -62,75 +67,26 @@ function isHttpUrl(baseUrl = '') {
   return baseUrl.startsWith('http://') || baseUrl.startsWith('https://');
 }
 
-async function buildNeuroglassLayerUrl(protocol, baseUrl, instanceId) {
-  let path = instanceId;
+// Default template folder for an instance: the KB knows which template(s) an
+// image is registered to; until that is wired through, JRC2018U is the one
+// every brain image in VFB3 is shown on.
+const DEFAULT_TEMPLATE_ID = 'VFB_00101567';
 
-  // Check if the protocol is 'neuroglancer-precomputed'
+async function buildNeuroglassLayerUrl(protocol, baseUrl, instancePath, templateId = DEFAULT_TEMPLATE_ID) {
   if (protocol === 'neuroglancer-precomputed') {
     if (isObjectStoreUrl(baseUrl)) {
-      return `${baseUrl}/${path}/|${protocol}:`;
+      return `${baseUrl}/${instancePath}/|${protocol}:`;
     }
-
     if (isHttpUrl(baseUrl)) {
-      const url = `${baseUrl}/${path}`;
-      try {
-        // Fetch the folder contents of the URL
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error(`Failed to fetch URL: ${url}`);
-        }
-
-        // Check if the response is HTML
-        const contentType = response.headers.get('Content-Type');
-        if (contentType && contentType.includes('text/html')) {
-          // Parse the HTML response
-          const html = await response.text();
-          const folderNames = extractFolderNamesFromHtml(html);
-
-          // Find the folder starting with VFB_
-          const vfbFolder = folderNames.find((name) => name.startsWith('VFB_'));
-
-          if (vfbFolder) {
-            // Check if the VFB_ folder contains a 'neuroglancer' folder
-            const vfbFolderUrl = `${url}/${vfbFolder}`;
-            const vfbResponse = await fetch(vfbFolderUrl);
-            if (!vfbResponse.ok) {
-              throw new Error(`Failed to fetch VFB folder: ${vfbFolderUrl}`);
-            }
-
-            const vfbHtml = await vfbResponse.text();
-            const vfbFolderNames = extractFolderNamesFromHtml(vfbHtml);
-            const neuroglancerFolder = vfbFolderNames.find(
-              (name) => name === 'neuroglancer/'
-            );
-
-            if (neuroglancerFolder) {
-              return `${vfbFolderUrl}${neuroglancerFolder}|${protocol}:`;
-            }
-          }
-        } else {
-          throw new Error(`Unexpected Content-Type: ${contentType}`);
-        }
-      } catch (error) {
-        console.error(`[buildNeuroglassLayerUrl] Error: ${error.message}`);
-      }
+      // No directory listing round-trips: the layout is fixed, one zip per image folder.
+      return `${baseUrl}/${instancePath}${templateId}/${PRECOMPUTED_ZIP}|zip:|${protocol}:`;
     }
-    return `${baseUrl}/${path}/|${protocol}:`;
+    return `${baseUrl}/${instancePath}/|${protocol}:`;
   }
 
   if (protocol === 'gs' || protocol === 'n5') {
-    return `${baseUrl}/${path}/|${protocol}:`;
+    return `${baseUrl}/${instancePath}/|${protocol}:`;
   }
-}
-
-function extractFolderNamesFromHtml(html) {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, 'text/html');
-  const links = doc.querySelectorAll('a'); // Select all <a> tags
-  const folderNames = Array.from(links)
-    .map((link) => link.textContent.trim()) // Extract text content
-    .filter((name) => name && !name.startsWith('..')); // Exclude parent directory links
-  return folderNames;
 }
 
 // Fixed GLSL shader template : Only shaderControls.color and layer.opacity change per instance.
@@ -209,8 +165,12 @@ function normalizeContrast(inst) {
 async function buildSingleInstanceLayer(inst) {
   const source = await NEUROGLASS_DATASOURCE.buildUrl(inst.metadata.Id);
 
+  // The pipeline writes templates and expression patterns as image layers
+  // (intensities) and neurons/clones/domains as segmentation layers (segment 1
+  // + mesh). 'auto' lets Neuroglancer pick the layer type from the source's
+  // info; the image-only fields are ignored on a segmentation and vice versa.
   const layer = {
-    type: 'image',
+    type: 'auto',
     source: source,
     tab: 'rendering',
     opacity: alphaToOpacity(inst.color?.a),
@@ -222,6 +182,9 @@ async function buildSingleInstanceLayer(inst) {
     },
     volumeRenderingDepthSamples: 256,
     volumeRendering: 'on',
+    // segmentation layers: show the one segment, in the instance colour
+    segments: ['1'],
+    segmentDefaultColor: colorToHex(inst.color),
     name: inst.metadata.Id,
   };
 

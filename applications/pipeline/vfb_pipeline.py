@@ -559,6 +559,8 @@ def process_image(image_dir: str, vfb_id: str, template_id: str, category: str |
 
     nrrd_path = os.path.join(image_dir, "volume.nrrd") if status["has_nrrd"] else None
     lt = layer_type if layer_type != "auto" else decide_layer_type(category, status, nrrd_path)
+    result.update(category=category, layer_type=lt, pipeline_version=PIPELINE_VERSION,
+                  sources=status["sources"])
     needs_obj = lt == "segmentation" and status["has_swc"] and not status["has_obj_man_faces"]
     have_obj = status["has_obj_man_faces"] or needs_obj
     if lt == "segmentation":
@@ -623,9 +625,10 @@ def process_image(image_dir: str, vfb_id: str, template_id: str, category: str |
             shutil.rmtree(final, ignore_errors=True)
             shutil.copytree(out_dir, final)
         result["precomputed_generated"] = True
+        result["bytes"] = os.path.getsize(os.path.join(image_dir, OUTPUT_ZIP)) if compress else None
+        result["seconds"] = round(time.time() - t0, 1)
         log.info("  [%s] wrote %s (%s, %.1f MB) in %.1fs", vfb_id, OUTPUT_ZIP if compress else OUTPUT_NAME, lt,
-                 os.path.getsize(os.path.join(image_dir, OUTPUT_ZIP)) / 1e6 if compress else 0.0,
-                 time.time() - t0)
+                 (result["bytes"] or 0) / 1e6, result["seconds"])
     except Exception as e:
         result["error"] = f"Precomputed generation failed: {e}"
         log.error("  ERROR generating precomputed: %s", e, exc_info=log.isEnabledFor(logging.DEBUG))
@@ -654,6 +657,14 @@ def main():
     g.add_argument("--ids-file", help="File with VFB IDs (one per line; '#' comments)")
     g.add_argument("--use-kb", action="store_true",
                    help="Discover live images (production datasets) and their category from the KB")
+    g.add_argument("--targets-file",
+                   help="TSV of image_dir<TAB>vfb_id<TAB>template_id<TAB>category (as --list-targets "
+                        "writes it): one batch of a planned run, no KB access needed")
+    parser.add_argument("--list-targets", metavar="TSV",
+                        help="Write the discovered targets (after --template filtering and ordering) "
+                             "to this TSV and exit without converting anything")
+    parser.add_argument("--results", metavar="JSONL",
+                        help="Append one JSON line per processed image (status, size, seconds, error)")
     parser.add_argument("--image-root", default=IMAGE_ROOT,
                         help="Directory that contains VFB/i/ (default: %(default)s)")
     parser.add_argument("--work-dir", default=None,
@@ -718,6 +729,13 @@ def main():
             for d in dirs:
                 tid = os.path.basename(d)
                 targets.append((d, vfb_id, tid, CATEGORY_TEMPLATE if vfb_id == tid else None))
+    elif args.targets_file:
+        targets = []
+        with open(args.targets_file) as f:
+            for line in f:
+                if line.strip() and not line.startswith("#"):
+                    d, v, t, c = line.rstrip("\n").split("\t")
+                    targets.append((d, v, t, c or None))
     elif args.use_kb:
         targets = list(iter_kb_template_dirs(args.image_root, args.template))
         seen = {t[0] for t in targets}
@@ -735,6 +753,12 @@ def main():
     targets = _order_targets(targets, args.template or DEFAULT_TEMPLATE_ORDER)
     if not targets:
         log.info("No image directories to process")
+        return
+    if args.list_targets:
+        with open(args.list_targets, "w") as f:
+            for d, v, t, c in targets:
+                f.write(f"{d}\t{v}\t{t}\t{c or ''}\n")
+        log.info("Wrote %d targets to %s", len(targets), args.list_targets)
         return
 
     work_dir = args.work_dir or os.path.join(os.environ.get("TMPDIR", "/tmp"), "vfb-precomputed")
@@ -755,6 +779,9 @@ def main():
         for k in ("obj_generated", "precomputed_generated", "skipped"):
             stats[k] += bool(r[k])
         stats["errors"] += bool(r["error"])
+        if args.results and not args.dry_run:
+            with open(args.results, "a") as f:
+                f.write(json.dumps(r, sort_keys=True) + "\n")
 
     log.info("=" * 60)
     log.info("Pipeline Summary%s", " (DRY RUN)" if args.dry_run else "")

@@ -49,6 +49,8 @@ python vfb_pipeline.py --image-root /data --ids VFB_00101567 VFB_00102107 VFB_jr
 python vfb_pipeline.py --image-root /data --ids-file batch.txt --work-dir /scratch
 ```
 
+For a planned run (one plan pod, many workers): `--use-kb --list-targets targets.tsv` writes the discovered targets with their category (40 s for the 680k JRC2018U images); split that into batches and give each worker `--targets-file batch.tsv --results results.jsonl` — no KB access in the workers, one JSON line per image for the report.
+
 `--layer-type image|segmentation` overrides the per-image decision; `--mask/--mesh-percentile/--decimate-fraction/--mesh-format` only affect the marching-cubes path (objects with no mesh); `--no-compress` leaves an uncompressed `precomputed/` folder for debugging. Discovery needs only HTTP access to `kb.virtualflybrain.org` (read-only, published credentials).
 
 Measured on JRC2018U samples (one core): template 29 MB in 5 s; neurons and painted domains 0.3–0.9 MB in ~2 s; a dense GAL4 line 16 MB in 5 s; an MCFO fragment 6 MB in 3.5 s.

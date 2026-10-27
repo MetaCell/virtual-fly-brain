@@ -91,12 +91,6 @@ VFB_DATA_DIR = os.path.join(IMAGE_ROOT, "VFB", "i")
 # with no volume.nrrd to read the real voxel size from.
 DEFAULT_RESOLUTION = [0.5189161, 0.5189161, 1.0]
 
-# Processing order when --template is not given: these first, in order, then the rest.
-DEFAULT_TEMPLATE_ORDER = [
-    "VFB_00101567",  # JRC2018U / JRC2018Unisex
-    "VFB_00200000",  # JRCVNC2018U / JRC2018UnisexVNC
-]
-
 # Never converted, whatever else is asked for: the FlyEM hemibrain-aligned versions of images are not wanted.
 EXCLUDED_TEMPLATES = {"VFB_00101384"}  # JRC FlyEM Hemibrain
 
@@ -674,13 +668,11 @@ def main():
                         help="Local scratch for building each dataset before its zip is moved into "
                              "the image folder (default: a temp dir). Needs room for one uncompressed "
                              "dataset (a full template-sized image volume is ~120 MB raw chunks).")
-    parser.add_argument("--all-templates", action="store_true",
-                        help="With no --template, process every template instead of only DEFAULT_TEMPLATE_ORDER "
-                             "(excluded templates are still skipped).")
     parser.add_argument("--template", nargs="+", metavar="TEMPLATE_ID",
                         help="Only process images aligned to these template short_forms "
-                             "(e.g. VFB_00101567), in this order. Default: all, JRC2018U and "
-                             "JRCVNC2018U first. The template image itself always goes first.")
+                             "(e.g. VFB_00101567), in this order. Required (except with "
+                             "--targets-file): space is limited, so only alignments named here get a "
+                             "precomputed.zip. The template image itself always goes first.")
     parser.add_argument("--layer-type", choices=["auto", "image", "segmentation"], default="auto",
                         help="Override the per-image decision (default: auto = from the KB category)")
     parser.add_argument("--resolution", type=float, nargs=3, default=DEFAULT_RESOLUTION,
@@ -724,6 +716,9 @@ def main():
                   vfb_data_dir)
         sys.exit(1)
 
+    if not args.template and not args.targets_file:
+        parser.error("--template is required: name the template alignment(s) to convert (e.g. VFB_00101567)")
+
     # Collect (image_dir, vfb_id, template_id, category)
     if args.ids or args.ids_file:
         ids = args.ids or [l.strip() for l in open(args.ids_file) if l.strip() and not l.startswith("#")]
@@ -751,14 +746,14 @@ def main():
         targets = [(d, v, t, CATEGORY_TEMPLATE if v == t else None) for d, v, t in iter_image_dirs(vfb_data_dir)]
         log.info("Found %d image directories", len(targets))
 
-    # Only the templates asked for (default: DEFAULT_TEMPLATE_ORDER; --all-templates for the rest), and never
-    # an excluded one, so an --ids run cannot reach into other templates' alignments of the same image.
-    wanted = set(args.template) if args.template else (None if args.all_templates else set(DEFAULT_TEMPLATE_ORDER))
+    # Only the templates named with --template (space is limited: the operator says which alignments get a
+    # precomputed.zip) and never an excluded one. A --targets-file was already made by a --template run.
+    wanted = set(args.template) if args.template else None
     before = len(targets)
     targets = [t for t in targets if t[2] not in EXCLUDED_TEMPLATES and (wanted is None or t[2] in wanted)]
     log.info("Template filter %s (excluding %s): %d / %d directories match",
-             sorted(wanted) if wanted else "all", sorted(EXCLUDED_TEMPLATES), len(targets), before)
-    targets = _order_targets(targets, args.template or DEFAULT_TEMPLATE_ORDER)
+             sorted(wanted) if wanted else "targets file", sorted(EXCLUDED_TEMPLATES), len(targets), before)
+    targets = _order_targets(targets, args.template or [])
     if not targets:
         log.info("No image directories to process")
         return

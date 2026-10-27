@@ -43,13 +43,15 @@ Each dataset is built in `--work-dir` (local scratch; a template-sized volume is
 python vfb_pipeline.py --image-root /data --use-kb --template VFB_00101567 --dry-run
 
 # A few folders, building on local scratch
-python vfb_pipeline.py --image-root /data --ids VFB_00101567 VFB_00102107 VFB_jrchk0ew --work-dir /scratch
+python vfb_pipeline.py --image-root /data --ids VFB_00101567 VFB_00102107 VFB_jrchk0ew --template VFB_00101567 --work-dir /scratch
 
 # A batch file (one id per line), e.g. one Argo task
-python vfb_pipeline.py --image-root /data --ids-file batch.txt --work-dir /scratch
+python vfb_pipeline.py --image-root /data --ids-file batch.txt --template VFB_00101567 --work-dir /scratch
 ```
 
 For a planned run (one plan pod, many workers): `--use-kb --list-targets targets.tsv` writes the discovered targets with their category (40 s for the 680k JRC2018U images); split that into batches and give each worker `--targets-file batch.tsv --results results.jsonl` — no KB access in the workers, one JSON line per image for the report.
+
+`--template` is required (except with `--targets-file`): space is limited, so only the alignments you name get a `precomputed.zip`. Hemibrain (`VFB_00101384`) alignments are never converted.
 
 `--layer-type image|segmentation` overrides the per-image decision; `--mask/--mesh-percentile/--decimate-fraction/--mesh-format` only affect the marching-cubes path (objects with no mesh); `--no-compress` leaves an uncompressed `precomputed/` folder for debugging. Discovery needs only HTTP access to `kb.virtualflybrain.org` (read-only, published credentials).
 

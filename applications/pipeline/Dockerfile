@@ -17,6 +17,7 @@ RUN grep -vE '^(igneous|zmesh|DracoPy|navis)' requirements.txt > /tmp/req.txt \
     && pip install --no-cache-dir -r /tmp/req.txt
 COPY . /app
 RUN python -c "import numpy, scipy, skimage, trimesh, nrrd, cloudvolume, vfb_pipeline; print('numpy', numpy.__version__)"
-ENV PYTHONUNBUFFERED=1
+# cloud-volume writes ~/.cloudfiles and ~/.cloudvolume; uid 1000 has no home in the image.
+ENV PYTHONUNBUFFERED=1 HOME=/tmp
 USER 1000:1000
 ENTRYPOINT ["python", "/app/vfb_pipeline.py"]

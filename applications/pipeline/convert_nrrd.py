@@ -5,17 +5,20 @@ with a mesh generated from the external volume boundary.
 
 This script:
   1. Reads the NRRD file
-  2. Converts to precomputed format (segmentation or image layer)
-  3. For segmentation data, generates a single mesh from the outer boundary
-     of all non-zero voxels via marching cubes
+  2. Converts to precomputed format as an image layer (intensities kept: templates,
+     expression patterns) or a segmentation layer (every non-zero voxel -> segment 1:
+     neurons, clones, painted domains) -- the caller says which via layer_type, since
+     every VFB NRRD is uint8 and the dtype cannot tell them apart
+  3. For a segmentation, writes one mesh for segment 1: an existing volume_man.obj
+     when supplied, else marching cubes on the outer boundary of the non-zero voxels
 
-Volume conversion approach matches MetaCell/virtual-fly-brain converter.py:
-  - Detects voxel spacing and origin from NRRD header
-  - Writes data as-is (no thresholding/relabeling for integer data)
-  - Writes chunks/mesh fragments uncompressed -- the whole neuroglancer/ output folder is
-    zipped as a single artifact afterward (see mesh_compression/zip_output.py) instead of per-chunk gzip/
-    brotli, so Neuroglancer's client-side zip-kvstore adapter can decompress it without any
-    server-side Content-Encoding hacks.
+  - Axes: data and header are used in pynrrd's X, Y, Z order; nothing is transposed
+  - voxel_offset is written in voxel units, resolution and mesh vertices in nanometres,
+    as the precomputed spec requires (sources are in microns)
+  - Writes chunks/mesh fragments uncompressed -- the whole output folder is zipped as
+    one artifact afterward (see mesh_compression/zip_output.py) instead of per-chunk
+    gzip/brotli, so Neuroglancer's client-side zip-kvstore adapter can decompress it
+    without any server-side Content-Encoding hacks.
 
 Mesh-size reduction (mask cleanup, decimation, Draco) is implemented in
 mesh_compression/ and wired in here -- see mesh_compression/README.md
@@ -70,29 +73,49 @@ def download_file(url: str, dest: str) -> str:
 
 
 def detect_spacing(header: dict) -> list[float]:
+    """Voxel size [x, y, z] in the header's own units (microns for VFB data).
+
+    pynrrd's default index_order="F" returns the data array AND the header's
+    "space directions"/"spacings"/"space origin" in the file's own axis order,
+    which for VFB NRRDs is X, Y, Z (sizes: 1210 566 174 for JRC2018U). Nothing
+    is reversed here -- the earlier [::-1] produced Z,Y,X output (size
+    [174, 566, 1210], resolution [1.0, 0.519, 0.519]) that only lined up with
+    the OBJ meshes because write_precomputed() swapped those to match.
+    """
     if "space directions" in header and header["space directions"] is not None:
         try:
             dirs = header["space directions"]
-            return [float(np.linalg.norm(d)) if d is not None else 1.0 for d in dirs][::-1]
+            return [float(np.linalg.norm(d)) if d is not None else 1.0 for d in dirs]
         except Exception:
             pass
     if "spacings" in header:
         try:
-            return list(map(float, header["spacings"]))[::-1]
+            return list(map(float, header["spacings"]))
         except Exception:
             pass
     return [1.0, 1.0, 1.0]
 
 
 def detect_origin(header: dict) -> list[float]:
-    """Extract space origin from NRRD header and convert to XYZ order."""
+    """Space origin [x, y, z] in the header's own units (microns), same axis
+    order as detect_spacing()."""
     if "space origin" in header and header["space origin"] is not None:
         try:
-            origin = header["space origin"]
-            return [float(x) for x in origin[::-1]]
+            return [float(x) for x in header["space origin"]]
         except Exception:
             pass
     return [0.0, 0.0, 0.0]
+
+
+# Precomputed `resolution` and legacy-mesh vertex positions are in NANOMETRES (the
+# spec's unit); VFB NRRD headers, OBJ and SWC files are in microns.
+NM_PER_UM = 1000.0
+
+
+def origin_to_voxel_offset(origin_um: list[float], voxel_size: list[float]) -> list[int]:
+    """The precomputed `voxel_offset` is in integer VOXEL units at that scale
+    (physical origin = voxel_offset * resolution), not microns."""
+    return [int(round(o / v)) if v else 0 for o, v in zip(origin_um, voxel_size)]
 
 
 def read_nrrd_voxel_size(nrrd_path: str) -> list[float]:
@@ -169,12 +192,9 @@ def convert_nrrd(
     nrrd_path: str,
     output_dir: str,
     dataset_name: str,
-    threshold: float | None = None,
+    layer_type: str = "auto",
     dust_threshold: int = 100,
-    merge_segments: bool = False,
-    min_intensity: int | None = None,
-    max_intensity: int | None = None,
-    generate_mesh: bool = False,
+    generate_mesh: bool = True,
     mask: str = "none",
     mesh_min_intensity: int | None = None,
     mesh_max_intensity: int | None = None,
@@ -183,98 +203,80 @@ def convert_nrrd(
     decimate_fraction: float = 0.0,
     max_simplification_error: int = 10,
     mesh_obj_path: str | None = None,
-    mesh_obj_swap_xz: bool = False,
     verbose: bool = True
-):
-    """Convert an NRRD volume to precomputed format with external-boundary mesh.
+) -> str:
+    """Convert an NRRD volume to precomputed format at {output_dir}/{dataset_name}/.
 
-    The volume is written as-is (matching converter.py behaviour) -- min_intensity/
-    max_intensity zero voxels in the STORED volume (destructive, unrelated to meshing).
-    A single mesh is generated from the outer boundary of non-zero voxels, rather than
-    one mesh per segmented region.
+    layer_type decides what the volume IS, which the voxel dtype cannot (every VFB
+    NRRD is uint8):
+      "image"         -- intensity data (a template brain, a GAL4 expression pattern,
+                         a split-GAL4 line, an MCFO fragment). Values are stored as-is
+                         as a Neuroglancer image layer. No mesh.
+      "segmentation"  -- one object (a neuron, a clone, a painted neuropil domain).
+                         Every non-zero voxel becomes segment 1 and, with
+                         generate_mesh, one mesh for segment 1 is written: from
+                         mesh_obj_path (an existing volume_man.obj, used as-is) when
+                         given, otherwise marching cubes on the mesh mask.
+      "auto"          -- "segmentation" when the volume holds a single non-zero value
+                         (a mask) or a volume_man.obj mesh was supplied, else "image".
+                         Callers that know the VFB category (vfb_pipeline.py, from the
+                         KB) should pass it explicitly rather than rely on this.
 
-    mesh_obj_path: if given (and generate_mesh is True), the mesh is loaded from this
-    OBJ file instead of running marching cubes on the NRRD volume -- mask/mesh_format/
-    decimate_fraction/max_simplification_error are ignored in that case (see
-    _generate_mesh_from_obj). Volume chunks (0/) are still written from the NRRD either
-    way; only the mesh source changes. See vfb_pipeline.py's --mesh-from-obj.
+    Axes: pynrrd (index_order="F") already returns the array as X, Y, Z, which is what
+    CloudVolume expects, so the data is written without any transpose and the header's
+    spacing/origin are used in their own order (see detect_spacing). voxel_offset is
+    written in voxel units (see origin_to_voxel_offset); resolution and mesh vertices
+    in nanometres (NM_PER_UM), as the precomputed spec requires.
 
-    mesh_obj_swap_xz: pass True when mesh_obj_path is a pre-existing external obj built
-    upstream directly off the raw NRRD array (Z,Y,X order) rather than one generated
-    from a .swc file this run -- see vfb_pipeline.write_precomputed()'s swap_xz for the
-    full explanation and how it's determined per-image.
-
-    Everything below mesh-size reduction is OPTIONAL and each choice is independent --
-    see mesh_compression/README.md for the full validation. Three separate decisions,
-    each on its own axis (pick at most one thing per axis; axes combine freely):
-
-      1. generate_mesh: False (default) | True. Whether to generate a mesh from the
-         volume's external boundary at all -- off by default since most instances
-         already ship a usable volume_man.obj (see vfb_pipeline.py) and don't need one
-         regenerated from the NRRD. When True, mesh_obj_path picks the source: an
-         existing volume_man.obj (used as-is) or marching cubes on the NRRD (default).
-      2. mask: "none" (default -- no mask cleanup at all) | "otsu" (automatic threshold,
-         no extra params) | "minmax" (explicit band -- supply mesh_percentile for a
-         per-sample floor, OR mesh_min_intensity/mesh_max_intensity for a fixed band;
-         not both). Pick ONE of otsu/minmax, or leave at "none". Applied exactly as
-         requested -- masking is known to backfire on dense data (e.g. whole-brain
-         templates, confirmed: +23% bigger), so choosing otsu/minmax there is a real
-         risk you're opting into, not something this function protects you from.
-      3. mesh_format: "legacy" (default) | "multires_draco". Pick ONE. Under "legacy",
-         decimate_fraction (default 0.0 = off) optionally simplifies the mesh afterward
-         (pyfqmr, safe on both sparse and dense data). Under "multires_draco",
-         max_simplification_error (default 10) controls Draco's own simplification
-         instead -- decimate_fraction is ignored in that case. Can't combine decimation
-         with Draco (they're different mesh formats), but masking (axis 2) combines
-         freely with either.
+    Mesh-size options (mask / mesh_format / decimate_fraction / max_simplification_error)
+    apply only to the marching-cubes path -- see mesh_compression/README.md. They are
+    ignored when mesh_obj_path supplies the mesh.
     """
     validate_mesh_params(mask, mesh_min_intensity, mesh_max_intensity, mesh_percentile,
                          mesh_format, decimate_fraction, generate_mesh, verbose)
+    if layer_type not in ("auto", "image", "segmentation"):
+        raise ValueError(f"layer_type must be 'auto', 'image' or 'segmentation', got {layer_type!r}")
 
     if verbose:
         print(f"Reading NRRD: {nrrd_path}")
 
-    data, header = nrrd.read(nrrd_path)
+    data, header = nrrd.read(nrrd_path)          # X, Y, Z (pynrrd index_order="F")
     if data.ndim != 3:
         raise RuntimeError(f"Expected 3D volume, got ndim={data.ndim}")
+    arr = np.ascontiguousarray(data)
+    voxel_size_um = detect_spacing(header)
+    voxel_offset = origin_to_voxel_offset(detect_origin(header), voxel_size_um)
+    voxel_size = [v * NM_PER_UM for v in voxel_size_um]     # nm, as the spec requires
 
-    # Transpose from ZYX (NRRD) to XYZ (Neuroglancer)
-    arr = np.transpose(data, (2, 1, 0)).copy()
-    voxel_size = detect_spacing(header)
-    voxel_offset = detect_origin(header)
+    nonzero = np.unique(arr[arr > 0])
+    if layer_type == "auto":
+        layer_type = "segmentation" if (len(nonzero) <= 1 or mesh_obj_path) else "image"
+        if verbose:
+            print(f"  layer_type=auto -> {layer_type} ({len(nonzero)} distinct non-zero values"
+                  f"{', mesh supplied' if mesh_obj_path else ''})")
+
+    if layer_type == "segmentation":
+        # One object per VFB image: collapse whatever values are present to segment 1.
+        # Chunks are stored as uint8 {0, 1}; the mesh is written for segid 1.
+        seg = (arr > 0).astype(np.uint8)
+        if verbose:
+            print(f"  Segmentation: {int(seg.sum())} voxels -> segment 1")
+        intensity_for_mask = arr      # the mesh mask may still use the original intensities
+        arr = seg
 
     if verbose:
         print(f"  Shape (XYZ): {arr.shape}")
-        print(f"  Voxel size:  {voxel_size}")
-        print(f"  Voxel offset: {voxel_offset}")
+        print(f"  Voxel size:  {voxel_size} nm")
+        print(f"  Voxel offset: {voxel_offset} (voxels)")
         print(f"  Dtype:       {arr.dtype}")
-        print(f"  Value range: [{arr.min()}, {arr.max()}]")
-
-    # Apply intensity filtering if specified (for segmentation data)
-    if np.issubdtype(arr.dtype, np.integer):
-        if min_intensity is not None or max_intensity is not None:
-            original_segments = len(np.unique(arr[arr > 0]))
-            if min_intensity is not None:
-                arr[arr < min_intensity] = 0
-            if max_intensity is not None:
-                arr[arr > max_intensity] = 0
-            filtered_segments = len(np.unique(arr[arr > 0]))
-            if verbose:
-                print(f"  Intensity filter: {original_segments} segments -> {filtered_segments} segments")
-                print(f"  Range: [{min_intensity or 'any'}, {max_intensity or 'any'}]")
-
-    # Determine layer type
-    is_segmentation = np.issubdtype(arr.dtype, np.integer)
-    layer_type = "segmentation" if is_segmentation else "image"
-    dtype_str = str(np.dtype(arr.dtype).name)
+        print(f"  Layer type:  {layer_type}")
 
     dest_local = os.path.join(output_dir, dataset_name)
     os.makedirs(dest_local, exist_ok=True)
     dest = f"file://{dest_local}"
 
-    # Write precomputed volume
     info = {
-        "data_type": dtype_str,
+        "data_type": str(np.dtype(arr.dtype).name),
         "num_channels": 1,
         "scales": [{
             "chunk_sizes": [[64, 64, 64]],
@@ -286,15 +288,9 @@ def convert_nrrd(
         }],
         "type": layer_type,
     }
-
-    if is_segmentation and generate_mesh:
+    if layer_type == "segmentation" and generate_mesh:
         # Only declare a mesh directory when we're actually going to write one --
-        # otherwise Neuroglancer requests neuroglancer/mesh/info and gets a 404
-        # (see _generate_external_mesh/_generate_draco_mesh for what populates it).
-        # segment_properties is NOT declared: our mesh is always a single merged
-        # blob with a placeholder label ("Segment N"), never real per-segment
-        # labels, so a segment_properties list would be misleading rather than
-        # informative (see NEUROGLANCER_STANDARDIZATION.md item 3).
+        # otherwise Neuroglancer requests mesh/info and gets a 404.
         info["mesh"] = "mesh"
 
     vol = CloudVolume(dest, mip=0, info=info, compress=False)
@@ -303,38 +299,18 @@ def convert_nrrd(
 
     if verbose:
         print(f"  Wrote precomputed volume to {dest_local}")
-        print(f"  Layer type: {layer_type}")
 
-    # Generate mesh from the external boundary of all non-zero voxels, or from an
-    # existing volume_man.obj if mesh_obj_path was given
-    if is_segmentation:
-        if generate_mesh and mesh_obj_path:
-            if verbose:
-                touched = []
-                if mask != "none":
-                    touched.append(f"--mask {mask}")
-                if mesh_format != "legacy":
-                    touched.append(f"--mesh-format {mesh_format}")
-                if decimate_fraction > 0:
-                    touched.append("--decimate-fraction")
-                if mesh_min_intensity is not None or mesh_max_intensity is not None or mesh_percentile is not None:
-                    touched.append("--mesh-min-intensity/--mesh-max-intensity/--mesh-percentile")
-                if touched:
-                    print(f"  WARNING: mesh_obj_path set -- {', '.join(touched)} will have no "
-                          f"effect (mesh sourced from {mesh_obj_path}, no marching cubes step runs).")
-            _generate_mesh_from_obj(mesh_obj_path, arr, dest_local, vol, verbose,
-                                     swap_xz=mesh_obj_swap_xz)
-        elif generate_mesh:
+    if layer_type == "segmentation" and generate_mesh:
+        if mesh_obj_path:
+            _generate_mesh_from_obj(mesh_obj_path, dest_local, vol, verbose)
+        else:
             _generate_external_mesh(
-                arr, dest_local, vol, voxel_size, voxel_offset, dust_threshold, verbose,
+                intensity_for_mask, dest_local, vol, voxel_size, voxel_offset, dust_threshold, verbose,
                 mask=mask,
                 mesh_min_intensity=mesh_min_intensity, mesh_max_intensity=mesh_max_intensity,
                 mesh_percentile=mesh_percentile, mesh_format=mesh_format,
                 decimate_fraction=decimate_fraction, max_simplification_error=max_simplification_error,
             )
-        else:
-            if verbose:
-                print("  generate_mesh=False, skipping mesh generation")
 
     return dest_local
 
@@ -406,9 +382,10 @@ def _generate_external_mesh(arr, dest_local, vol, voxel_size, voxel_offset, dust
                             mask="none", mesh_min_intensity=None, mesh_max_intensity=None,
                             mesh_percentile=None, mesh_format="legacy",
                             decimate_fraction=0.0, max_simplification_error=10):
-    """Generate a single mesh from the outer boundary of the mesh mask (see
-    _select_mesh_mask). A single mesh with segment ID = the lowest non-zero segment ID
-    present, vertices transformed to physical coordinates including voxel_offset.
+    """Generate a single mesh (segment ID 1) from the outer boundary of the mesh mask
+    (see _select_mesh_mask), vertices in physical units including voxel_offset.
+    `arr` is the ORIGINAL intensity volume so percentile/otsu masks still mean
+    something; the stored segmentation is always {0, 1}.
     """
 
     if mesh_format == "legacy":
@@ -428,9 +405,7 @@ def _generate_external_mesh(arr, dest_local, vol, voxel_size, voxel_offset, dust
             print(f"  Skipping mesh: only {voxel_count} non-zero voxels (< {dust_threshold})")
         return
 
-    all_segments = np.unique(arr)
-    all_segments = all_segments[all_segments > 0]
-    mesh_seg_id = int(all_segments[0])
+    mesh_seg_id = 1          # the stored segmentation is {0, 1} -- see convert_nrrd()
 
     if mesh_format == "multires_draco":
         _generate_draco_mesh(
@@ -456,11 +431,10 @@ def _generate_external_mesh(arr, dest_local, vol, voxel_size, voxel_offset, dust
             print("  Merged mesh has no geometry")
         return
 
-    # Transform vertices to physical coordinates (resolution + offset)
+    # Transform vertices to physical coordinates: (voxel index + voxel_offset) * resolution
     vertices = vertices.astype(np.float32)
-    vertices[:, 0] = vertices[:, 0] * voxel_size[0] + voxel_offset[0]
-    vertices[:, 1] = vertices[:, 1] * voxel_size[1] + voxel_offset[1]
-    vertices[:, 2] = vertices[:, 2] * voxel_size[2] + voxel_offset[2]
+    for ax in range(3):
+        vertices[:, ax] = (vertices[:, ax] + voxel_offset[ax]) * voxel_size[ax]
     faces = faces.astype(np.uint32)
 
     if verbose:
@@ -481,52 +455,25 @@ def _generate_external_mesh(arr, dest_local, vol, voxel_size, voxel_offset, dust
         print(f"  Wrote merged external boundary mesh (segment ID {mesh_seg_id})")
 
 
-def _generate_mesh_from_obj(obj_path, arr, dest_local, vol, verbose, swap_xz=False):
+def _generate_mesh_from_obj(obj_path, dest_local, vol, verbose):
     """Use an existing volume_man.obj as the mesh source instead of marching cubes
-    on the NRRD volume (see vfb_pipeline.py's --mesh-from-obj). The OBJ is used
-    as-is -- mask/mesh_format/decimate_fraction/max_simplification_error don't apply
-    here, only to the marching-cubes path in _generate_external_mesh.
-
-    swap_xz: True for a pre-existing external obj stored in NRRD's native (Z, Y, X)
-    order instead of (X, Y, Z) -- see vfb_pipeline.write_precomputed()'s swap_xz.
+    on the NRRD volume. The OBJ is used as-is: VFB OBJ vertices are X, Y, Z in
+    microns (checked against the NRRD voxel extents of templates, painted domains,
+    FlyWire/hemibrain neurons and LM neurons -- all agree): same axis order as the
+    volume, so no swap; scaled um -> nm to match the volume's resolution.
+    mask/mesh_format/decimate_fraction/max_simplification_error don't apply here.
     """
     _setup_mesh_metadata(dest_local, vol, verbose)
-
     mesh = trimesh.load(obj_path, force="mesh")
     if not isinstance(mesh, trimesh.Trimesh):
         raise ValueError(f"Could not load as triangle mesh: {obj_path}")
-
-    if swap_xz:
-        mesh.vertices = mesh.vertices[:, [2, 1, 0]]
-
-    all_segments = np.unique(arr)
-    all_segments = all_segments[all_segments > 0]
-    if len(all_segments) == 0:
-        if verbose:
-            print("  No non-zero voxels found, skipping mesh generation")
-        return
-    mesh_seg_id = int(all_segments[0])
-
-    # OBJ vertices are physical microns, same as this dataset's voxel_size (detected
-    # straight from the NRRD header's "space directions"/"spacings", themselves in
-    # microns -- see detect_spacing() and README.md's template voxel-size table, e.g.
-    # JRC2018Unisex 0.519 um). No unit conversion here: unlike vfb_pipeline's standalone
-    # write_precomputed() (OBJ-only path, no NRRD to read a voxel_size from -- it uses
-    # a hardcoded nm-scale resolution and therefore multiplies vertices by 1000 to
-    # bridge um->nm), this vol's resolution field is already in the same microns as the
-    # OBJ. Applying that *1000.0 here would make the mesh ~1000x too big relative to
-    # this volume's own grid.
-    vertices = mesh.vertices.astype(np.float32)
+    vertices = (mesh.vertices * NM_PER_UM).astype(np.float32)     # um -> nm
     faces = mesh.faces.astype(np.uint32)
-
     if verbose:
         print(f"  Using mesh from {obj_path}: {len(vertices)} vertices, {len(faces)} faces")
-
-    mesh_obj = Mesh(vertices, faces, segid=mesh_seg_id)
-    vol.mesh.put(mesh_obj, compress=False)
-
+    vol.mesh.put(Mesh(vertices, faces, segid=1), compress=False)
     if verbose:
-        print(f"  Wrote mesh from volume_man.obj (segment ID {mesh_seg_id})")
+        print("  Wrote mesh from volume_man.obj (segment ID 1)")
 
 
 def _generate_draco_mesh(
@@ -618,22 +565,19 @@ def main():
                         help="Output directory for precomputed datasets")
     parser.add_argument("--dataset-name", default=None,
                         help="Name for the output dataset (default: derived from input)")
-    parser.add_argument("--threshold", type=float, default=None,
-                        help="(unused, kept for CLI compatibility)")
+    parser.add_argument("--layer-type", choices=["auto", "image", "segmentation"], default="auto",
+                        help="What the volume is (see convert_nrrd()): 'image' keeps the intensities "
+                             "(templates, expression patterns); 'segmentation' makes every non-zero "
+                             "voxel segment 1 and writes one mesh (neurons, clones, domains); "
+                             "'auto' (default) picks segmentation for a single-valued mask or when "
+                             "--mesh-obj is given, else image.")
+    parser.add_argument("--mesh-obj", default=None,
+                        help="Existing volume_man.obj to use as the segment-1 mesh instead of "
+                             "marching cubes (segmentation only).")
     parser.add_argument("--dust-threshold", type=int, default=100,
                         help="Minimum voxel count for mesh generation (default: 100)")
-    parser.add_argument("--merge-segments", action="store_true",
-                        help="(unused, kept for CLI compatibility)")
-    parser.add_argument("--min-intensity", type=int, default=None,
-                        help="Minimum segment ID/intensity to keep in the STORED volume "
-                             "(destructive, values below will be set to 0)")
-    parser.add_argument("--max-intensity", type=int, default=None,
-                        help="Maximum segment ID/intensity to keep in the STORED volume "
-                             "(destructive, values above will be set to 0)")
-    parser.add_argument("--generate-mesh", action="store_true",
-                        help="Generate a marching-cubes mesh from the NRRD volume's external "
-                             "boundary (default: off). Independent of --mesh-format/--mask/"
-                             "--decimate-fraction/etc, which only take effect when this is set.")
+    parser.add_argument("--no-mesh", action="store_true",
+                        help="Segmentation only: write the chunks but no mesh.")
     parser.add_argument("--mask", choices=["none", "otsu", "minmax"], default="none",
                         help="OPTIONAL. 'none' (default): no mask cleanup. 'otsu': automatic "
                              "threshold, no extra params needed. 'minmax': explicit intensity "
@@ -665,10 +609,9 @@ def main():
                         help="Regenerate even if --output-dir/--dataset-name already has an "
                              "info file (default: skip existing results without touching them)")
     parser.add_argument("--compress", action="store_true",
-                        help="Zip the output neuroglancer/ folder into a single artifact "
-                             "(default: off, leaves the raw uncompressed tree as-is). "
-                             "No gzip/brotli choice anymore -- if set, this simply zips the "
-                             "whole folder; see mesh_compression/zip_output.py.")
+                        help="Zip the output folder into a single <dataset-name>.zip artifact "
+                             "(default: off, leaves the raw uncompressed tree as-is); see "
+                             "mesh_compression/zip_output.py.")
     parser.add_argument("--verbose", action="store_true")
     args = parser.parse_args()
 
@@ -678,7 +621,7 @@ def main():
     try:
         validate_mesh_params(args.mask, args.mesh_min_intensity, args.mesh_max_intensity,
                               args.mesh_percentile, args.mesh_format, args.decimate_fraction,
-                              args.generate_mesh, args.verbose)
+                              not args.no_mesh, args.verbose)
     except ValueError as e:
         parser.error(str(e))
 
@@ -718,12 +661,10 @@ def main():
     try:
         dest_local = convert_nrrd(
             nrrd_path, output_dir, dataset_name,
-            threshold=args.threshold,
+            layer_type=args.layer_type,
             dust_threshold=args.dust_threshold,
-            merge_segments=args.merge_segments,
-            min_intensity=args.min_intensity,
-            max_intensity=args.max_intensity,
-            generate_mesh=args.generate_mesh,
+            generate_mesh=not args.no_mesh,
+            mesh_obj_path=args.mesh_obj,
             mask=args.mask,
             mesh_min_intensity=args.mesh_min_intensity,
             mesh_max_intensity=args.mesh_max_intensity,

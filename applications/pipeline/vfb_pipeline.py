@@ -97,6 +97,9 @@ DEFAULT_TEMPLATE_ORDER = [
     "VFB_00200000",  # JRCVNC2018U / JRC2018UnisexVNC
 ]
 
+# Never converted, whatever else is asked for: the FlyEM hemibrain-aligned versions of images are not wanted.
+EXCLUDED_TEMPLATES = {"VFB_00101384"}  # JRC FlyEM Hemibrain
+
 KB_ENDPOINT = os.environ.get("VFB_KB", "http://kb.virtualflybrain.org")
 KB_USER = "neo4j"          # the published read-only pair
 KB_PASSWORD = "vfb"
@@ -671,6 +674,9 @@ def main():
                         help="Local scratch for building each dataset before its zip is moved into "
                              "the image folder (default: a temp dir). Needs room for one uncompressed "
                              "dataset (a full template-sized image volume is ~120 MB raw chunks).")
+    parser.add_argument("--all-templates", action="store_true",
+                        help="With no --template, process every template instead of only DEFAULT_TEMPLATE_ORDER "
+                             "(excluded templates are still skipped).")
     parser.add_argument("--template", nargs="+", metavar="TEMPLATE_ID",
                         help="Only process images aligned to these template short_forms "
                              "(e.g. VFB_00101567), in this order. Default: all, JRC2018U and "
@@ -745,11 +751,13 @@ def main():
         targets = [(d, v, t, CATEGORY_TEMPLATE if v == t else None) for d, v, t in iter_image_dirs(vfb_data_dir)]
         log.info("Found %d image directories", len(targets))
 
-    if args.template:
-        wanted = set(args.template)
-        before = len(targets)
-        targets = [t for t in targets if t[2] in wanted]
-        log.info("Template filter %s: %d / %d directories match", sorted(wanted), len(targets), before)
+    # Only the templates asked for (default: DEFAULT_TEMPLATE_ORDER; --all-templates for the rest), and never
+    # an excluded one, so an --ids run cannot reach into other templates' alignments of the same image.
+    wanted = set(args.template) if args.template else (None if args.all_templates else set(DEFAULT_TEMPLATE_ORDER))
+    before = len(targets)
+    targets = [t for t in targets if t[2] not in EXCLUDED_TEMPLATES and (wanted is None or t[2] in wanted)]
+    log.info("Template filter %s (excluding %s): %d / %d directories match",
+             sorted(wanted) if wanted else "all", sorted(EXCLUDED_TEMPLATES), len(targets), before)
     targets = _order_targets(targets, args.template or DEFAULT_TEMPLATE_ORDER)
     if not targets:
         log.info("No image directories to process")
